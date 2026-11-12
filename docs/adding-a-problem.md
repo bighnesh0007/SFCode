@@ -13,6 +13,10 @@ mistakes before review.
 | `apex` | Challenge Arena | classes and/or triggers | your hidden Apex test class |
 | `debug` | Debugging Arena | a fix to the **buggy starter** | your hidden Apex test class |
 | `soql` | SOQL Practice | one SOQL query (`query.soql`) | comparing its rows with your reference query's rows |
+| `flow` | Flows | nothing on SFCode: they **build the flow in their own org** | your hidden Apex test class, which fires the flow |
+| `lwc` | LWC | a component's `.html`, `.js`, `.css` | your browser tests, run in a sandboxed iframe |
+
+Flow and LWC problems have their own folder layouts; see the sections at the end.
 
 ## 2. Create the folder
 
@@ -40,8 +44,8 @@ Copy a similar existing problem and edit it. `problem.json`:
 }
 ```
 
-`order` must be unique (Apex 1–99, SOQL 101+, debug 201+). SOQL problems use
-`"files": [{ "name": "query", "type": "soql" }]`.
+`order` must be unique (Apex 1–99, SOQL 101+, debug 201+, flow 301+, LWC 401+).
+SOQL problems use `"files": [{ "name": "query", "type": "soql" }]`.
 
 ## 3. Rules the loader enforces
 
@@ -75,3 +79,59 @@ npm run verify:problems -w sfcode-server -- --user <your Clerk user id> my-probl
 `verify:problems` needs a connected Salesforce org (see README). It grades your
 `reference/` (must be **accepted**) and your `starter/` (must **not** be) through
 the real grader. If you can't run it, say so in the PR and a maintainer will.
+
+## Flow problems
+
+The learner builds the flow in **their own org's Flow Builder**; SFCode only
+deploys your hidden test class (check-only), which fires their active flow.
+
+```
+server/problems/flow-my-problem/
+  problem.json      # "track": "flow", "files": [], "flow": { "apiName": "SFC_…", "kind": "record-triggered" | "autolaunched" }
+  statement.md      # a table of exact settings: API name, object, trigger, optimize-for; variable names for autolaunched
+  reference/SFC_….flow-meta.xml   # a working, ACTIVE flow; only verify:problems deploys it
+  tests/<TestClass>.cls
+```
+
+- The flow API name starts with **`SFC_`**. The statement must give it exactly; the
+  tests find the flow by name.
+- Record-triggered: tests do DML and assert the result. Autolaunched: tests call
+  `Flow.Interview.createInterview('SFC_…', inputs)`, `.start()`, then read
+  `getVariableValue('…')`. See `flow-shipping-cost`.
+- The easiest way to get the reference XML is to build the flow in a Developer
+  Edition org and retrieve it (`sf project retrieve start -m Flow:SFC_…`).
+- `verify:problems` deploys the reference plus the tests (must be accepted) and the
+  tests alone (must fail; that proves they depend on the flow).
+
+## LWC problems
+
+The component is compiled by SFCode's server and runs, with its tests, in a
+sandboxed iframe **in the learner's browser**. No org is involved.
+
+```
+server/problems/lwc-my-problem/
+  problem.json      # "track": "lwc", "files": [], "lwc": { "component": "myThing" }   (no testClass)
+  statement.md
+  starter/myThing.html  myThing.js  myThing.css   (all three, CSS may be empty)
+  reference/myThing.html myThing.js myThing.css
+  tests/myThing.test.js
+```
+
+The test file defines `const tests = [...]`. Each test is
+`{ name, async run({ mount, q, qa, flush, assert, equal }) }`:
+
+| Helper | Does |
+|---|---|
+| `mount(props)` | creates a fresh component with those `@api` props and attaches it |
+| `q(el, sel)` / `qa(el, sel)` | `querySelector` / `querySelectorAll` (as an array) inside its shadow root |
+| `flush()` | waits for the component to re-render after a change |
+| `assert(cond, msg)`, `equal(actual, expected, msg)` | fail the test with a readable message |
+
+- Write failure messages for the learner: *"Expected one li.contact per contact"*
+  beats a bare `expected 5, got 0`.
+- Salesforce's `lightning-*` base components aren't available; use plain HTML.
+- The tests are visible to a determined learner (they run in their browser). That's
+  fine for practice; don't rely on them being secret.
+- Prove it in a browser: open the problem, put the reference in the editor, and
+  check **Run tests** passes; with the starter it must fail. (`verify:problems`
+  only checks that both compile.)
