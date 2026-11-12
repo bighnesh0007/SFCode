@@ -162,7 +162,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
   const canSubmit = org.kind === "connected" && !submitting && submission?.status !== "running";
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] flex-col">
+    <div className="flex h-[calc(100vh-3rem)] flex-col">
       <ResizablePanelGroup orientation="horizontal" className="flex-1">
         {/* ── statement / submissions ─────────────────────────────────── */}
         <ResizablePanel defaultSize="40%" minSize="25%">
@@ -325,7 +325,7 @@ function OrgGate({ org }: { org: ReturnType<typeof useOrgConnection>["state"] })
     case "connected":
       return (
         <span className="hidden items-center gap-1 text-xs text-muted-foreground lg:flex" title={org.connection.orgId}>
-          <Cloud className="h-3.5 w-3.5 text-sky-500" /> {org.connection.username}
+          <span className="h-1.5 w-1.5 rounded-full bg-green-500" aria-hidden="true" /> {org.connection.username}
         </span>
       );
   }
