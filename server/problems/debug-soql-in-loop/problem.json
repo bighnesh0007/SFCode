@@ -1,0 +1,3 @@
+{ "title": "Too Many SOQL Queries", "track": "debug", "difficulty": "Medium", "category": "Governor Limits", "order": 201,
+  "tags": ["SOQL in a loop", "bulkification", "LimitException"],
+  "files": [{ "name": "SfcContactAccountName", "type": "trigger" }], "testClass": "SfcContactAccountNameTest" }

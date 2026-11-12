@@ -1,0 +1,3 @@
+{ "title": "Maximum Trigger Depth Exceeded", "track": "debug", "difficulty": "Medium", "category": "Trigger Recursion", "order": 203,
+  "tags": ["recursion", "before vs after", "DML in trigger"],
+  "files": [{ "name": "SfcAccountStamp", "type": "trigger" }], "testClass": "SfcAccountStampTest" }

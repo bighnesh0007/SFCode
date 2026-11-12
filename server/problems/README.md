@@ -17,6 +17,8 @@ Rules:
 - Hidden tests must not depend on org data (no `SeeAllData=true`) and must cover
   the reference solution well above 75%: a check-only deploy with
   `RunSpecifiedTests` fails any class or trigger under 75% coverage.
+- Never filter on a long text area (e.g. `Description`) in a test's `WHERE` — it
+  is a query error, so every submission would fail. Count in Apex instead.
 - Prefix every class/trigger name with `Sfc` so it cannot collide with
   something already in the learner's org.
 - A reference solution is only proven by running it: `npm run verify:problems`

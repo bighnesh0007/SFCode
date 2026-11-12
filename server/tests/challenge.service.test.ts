@@ -62,7 +62,8 @@ describe("ChallengeService — what clients can see", () => {
     expect((await service.list(null, "soql")).every((c) => c.track === "soql")).toBe(true);
     expect((await service.list(null, "soql")).length).toBe(5);
     expect((await service.list(null, "apex")).length).toBe(6);
-    expect((await service.list(null)).length).toBe(11);
+    expect((await service.list(null, "debug")).length).toBe(4);
+    expect((await service.list(null)).length).toBe(15);
   });
 
   it("404s unknown problems", () => {

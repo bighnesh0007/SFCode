@@ -8,7 +8,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
-import type { ApexFileType, Challenge, ChallengeFile } from "../../domain/challenge.ts";
+import { TRACKS, type ApexFileType, type Challenge, type ChallengeFile } from "../../domain/challenge.ts";
 import { DIFFICULTY_IDS } from "../../domain/difficulty.ts";
 
 // Apex identifiers; the `Sfc` prefix keeps them clear of names already in a learner's org.
@@ -31,7 +31,7 @@ const soqlFile = z.strictObject({ name: z.literal("query"), type: z.literal("soq
 
 const problemJson = z.strictObject({
   title: z.string().min(3).max(120),
-  track: z.enum(["apex", "soql"]).default("apex"),
+  track: z.enum(TRACKS).default("apex"),
   difficulty: z.enum(DIFFICULTY_IDS),
   category: z.string().min(2).max(40),
   order: z.number().int().positive(),
@@ -80,6 +80,9 @@ export function loadChallenge(root: string, slug: string): Challenge {
   const testSource = readFileSync(testPath, "utf8");
   if (!/@isTest/i.test(testSource)) throw new Error(`${where}: hidden test class has no @isTest`);
   if (/SeeAllData\s*=\s*true/i.test(testSource)) throw new Error(`${where}: hidden tests must not use SeeAllData=true`);
+  // Long text areas cannot be filtered in SOQL; such a test fails for every
+  // submission, correct or not. Description is the one problems reach for.
+  if (/\bWHERE\b[^\]]*\bDescription\b/i.test(testSource)) throw new Error(`${where}: hidden tests filter on Description (a long text area — not filterable)`);
 
   const starter = readSources(join(dir, "starter"), meta.files, `${where}/starter`);
   const reference = readSources(join(dir, "reference"), meta.files, `${where}/reference`);
@@ -94,6 +97,10 @@ export function loadChallenge(root: string, slug: string): Challenge {
     for (const [label, src] of [["starter", starter], ["reference", reference]] as const) {
       if (!decl.test(src[f.name] ?? "")) throw new Error(`${where}/${label}/${f.name}: does not declare ${f.type} ${f.name}`);
     }
+  }
+
+  if (meta.track === "debug" && meta.files.every((f) => starter[f.name]?.trim() === reference[f.name]?.trim())) {
+    throw new Error(`${where}: a debugging problem's starter must contain the bug (it equals the reference)`);
   }
 
   if (meta.track === "soql") {

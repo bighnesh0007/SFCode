@@ -2,8 +2,9 @@
 import type { Difficulty } from "./difficulty.ts";
 
 export type ApexFileType = "class" | "trigger" | "soql";
-/** Which practice area a problem belongs to (Challenge Arena vs SOQL Practice). */
-export type Track = "apex" | "soql";
+/** Practice areas. The one list: catalog validation and the API schema both read it. */
+export const TRACKS = ["apex", "soql", "debug"] as const;
+export type Track = (typeof TRACKS)[number];
 
 export interface ChallengeFile {
   name: string;

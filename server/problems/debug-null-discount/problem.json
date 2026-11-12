@@ -1,0 +1,3 @@
+{ "title": "The Discount That Crashes", "track": "debug", "difficulty": "Easy", "category": "Null Safety", "order": 202,
+  "tags": ["NullPointerException", "Decimal"],
+  "files": [{ "name": "SfcDiscount", "type": "class" }], "testClass": "SfcDiscountTest" }

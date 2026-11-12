@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TRACKS } from "../domain/challenge.ts";
 import { MAX_FILE_CHARS } from "../services/challenges/challenge.service.ts";
 
 export const slugParams = z.strictObject({ slug: z.string().regex(/^[a-z0-9-]{1,80}$/) });
@@ -13,5 +14,5 @@ export const submitBody = z.strictObject({
 });
 export type SubmitBody = z.infer<typeof submitBody>;
 
-export const listQuery = z.object({ track: z.enum(["apex", "soql"]).optional() });
+export const listQuery = z.object({ track: z.enum(TRACKS).optional() });
 export type ListQuery = z.infer<typeof listQuery>;

@@ -21,6 +21,10 @@ describe("the shipped problems", () => {
       "soql-accounts-without-contacts",
       "soql-pipeline-by-stage",
       "soql-accounts-with-won-deals",
+      "debug-soql-in-loop",
+      "debug-null-discount",
+      "debug-recursive-trigger",
+      "debug-off-by-one-buckets",
     ]);
   });
 });
@@ -56,6 +60,12 @@ describe("loadChallenge rejects broken problems", () => {
     const p = fresh();
     writeFileSync(join(p, "tests", "SfcTextUtilsTest.cls"), "@isTest(SeeAllData=true) private class SfcTextUtilsTest {}");
     expect(() => loadChallenge(dir, "text-utils")).toThrow(/SeeAllData/);
+  });
+
+  it("hidden tests that filter on a long text area", () => {
+    const p = fresh();
+    writeFileSync(join(p, "tests", "SfcTextUtilsTest.cls"), "@isTest private class SfcTextUtilsTest { static void t() { Integer n = [SELECT COUNT() FROM Account WHERE Description = 'x']; } }");
+    expect(() => loadChallenge(dir, "text-utils")).toThrow(/long text area/);
   });
 
   it("names without the Sfc prefix", () => {
@@ -113,6 +123,20 @@ describe("SOQL problem rules", () => {
     const c = ChallengeCatalog.load(PROBLEMS_DIR).get("soql-contacts-in-city");
     if (!c) throw new Error("fixture");
     expect(() => new ChallengeCatalog([c], "")).toThrow(/soqlCompare.apex/);
+  });
+});
+
+describe("debugging problems", () => {
+  it("must ship a starter that differs from the reference", () => {
+    const dir = mkdtempSync(join(tmpdir(), "sfc-debug-"));
+    try {
+      cpSync(join(PROBLEMS_DIR, "debug-null-discount"), join(dir, "debug-null-discount"), { recursive: true });
+      const p = join(dir, "debug-null-discount");
+      writeFileSync(join(p, "starter", "SfcDiscount.cls"), readFileSync(join(p, "reference", "SfcDiscount.cls"), "utf8"));
+      expect(() => loadChallenge(dir, "debug-null-discount")).toThrow(/must contain the bug/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });
 

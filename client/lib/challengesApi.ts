@@ -4,7 +4,8 @@ import { apiRequest } from "./apiClient";
 type Token = string | null;
 
 export type Tone = "green" | "amber" | "red";
-export type Track = "apex" | "soql";
+// Mirrors server/src/domain/challenge.ts TRACKS.
+export type Track = "apex" | "soql" | "debug";
 export interface DifficultyDef {
   id: string;
   rank: number;
