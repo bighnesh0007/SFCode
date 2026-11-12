@@ -8,7 +8,7 @@
  * inputs are size-limited, at most MAX_CONCURRENT compiles run at once, and
  * each has a deadline.
  */
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { rollup } from "rollup";
@@ -49,6 +49,25 @@ export interface LwcSource {
 
 let running = 0;
 
+/**
+ * Compiled bundles by content hash. Learners re-run unchanged code constantly
+ * (Run tests, Preview, Run tests again), and each compile costs ~1s of CPU.
+ * In-process LRU: the server is a single instance; a shared cache (Redis)
+ * only pays off once there are several. ~350 KB per entry.
+ */
+const CACHE_LIMIT = 64;
+const cache = new Map<string, string>();
+
+function cacheKey(src: LwcSource): string {
+  // Lengths are included so field boundaries can't be shifted to collide.
+  const parts = [src.component, src.html, src.js, src.css];
+  return createHash("sha256").update(parts.map((p) => `${p.length}:${p}`).join("|")).digest("hex");
+}
+
+export function lwcCacheSize(): number {
+  return cache.size;
+}
+
 /** Strip the work-dir path out of compiler messages: it's ours, not the learner's. */
 function cleanMessage(message: string, dir: string, component: string): string {
   return message.split(join(dir, "modules", "c", component) + "/").join("").split(dir).join("").slice(0, 2000);
@@ -58,6 +77,14 @@ export async function compileLwc(src: LwcSource): Promise<string> {
   if (!COMPONENT_NAME.test(src.component)) throw new LwcCompileError("Invalid component name.");
   for (const [kind, text] of [["html", src.html], ["js", src.js], ["css", src.css]] as const) {
     if (text.length > MAX_FILE_CHARS) throw new LwcCompileError(`The ${kind} file is longer than ${MAX_FILE_CHARS} characters.`);
+  }
+  const key = cacheKey(src);
+  const hit = cache.get(key);
+  if (hit !== undefined) {
+    // Re-insert to mark as most recently used.
+    cache.delete(key);
+    cache.set(key, hit);
+    return hit;
   }
   if (running >= MAX_CONCURRENT) throw new CompilerBusyError();
   running++;
@@ -92,7 +119,13 @@ export async function compileLwc(src: LwcSource): Promise<string> {
       timer = setTimeout(() => reject(new LwcCompileError("Compiling took too long.")), DEADLINE_MS);
     });
     try {
-      return await Promise.race([build, deadline]);
+      const code = await Promise.race([build, deadline]);
+      cache.set(key, code);
+      if (cache.size > CACHE_LIMIT) {
+        const oldest = cache.keys().next().value;
+        if (oldest !== undefined) cache.delete(oldest);
+      }
+      return code;
     } catch (err) {
       if (err instanceof AppError) throw err;
       throw new LwcCompileError(cleanMessage(err instanceof Error ? err.message : String(err), dir, src.component));

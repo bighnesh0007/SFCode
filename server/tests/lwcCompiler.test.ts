@@ -32,3 +32,27 @@ describe("compileLwc", () => {
     await expect(compileLwc({ ...ok, component: "../evil" })).rejects.toThrow(/Invalid component name/);
   });
 });
+
+describe("compile cache", () => {
+  it("serves identical source from cache, and recompiles on any change", async () => {
+    const src = { ...ok, html: `<template><p>cache {name}</p></template>` };
+    const t0 = performance.now();
+    const first = await compileLwc(src);
+    const cold = performance.now() - t0;
+    const t1 = performance.now();
+    const second = await compileLwc({ ...src });
+    const warm = performance.now() - t1;
+    expect(second).toBe(first);
+    expect(warm).toBeLessThan(cold / 10);
+    const changed = await compileLwc({ ...src, css: ".x { color: blue; }" });
+    expect(changed).not.toBe(first);
+    expect(changed).toContain("color: blue");
+  }, 60_000);
+
+  it("doesn't cache failed compiles", async () => {
+    const { lwcCacheSize } = await import("../src/services/lwc/compiler.ts");
+    const before = lwcCacheSize();
+    await compileLwc({ ...ok, html: "<div>bad</div>" }).catch(() => undefined);
+    expect(lwcCacheSize()).toBe(before);
+  }, 30_000);
+});
