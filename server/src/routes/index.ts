@@ -11,7 +11,7 @@ import { validate } from "../middleware/validate.ts";
 import { ok } from "../utils/respond.ts";
 import { callbackQuery, connectBody, executeBody } from "../validation/salesforce.schema.ts";
 import { challengeController } from "../controllers/challenge.controller.ts";
-import { slugParams, submissionParams, submitBody } from "../validation/challenge.schema.ts";
+import { listQuery, slugParams, submissionParams, submitBody } from "../validation/challenge.schema.ts";
 
 function disabled(what: string): RequestHandler {
   return (_req, _res, next) => next(new NotConfiguredError(what));
@@ -64,7 +64,7 @@ export function mountRoutes(app: Application, container: Container): void {
   } else {
     const c = challengeController(challenges);
     // Browsing is public; progress markers appear when signed in.
-    ch.get("/", optionalAuth(verifier), c.list);
+    ch.get("/", optionalAuth(verifier), validate({ query: listQuery }), c.list);
     // Static path before /:slug so "submissions" is never read as a slug.
     ch.get("/submissions/:id", requireAuth(verifier), validate({ params: submissionParams }), c.submission);
     ch.get("/:slug", validate({ params: slugParams }), c.get);

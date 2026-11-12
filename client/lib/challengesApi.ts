@@ -4,6 +4,7 @@ import { apiRequest } from "./apiClient";
 type Token = string | null;
 
 export type Tone = "green" | "amber" | "red";
+export type Track = "apex" | "soql";
 export interface DifficultyDef {
   id: string;
   rank: number;
@@ -12,6 +13,7 @@ export interface DifficultyDef {
 
 export interface ChallengeSummary {
   slug: string;
+  track: Track;
   title: string;
   difficulty: string;
   category: string;
@@ -21,13 +23,14 @@ export interface ChallengeSummary {
 
 export interface ChallengeFile {
   name: string;
-  type: "class" | "trigger";
+  type: "class" | "trigger" | "soql";
   fileName: string;
   starter: string;
 }
 
 export interface ChallengeView {
   slug: string;
+  track: Track;
   title: string;
   difficulty: string;
   category: string;
@@ -67,8 +70,8 @@ export interface SubmissionSummary {
   testsRun: number | null;
 }
 
-export const listChallenges = (token: Token) =>
-  apiRequest<{ difficulties: DifficultyDef[]; challenges: ChallengeSummary[] }>("/api/v1/challenges", { token });
+export const listChallenges = (token: Token, track: Track) =>
+  apiRequest<{ difficulties: DifficultyDef[]; challenges: ChallengeSummary[] }>(`/api/v1/challenges?track=${track}`, { token });
 
 export const getChallenge = (slug: string) => apiRequest<ChallengeView>(`/api/v1/challenges/${encodeURIComponent(slug)}`);
 

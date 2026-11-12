@@ -1,4 +1,4 @@
-import { cpSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -16,6 +16,11 @@ describe("the shipped problems", () => {
       "won-revenue-rollup",
       "close-stale-opportunities",
       "sync-contact-city",
+      "soql-hot-tech-accounts",
+      "soql-contacts-in-city",
+      "soql-accounts-without-contacts",
+      "soql-pipeline-by-stage",
+      "soql-accounts-with-won-deals",
     ]);
   });
 });
@@ -63,6 +68,51 @@ describe("loadChallenge rejects broken problems", () => {
     const p = fresh();
     writeFileSync(join(p, "problem.json"), JSON.stringify({ title: "Tt", difficulty: "Insane", category: "Classes", order: 1, files: [{ name: "SfcTextUtils", type: "class" }], testClass: "SfcTextUtilsTest" }));
     expect(() => loadChallenge(dir, "text-utils")).toThrow(/difficulty/);
+  });
+});
+
+describe("SOQL problem rules", () => {
+  let dir: string;
+  const fresh = () => {
+    dir = mkdtempSync(join(tmpdir(), "sfc-soql-"));
+    cpSync(join(PROBLEMS_DIR, "soql-contacts-in-city"), join(dir, "soql-contacts-in-city"), { recursive: true });
+    return join(dir, "soql-contacts-in-city");
+  };
+  afterEach(() => rmSync(dir, { recursive: true, force: true }));
+
+  it("tests must take the reference from the placeholder, not inline it", () => {
+    const p = fresh();
+    const t = join(p, "tests", "SfcSoqlContactsCityTest.cls");
+    writeFileSync(t, readFileSync(t, "utf8").replace("{{REFERENCE_QUERY}}", "'SELECT Id FROM Contact'"));
+    expect(() => loadChallenge(dir, "soql-contacts-in-city")).toThrow(/REFERENCE_QUERY/);
+  });
+
+  it("a soql file only on the soql track", () => {
+    const p = fresh();
+    const meta = JSON.parse(readFileSync(join(p, "problem.json"), "utf8")) as Record<string, unknown>;
+    writeFileSync(join(p, "problem.json"), JSON.stringify({ ...meta, track: "apex" }));
+    expect(() => loadChallenge(dir, "soql-contacts-in-city")).toThrow(/soql-track/);
+  });
+
+  it("the reference must be a SELECT", () => {
+    const p = fresh();
+    writeFileSync(join(p, "reference", "query.soql"), "DELETE FROM Contact");
+    expect(() => loadChallenge(dir, "soql-contacts-in-city")).toThrow(/does not declare soql/);
+  });
+
+  it("no problem may use the grader's generated class name", () => {
+    const p = fresh();
+    rmSync(join(p, "..", "soql-contacts-in-city"), { recursive: true });
+    cpSync(join(PROBLEMS_DIR, "text-utils"), p, { recursive: true });
+    const meta = JSON.parse(readFileSync(join(p, "problem.json"), "utf8")) as Record<string, unknown>;
+    writeFileSync(join(p, "problem.json"), JSON.stringify({ ...meta, testClass: "SfcSoqlSubmission" }));
+    expect(() => loadChallenge(dir, "soql-contacts-in-city")).toThrow(/reserved/);
+  });
+
+  it("SOQL problems need the shared compare helper", () => {
+    const c = ChallengeCatalog.load(PROBLEMS_DIR).get("soql-contacts-in-city");
+    if (!c) throw new Error("fixture");
+    expect(() => new ChallengeCatalog([c], "")).toThrow(/soqlCompare.apex/);
   });
 });
 

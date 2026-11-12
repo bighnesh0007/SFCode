@@ -1,12 +1,12 @@
 import type { RequestHandler } from "express";
-import { validatedBody, validatedParams } from "../middleware/validate.ts";
+import { validatedBody, validatedParams, validatedQuery } from "../middleware/validate.ts";
 import type { ChallengeService } from "../services/challenges/challenge.service.ts";
 import { accepted, ok } from "../utils/respond.ts";
-import type { SlugParams, SubmissionParams, SubmitBody } from "../validation/challenge.schema.ts";
+import type { ListQuery, SlugParams, SubmissionParams, SubmitBody } from "../validation/challenge.schema.ts";
 
 export function challengeController(service: ChallengeService) {
   const list: RequestHandler = async (req, res) => {
-    ok(res, { difficulties: service.difficulties(), challenges: await service.list(req.auth?.userId ?? null) });
+    ok(res, { difficulties: service.difficulties(), challenges: await service.list(req.auth?.userId ?? null, validatedQuery<ListQuery>(req).track) });
   };
 
   const get: RequestHandler = (req, res) => {

@@ -9,7 +9,7 @@
 import { AppError, ConflictError, NotConfiguredError, NotFoundError, ValidationError } from "../../errors/AppError.ts";
 import { logEvent, contextLogger } from "../../lib/logger.ts";
 import type { ChallengeSubmissionRepository, SubmissionRecord } from "../../repositories/challengeSubmission.repository.ts";
-import type { Challenge, GradeResult, SubmissionStatus } from "../../domain/challenge.ts";
+import type { ApexFileType, Challenge, GradeResult, SubmissionStatus, Track } from "../../domain/challenge.ts";
 import { DIFFICULTIES } from "../../domain/difficulty.ts";
 import type { Clock } from "../../types/ports.ts";
 import type { SalesforceConnectionService } from "../salesforce/connection.service.ts";
@@ -28,6 +28,7 @@ export const START_TIMEOUT_MS = 2 * 60_000;
 
 export interface ChallengeSummary {
   slug: string;
+  track: Track;
   title: string;
   difficulty: string;
   category: string;
@@ -38,12 +39,13 @@ export interface ChallengeSummary {
 /** Everything a client may see about a problem. Hidden tests and reference are absent by construction. */
 export interface ChallengeView {
   slug: string;
+  track: Track;
   title: string;
   difficulty: string;
   category: string;
   tags: string[];
   statement: string;
-  files: { name: string; type: "class" | "trigger"; fileName: string; starter: string }[];
+  files: { name: string; type: ApexFileType; fileName: string; starter: string }[];
 }
 
 export interface SubmissionView {
@@ -104,10 +106,14 @@ export class ChallengeService {
     return DIFFICULTIES;
   }
 
-  async list(userId: string | null): Promise<ChallengeSummary[]> {
+  async list(userId: string | null, track?: Track): Promise<ChallengeSummary[]> {
     const progress = userId ? await this.submissions.progress(userId) : new Map<string, "solved" | "attempted">();
-    return this.catalog.all().map((c) => ({
+    return this.catalog
+      .all()
+      .filter((c) => track === undefined || c.track === track)
+      .map((c) => ({
       slug: c.slug,
+      track: c.track,
       title: c.title,
       difficulty: c.difficulty,
       category: c.category,
@@ -120,6 +126,7 @@ export class ChallengeService {
     const c = this.require(slug);
     return {
       slug: c.slug,
+      track: c.track,
       title: c.title,
       difficulty: c.difficulty,
       category: c.category,
@@ -141,7 +148,7 @@ export class ChallengeService {
     if (!record) throw new ConflictError("You already have a submission being graded. Wait for it to finish.");
 
     try {
-      const zip = buildDeployPackage(challenge, files, apiVersion);
+      const zip = buildDeployPackage(challenge, files, apiVersion, this.catalog.soqlCompare);
       const deployId = await connections.withOrg(userId, (org) => sf.deployCheckOnly(org.instanceUrl, org.accessToken, zip, challenge.testClass.name));
       await this.submissions.setDeployId(record.id, deployId);
       logEvent("challenge.submitted", { slug, submissionId: record.id });

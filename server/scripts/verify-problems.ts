@@ -36,7 +36,7 @@ const catalog = ChallengeCatalog.load(PROBLEMS_DIR);
 async function grade(slug: string, sources: Record<string, string>) {
   const challenge = catalog.get(slug);
   if (!challenge) throw new Error(`unknown problem ${slug}`);
-  const zip = buildDeployPackage(challenge, sources, apiVersion);
+  const zip = buildDeployPackage(challenge, sources, apiVersion, catalog.soqlCompare);
   return connections.withOrg(userId ?? "", async (org) => {
     const id = await sf.deployCheckOnly(org.instanceUrl, org.accessToken, zip, challenge.testClass.name);
     for (;;) {

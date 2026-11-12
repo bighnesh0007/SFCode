@@ -40,7 +40,7 @@ function readDraft(challenge: ChallengeView): Record<string, string> {
   }
 }
 
-export function Workspace({ challenge }: { challenge: ChallengeView }) {
+export function Workspace({ challenge, backHref }: { challenge: ChallengeView; backHref: string }) {
   const { resolvedTheme } = useTheme();
   const { isSignedIn, getToken } = useAuth();
   const { state: org } = useOrgConnection();
@@ -168,7 +168,7 @@ export function Workspace({ challenge }: { challenge: ChallengeView }) {
         <ResizablePanel defaultSize="40%" minSize="25%">
           <div className="flex h-full flex-col">
             <div className="flex items-center gap-1 border-b px-2 py-1.5">
-              <Link href="/challenges" className="mr-1 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label="All challenges">
+              <Link href={backHref} className="mr-1 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label="Back to the list">
                 <ChevronLeft className="h-4 w-4" />
               </Link>
               {(["description", "submissions"] as const).map((t) => (
@@ -191,11 +191,19 @@ export function Workspace({ challenge }: { challenge: ChallengeView }) {
                   <Markdown source={challenge.statement} className="markdown mt-5" />
                   <div className="mt-6 flex gap-2 rounded-lg border bg-muted/30 p-3 text-xs text-muted-foreground">
                     <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                    <p>
-                      Grading runs a check-only deploy of your files and hidden tests in your connected org, then rolls
-                      back. Your org&apos;s own triggers, flows and validation rules run too, so a fresh Developer Edition
-                      org gives the cleanest results. Each file also needs 75% test coverage, as in any Salesforce deploy.
-                    </p>
+                    {challenge.track === "soql" ? (
+                      <p>
+                        Grading runs your query inside a hidden Apex test in your connected org, against records the test
+                        creates itself, and compares the rows with the expected answer. Nothing is left behind in the org,
+                        and your org&apos;s existing records don&apos;t affect the result.
+                      </p>
+                    ) : (
+                      <p>
+                        Grading runs a check-only deploy of your files and hidden tests in your connected org, then rolls
+                        back. Your org&apos;s own triggers, flows and validation rules run too, so a fresh Developer Edition
+                        org gives the cleanest results. Each file also needs 75% test coverage, as in any Salesforce deploy.
+                      </p>
+                    )}
                   </div>
                 </>
               ) : (
@@ -231,7 +239,8 @@ export function Workspace({ challenge }: { challenge: ChallengeView }) {
                 {activeFile && (
                   <Editor
                     path={activeFile.fileName}
-                    language="apex"
+                    // Monaco has no SOQL mode; SQL highlighting is close enough.
+                    language={activeFile.type === "soql" ? "sql" : "apex"}
                     theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
                     value={sources[activeFile.name] ?? ""}
                     onChange={(v) => setSources((s) => ({ ...s, [activeFile.name]: v ?? "" }))}

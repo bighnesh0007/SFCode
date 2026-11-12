@@ -1,0 +1,2 @@
+{ "title": "Pipeline by Stage", "track": "soql", "difficulty": "Medium", "category": "Aggregates", "order": 104,
+  "tags": ["GROUP BY", "COUNT", "SUM", "aliases"], "files": [{ "name": "query", "type": "soql" }], "testClass": "SfcSoqlPipelineTest" }

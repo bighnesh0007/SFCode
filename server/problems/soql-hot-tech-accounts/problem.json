@@ -1,0 +1,2 @@
+{ "title": "Hot Technology Accounts", "track": "soql", "difficulty": "Easy", "category": "Filtering", "order": 101,
+  "tags": ["WHERE", "ORDER BY", "NULLS LAST"], "files": [{ "name": "query", "type": "soql" }], "testClass": "SfcSoqlHotTechTest" }

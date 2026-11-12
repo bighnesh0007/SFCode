@@ -1,0 +1,2 @@
+{ "title": "Accounts and Their Won Deals", "track": "soql", "difficulty": "Hard", "category": "Subqueries", "order": 105,
+  "tags": ["child subquery", "semi-join", "ORDER BY"], "files": [{ "name": "query", "type": "soql" }], "testClass": "SfcSoqlWonDealsTest" }

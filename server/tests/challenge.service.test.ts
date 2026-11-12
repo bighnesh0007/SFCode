@@ -39,6 +39,7 @@ describe("ChallengeService — what clients can see", () => {
     for (const c of catalog.all()) {
       const json = JSON.stringify(service.get(c.slug)) + JSON.stringify(await service.list(null));
       expect(json).not.toContain(c.testClass.name);
+      expect(json).not.toContain("sfcAssertSameRows");
       for (const ref of Object.values(c.reference)) expect(json).not.toContain(ref);
     }
   });
@@ -54,6 +55,14 @@ describe("ChallengeService — what clients can see", () => {
     const browseOnly = new ChallengeService(catalog, new MemorySubmissionRepository(clock), undefined, clock);
     expect((await browseOnly.list(null)).length).toBe(catalog.all().length);
     await expect(browseOnly.submit("u1", "account-rating-default", RATING)).rejects.toMatchObject({ code: "NOT_CONFIGURED" });
+  });
+
+  it("filters the list by track", async () => {
+    const { service } = setup();
+    expect((await service.list(null, "soql")).every((c) => c.track === "soql")).toBe(true);
+    expect((await service.list(null, "soql")).length).toBe(5);
+    expect((await service.list(null, "apex")).length).toBe(6);
+    expect((await service.list(null)).length).toBe(11);
   });
 
   it("404s unknown problems", () => {

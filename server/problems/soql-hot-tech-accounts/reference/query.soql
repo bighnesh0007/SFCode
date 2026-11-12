@@ -1,0 +1,1 @@
+SELECT Id, Name, AnnualRevenue FROM Account WHERE Industry = 'Technology' AND Rating = 'Hot' ORDER BY AnnualRevenue DESC NULLS LAST, Name ASC

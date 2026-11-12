@@ -1,0 +1,1 @@
+SELECT StageName, COUNT(Id) total, SUM(Amount) amount FROM Opportunity GROUP BY StageName

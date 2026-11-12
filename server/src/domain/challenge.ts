@@ -1,7 +1,9 @@
 /** Shapes shared by the challenge catalogue, grader and API. */
 import type { Difficulty } from "./difficulty.ts";
 
-export type ApexFileType = "class" | "trigger";
+export type ApexFileType = "class" | "trigger" | "soql";
+/** Which practice area a problem belongs to (Challenge Arena vs SOQL Practice). */
+export type Track = "apex" | "soql";
 
 export interface ChallengeFile {
   name: string;
@@ -13,6 +15,7 @@ export interface Challenge {
   slug: string;
   title: string;
   difficulty: Difficulty;
+  track: Track;
   category: string;
   order: number;
   tags: string[];

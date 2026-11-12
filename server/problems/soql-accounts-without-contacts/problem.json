@@ -1,0 +1,2 @@
+{ "title": "Accounts Without Contacts", "track": "soql", "difficulty": "Medium", "category": "Subqueries", "order": 103,
+  "tags": ["anti-join", "NOT IN"], "files": [{ "name": "query", "type": "soql" }], "testClass": "SfcSoqlNoContactsTest" }

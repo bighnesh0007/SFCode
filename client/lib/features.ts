@@ -22,7 +22,7 @@ export interface Feature {
 
 export const FEATURES: readonly Feature[] = [
   { id: "apex", href: "/playground/apex", title: "Apex Playground", nav: "Apex", description: "Write anonymous Apex and run it against your connected org, with the debug log alongside.", icon: Terminal, status: "live", primary: true },
-  { id: "soql", href: "/soql", title: "SOQL Practice", nav: "SOQL", description: "LeetCode-style query challenges: relationships, aggregates, semi-joins and governor-friendly filters.", icon: Database, status: "soon", primary: true },
+  { id: "soql", href: "/soql", title: "SOQL Practice", nav: "SOQL", description: "LeetCode-style query challenges: filters, relationships, aggregates and subqueries, checked against an expected answer.", icon: Database, status: "live", primary: true },
   { id: "lwc", href: "/playground/lwc", title: "LWC Playground", nav: "LWC", description: "Write Lightning Web Components and preview them live.", icon: LayoutTemplate, status: "soon", primary: true },
   { id: "challenges", href: "/challenges", title: "Apex Challenge Arena", nav: "Challenges", description: "Problems on triggers, classes, batch and asynchronous Apex, graded by hidden Apex tests in your org.", icon: Swords, status: "live", primary: true },
   { id: "flows", href: "/flows", title: "Flow Builder Challenges", nav: "Flows", description: "Practice building record-triggered, screen and scheduled flows.", icon: Workflow, status: "soon", primary: false },

@@ -12,3 +12,6 @@ export const submitBody = z.strictObject({
   files: z.record(z.string().regex(/^[A-Za-z0-9_]{1,40}$/), z.string().max(MAX_FILE_CHARS)),
 });
 export type SubmitBody = z.infer<typeof submitBody>;
+
+export const listQuery = z.object({ track: z.enum(["apex", "soql"]).optional() });
+export type ListQuery = z.infer<typeof listQuery>;

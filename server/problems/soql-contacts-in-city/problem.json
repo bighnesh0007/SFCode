@@ -1,0 +1,2 @@
+{ "title": "Contacts of Pune Accounts", "track": "soql", "difficulty": "Easy", "category": "Relationships", "order": 102,
+  "tags": ["parent relationship", "dot notation"], "files": [{ "name": "query", "type": "soql" }], "testClass": "SfcSoqlContactsCityTest" }
