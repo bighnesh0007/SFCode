@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
+import { AboutCard, AchievementsWall, ContestHistory, RoadmapProgress, ShareButtons, SkillRadar, StatsStrip } from "@/components/profile/Sections";
 import { Flair, accentClass, frameClass } from "@/components/Cosmetics";
 import { useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
@@ -106,29 +107,34 @@ export function ProfileView({ profile: initial, editable }: { profile: Profile; 
           )}
           {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
         </div>
-        <dl className="flex gap-6 text-center">
-          <div><dt className="text-xs text-muted-foreground">Points</dt><dd className="text-xl font-semibold tabular-nums">{profile.score}</dd></div>
-          <div><dt className="text-xs text-muted-foreground">Solved</dt><dd className="text-xl font-semibold tabular-nums">{profile.solved}</dd></div>
-          <div><dt className="text-xs text-muted-foreground">Rank</dt><dd className="text-xl font-semibold tabular-nums">{profile.rank ? `#${profile.rank}` : "—"}</dd></div>
-        </dl>
+        <ShareButtons p={profile} />
       </div>
 
-      <div className="mt-8 grid gap-6 md:grid-cols-2">
-        <section className="rounded-lg border p-5">
-          <h2 className="mb-4 text-sm font-semibold">By track</h2>
-          <div className="space-y-3">
-            {profile.byTrack.map((t) => <Bar key={t.track} label={trackInfo(t.track).label} solved={t.solved} total={t.total} />)}
-          </div>
-        </section>
-        <section className="rounded-lg border p-5">
+      <StatsStrip p={profile} />
+
+      <div className="mt-6 grid gap-6 md:grid-cols-2">
+        <AboutCard p={profile} editable={editable} onChange={setProfile} />
+        <SkillRadar p={profile} />
+      </div>
+
+      <div className="mt-6">
+        <AchievementsWall p={profile} />
+      </div>
+
+      <div className={cn("mt-6 grid gap-6", (profile.roadmap || profile.contests.length > 0) && "md:grid-cols-2")}>
+        <section className="rounded-xl border p-5">
           <h2 className="mb-4 text-sm font-semibold">By difficulty</h2>
           <div className="space-y-3">
             {profile.byDifficulty.map((d) => <Bar key={d.difficulty} label={d.difficulty} solved={d.solved} total={d.total} />)}
           </div>
         </section>
+        <div className="space-y-6">
+          <RoadmapProgress p={profile} editable={editable} />
+          <ContestHistory p={profile} />
+        </div>
       </div>
 
-      <section className="mt-6 rounded-lg border p-5">
+      <section className="mt-6 rounded-xl border p-5">
         <h2 className="mb-4 text-sm font-semibold">Activity</h2>
         <Heatmap activity={profile.activity} />
       </section>

@@ -4,9 +4,11 @@
  * (SCORED_TRACKS) — see ADR-013.
  */
 import { randomBytes } from "node:crypto";
-import { ConflictError, NotFoundError, ValidationError } from "../../errors/AppError.ts";
+import { ConflictError, NotConfiguredError, NotFoundError, ValidationError } from "../../errors/AppError.ts";
 import { SCORED_TRACKS, type Track } from "../../domain/challenge.ts";
 import { DIFFICULTIES, pointsFor, type Difficulty } from "../../domain/difficulty.ts";
+import { achievements, streaks, type Achievement } from "../../domain/achievements.ts";
+import { EMPTY_ABOUT, type AboutRecord, type AboutRepository } from "../../repositories/about.repository.ts";
 import type { ChallengeSubmissionRepository } from "../../repositories/challengeSubmission.repository.ts";
 import type { ProfileRecord, ProfileRepository } from "../../repositories/profile.repository.ts";
 import type { Clock } from "../../types/ports.ts";
@@ -26,8 +28,38 @@ export interface CosmeticsSource {
   cosmetics(userIds: string[]): Promise<Map<string, Cosmetics>>;
 }
 
+/** Profile data owned by other services; wired after construction (they depend on this one). */
+export interface ProfileExtras {
+  coins(userId: string): Promise<number>;
+  contestHistory(userId: string): Promise<ContestResult[]>;
+  roadmapProgress(userId: string): Promise<{ done: number; total: number } | null>;
+}
+
+export interface ContestResult {
+  slug: string;
+  title: string;
+  endsAt: string;
+  rank: number;
+  entrants: number;
+  score: number;
+}
+
+export interface ProfileStats {
+  streak: number;
+  longestStreak: number;
+  coins: number | null;
+  contests: number;
+  bestPlacement: number | null;
+  activeDays: number;
+}
+
 export interface ProfileView {
   cosmetics: Cosmetics;
+  about: AboutRecord;
+  stats: ProfileStats;
+  achievements: Achievement[];
+  contests: ContestResult[];
+  roadmap: { done: number; total: number } | null;
   handle: string;
   displayName: string;
   imageUrl: string | null;
@@ -62,6 +94,19 @@ export class CommunityService {
     this.cosmeticsSource = source;
   }
 
+  private extras: ProfileExtras | undefined;
+  setExtras(extras: ProfileExtras): void {
+    this.extras = extras;
+  }
+
+  async updateAbout(userId: string, about: AboutRecord): Promise<ProfileView> {
+    if (!this.about) throw new NotConfiguredError("Profile details");
+    const p = await this.ensureProfile(userId);
+    // Empty links are stored as null so the profile shows nothing rather than a dead link.
+    await this.about.save(userId, { ...about, bio: about.bio.trim(), company: about.company.trim(), location: about.location.trim(), trailheadUrl: about.trailheadUrl || null, linkedinUrl: about.linkedinUrl || null, githubUrl: about.githubUrl || null, certifications: [...new Set(about.certifications)] });
+    return this.view(p);
+  }
+
   private async cosmeticsOf(userIds: string[]): Promise<Map<string, Cosmetics>> {
     return this.cosmeticsSource ? this.cosmeticsSource.cosmetics(userIds) : new Map();
   }
@@ -72,6 +117,7 @@ export class CommunityService {
     private readonly profiles: ProfileRepository,
     private readonly identity: IdentityLookup | undefined,
     private readonly clock: Clock,
+    private readonly about?: AboutRepository,
   ) {}
 
   /** The caller's profile, created on first use from their public Clerk identity. */
@@ -151,14 +197,36 @@ export class CommunityService {
     const solvedScored = scored.filter((c) => solvedSlugs.has(c.slug));
     const board = await this.leaderboard("all", Number.MAX_SAFE_INTEGER);
     const since = new Date(this.clock.nowMs() - ACTIVITY_DAYS * 86_400_000);
+    const activity = await this.submissions.dailyActivity(p.userId, since);
+    const streak = streaks(activity.filter((d) => d.count > 0).map((d) => d.day), this.clock.now().toISOString().slice(0, 10));
+    const [coins, contests, roadmap, about] = await Promise.all([
+      this.extras ? this.extras.coins(p.userId) : Promise.resolve(null),
+      this.extras ? this.extras.contestHistory(p.userId) : Promise.resolve([]),
+      this.extras ? this.extras.roadmapProgress(p.userId) : Promise.resolve(null),
+      this.about ? this.about.get(p.userId) : Promise.resolve(null),
+    ]);
+    const bestPlacement = contests.length ? Math.min(...contests.map((c) => c.rank)) : null;
+    const score = solvedScored.reduce((sum, c) => sum + pointsFor(c.difficulty), 0);
 
     return {
+      about: about ?? EMPTY_ABOUT,
+      stats: { streak: streak.current, longestStreak: streak.longest, coins, contests: contests.length, bestPlacement, activeDays: activity.filter((d) => d.count > 0).length },
+      achievements: achievements({
+        solved: solvedScored.map((c) => ({ slug: c.slug, track: c.track, difficulty: c.difficulty, category: c.category })),
+        score,
+        longestStreak: streak.longest,
+        contestsEntered: contests.length,
+        bestPlacement,
+        roadmapPct: roadmap && roadmap.total > 0 ? (100 * roadmap.done) / roadmap.total : null,
+      }),
+      contests: contests.slice(0, 10),
+      roadmap,
       cosmetics: (await this.cosmeticsOf([p.userId])).get(p.userId) ?? {},
       handle: p.handle,
       displayName: p.displayName,
       imageUrl: p.imageUrl,
       joined: p.createdAt.toISOString(),
-      score: solvedScored.reduce((sum, c) => sum + pointsFor(c.difficulty), 0),
+      score,
       solved: solvedScored.length,
       rank: board.find((r) => r.handle === p.handle)?.rank ?? null,
       byTrack: SCORED_TRACKS.map((track) => ({
@@ -171,7 +239,7 @@ export class CommunityService {
         solved: solvedScored.filter((c) => c.difficulty === d.id).length,
         total: scored.filter((c) => c.difficulty === d.id).length,
       })),
-      activity: await this.submissions.dailyActivity(p.userId, since),
+      activity,
       // Same rule as the score: only server-verified solves are shown as solved.
       recent: mine
         .sort((a, b) => b.at.getTime() - a.at.getTime())

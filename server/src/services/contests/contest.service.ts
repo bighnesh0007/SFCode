@@ -141,6 +141,18 @@ export class ContestService {
   }
 
   /** Final placements of every ended contest: userId → coins won. */
+  /** Finished contests the user entered, newest first, with their rank. */
+  async history(userId: string): Promise<{ slug: string; title: string; endsAt: string; rank: number; entrants: number; score: number }[]> {
+    const out: { slug: string; title: string; endsAt: string; rank: number; entrants: number; score: number }[] = [];
+    for (const c of await this.repo.list()) {
+      if (this.phase(c) !== "ended") continue;
+      const rows = await this.standings(c);
+      const mine = rows.find((r) => r.userId === userId);
+      if (mine) out.push({ slug: c.slug, title: c.title, endsAt: c.endsAt.toISOString(), rank: mine.rank, entrants: rows.length, score: mine.score });
+    }
+    return out.sort((a, b) => b.endsAt.localeCompare(a.endsAt));
+  }
+
   async prizes(): Promise<Map<string, number>> {
     const won = new Map<string, number>();
     for (const c of await this.repo.list()) {
