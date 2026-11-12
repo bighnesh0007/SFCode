@@ -11,6 +11,7 @@ import { PgSalesforceConnectionRepository } from "../../src/repositories/salesfo
 import { PgChallengeSubmissionRepository } from "../../src/repositories/challengeSubmission.repository.ts";
 import { PgCertAttemptRepository } from "../../src/repositories/certAttempt.repository.ts";
 import { PgProfileRepository } from "../../src/repositories/profile.repository.ts";
+import { PgAdminRepository } from "../../src/repositories/admin.repository.ts";
 import type { GradeResult } from "../../src/domain/challenge.ts";
 
 const url = process.env.TEST_DATABASE_URL;
@@ -176,5 +177,39 @@ describe.skipIf(!safe)("PgProfileRepository and solve queries", () => {
     expect(rows[0]?.at.toISOString()).toBe("2026-01-01T00:00:00.000Z");
     expect(await subs.firstSolves(new Date("2026-06-01"))).toHaveLength(0);
     expect((await subs.dailyActivity("u1", new Date(0))).reduce((n, d) => n + d.count, 0)).toBe(2);
+  });
+});
+
+describe.skipIf(!safe)("PgAdminRepository", () => {
+  let db: PgDatabase;
+  let admin: PgAdminRepository;
+  let profiles: PgProfileRepository;
+
+  beforeAll(async () => {
+    db = createPgDatabase(url ?? "");
+    await migrate(db, { migrationsFolder: new URL("../../src/data/postgres/migrations", import.meta.url).pathname });
+    admin = new PgAdminRepository(db);
+    profiles = new PgProfileRepository(db);
+  });
+  afterAll(() => db.close());
+  beforeEach(async () => {
+    await db.execute(sql`TRUNCATE user_profiles, user_roles`);
+  });
+
+  it("grants idempotently, revokes, and lists roles with users", async () => {
+    await profiles.create({ userId: "u1", handle: "ada", displayName: "Ada", imageUrl: null });
+    await admin.grant("u1", "moderator", "owner");
+    await admin.grant("u1", "moderator", "owner");
+    expect(await admin.rolesOf("u1")).toEqual(["moderator"]);
+    expect((await admin.users("ada", 10))[0]?.roles).toEqual(["moderator"]);
+    expect(await admin.revoke("u1", "moderator")).toBe(true);
+    expect(await admin.revoke("u1", "moderator")).toBe(false);
+  });
+
+  it("search treats % and _ literally", async () => {
+    await profiles.create({ userId: "u1", handle: "ada", displayName: "Ada", imageUrl: null });
+    await profiles.create({ userId: "u2", handle: "a_b", displayName: "Under Score", imageUrl: null });
+    expect((await admin.users("%", 10)).length).toBe(0);
+    expect((await admin.users("_", 10)).map((u) => u.handle)).toEqual(["a_b"]);
   });
 });

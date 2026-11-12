@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getStanding } from "@/lib/adminApi";
 import { Menu, X } from "lucide-react";
 import { LocalModeBadge, SignInButton, SignUpButton, UserButton, useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,21 @@ export default function Navbar() {
   const pathname = usePathname();
   const { isSignedIn } = useAuthState();
   const [open, setOpen] = useState(false);
+  const { getToken } = useAuthState();
+  const [isStaff, setIsStaff] = useState(false);
+
+  // The Admin link is a convenience only; every admin API checks standing itself.
+  useEffect(() => {
+    if (!isSignedIn) return;
+    let cancelled = false;
+    getToken()
+      .then((t) => getStanding(t))
+      .then(() => !cancelled && setIsStaff(true))
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [isSignedIn, getToken]);
   const active = (match: string[]) => match.some((m) => pathname === m || pathname.startsWith(`${m}/`));
 
   return (
@@ -56,6 +72,7 @@ export default function Navbar() {
           <ModeToggle />
           {isSignedIn ? (
             <>
+              {isStaff && isSignedIn && <Link href="/admin" className="text-sm text-muted-foreground hover:text-foreground">Admin</Link>}
               <Link href="/profile" className="text-sm text-muted-foreground hover:text-foreground">Profile</Link>
               <UserButton />
             </>

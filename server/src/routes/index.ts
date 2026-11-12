@@ -16,6 +16,8 @@ import { answerBody, examParams, practiceQuery } from "../validation/certificati
 import { lwcCompileBody, type LwcCompileBody } from "../validation/lwc.schema.ts";
 import { compileLwc } from "../services/lwc/compiler.ts";
 import { communityController } from "../controllers/community.controller.ts";
+import { adminController } from "../controllers/admin.controller.ts";
+import { adminUsersQuery, roleBody } from "../validation/admin.schema.ts";
 import { handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
 import { validatedBody } from "../middleware/validate.ts";
 import { listQuery, slugParams, submissionParams, submitBody } from "../validation/challenge.schema.ts";
@@ -113,6 +115,19 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.get("/leaderboard", validate({ query: leaderboardQuery }), c.leaderboard);
   } else {
     v1.use(["/profile", "/leaderboard"], disabled("Profiles and the leaderboard"));
+  }
+
+  // Admin: every handler re-checks the actor's standing in AdminService.
+  if (container.admin && verifier) {
+    const a = adminController(container.admin);
+    const auth = requireAuth(verifier);
+    v1.get("/admin/me", auth, a.me);
+    v1.get("/admin/overview", auth, a.overview);
+    v1.get("/admin/users", auth, validate({ query: adminUsersQuery }), a.users);
+    v1.post("/admin/roles", auth, limiter(30), validate({ body: roleBody }), a.grant);
+    v1.delete("/admin/roles", auth, limiter(30), validate({ body: roleBody }), a.revoke);
+  } else {
+    v1.use("/admin", disabled("Admin"));
   }
 
   // LWC: compile only. The learner's component runs in their own browser

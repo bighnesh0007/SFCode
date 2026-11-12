@@ -82,6 +82,8 @@ export type BusinessEvent =
   | "salesforce.disconnected"
   | "salesforce.token_refreshed"
   | "apex.executed"
+  | "admin.role_granted"
+  | "admin.role_revoked"
   | "challenge.submitted"
   | "challenge.graded"
   | "ratelimit.exceeded";

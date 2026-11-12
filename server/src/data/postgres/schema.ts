@@ -3,7 +3,7 @@
  * `npm run db:generate` — never hand-edit a generated migration.
  */
 import { sql } from "drizzle-orm";
-import { boolean, index, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import type { GradeResult, SubmissionStatus } from "../../domain/challenge.ts";
 
 /**
@@ -99,4 +99,16 @@ export const userProfiles = pgTable(
   },
   // Case-insensitive uniqueness: /u/Ada and /u/ada are the same person.
   (t) => [uniqueIndex("user_profiles_handle_lower_idx").on(sql`lower(${t.handle})`)],
+);
+
+/** Granted roles. The owner (SUPER_ADMIN_USER_ID) is config, not a row. */
+export const userRoles = pgTable(
+  "user_roles",
+  {
+    userId: text("user_id").notNull(),
+    role: text("role").$type<"admin" | "moderator">().notNull(),
+    grantedBy: text("granted_by").notNull(),
+    grantedAt: timestamp("granted_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.role] })],
 );

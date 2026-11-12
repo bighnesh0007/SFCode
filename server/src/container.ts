@@ -17,6 +17,8 @@ import { CertificationService } from "./services/certification/certification.ser
 import { PgCertAttemptRepository } from "./repositories/certAttempt.repository.ts";
 import { PgProfileRepository } from "./repositories/profile.repository.ts";
 import { CommunityService } from "./services/community/community.service.ts";
+import { AdminService } from "./services/admin/admin.service.ts";
+import { PgAdminRepository } from "./repositories/admin.repository.ts";
 import { ClerkIdentityLookup } from "./services/identity/clerkIdentity.ts";
 import { ChallengeService, type GradingDeps } from "./services/challenges/challenge.service.ts";
 
@@ -27,6 +29,7 @@ export interface Container {
   challenges?: ChallengeService;
   certification?: CertificationService;
   community?: CommunityService;
+  admin?: AdminService;
 }
 
 /** server/certification (question banks), resolved like PROBLEMS_DIR. */
@@ -73,6 +76,8 @@ export function buildContainer(): Container {
       systemClock,
     );
   }
+
+  if (container.db) container.admin = new AdminService(new PgAdminRepository(container.db), config.superAdminUserId, systemClock);
 
   // No database needed to practise; attempts are saved only when there is one.
   container.certification = new CertificationService(
