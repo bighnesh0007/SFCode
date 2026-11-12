@@ -55,8 +55,10 @@ describe.skipIf(!safe)("PgSalesforceConnectionRepository", () => {
     await repo.upsert(base);
     await repo.upsert({ ...base, orgId: "00D2" });
     expect((await repo.findByUser("u1"))?.orgId).toBe("00D2");
-    await repo.updateAccessToken("u1", "enc:v1:new", "https://b.my.salesforce.com");
-    expect(await repo.findByUser("u1")).toMatchObject({ accessTokenEnc: "enc:v1:new", instanceUrl: "https://b.my.salesforce.com" });
+    await repo.updateTokens("u1", { accessTokenEnc: "enc:v1:new", instanceUrl: "https://b.my.salesforce.com" });
+    expect(await repo.findByUser("u1")).toMatchObject({ accessTokenEnc: "enc:v1:new", instanceUrl: "https://b.my.salesforce.com", refreshTokenEnc: "enc:v1:r" });
+    await repo.updateTokens("u1", { accessTokenEnc: "enc:v1:new2", instanceUrl: "https://b.my.salesforce.com", refreshTokenEnc: "enc:v1:r2" });
+    expect((await repo.findByUser("u1"))?.refreshTokenEnc).toBe("enc:v1:r2");
     expect(await repo.delete("u1")).toBe(true);
     expect(await repo.delete("u1")).toBe(false);
   });

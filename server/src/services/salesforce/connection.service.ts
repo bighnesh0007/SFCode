@@ -145,15 +145,24 @@ export class SalesforceConnectionService {
     try {
       refreshed = await this.sf.refresh(conn.loginUrl, decryptToken(conn.refreshTokenEnc, this.secrets.tokenKey));
     } catch (err) {
-      if (err instanceof RefreshRevokedError) {
-        // The stored connection can never work again; drop it so the UI asks to reconnect.
-        await this.repo.delete(userId);
-        throw new OrgNotConnectedError("Your Salesforce connection expired or was revoked. Connect again.");
+      if (!(err instanceof RefreshRevokedError)) throw err;
+      // With refresh-token rotation, a concurrent request may have refreshed
+      // first: our token is now spent, but the connection is fine. Only a
+      // token that is STILL the stored one is really revoked.
+      const latest = await this.repo.findByUser(userId);
+      if (latest && latest.refreshTokenEnc !== conn.refreshTokenEnc) {
+        return fn({ orgId: latest.orgId, instanceUrl: latest.instanceUrl, accessToken: decryptToken(latest.accessTokenEnc, this.secrets.tokenKey) });
       }
-      throw err;
+      // The stored connection can never work again; drop it so the UI asks to reconnect.
+      await this.repo.delete(userId);
+      throw new OrgNotConnectedError("Your Salesforce connection expired or was revoked. Connect again.");
     }
-    await this.repo.updateAccessToken(userId, encryptToken(refreshed.accessToken, this.secrets.tokenKey), refreshed.instanceUrl);
-    logEvent("salesforce.token_refreshed");
+    await this.repo.updateTokens(userId, {
+      accessTokenEnc: encryptToken(refreshed.accessToken, this.secrets.tokenKey),
+      instanceUrl: refreshed.instanceUrl,
+      ...(refreshed.refreshToken ? { refreshTokenEnc: encryptToken(refreshed.refreshToken, this.secrets.tokenKey) } : {}),
+    });
+    logEvent("salesforce.token_refreshed", { rotated: Boolean(refreshed.refreshToken) });
     return fn({ orgId: conn.orgId, instanceUrl: refreshed.instanceUrl, accessToken: refreshed.accessToken });
   }
 }
