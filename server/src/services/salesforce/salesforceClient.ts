@@ -8,7 +8,8 @@
  * response via DebuggingHeader, where REST needs a TraceFlag + ApexLog query.
  */
 import { XMLParser } from "fast-xml-parser";
-import { UpstreamError } from "../../errors/AppError.ts";
+import { AppError, UpstreamError } from "../../errors/AppError.ts";
+import { ErrorCode } from "../../errors/codes.ts";
 import type { FetchLike } from "../../types/ports.ts";
 import { normaliseSalesforceOrigin } from "./loginUrl.ts";
 
@@ -33,6 +34,31 @@ export interface ApexExecutionResult {
   line: number | null;
   column: number | null;
   debugLog: string;
+}
+
+/**
+ * Salesforce understood the request and refused it for a reason about the
+ * user's org (edition, permissions, invalid input). That's actionable for the
+ * user, so it's a 422 with the message, not a 502: it isn't a gateway failure,
+ * and proxies (Cloudflare) may swap a 5xx body for their own error page.
+ */
+export class SalesforceRefusedError extends AppError {
+  constructor(message: string) {
+    super({ code: ErrorCode.UNPROCESSABLE, message, status: 422, expose: true });
+  }
+}
+
+/** Plain-language versions of faults that need the user to change something. */
+const FAULT_HINTS: { match: RegExp; message: string }[] = [
+  {
+    match: /Apex compilation not enabled/i,
+    message: "This org's Salesforce edition doesn't include Apex, so code can't run in it. Connect a Developer Edition org (free) instead.",
+  },
+];
+
+function refusal(faultString: string): SalesforceRefusedError {
+  const hint = FAULT_HINTS.find((h) => h.match.test(faultString));
+  return new SalesforceRefusedError(hint ? hint.message : `Salesforce refused the request: ${faultString}`);
 }
 
 /** Salesforce rejected the session — the caller should refresh and retry once. */
@@ -225,7 +251,7 @@ export class SalesforceClient {
     if (fault) {
       const code = str(fault.faultcode) ?? "";
       if (code.includes("INVALID_SESSION_ID")) throw new SessionExpiredError();
-      throw new UpstreamError(`Salesforce rejected the request: ${str(fault.faultstring) ?? code}`);
+      throw refusal(str(fault.faultstring) ?? code);
     }
     if (!res.ok || !body) throw new UpstreamError(`Salesforce SOAP API failed (HTTP ${res.status}).`);
     return { body, header: doc.Envelope?.Header };

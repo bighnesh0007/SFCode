@@ -60,8 +60,12 @@ export async function apiRequest<T>(
   try {
     payload = await response.json();
   } catch {
+    // A non-JSON body means something between the browser and the API answered
+    // (a proxy or gateway error page), so say that rather than "non-JSON".
     throw new ApiError(
-      `Backend returned a non-JSON response (HTTP ${response.status}).`,
+      response.status >= 500
+        ? `SFCode's server couldn't be reached properly (HTTP ${response.status}). Try again in a moment.`
+        : `Unexpected response from SFCode's server (HTTP ${response.status}).`,
       "INVALID_RESPONSE",
       response.status,
     );

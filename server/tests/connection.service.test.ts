@@ -194,6 +194,29 @@ describe("SalesforceConnectionService — executeAnonymous", () => {
     expect(s.repo.connections.has("user_1")).toBe(false);
   });
 
+  it("reports an org that can't run Apex as a 422 the user can act on, not a gateway error", async () => {
+    const fault = fixture("invalidSession.xml")
+      .replace("sf:INVALID_SESSION_ID", "sf:INVALID_OPERATION")
+      .replace(/<faultstring>[^<]*<\/faultstring>/, "<faultstring>INVALID_OPERATION: Apex compilation not enabled for this organization</faultstring>");
+    const s = setup((c) => (c.url.includes("/services/Soap/") ? xml(500, fault) : happyOAuth(c)));
+    await connect(s);
+    await expect(s.service.executeAnonymous("user_1", "x")).rejects.toMatchObject({
+      status: 422,
+      code: "UNPROCESSABLE",
+      expose: true,
+      message: expect.stringMatching(/doesn't include Apex.*Developer Edition/s),
+    });
+  });
+
+  it("passes other Salesforce faults through as 422 with Salesforce's own message", async () => {
+    const fault = fixture("invalidSession.xml")
+      .replace("sf:INVALID_SESSION_ID", "sf:INSUFFICIENT_ACCESS")
+      .replace(/<faultstring>[^<]*<\/faultstring>/, "<faultstring>INSUFFICIENT_ACCESS: you lack Author Apex</faultstring>");
+    const s = setup((c) => (c.url.includes("/services/Soap/") ? xml(500, fault) : happyOAuth(c)));
+    await connect(s);
+    await expect(s.service.executeAnonymous("user_1", "x")).rejects.toMatchObject({ status: 422, message: expect.stringContaining("you lack Author Apex") });
+  });
+
   it("requires a connection", async () => {
     const s = setup(happyOAuth);
     await expect(s.service.executeAnonymous("nobody", "x")).rejects.toBeInstanceOf(OrgNotConnectedError);
