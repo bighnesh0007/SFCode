@@ -1,0 +1,18 @@
+name: Certification question is wrong or unclear
+description: Report an inaccurate, ambiguous or outdated practice question.
+labels: ["content", "certification"]
+body:
+  - type: input
+    id: qid
+    attributes:
+      label: Question id or text
+    validations: { required: true }
+  - type: textarea
+    id: issue
+    attributes:
+      label: What's wrong
+    validations: { required: true }
+  - type: input
+    id: source
+    attributes:
+      label: Documentation link that supports the correction

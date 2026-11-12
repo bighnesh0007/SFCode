@@ -1,0 +1,28 @@
+name: Propose a problem
+description: Suggest an Apex, SOQL or debugging problem (see docs/adding-a-problem.md).
+labels: ["content", "problem"]
+body:
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track
+      options: ["Apex Challenge Arena", "SOQL Practice", "Debugging Arena"]
+    validations: { required: true }
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Difficulty
+      options: ["Easy", "Medium", "Hard"]
+    validations: { required: true }
+  - type: textarea
+    id: idea
+    attributes:
+      label: The problem
+      description: What the learner must do, and the Salesforce concept it teaches.
+    validations: { required: true }
+  - type: checkboxes
+    id: build
+    attributes:
+      label: Contributing
+      options:
+        - label: I'll write it (statement, starter, reference and hidden tests)

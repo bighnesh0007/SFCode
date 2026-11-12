@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@clerk/nextjs";
+import { useAuthState } from "@/components/auth";
 import { GraduationCap, Play } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import { ApiError } from "@/lib/apiClient";
 import { listExams, type ExamSummary } from "@/lib/certificationApi";
 
 export default function CertificationPage() {
-  const { isLoaded, isSignedIn, getToken } = useAuth();
+  const { isLoaded, isSignedIn, getToken } = useAuthState();
   const [exams, setExams] = useState<ExamSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 

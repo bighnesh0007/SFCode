@@ -1,11 +1,15 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
 /**
- * Clerk session handling only. Pages that need a user check `auth()` themselves
- * (DWCode's route-matcher approach is deprecated by Clerk for path-matching
- * bypass reasons), and every API action is authorised again on the server.
+ * Clerk session handling only, and only when Clerk is configured: without keys
+ * (a contributor's "local mode") clerkMiddleware would throw on every request.
+ * Pages that need a user check for one themselves, and every API action is
+ * authorised again on the server.
  */
-export default clerkMiddleware();
+const clerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && process.env.CLERK_SECRET_KEY);
+
+export default clerkConfigured ? clerkMiddleware() : () => NextResponse.next();
 
 export const config = {
   matcher: [

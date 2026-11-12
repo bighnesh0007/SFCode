@@ -49,11 +49,15 @@ export function buildContainer(): Container {
     );
     grading = { connections: container.salesforce, sf, apiVersion };
   }
-  if (container.db) {
-    // Loading validates every problem; a broken one stops startup on purpose.
-    // Browsing needs only the database; submitting also needs `grading`.
-    container.challenges = new ChallengeService(ChallengeCatalog.load(PROBLEMS_DIR), new PgChallengeSubmissionRepository(container.db), grading, systemClock);
-  }
+  // Loading validates every problem; a broken one stops startup on purpose.
+  // Browsing needs nothing (contributors run without accounts or a database);
+  // submissions need the database, and grading also needs Salesforce.
+  container.challenges = new ChallengeService(
+    ChallengeCatalog.load(PROBLEMS_DIR),
+    container.db ? new PgChallengeSubmissionRepository(container.db) : undefined,
+    grading,
+    systemClock,
+  );
   // No database needed to practise; attempts are saved only when there is one.
   container.certification = new CertificationService(
     QuestionBank.load(CERTIFICATION_DIR),

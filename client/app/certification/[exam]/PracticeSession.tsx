@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@clerk/nextjs";
+import { useAuthState } from "@/components/auth";
 import { CheckCircle2, ChevronLeft, Loader2, RotateCcw, XCircle } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Markdown } from "@/components/Markdown";
@@ -11,7 +11,7 @@ import { getPractice, submitAnswer, type AnswerResult, type PracticeQuestion } f
 import { cn } from "@/lib/utils";
 
 export function PracticeSession({ exam, section }: { exam: string; section: string | null }) {
-  const { getToken } = useAuth();
+  const { getToken } = useAuthState();
   const [questions, setQuestions] = useState<PracticeQuestion[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [index, setIndex] = useState(0);

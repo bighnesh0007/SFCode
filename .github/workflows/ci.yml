@@ -1,0 +1,51 @@
+name: CI
+
+# The same gate contributors run locally (CONTRIBUTING.md → "Checks"):
+# typecheck, lint, tests (including the Postgres suite), production build.
+# Runs with NO Clerk or Salesforce keys, which also proves local mode builds.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Typecheck, lint, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: sfcode
+          POSTGRES_PASSWORD: sfcode
+          POSTGRES_DB: sfcode_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U sfcode"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      # The Postgres repository tests run only against a database named *_test.
+      # In CI they must run: tests/postgres fails (not skips) when CI is set
+      # and this is missing, so a misconfigured job can't pass silently.
+      TEST_DATABASE_URL: postgres://sfcode:sfcode@localhost:5432/sfcode_test
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      # npm 10.9 crashes resolving this tree (arborist "edgesOut"); npm 11 works.
+      - run: npx -y npm@11 ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
