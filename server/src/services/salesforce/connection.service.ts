@@ -9,7 +9,7 @@ import { ErrorCode } from "../../errors/codes.ts";
 import { signOAuthState, verifyOAuthState, OAUTH_STATE_TTL_MS, safeReturnTo } from "../../lib/crypto/oauthState.ts";
 import { createPkcePair } from "../../lib/crypto/pkce.ts";
 import { decryptToken, encryptToken } from "../../lib/crypto/tokenCipher.ts";
-import { logEvent } from "../../lib/logger.ts";
+import { contextLogger, logEvent } from "../../lib/logger.ts";
 import type { SalesforceConnectionRepository, StoredConnection } from "../../repositories/salesforceConnection.repository.ts";
 import type { Clock } from "../../types/ports.ts";
 import { resolveLoginUrl } from "./loginUrl.ts";
@@ -52,7 +52,9 @@ export class SalesforceConnectionService {
 
   async start(userId: string, loginInput: string, returnTo: string): Promise<{ authorizeUrl: string }> {
     const loginUrl = resolveLoginUrl(loginInput);
-    if (!loginUrl) throw new BadRequestError("Login URL must be production, sandbox, or an https://<domain>.my.salesforce.com address.");
+    if (!loginUrl) {
+      throw new BadRequestError("Enter your org's My Domain URL — the address of any page in your org, e.g. https://yourorg.lightning.force.com.");
+    }
 
     const state = signOAuthState({ userId, returnTo }, this.secrets.stateSecret, this.clock.nowMs());
     const nonce = verifyOAuthState(state, this.secrets.stateSecret, this.clock.nowMs())?.nonce;
@@ -74,7 +76,7 @@ export class SalesforceConnectionService {
    * Finish the handshake. Returns where to send the browser; failures are encoded
    * in the redirect (`?sf=error`) because this is a top-level navigation, not XHR.
    */
-  async complete(input: { code?: string; state?: string; error?: string }): Promise<string> {
+  async complete(input: { code?: string; state?: string; error?: string; errorDescription?: string }): Promise<string> {
     const payload = input.state ? verifyOAuthState(input.state, this.secrets.stateSecret, this.clock.nowMs()) : null;
     const returnTo = payload ? payload.returnTo : safeReturnTo(undefined);
     const fail = (reason: string): string => {
@@ -83,7 +85,12 @@ export class SalesforceConnectionService {
     };
 
     if (!payload) return fail("invalid_state");
-    if (input.error) return fail(input.error === "access_denied" ? "denied" : "salesforce_error");
+    if (input.error) {
+      // Salesforce's own code and description are what make this diagnosable
+      // (e.g. an app that doesn't exist in the user's org); neither is secret.
+      contextLogger().warn({ sfError: input.error, sfErrorDescription: input.errorDescription }, "salesforce returned an OAuth error");
+      return fail(input.error === "access_denied" ? "denied" : "salesforce_error");
+    }
     if (!input.code) return fail("missing_code");
 
     const pending = await this.repo.consumePending(payload.nonce, payload.userId, this.clock.now());

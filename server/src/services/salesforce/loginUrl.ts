@@ -30,11 +30,39 @@ export function normaliseSalesforceOrigin(value: string): string | null {
   return `https://${url.hostname.toLowerCase()}`;
 }
 
-/** Accepts "production", "sandbox", or a My Domain URL. */
+/**
+ * My Domain hostnames people copy from the address bar, mapped to the login
+ * domain. Every My Domain org has all three under the same prefix:
+ *   acme.lightning.force.com        (Lightning)   → acme.my.salesforce.com
+ *   acme.my.salesforce-setup.com    (Setup)       → acme.my.salesforce.com
+ * The prefix may carry one org-type label, e.g. `x-dev-ed.develop` or
+ * `acme--uat.sandbox`.
+ */
+const PASTED_DOMAINS = [".lightning.force.com", ".my.salesforce-setup.com"];
+const MY_DOMAIN_PREFIX = /^[a-z0-9-]+(\.[a-z0-9-]+)?$/;
+
+function toLoginDomain(input: string): string {
+  const withScheme = /^[a-z]+:\/\//i.test(input) ? input : `https://${input}`;
+  let url: URL;
+  try {
+    url = new URL(withScheme);
+  } catch {
+    return input;
+  }
+  if (url.protocol !== "https:") return input;
+  const host = url.hostname.toLowerCase();
+  for (const suffix of PASTED_DOMAINS) {
+    const prefix = host.slice(0, -suffix.length);
+    if (host.endsWith(suffix) && MY_DOMAIN_PREFIX.test(prefix)) return `https://${prefix}.my.salesforce.com`;
+  }
+  return withScheme;
+}
+
+/** Accepts "production", "sandbox", or a My Domain URL (login, Lightning or Setup form). */
 export function resolveLoginUrl(input: string): string | null {
   if (input === "production") return PRODUCTION_LOGIN;
   if (input === "sandbox") return SANDBOX_LOGIN;
-  const origin = normaliseSalesforceOrigin(input);
+  const origin = normaliseSalesforceOrigin(toLoginDomain(input.trim()));
   // My Domain login hosts are always `*.my.salesforce.com` (incl. sandboxes'
   // `*.sandbox.my.salesforce.com`). Narrower than the instance allowlist on purpose.
   if (!origin?.endsWith(".my.salesforce.com")) return null;

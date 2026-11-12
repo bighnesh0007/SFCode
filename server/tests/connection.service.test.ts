@@ -86,7 +86,7 @@ describe("SalesforceConnectionService — connect", () => {
   });
 
   it("rejects a non-Salesforce login host before any request is made", async () => {
-    await expect(s.service.start("user_1", "https://evil.com", "/")).rejects.toThrow(/my\.salesforce\.com/);
+    await expect(s.service.start("user_1", "https://evil.com", "/")).rejects.toThrow(/My Domain URL/);
     expect(s.fetch.calls).toHaveLength(0);
   });
 

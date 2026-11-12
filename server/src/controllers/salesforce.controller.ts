@@ -22,6 +22,7 @@ export function salesforceController(service: SalesforceConnectionService) {
       ...(q.code ? { code: q.code } : {}),
       ...(q.state ? { state: q.state } : {}),
       ...(q.error ? { error: q.error } : {}),
+      ...(q.error_description ? { errorDescription: q.error_description } : {}),
     });
     // `path` is always a same-site path (safeReturnTo), so this is not an open redirect.
     res.redirect(303, `${config.http.appUrl}${path}`);

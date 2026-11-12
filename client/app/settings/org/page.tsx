@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 
 const CALLBACK_ERRORS: Record<string, string> = {
   denied: "You declined access in Salesforce.",
+  salesforce_error: "Salesforce refused the sign-in. If you just set up the app, wait a few minutes; otherwise check the app exists in the org you logged into.",
   expired: "The sign-in took too long or was already used. Try again.",
   invalid_state: "The sign-in response could not be verified. Try again.",
   exchange: "Salesforce signed you in, but the token exchange failed. Check the External Client App settings.",
@@ -149,7 +150,7 @@ function OrgSettings() {
               {env === "custom" && (
                 <div className="space-y-1.5">
                   <Label htmlFor="domain">My Domain URL</Label>
-                  <Input id="domain" placeholder="https://yourcompany.my.salesforce.com" value={domain} onChange={(e) => setDomain(e.target.value)} />
+                  <Input id="domain" placeholder="https://yourorg.lightning.force.com" value={domain} onChange={(e) => setDomain(e.target.value)} />
                 </div>
               )}
               {error && <p className="text-sm text-destructive">{error}</p>}
