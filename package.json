@@ -1,0 +1,31 @@
+{
+  "name": "sfcode",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SFCode monorepo — Next.js client + Express backend for Salesforce developer practice.",
+  "license": "MIT",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -n client,server -c cyan,magenta --kill-others-on-fail \"npm:dev:client\" \"npm:dev:server\"",
+    "dev:client": "npm run dev -w sfcode-client",
+    "dev:server": "npm run dev -w sfcode-server",
+    "build": "npm run build -w sfcode-server && npm run build -w sfcode-client",
+    "lint": "npm run lint -w sfcode-client && npm run lint -w sfcode-server",
+    "typecheck": "npm run typecheck -w sfcode-client && npm run typecheck -w sfcode-server",
+    "test": "npm run test -w sfcode-server",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "overrides": {
+    "dompurify": "3.4.17"
+  }
+}

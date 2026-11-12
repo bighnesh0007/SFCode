@@ -1,0 +1,15 @@
+# Local development database only. Bound to loopback so it is never reachable
+# from the network; the credentials below are throwaway dev values.
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: sfcode
+      POSTGRES_PASSWORD: sfcode
+      POSTGRES_DB: sfcode
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - sfcode-pg:/var/lib/postgresql/data
+volumes:
+  sfcode-pg:

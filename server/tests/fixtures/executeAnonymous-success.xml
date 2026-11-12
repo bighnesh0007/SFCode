@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="http://soap.sforce.com/2006/08/apex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><soapenv:Header><DebuggingInfo><debugLog>62.0 APEX_CODE,DEBUG
+12:00:00.1 (1000)|EXECUTION_STARTED
+12:00:00.1 (2000)|USER_DEBUG|[2]|DEBUG|Hello &amp; welcome
+12:00:00.1 (3000)|EXECUTION_FINISHED
+</debugLog></DebuggingInfo></soapenv:Header><soapenv:Body><executeAnonymousResponse><result><column>-1</column><compileProblem xsi:nil="true"/><compiled>true</compiled><exceptionMessage xsi:nil="true"/><exceptionStackTrace xsi:nil="true"/><line>-1</line><success>true</success></result></executeAnonymousResponse></soapenv:Body></soapenv:Envelope>

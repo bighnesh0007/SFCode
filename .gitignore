@@ -1,0 +1,76 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+#
+# This is a monorepo: client/ (Next.js) + server/ (TypeScript backend).
+# NOTE: patterns are intentionally unanchored (no leading "/") so they match inside
+# client/ and server/ as well as the repo root.
+
+# ── dependencies ──────────────────────────────────────────────────────────────
+node_modules
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ── build output ──────────────────────────────────────────────────────────────
+# client/ (Next.js)
+.next/
+out/
+next-env.d.ts
+# server/ (tsc -> dist)
+dist/
+build
+
+# ── testing ───────────────────────────────────────────────────────────────────
+coverage
+.vitest-reports
+*.lcov
+
+# ── secrets & local config ────────────────────────────────────────────────────
+# Covers client/.env.local, server/.env, .env.test, etc.
+.env*
+!.env.example
+# Clerk keyless dev instance — holds a secret key, never commit
+.clerk
+*.pem
+*.key
+!**/public/**/*.key
+# Local credential store for tooling (MCP servers, git push, scripts).
+# Never committed. See .secrets.local.example for the expected shape.
+.secrets.local
+.secrets.local.*
+!.secrets.local.example
+
+# ── caches ────────────────────────────────────────────────────────────────────
+*.tsbuildinfo
+.eslintcache
+.turbo
+.cache
+
+# ── platform / editor ─────────────────────────────────────────────────────────
+.vercel
+.DS_Store
+Thumbs.db
+*.swp
+
+# ── debug logs ────────────────────────────────────────────────────────────────
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+
+# ── local tooling artifacts ───────────────────────────────────────────────────
+# Playwright CLI session dumps; useful locally, noise in git.
+.playwright-cli/*.log
+.playwright-cli/*.yml
+
+# ── compiler parity corpus (contains hidden test cases — never commit) ──────
+compiler/parity/out/
+# compiler/ (Maven)
+compiler/target/
+
+# local stack runtime (scripts/up.mjs): logs, redis data
+.run/
