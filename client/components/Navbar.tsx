@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 import { LocalModeBadge, SignInButton, SignUpButton, UserButton, useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
+import { LogoMark } from "@/components/Logo";
 import { OrgBadge } from "@/components/OrgBadge";
 import { SearchPalette } from "@/components/SearchPalette";
 import { cn } from "@/lib/utils";
@@ -48,11 +49,11 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="mx-auto flex h-12 max-w-screen-2xl items-center gap-6 px-4">
         <Link href="/" className="flex items-center gap-1.5 text-[15px] font-semibold tracking-tight">
-          <span className="grid h-6 w-6 place-items-center rounded-md bg-primary text-[11px] font-bold text-primary-foreground">SF</span>
-          SFCode
+          <LogoMark size={24} />
+          <span>SF<span className="text-sky-500">Code</span></span>
         </Link>
 
-        <nav className="hidden h-full items-center gap-5 text-sm md:flex">
+        <nav className="hidden h-full items-center gap-5 whitespace-nowrap text-sm lg:flex">
           {NAV.map((n) => (
             <Link
               key={n.href}
@@ -68,15 +69,15 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <div className="ml-auto hidden items-center gap-2 md:flex">
+        <div className="ml-auto hidden items-center gap-2 lg:flex">
           <SearchPalette shortcut />
           <LocalModeBadge />
           {isSignedIn && <OrgBadge />}
           <ModeToggle />
           {isSignedIn ? (
             <>
-              {isStaff && isSignedIn && <Link href="/admin" className="text-sm text-muted-foreground hover:text-foreground">Admin</Link>}
-              <Link href="/profile" className="text-sm text-muted-foreground hover:text-foreground">Profile</Link>
+              {isStaff && isSignedIn && <Link href="/admin" className={cn("text-sm hover:text-foreground", active(["/admin"]) ? "text-foreground" : "text-muted-foreground")}>Admin</Link>}
+              <Link href="/profile" className={cn("text-sm hover:text-foreground", active(["/profile"]) ? "text-foreground" : "text-muted-foreground")}>Profile</Link>
               <UserButton />
             </>
           ) : (
@@ -91,7 +92,7 @@ export default function Navbar() {
           )}
         </div>
 
-        <div className="ml-auto flex items-center gap-1 md:hidden">
+        <div className="ml-auto flex items-center gap-1 lg:hidden">
           <SearchPalette />
           <ModeToggle />
           <Button type="button" variant="ghost" size="icon" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"}>
@@ -101,9 +102,14 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <div className="border-t px-4 py-3 md:hidden">
+        <div className="border-t px-4 py-3 lg:hidden">
           <nav className="flex flex-col">
-            {[...NAV, { href: "/settings/org", label: "Salesforce org", match: ["/settings"] }].map((n) => (
+            {[
+              ...NAV,
+              ...(isSignedIn ? [{ href: "/profile", label: "Profile", match: ["/profile"] }] : []),
+              ...(isSignedIn && isStaff ? [{ href: "/admin", label: "Admin", match: ["/admin"] }] : []),
+              { href: "/settings/org", label: "Salesforce org", match: ["/settings"] },
+            ].map((n) => (
               <Link
                 key={n.href}
                 href={n.href}
