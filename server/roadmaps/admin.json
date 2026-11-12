@@ -1,0 +1,141 @@
+{
+  "id": "admin",
+  "title": "Salesforce Admin",
+  "description": "From your first org to the Admin certification: data model, data quality, security and sharing, page design, Flows, reports and data tools. Each step ends with a short quiz.",
+  "nodes": [
+    {
+      "id": "admin-org", "title": "Orgs, apps & Setup", "level": 1, "col": 1, "requires": [],
+      "summary": "What an org is, how apps group your work, and where admins configure everything.",
+      "lesson": "An **org** is your company's instance of Salesforce: its data, configuration and users. To practise, use a free **Developer Edition** org: it doesn't expire. Companies test changes in **sandboxes** before touching **production**.\n\nAn **app** is a named set of tabs and items (Sales, Service, your own) that users switch between in the **App Launcher**. It's a view, not a separate database: every app reads the same records.\n\nAdmins work in **Setup** (the gear icon). Use the Quick Find box: type `Object Manager`, `Users`, `Flows`… and you'll rarely need to browse menus.",
+      "problems": [],
+      "quiz": [
+        { "q": "What is a Salesforce \"app\"?", "options": ["A separate database with its own records", "A named set of tabs and items users open from the App Launcher", "A managed package you must install", "A type of user license"], "answer": 1, "why": "Apps are navigation: groups of tabs over the same shared data." },
+        { "q": "Which org is free, doesn't expire, and is meant for learning and building?", "options": ["Production", "Full sandbox", "Developer Edition", "Partial Copy sandbox"], "answer": 2, "why": "Developer Edition orgs are free and permanent. Sandboxes are copies of a paid production org." },
+        { "q": "Where do admins configure objects, users and automation?", "options": ["The App Launcher", "Setup", "The Reports tab", "Chatter"], "answer": 1, "why": "Setup (gear icon) is the admin's home; Quick Find gets you anywhere fast." }
+      ]
+    },
+    {
+      "id": "admin-objects", "title": "Objects & fields", "level": 1, "col": 0, "requires": ["admin-org"],
+      "summary": "Standard vs custom objects, field types, and formulas.",
+      "lesson": "An **object** is a table: Account, Contact, Opportunity are **standard** objects that ship with Salesforce. You create **custom** objects for your business; their API names end in `__c` (e.g. `Project__c`), and so do custom fields.\n\nPick field types deliberately:\n\n- **Picklist** for a fixed list of values (clean reporting, unlike free text).\n- **Formula** for a read-only value calculated from other fields every time it's read, e.g. `Amount * Probability`.\n- **Lookup / Master-Detail** to relate records (next step).\n\nCreate objects and fields in **Setup → Object Manager**.",
+      "problems": [],
+      "quiz": [
+        { "q": "Custom object and custom field API names end in…", "options": ["__r", "__c", "_obj", "__x"], "answer": 1, "why": "__c marks custom objects and fields. __r is a relationship name, __x an external object." },
+        { "q": "Which field type calculates a read-only value from other fields?", "options": ["Picklist", "Formula", "Text Area", "Lookup"], "answer": 1, "why": "Formula fields are computed when read and can't be edited." },
+        { "q": "Which of these is a standard object?", "options": ["Invoice__c", "Account", "Project__c", "Shipment__c"], "answer": 1, "why": "Account ships with Salesforce; the others end in __c, so they're custom." }
+      ]
+    },
+    {
+      "id": "admin-users", "title": "Users & licenses", "level": 1, "col": 2, "requires": ["admin-org"],
+      "summary": "Creating users, licenses, and deactivating instead of deleting.",
+      "lesson": "Every person who logs in is a **user** with a **user license** (which features they can ever use) and exactly one **profile** (their baseline permissions).\n\nYou can't delete users: you **deactivate** them, which frees the license and keeps the records they own and their history intact. If a deactivation is blocked (they're a default owner, for example), **freeze** the user first to stop logins immediately.\n\nUsername must be unique across *all* Salesforce orgs and look like an email address; the email field is where notifications go.",
+      "problems": [],
+      "quiz": [
+        { "q": "An employee leaves. What do you do with their user?", "options": ["Delete the user", "Deactivate it (freeze first if you need to block login right away)", "Change their profile to read-only and leave it active", "Delete their records, then the user"], "answer": 1, "why": "Users can't be deleted; deactivation frees the license and keeps data and history." },
+        { "q": "How many profiles does each user have?", "options": ["Zero or more", "Exactly one", "One per app", "As many as their role allows"], "answer": 1, "why": "One profile per user; extra access is added with permission sets." },
+        { "q": "A Salesforce username must be…", "options": ["The user's real email address", "Unique across all Salesforce orgs, in email format", "Unique only within your org", "The same as their nickname"], "answer": 1, "why": "Usernames are globally unique and email-shaped, but don't have to be a real mailbox." }
+      ]
+    },
+    {
+      "id": "admin-relationships", "title": "Relationships", "level": 2, "col": 0, "requires": ["admin-objects"],
+      "summary": "Lookup vs master-detail, roll-ups and junction objects.",
+      "lesson": "- **Lookup**: a loose link. The child has its own owner and sharing; deleting the parent doesn't delete it.\n- **Master-detail**: a tight link. The detail inherits the master's owner and sharing, can't exist without a master, and **is deleted with it**. Only the master can have **roll-up summary** fields (COUNT, SUM, MIN, MAX of details).\n- **Many-to-many**: a **junction object** with two master-detail relationships, e.g. `Enrollment__c` between Student and Course.",
+      "problems": [],
+      "quiz": [
+        { "q": "In a master-detail relationship, what happens to detail records when the master is deleted?", "options": ["Nothing; they keep a blank parent", "They are deleted too", "They move to the default owner", "The delete is always blocked"], "answer": 1, "why": "Details can't exist without a master, so they're deleted with it." },
+        { "q": "Where can you create a roll-up summary field?", "options": ["On either side of a lookup", "On the master object of a master-detail relationship", "On the detail object", "On any object"], "answer": 1, "why": "Roll-ups summarise detail records onto their master." },
+        { "q": "How do you model many-to-many (students ↔ courses)?", "options": ["A multi-select picklist", "Two lookups on Student", "A junction object with two master-detail relationships", "A formula field"], "answer": 2, "why": "Each junction record links one student to one course." }
+      ]
+    },
+    {
+      "id": "admin-data-quality", "title": "Validation rules", "level": 2, "col": 1, "requires": ["admin-objects"],
+      "summary": "Stop bad data at save time with formulas.",
+      "lesson": "A **validation rule** is a formula that describes *bad* data. When it evaluates to **TRUE**, the save is blocked and your error message is shown, at the top of the page or next to a field.\n\n```\nAND(\n  ISPICKVAL(StageName, \"Closed Won\"),\n  ISBLANK(NextStep)\n)\n```\n\nUseful functions: `ISBLANK`, `ISPICKVAL`, `ISCHANGED`, `PRIORVALUE`, `REGEX`. Rules run on **every** save, from the UI, the API, imports and Apex, so they protect data everywhere, and can break integrations if you don't test them.",
+      "problems": [],
+      "quiz": [
+        { "q": "A validation rule blocks the save when its formula returns…", "options": ["FALSE", "TRUE", "An error code", "Null"], "answer": 1, "why": "Write the formula to describe invalid data; TRUE means \"block\"." },
+        { "q": "Which function checks whether a text field is empty?", "options": ["ISNULL only", "ISBLANK", "ISEMPTY", "LEN = null"], "answer": 1, "why": "ISBLANK is the recommended check for empty values." },
+        { "q": "Do validation rules apply to records saved through the API or Data Loader?", "options": ["No, UI only", "Yes, every save", "Only for admins", "Only if the field is on the page layout"], "answer": 1, "why": "They run on every save regardless of where it comes from." }
+      ]
+    },
+    {
+      "id": "admin-security", "title": "Profiles & permission sets", "level": 2, "col": 2, "requires": ["admin-users"],
+      "summary": "Object permissions, field-level security, least privilege.",
+      "lesson": "Two questions decide what someone can do:\n\n1. **What** can they touch? **Object permissions** (Create, Read, Edit, Delete) and **field-level security** (visible / read-only). These come from the **profile** plus any **permission sets**.\n2. **Which records**? That's **sharing** (next step).\n\nBest practice: keep profiles minimal and grant extra access with **permission sets** (bundled into **permission set groups**). Adding is easy; taking away from a shared profile breaks other people.",
+      "problems": [],
+      "quiz": [
+        { "q": "A few users need to edit one extra field their profile can't. Best approach?", "options": ["Clone their profile", "Assign a permission set", "Make the field required", "Change the org-wide default"], "answer": 1, "why": "Permission sets add access to specific users without new profiles." },
+        { "q": "Field-level security controls…", "options": ["Which records a user sees", "Whether a user can see or edit a field", "The order of fields on a page", "Which picklist values appear"], "answer": 1, "why": "FLS is per field: hidden, read-only or editable." },
+        { "q": "What do object permissions NOT control?", "options": ["Whether you can create records", "Whether you can delete records", "Which specific records you can see", "Whether you can read the object"], "answer": 2, "why": "Which records is decided by sharing, not object permissions." }
+      ]
+    },
+    {
+      "id": "admin-ui", "title": "Record types & page layouts", "level": 3, "col": 0, "requires": ["admin-relationships"],
+      "summary": "Different processes, picklists and layouts on one object.",
+      "lesson": "**Page layouts** arrange fields, related lists and buttons on a record. **Lightning App Builder** designs the whole record page; **Dynamic Forms** show fields only when they're relevant.\n\n**Record types** let one object serve different processes: a *Partner* vs *Customer* Account can have different **picklist values** and **page layouts**, assigned by profile.\n\nCareful: a field marked required **on a page layout** is enforced only in that UI. Make the field required in its definition (or use a validation rule) to enforce it everywhere.",
+      "problems": [],
+      "quiz": [
+        { "q": "What do record types let you vary for different processes on one object?", "options": ["The object's API name", "Picklist values and page layouts", "The org-wide default", "The user license"], "answer": 1, "why": "Record types drive picklist values and which layout users see." },
+        { "q": "A field is required on the page layout only. Is it required for Data Loader imports?", "options": ["Yes, always", "No, layout-required is UI-only", "Only for new records", "Only for admins"], "answer": 1, "why": "Use field-level required or a validation rule to enforce everywhere." },
+        { "q": "Which tool designs Lightning record pages with components?", "options": ["Schema Builder", "Lightning App Builder", "Data Loader", "Process Builder"], "answer": 1, "why": "App Builder lays out components; Dynamic Forms add field visibility rules." }
+      ]
+    },
+    {
+      "id": "admin-flows", "title": "Automate with Flow", "level": 3, "col": 1, "requires": ["admin-data-quality"],
+      "summary": "Build real flows in your org, graded by tests.",
+      "lesson": "**Flow** is the declarative automation tool (Workflow Rules and Process Builder are retired). Record-triggered flows that only update the triggering record should run **before save**: fast, no extra DML. Do the three problems below in your own org's Flow Builder; SFCode grades them with hidden tests.",
+      "problems": ["flow-account-default-rating", "flow-won-next-step", "flow-revenue-tier"]
+    },
+    {
+      "id": "admin-sharing", "title": "Sharing: OWD, roles, rules", "level": 3, "col": 2, "requires": ["admin-security"],
+      "summary": "Lock down with OWD, then open up.",
+      "lesson": "Record access is built in layers:\n\n1. **Organization-wide defaults (OWD)**: the most restrictive baseline per object (Private, Public Read Only, Public Read/Write).\n2. **Role hierarchy**: managers see what their team owns.\n3. **Sharing rules**: open access to groups or roles by owner or criteria.\n4. **Manual sharing** and **teams** for one-offs.\n\nEverything after OWD only **opens** access; you can't use sharing rules to take it away. So set OWD to the strictest anyone needs, then open up.",
+      "problems": [],
+      "quiz": [
+        { "q": "What sets the baseline (most restrictive) record access for an object?", "options": ["Profiles", "Organization-wide defaults", "Sharing rules", "Page layouts"], "answer": 1, "why": "OWD is the floor; everything else opens access from there." },
+        { "q": "Can a sharing rule restrict access below the org-wide default?", "options": ["Yes", "No, sharing rules only grant extra access", "Only for custom objects", "Only with a permission set"], "answer": 1, "why": "Sharing only ever adds access." },
+        { "q": "OWD for Opportunity is Private. How does a sales manager see their team's deals?", "options": ["Field-level security", "The role hierarchy", "A validation rule", "A record type"], "answer": 1, "why": "Users above in the role hierarchy get access to records owned below them." }
+      ]
+    },
+    {
+      "id": "admin-reports", "title": "Reports & dashboards", "level": 4, "col": 0, "requires": ["admin-ui"],
+      "summary": "Report types, formats and dashboard running users.",
+      "lesson": "A **report type** decides which objects and fields a report can use (e.g. *Accounts with Contacts*). Formats:\n\n- **Tabular**: a plain list.\n- **Summary**: grouped by rows, with subtotals.\n- **Matrix**: grouped by rows **and** columns.\n- **Joined**: several report blocks side by side.\n\n**Dashboards** visualise source reports. A standard dashboard shows data as its **running user** sees it; a **dynamic dashboard** uses each viewer's own access.",
+      "problems": [],
+      "quiz": [
+        { "q": "You need totals grouped by Stage (rows) and Close Month (columns). Which format?", "options": ["Tabular", "Summary", "Matrix", "Joined"], "answer": 2, "why": "Matrix groups by rows and columns." },
+        { "q": "What decides which objects and fields a report can include?", "options": ["The dashboard", "The report type", "The page layout", "The user's role"], "answer": 1, "why": "Report types define the available objects, relationships and fields." },
+        { "q": "Whose access determines what a standard (non-dynamic) dashboard shows?", "options": ["Each viewer", "The running user", "The system administrator", "The report owner's manager"], "answer": 1, "why": "Dynamic dashboards are the ones that use each viewer's access." }
+      ]
+    },
+    {
+      "id": "admin-soql", "title": "SOQL for admins", "level": 4, "col": 1, "requires": ["admin-relationships", "admin-flows"],
+      "summary": "Query your data directly: filters and parent fields.",
+      "lesson": "SOQL lets you ask precise questions of your data: in the Developer Console, in Flow \"Get Records\" thinking, and in tools like Data Loader exports. Try these two; they're graded against real records in your org.",
+      "problems": ["soql-hot-tech-accounts", "soql-contacts-in-city"]
+    },
+    {
+      "id": "admin-data", "title": "Data import & tools", "level": 4, "col": 2, "requires": ["admin-sharing"],
+      "summary": "Import Wizard vs Data Loader, duplicates, backups.",
+      "lesson": "- **Data Import Wizard** (in Setup): guided, up to **50,000** records, common standard objects and custom objects, with duplicate matching.\n- **Data Loader** (desktop app): up to **5 million** records, any object, insert / update / upsert / delete / export, and can be scripted.\n- **Duplicate rules** with **matching rules** warn about or block duplicates.\n- **Data Export Service** schedules weekly or monthly CSV exports of your data as a backup.",
+      "problems": [],
+      "quiz": [
+        { "q": "You must load 1 million records. Which tool?", "options": ["Data Import Wizard", "Data Loader", "Manual entry", "A report"], "answer": 1, "why": "The Import Wizard tops out at 50,000; Data Loader handles millions." },
+        { "q": "Which feature warns about or blocks duplicate records?", "options": ["Validation rules only", "Duplicate rules with matching rules", "Sharing rules", "Record types"], "answer": 1, "why": "Matching rules find duplicates; duplicate rules decide what to do." },
+        { "q": "Built-in way to schedule regular CSV backups of your data?", "options": ["Data Export Service", "Dashboards", "Change sets", "Sandbox refresh"], "answer": 0, "why": "Data Export runs weekly or monthly exports." }
+      ]
+    },
+    {
+      "id": "admin-cert", "title": "Admin cert checkpoint", "level": 4, "col": 1, "requires": ["admin-reports", "admin-soql", "admin-data"],
+      "summary": "Mixed scenario questions across the whole path.",
+      "lesson": "The Admin exam is scenario-based: read what's asked, then pick the **least effort, most maintainable** declarative answer. Pass this checkpoint, then review any step you hesitated on.",
+      "problems": [],
+      "quiz": [
+        { "q": "Phone must be filled in only when Status is Closed. What do you build?", "options": ["Make Phone required on the field", "A validation rule", "A page layout", "A sharing rule"], "answer": 1, "why": "Conditional requirements are validation rules: AND(ISPICKVAL(Status, 'Closed'), ISBLANK(Phone))." },
+        { "q": "Support agents need Delete on Cases, but their profile is shared with others. Least-effort fix?", "options": ["New profile", "Permission set for the agents", "Change OWD to Public Read/Write", "Give them the System Administrator profile"], "answer": 1, "why": "Permission sets add access to specific users without side effects." },
+        { "q": "Accounts must be Private, but the whole Finance team needs to read accounts in the Enterprise segment. What do you use?", "options": ["Criteria-based sharing rule", "Field-level security", "Role hierarchy change", "Record type"], "answer": 0, "why": "Criteria-based sharing rules open access by field values to a group or role." },
+        { "q": "Each Course has many Students and each Student many Courses, and you need a count of students per course. What do you build?", "options": ["A lookup on Course and a formula", "A junction object with two master-detail relationships, plus a roll-up summary on Course", "A multi-select picklist", "Two reports"], "answer": 1, "why": "A junction object gives many-to-many; master-detail enables the roll-up count." }
+      ]
+    }
+  ]
+}

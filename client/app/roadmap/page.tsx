@@ -8,7 +8,7 @@ import { Markdown } from "@/components/Markdown";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
 import type { Track } from "@/lib/challengesApi";
-import { getRoadmap, markRead, type NodeState, type RoadmapNode, type RoadmapView } from "@/lib/roadmapApi";
+import { getOnboarding, getRoadmap, listRoadmaps, markRead, submitQuiz, type NodeState, type QuizResult, type RoadmapNode, type RoadmapView } from "@/lib/roadmapApi";
 import { trackInfo } from "@/lib/tracks";
 import { cn } from "@/lib/utils";
 
@@ -52,13 +52,36 @@ export default function RoadmapPage() {
   const [view, setView] = useState<RoadmapView | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState<string | null>(null);
+  const [roadmaps, setRoadmaps] = useState<{ id: string; title: string }[]>([]);
+  /** null until we know: the learner's own roadmap if they did the quiz, else Developer. */
+  const [roadmapId, setRoadmapId] = useState<string | null>(null);
+
+  useEffect(() => {
+    listRoadmaps().then(setRoadmaps).catch(() => {});
+  }, []);
+  useEffect(() => {
+    let cancelled = false;
+    const fallback = () => !cancelled && setRoadmapId((cur) => cur ?? "developer");
+    if (!isSignedIn) {
+      fallback();
+      return;
+    }
+    getToken()
+      .then((t) => getOnboarding(t))
+      .then((ob) => !cancelled && setRoadmapId((cur) => cur ?? ob?.roadmapId ?? "developer"))
+      .catch(fallback);
+    return () => {
+      cancelled = true;
+    };
+  }, [isSignedIn, getToken]);
 
   const load = useCallback(() => {
+    if (!roadmapId) return;
     getToken()
-      .then((t) => getRoadmap(t, "developer"))
+      .then((t) => getRoadmap(t, roadmapId))
       .then(setView)
       .catch((err: unknown) => setError(err instanceof ApiError ? err.message : "Could not load the roadmap."));
-  }, [getToken]);
+  }, [getToken, roadmapId]);
   useEffect(load, [load, isSignedIn]);
 
   const byId = useMemo(() => new Map((view?.nodes ?? []).map((n) => [n.id, n])), [view]);
@@ -87,6 +110,16 @@ export default function RoadmapPage() {
           <Link href="/welcome"><Button>Personalise it</Button></Link>
         ) : null}
       </div>
+
+      {roadmaps.length > 1 && (
+        <div role="tablist" aria-label="Roadmap" className="mt-5 inline-flex rounded-lg border p-0.5 text-sm">
+          {roadmaps.map((r) => (
+            <button key={r.id} role="tab" type="button" aria-selected={r.id === view.id} onClick={() => { setOpen(null); setRoadmapId(r.id); }} className={cn("rounded-md px-3 py-1", r.id === view.id ? "bg-accent font-medium" : "text-muted-foreground hover:text-foreground")}>
+              {r.title}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="mt-6 flex flex-wrap gap-3 text-xs text-muted-foreground">
         {(Object.keys(STATE_LABEL) as NodeState[]).map((s) => <span key={s} className="inline-flex items-center gap-1"><StateIcon state={s} className="h-3.5 w-3.5" />{STATE_LABEL[s]}</span>)}
@@ -212,6 +245,8 @@ function NodePanel({ node, view, onClose, onChange }: { node: RoadmapNode; view:
           </Link>
         )}
 
+        {node.quiz && <Quiz node={node} view={view} onChange={onChange} />}
+
         {node.completeByReading && isSignedIn && view.personalised && (
           <Button className="mt-6" variant={node.read ? "outline" : "default"} disabled={busy} onClick={() => void toggleRead()}>
             {node.read ? "Mark as not done" : node.problems.length ? "I've finished these" : "Mark as done"}
@@ -220,5 +255,69 @@ function NodePanel({ node, view, onClose, onChange }: { node: RoadmapNode; view:
         {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
       </aside>
     </>
+  );
+}
+
+function Quiz({ node, view, onChange }: { node: RoadmapNode; view: RoadmapView; onChange: (v: RoadmapView) => void }) {
+  const { isSignedIn, getToken } = useAuthState();
+  const questions = node.quiz ?? [];
+  const [picks, setPicks] = useState<(number | null)[]>(() => questions.map(() => null));
+  const [result, setResult] = useState<QuizResult | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function check() {
+    setBusy(true);
+    setError(null);
+    try {
+      const r = await submitQuiz(await getToken(), view.id, node.id, picks.map((p) => p ?? -1));
+      setResult(r);
+      onChange(r.roadmap);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Could not check your answers.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="mt-6">
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Quiz {node.state === "done" && <span className="ml-1 normal-case text-emerald-600 dark:text-emerald-400">· passed</span>}</h3>
+      <ol className="mt-2 space-y-4">
+        {questions.map((q, i) => {
+          const r = result?.results[i];
+          return (
+            <li key={i} className="text-sm">
+              <p className="font-medium">{i + 1}. {q.q}</p>
+              <div className="mt-1.5 space-y-1">
+                {q.options.map((o, j) => {
+                  const picked = picks[i] === j;
+                  const tone = r ? (j === r.answer ? "border-emerald-500 bg-emerald-500/10" : picked ? "border-destructive bg-destructive/10" : "") : picked ? "border-sky-500 bg-sky-500/10" : "";
+                  return (
+                    <button key={j} type="button" disabled={Boolean(result)} aria-pressed={picked} onClick={() => setPicks((cur) => cur.map((v, k) => (k === i ? j : v)))} className={cn("block w-full rounded-md border px-3 py-1.5 text-left transition-colors hover:bg-accent/60 disabled:hover:bg-transparent", tone)}>
+                      {o}
+                    </button>
+                  );
+                })}
+              </div>
+              {r && <p className={cn("mt-1 text-xs", r.correct ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")}>{r.correct ? "Correct. " : "Not quite. "}{r.why}</p>}
+            </li>
+          );
+        })}
+      </ol>
+      {result && (
+        <p role="status" className={cn("mt-4 rounded-lg p-3 text-sm font-medium", result.passed ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-amber-500/10")}>
+          {result.correct}/{result.total} correct. {result.passed ? "Step complete!" : "You need all but one right. Reread the lesson and try again."}
+        </p>
+      )}
+      {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
+      {!isSignedIn || !view.personalised ? (
+        <p className="mt-3 text-xs text-muted-foreground">Sign in and take the welcome quiz to save your progress.</p>
+      ) : result ? (
+        !result.passed && <Button className="mt-3" variant="outline" onClick={() => { setResult(null); setPicks(questions.map(() => null)); }}>Try again</Button>
+      ) : (
+        <Button className="mt-3" disabled={busy || picks.some((p) => p === null)} onClick={() => void check()}>Check answers</Button>
+      )}
+    </section>
   );
 }

@@ -107,7 +107,7 @@ export function RoadmapProgress({ p, editable }: { p: Profile; editable: boolean
   return (
     <section className="rounded-xl border p-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold">Developer roadmap</h2>
+        <h2 className="text-sm font-semibold">{p.roadmap.title} roadmap</h2>
         {editable && <Link href="/roadmap" className="text-xs text-sky-600 hover:underline dark:text-sky-400">Continue →</Link>}
       </div>
       <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-gradient-to-r from-sky-400 to-indigo-500 transition-all duration-700" style={{ width: `${pct}%` }} /></div>

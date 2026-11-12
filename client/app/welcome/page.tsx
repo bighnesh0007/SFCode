@@ -74,6 +74,13 @@ const START: Record<Level, string> = {
   lead: "governor limits, async Apex and the PD II checkpoint",
 };
 
+const ADMIN_START: Record<Level, string> = {
+  new: "orgs and Setup, then objects, fields and users",
+  basics: "relationships, validation rules and security. The first steps are marked as known",
+  production: "sharing, page design and Flows. The basics are marked as known",
+  lead: "reports, data tools and the Admin cert checkpoint",
+};
+
 function Welcome() {
   const router = useRouter();
   const next = useSearchParams().get("next");
@@ -123,6 +130,7 @@ function Welcome() {
     );
   }
 
+  const adminPath = a.role === "admin" || a.role === "consultant" || a.goal === "admin-cert";
   if (saved && a.level) {
     return (
       <div className="relative mx-auto w-full max-w-2xl overflow-hidden px-4 py-12 text-center">
@@ -130,11 +138,11 @@ function Welcome() {
         <Sparkles className="mx-auto h-10 w-10 animate-bounce text-sky-500" />
         <h1 className="mt-4 text-3xl font-semibold tracking-tight">Your roadmap is ready</h1>
         <p className="mt-3 text-muted-foreground">
-          You&apos;re a <b className="text-foreground">{ROLES.find((r) => r.value === a.role)?.title}</b> who&apos;s <b className="text-foreground">{LEVELS.find((l) => l.value === a.level)?.title.toLowerCase()}</b>. You&apos;ll start with {START[a.level]}.
+          You&apos;re a <b className="text-foreground">{ROLES.find((r) => r.value === a.role)?.title}</b> who&apos;s <b className="text-foreground">{LEVELS.find((l) => l.value === a.level)?.title.toLowerCase()}</b>. You&apos;ll start with {adminPath ? ADMIN_START[a.level] : START[a.level]}.
         </p>
-        {a.role !== "developer" && (
+        {(a.role === "student" || a.role === "architect") && a.goal !== "admin-cert" && (
           <p className="mx-auto mt-3 max-w-md rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
-            A dedicated {a.role} roadmap is on the way. For now you&apos;re on the Developer path; its SOQL and Flow steps are the most useful to you.
+            A dedicated {a.role} roadmap is on the way. For now you&apos;re on the Developer path; you can switch to the Admin path on the roadmap page.
           </p>
         )}
         <div className="mt-8 flex flex-wrap justify-center gap-3">

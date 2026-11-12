@@ -114,9 +114,10 @@ export function buildContainer(): Container {
       coins: async (userId) => (await store.wallet(userId)).balance,
       contestHistory: (userId) => contests.history(userId),
       roadmapProgress: async (userId) => {
-        if (!roadmapSvc || !(await roadmapSvc.onboarding(userId))) return null;
-        const v = await roadmapSvc.view("developer", userId);
-        return { done: v.done, total: v.total };
+        const ob = roadmapSvc ? await roadmapSvc.onboarding(userId) : null;
+        if (!roadmapSvc || !ob) return null;
+        const v = await roadmapSvc.view(ob.roadmapId, userId);
+        return { title: v.title, done: v.done, total: v.total };
       },
     });
   }

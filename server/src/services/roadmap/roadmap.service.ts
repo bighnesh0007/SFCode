@@ -5,7 +5,7 @@
  * it counts as met for prerequisites but stays open to do.
  */
 import { BadRequestError, NotFoundError } from "../../errors/AppError.ts";
-import { ASSUMED_BELOW, type Level, type Roadmap, type RoadmapNode } from "../../domain/roadmap.ts";
+import { ASSUMED_BELOW, quizPassed, type Level, type Roadmap, type RoadmapNode } from "../../domain/roadmap.ts";
 import type { ChallengeSubmissionRepository } from "../../repositories/challengeSubmission.repository.ts";
 import type { OnboardingRecord, OnboardingRepository } from "../../repositories/onboarding.repository.ts";
 import type { ChallengeCatalog } from "../challenges/catalog.ts";
@@ -19,7 +19,17 @@ export interface OnboardingAnswers {
   hours: string;
 }
 
-export interface RoadmapNodeView extends Omit<RoadmapNode, "problems"> {
+export interface QuizResult {
+  correct: number;
+  total: number;
+  passed: boolean;
+  results: { correct: boolean; answer: number; why: string }[];
+  roadmap: RoadmapView;
+}
+
+export interface RoadmapNodeView extends Omit<RoadmapNode, "problems" | "quiz"> {
+  /** Questions only; answers and explanations come back after submitting. */
+  quiz?: { q: string; options: string[] }[];
   depth: number;
   state: NodeState;
   /** Attempted a problem here without solving it: suggest the prerequisites/lesson. */
@@ -27,6 +37,8 @@ export interface RoadmapNodeView extends Omit<RoadmapNode, "problems"> {
   read: boolean;
   /** Completion is by marking read: lesson-only nodes, and LWC (graded in the browser, not stored). */
   completeByReading: boolean;
+  /** Completion is by passing the step quiz. */
+  completeByQuiz: boolean;
   problems: { slug: string; title: string; track: string; difficulty: string; status: "solved" | "attempted" | "todo" }[];
 }
 
@@ -58,8 +70,10 @@ export class RoadmapService {
     return this.repo.get(userId);
   }
 
-  /** Phase 1 has one roadmap; other roles get it too until theirs exist. */
-  private pickRoadmap(_answers: OnboardingAnswers): string {
+  /** Admins, consultants and Admin-cert seekers get the Admin path; everyone else the Developer path. */
+  private pickRoadmap(answers: OnboardingAnswers): string {
+    const wantsAdmin = answers.role === "admin" || answers.role === "consultant" || answers.goal === "admin-cert";
+    if (wantsAdmin && this.roadmaps.has("admin")) return "admin";
     return this.roadmaps.has("developer") ? "developer" : ([...this.roadmaps.keys()][0] ?? "developer");
   }
 
@@ -87,10 +101,14 @@ export class RoadmapService {
         return { slug, title: c?.title ?? slug, track: c?.track ?? "apex", difficulty: c?.difficulty ?? "Easy", status: progress.get(slug) === "solved" ? "solved" as const : progress.get(slug) === "attempted" ? "attempted" as const : "todo" as const };
       });
       const graded = problems.filter((p) => p.track !== "lwc");
-      const completeByReading = graded.length === 0;
-      const selfDone = completeByReading ? read.has(n.id) : graded.every((p) => p.status === "solved");
+      const completeByQuiz = graded.length === 0 && n.quiz !== undefined;
+      const completeByReading = graded.length === 0 && !completeByQuiz;
+      const selfDone = graded.length === 0 ? read.has(n.id) : graded.every((p) => p.status === "solved");
+      const { quiz, ...rest } = n;
       base.set(n.id, {
-        ...n,
+        ...rest,
+        ...(quiz ? { quiz: quiz.map(({ q, options }) => ({ q, options })) } : {}),
+        completeByQuiz,
         problems,
         depth: r.depth[n.id] ?? 0,
         read: read.has(n.id),
@@ -140,8 +158,22 @@ export class RoadmapService {
 
   async setRead(userId: string, roadmapId: string, nodeId: string, read: boolean): Promise<RoadmapView> {
     const r = this.roadmap(roadmapId);
-    if (!r.nodes.some((n) => n.id === nodeId)) throw new NotFoundError("No such roadmap step.");
+    const node = r.nodes.find((n) => n.id === nodeId);
+    if (!node) throw new NotFoundError("No such roadmap step.");
+    // Quiz steps complete only by passing; otherwise the quiz is decoration.
+    if (read && node.quiz) throw new BadRequestError("Pass this step's quiz to complete it.");
     if ((await this.repo.setRead(userId, nodeId, read)) === null) throw new BadRequestError("Finish the welcome quiz first.");
     return this.view(roadmapId, userId);
+  }
+
+  async submitQuiz(userId: string, roadmapId: string, nodeId: string, answers: number[]): Promise<QuizResult> {
+    const node = this.roadmap(roadmapId).nodes.find((n) => n.id === nodeId);
+    if (!node?.quiz) throw new NotFoundError("This step has no quiz.");
+    if (answers.length !== node.quiz.length) throw new BadRequestError(`Answer all ${node.quiz.length} questions.`);
+    const results = node.quiz.map((q, i) => ({ correct: answers[i] === q.answer, answer: q.answer, why: q.why }));
+    const correct = results.filter((r) => r.correct).length;
+    const passed = quizPassed(correct, results.length);
+    if (passed && (await this.repo.setRead(userId, nodeId, true)) === null) throw new BadRequestError("Finish the welcome quiz first.");
+    return { correct, total: results.length, passed, results, roadmap: await this.view(roadmapId, userId) };
   }
 }

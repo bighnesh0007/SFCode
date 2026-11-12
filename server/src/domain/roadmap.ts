@@ -26,6 +26,11 @@ const nodeSchema = z.strictObject({
   requires: z.array(z.string()),
   problems: z.array(z.string()),
   cert: z.strictObject({ exam: z.string(), section: z.string().optional() }).optional(),
+  /** Passing it (at most one wrong) completes the step. Answers never leave the server. */
+  quiz: z
+    .array(z.strictObject({ q: z.string().min(1), options: z.array(z.string().min(1)).min(2).max(5), answer: z.number().int().min(0), why: z.string().min(1) }))
+    .min(3)
+    .optional(),
 });
 const roadmapSchema = z.strictObject({
   id: z.string().regex(/^[a-z0-9-]+$/),
@@ -43,18 +48,26 @@ export type Roadmap = z.infer<typeof roadmapSchema> & { depth: Record<string, nu
  */
 export function loadRoadmaps(dir: string, problemExists: (slug: string) => boolean): Map<string, Roadmap> {
   const out = new Map<string, Roadmap>();
+  // Read marks are stored per user without a roadmap prefix, so node ids must be unique across roadmaps.
+  const seen = new Map<string, string>();
   for (const file of readdirSync(dir).filter((f) => f.endsWith(".json")).sort()) {
     const where = `roadmaps/${file}`;
     const raw = roadmapSchema.parse(JSON.parse(readFileSync(join(dir, file), "utf8")));
     const ids = new Set<string>();
     for (const n of raw.nodes) {
       if (ids.has(n.id)) throw new Error(`${where}: duplicate node "${n.id}"`);
+      const other = seen.get(n.id);
+      if (other) throw new Error(`${where}: node "${n.id}" is also in ${other}; node ids must be unique across roadmaps`);
       ids.add(n.id);
+      seen.set(n.id, where);
+      for (const [i, q] of (n.quiz ?? []).entries()) {
+        if (q.answer >= q.options.length) throw new Error(`${where}: "${n.id}" quiz question ${i + 1} answer is out of range`);
+      }
     }
     for (const n of raw.nodes) {
       for (const r of n.requires) if (!ids.has(r)) throw new Error(`${where}: "${n.id}" requires unknown node "${r}"`);
       for (const p of n.problems) if (!problemExists(p)) throw new Error(`${where}: "${n.id}" links unknown problem "${p}"`);
-      if (n.problems.length === 0 && !n.lesson && !n.cert) throw new Error(`${where}: "${n.id}" has nothing to do`);
+      if (n.problems.length === 0 && !n.lesson && !n.cert && !n.quiz) throw new Error(`${where}: "${n.id}" has nothing to do`);
     }
     // Depth = longest prerequisite chain; also detects cycles.
     const byId = new Map(raw.nodes.map((n) => [n.id, n]));
@@ -75,3 +88,6 @@ export function loadRoadmaps(dir: string, problemExists: (slug: string) => boole
   }
   return out;
 }
+
+/** Pass mark for a step quiz: at most one wrong answer. */
+export const quizPassed = (correct: number, total: number) => total > 0 && total - correct <= 1;
