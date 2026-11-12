@@ -40,7 +40,7 @@ In any org you administer (a Developer Edition is fine): **Setup → External
 Client App Manager → New External Client App**.
 
 - Enable OAuth. Callback URL: `http://localhost:8100/backend/api/v1/salesforce/oauth/callback`
-  (and your production URL later — it is `APP_URL` + that path).
+  and `https://sf.bighnesh.space/backend/api/v1/salesforce/oauth/callback` (it is `APP_URL` + that path).
 - Scopes: **Manage user data via APIs (`api`)** and **Perform requests at any
   time (`refresh_token`, `offline_access`)**.
 - Require PKCE: on. Require secret for Web Server Flow: on.
