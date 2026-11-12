@@ -32,7 +32,7 @@ export interface CosmeticsSource {
 export interface ProfileExtras {
   coins(userId: string): Promise<number>;
   contestHistory(userId: string): Promise<ContestResult[]>;
-  roadmapProgress(userId: string): Promise<{ done: number; total: number } | null>;
+  roadmapProgress(userId: string): Promise<{ title: string; done: number; total: number } | null>;
 }
 
 export interface ContestResult {
@@ -59,7 +59,7 @@ export interface ProfileView {
   stats: ProfileStats;
   achievements: Achievement[];
   contests: ContestResult[];
-  roadmap: { done: number; total: number } | null;
+  roadmap: { title: string; done: number; total: number } | null;
   handle: string;
   displayName: string;
   imageUrl: string | null;

@@ -33,6 +33,8 @@ export interface RoadmapNode {
   struggling: boolean;
   read: boolean;
   completeByReading: boolean;
+  completeByQuiz: boolean;
+  quiz?: { q: string; options: string[] }[];
   problems: { slug: string; title: string; track: string; difficulty: string; status: "solved" | "attempted" | "todo" }[];
 }
 export interface RoadmapView {
@@ -52,3 +54,14 @@ export const saveOnboarding = (token: Token, a: Answers) => apiRequest<Onboardin
 export const getRoadmap = (token: Token, id: string) => apiRequest<RoadmapView>(`/api/v1/roadmaps/${encodeURIComponent(id)}`, { token });
 export const markRead = (token: Token, id: string, nodeId: string, read: boolean) =>
   apiRequest<RoadmapView>(`/api/v1/roadmaps/${encodeURIComponent(id)}/read`, { method: "POST", token, body: { nodeId, read } });
+
+export interface QuizResult {
+  correct: number;
+  total: number;
+  passed: boolean;
+  results: { correct: boolean; answer: number; why: string }[];
+  roadmap: RoadmapView;
+}
+export const listRoadmaps = () => apiRequest<{ id: string; title: string; description: string; nodes: number }[]>("/api/v1/roadmaps");
+export const submitQuiz = (token: Token, id: string, nodeId: string, answers: number[]) =>
+  apiRequest<QuizResult>(`/api/v1/roadmaps/${encodeURIComponent(id)}/quiz`, { method: "POST", token, body: { nodeId, answers } });

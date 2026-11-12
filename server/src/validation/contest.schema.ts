@@ -31,3 +31,6 @@ export type RoadmapParams = z.infer<typeof roadmapParams>;
 
 export const roadmapReadBody = z.strictObject({ nodeId: z.string().regex(/^[a-z0-9-]{1,60}$/), read: z.boolean() });
 export type RoadmapReadBody = z.infer<typeof roadmapReadBody>;
+
+export const roadmapQuizBody = z.strictObject({ nodeId: z.string().regex(/^[a-z0-9-]{1,60}$/), answers: z.array(z.number().int().min(0).max(9)).min(1).max(10) });
+export type RoadmapQuizBody = z.infer<typeof roadmapQuizBody>;

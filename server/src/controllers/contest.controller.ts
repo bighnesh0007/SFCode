@@ -4,7 +4,7 @@ import type { RoadmapService } from "../services/roadmap/roadmap.service.ts";
 import type { ContestService } from "../services/contests/contest.service.ts";
 import type { StoreService } from "../services/store/store.service.ts";
 import { created, noContent, ok } from "../utils/respond.ts";
-import type { ContestSlugParams, CreateContestBody, EquipBody, OnboardingBody, RoadmapParams, RoadmapReadBody, StoreItemBody } from "../validation/contest.schema.ts";
+import type { ContestSlugParams, CreateContestBody, EquipBody, OnboardingBody, RoadmapParams, RoadmapQuizBody, RoadmapReadBody, StoreItemBody } from "../validation/contest.schema.ts";
 
 export function contestController(service: ContestService) {
   const user = (req: { auth?: { userId: string } }) => req.auth?.userId ?? "";
@@ -45,6 +45,10 @@ export function roadmapController(service: RoadmapService) {
     onboarding: (async (req, res) => ok(res, await service.onboarding(user(req)))) as RequestHandler,
     saveOnboarding: (async (req, res) => ok(res, await service.saveOnboarding(user(req), validatedBody<OnboardingBody>(req)))) as RequestHandler,
     view: (async (req, res) => ok(res, await service.view(validatedParams<RoadmapParams>(req).id, req.auth?.userId ?? null))) as RequestHandler,
+    quiz: (async (req, res) => {
+      const { nodeId, answers } = validatedBody<RoadmapQuizBody>(req);
+      ok(res, await service.submitQuiz(user(req), validatedParams<RoadmapParams>(req).id, nodeId, answers));
+    }) as RequestHandler,
     read: (async (req, res) => {
       const { nodeId, read } = validatedBody<RoadmapReadBody>(req);
       ok(res, await service.setRead(user(req), validatedParams<RoadmapParams>(req).id, nodeId, read));

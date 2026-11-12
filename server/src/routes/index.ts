@@ -19,7 +19,7 @@ import { communityController } from "../controllers/community.controller.ts";
 import { adminController } from "../controllers/admin.controller.ts";
 import { blogController } from "../controllers/blog.controller.ts";
 import { contestController, roadmapController, storeController } from "../controllers/contest.controller.ts";
-import { contestSlugParams, createContestBody, equipBody, onboardingBody, roadmapParams, roadmapReadBody, storeItemBody } from "../validation/contest.schema.ts";
+import { contestSlugParams, createContestBody, equipBody, onboardingBody, roadmapParams, roadmapQuizBody, roadmapReadBody, storeItemBody } from "../validation/contest.schema.ts";
 import { blogListQuery, blogSlugParams, commentBody, commentParams, hideBody, postBody, postPatchBody, voteBody } from "../validation/blog.schema.ts";
 import { adminUsersQuery, roleBody } from "../validation/admin.schema.ts";
 import { aboutBody, handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
@@ -191,6 +191,7 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.put("/onboarding", signedIn, limiter(20), validate({ body: onboardingBody }), r.saveOnboarding);
     v1.get("/roadmaps", r.list);
     v1.get("/roadmaps/:id", identify, validate({ params: roadmapParams }), r.view);
+    v1.post("/roadmaps/:id/quiz", signedIn, limiter(60), validate({ params: roadmapParams, body: roadmapQuizBody }), r.quiz);
     v1.post("/roadmaps/:id/read", signedIn, limiter(60), validate({ params: roadmapParams, body: roadmapReadBody }), r.read);
   } else {
     v1.use(["/onboarding", "/roadmaps"], disabled("Roadmaps"));

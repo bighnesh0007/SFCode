@@ -43,6 +43,14 @@ describe("roadmap content", () => {
     expect(maps.get("developer")?.nodes.length).toBeGreaterThan(5);
   });
 
+  it("node ids must be unique across roadmap files; quiz answers must be in range", () => {
+    const dir = roadmapDir([node("shared")]);
+    writeFileSync(join(dir, "y.json"), JSON.stringify({ id: "y", title: "Y", description: "d", nodes: [node("shared")] }));
+    expect(() => loadRoadmaps(dir, exists)).toThrow(/unique across roadmaps/);
+    const quiz = [0, 1, 2].map(() => ({ q: "q", options: ["a", "b"], answer: 0, why: "w" }));
+    expect(() => loadRoadmaps(roadmapDir([{ ...node("a"), quiz: [...quiz, { q: "q", options: ["a", "b"], answer: 2, why: "w" }] }]), exists)).toThrow(/out of range/);
+  });
+
   it("rejects unknown problems, unknown prerequisites and cycles", () => {
     expect(() => loadRoadmaps(roadmapDir([node("a", [], ["no-such-problem"])]), exists)).toThrow(/unknown problem/);
     expect(() => loadRoadmaps(roadmapDir([node("a", ["ghost"])]), exists)).toThrow(/unknown node/);
@@ -114,5 +122,41 @@ describe("RoadmapService", () => {
     await expect(svc.setRead("nobody", "developer", "data-model", true)).rejects.toThrow(/welcome quiz/);
     await svc.saveOnboarding("u", { role: "developer", level: "new", goal: "pd1", hours: "3-5" });
     await expect(svc.setRead("u", "developer", "nope", true)).rejects.toMatchObject({ status: 404 });
+  });
+
+  it("admins, consultants and Admin-cert seekers get the Admin path", async () => {
+    const { svc } = setup();
+    expect((await svc.saveOnboarding("a", { role: "admin", level: "new", goal: "level-up", hours: "1-2" })).roadmapId).toBe("admin");
+    expect((await svc.saveOnboarding("b", { role: "student", level: "new", goal: "admin-cert", hours: "1-2" })).roadmapId).toBe("admin");
+    expect((await svc.saveOnboarding("c", { role: "developer", level: "new", goal: "pd1", hours: "1-2" })).roadmapId).toBe("developer");
+  });
+
+  it("quiz answers never reach the client; passing completes the step, failing doesn't", async () => {
+    const { svc } = setup();
+    await svc.saveOnboarding("u", { role: "admin", level: "new", goal: "admin-cert", hours: "3-5" });
+    const v = await svc.view("admin", "u");
+    const org = v.nodes.find((n) => n.id === "admin-org");
+    expect(org?.quiz?.length).toBe(3);
+    expect(JSON.stringify(v)).not.toMatch(/"answer"|"why"/);
+    expect(org?.completeByQuiz).toBe(true);
+
+    const maps = loadRoadmaps(ROADMAPS_DIR, exists);
+    const key = maps.get("admin")?.nodes.find((n) => n.id === "admin-org")?.quiz?.map((q) => q.answer) ?? [];
+    const wrong = key.map((a) => (a + 1) % 2);
+    const failed = await svc.submitQuiz("u", "admin", "admin-org", [wrong[0] ?? 0, wrong[1] ?? 0, key[2] ?? 0]);
+    expect(failed).toMatchObject({ passed: false, correct: 1 });
+    expect(failed.roadmap.nodes.find((n) => n.id === "admin-org")?.state).not.toBe("done");
+
+    const oneWrong = await svc.submitQuiz("u", "admin", "admin-org", [wrong[0] ?? 0, key[1] ?? 0, key[2] ?? 0]);
+    expect(oneWrong).toMatchObject({ passed: true, correct: 2 });
+    expect(oneWrong.results[0]).toMatchObject({ correct: false, answer: key[0] });
+    expect(oneWrong.roadmap.nodes.find((n) => n.id === "admin-org")?.state).toBe("done");
+  });
+
+  it("quiz steps can't be ticked done without passing", async () => {
+    const { svc } = setup();
+    await svc.saveOnboarding("u", { role: "admin", level: "new", goal: "admin-cert", hours: "3-5" });
+    await expect(svc.setRead("u", "admin", "admin-org", true)).rejects.toThrow(/quiz/);
+    await expect(svc.submitQuiz("u", "admin", "admin-org", [0])).rejects.toThrow(/all 3/);
   });
 });

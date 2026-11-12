@@ -59,7 +59,7 @@ export interface ProfileView {
   stats: { streak: number; longestStreak: number; coins: number | null; contests: number; bestPlacement: number | null; activeDays: number };
   achievements: Achievement[];
   contests: ContestResult[];
-  roadmap: { done: number; total: number } | null;
+  roadmap: { title: string; done: number; total: number } | null;
   handle: string;
   displayName: string;
   imageUrl: string | null;
