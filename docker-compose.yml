@@ -1,8 +1,11 @@
-# Local development database only. Bound to loopback so it is never reachable
-# from the network; the credentials below are throwaway dev values.
+# The database for this machine's SFCode (dev and the sf.bighnesh.space service).
+# Bound to loopback so it is never reachable from the network; the credentials
+# only matter to processes already on this machine.
 services:
   postgres:
     image: postgres:16
+    # Docker starts on boot; this brings the database back with it.
+    restart: unless-stopped
     environment:
       POSTGRES_USER: sfcode
       POSTGRES_PASSWORD: sfcode
