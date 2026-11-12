@@ -3,9 +3,10 @@
 [![CI](https://github.com/bighnesh0007/SFCode/actions/workflows/ci.yml/badge.svg)](https://github.com/bighnesh0007/SFCode/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**Open-source, LeetCode-style practice for Salesforce developers.** Write Apex,
-SOQL and fixes for broken code, graded by hidden tests in *your own* connected
-org. Prepare for Platform Developer I and II too.
+**Open-source, LeetCode-style practice for Salesforce developers and admins.**
+Write Apex, SOQL, Flows and Lightning Web Components, graded by hidden tests in
+*your own* connected org. Follow a roadmap from your first org to certification,
+and compete in weekly contests.
 
 Live at **https://sf.bighnesh.space**
 
@@ -15,15 +16,21 @@ Live at **https://sf.bighnesh.space**
 | **SOQL Practice** | One query per problem, checked row by row against the expected answer |
 | **Debugging Arena** | Start from broken Apex: governor limits, recursion, nulls, off-by-ones |
 | **Apex Playground** | Run anonymous Apex in your org and read the debug log |
-| **Certification Prep** | Original PD I / PD II questions with explanations |
+| **Flows** | Build record-triggered and autolaunched flows in your org's Flow Builder; hidden Apex tests grade them |
+| **LWC** | Build components in the browser; compiled on the server, tested in a sandboxed iframe |
+| **Certification Prep** | Original PD I / PD II questions with explanations, and a readiness meter per exam |
+| **Roadmaps** | Developer and Admin paths: a one-time welcome quiz places you, steps link real problems, lessons and quizzes, and a weekly plan fits your time |
+| **Daily Challenge** | One problem a day for everyone, with bonus coins and a streak |
+| **Contests** | Timed rounds with live standings; the top three win coins |
+| **Community** | Profiles with streaks, achievements and a skill radar, a leaderboard, a blog, and a coin store for cosmetics |
 
 ## Contributing
 
-Contributions are welcome, especially **new problems and certification
-questions**, which need no Salesforce or Clerk account to write and test.
+Contributions are welcome, especially **new problems, certification questions
+and roadmap steps**, which need no Salesforce or Clerk account to write and test.
 
 - [CONTRIBUTING.md](CONTRIBUTING.md): run it locally in two commands, the checks, and conventions
-- [Adding a problem](docs/adding-a-problem.md) · [Adding a question](docs/adding-a-question.md)
+- [Adding a problem](docs/adding-a-problem.md) · [Adding a question](docs/adding-a-question.md) · [Adding a roadmap step](docs/adding-a-roadmap-step.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md) · [Security policy](SECURITY.md)
 
 ```bash
