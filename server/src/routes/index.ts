@@ -15,6 +15,8 @@ import { certificationController } from "../controllers/certification.controller
 import { answerBody, examParams, practiceQuery } from "../validation/certification.schema.ts";
 import { lwcCompileBody, type LwcCompileBody } from "../validation/lwc.schema.ts";
 import { compileLwc } from "../services/lwc/compiler.ts";
+import { communityController } from "../controllers/community.controller.ts";
+import { handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
 import { validatedBody } from "../middleware/validate.ts";
 import { listQuery, slugParams, submissionParams, submitBody } from "../validation/challenge.schema.ts";
 
@@ -98,6 +100,20 @@ export function mountRoutes(app: Application, container: Container): void {
     cert.use(disabled("Certification Prep"));
   }
   v1.use("/certification", cert);
+
+  // Profiles and leaderboard: public reads; your own profile needs sign-in.
+  // Mounted on their own paths: a router at "/" with a catch-all "not
+  // configured" handler swallowed every unknown /api/v1 path as a 503.
+  if (container.community) {
+    const c = communityController(container.community);
+    const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
+    v1.get("/profile/me", signedIn, c.me);
+    v1.patch("/profile/me", signedIn, limiter(20), validate({ body: profileUpdateBody }), c.updateMe);
+    v1.get("/profile/:handle", validate({ params: handleParams }), c.byHandle);
+    v1.get("/leaderboard", validate({ query: leaderboardQuery }), c.leaderboard);
+  } else {
+    v1.use(["/profile", "/leaderboard"], disabled("Profiles and the leaderboard"));
+  }
 
   // LWC: compile only. The learner's component runs in their own browser
   // (sandboxed iframe), never here. Anonymous, so it is rate-limited.

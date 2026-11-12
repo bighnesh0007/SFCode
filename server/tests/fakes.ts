@@ -98,6 +98,25 @@ export class MemorySubmissionRepository implements ChallengeSubmissionRepository
       [...this.rows.values()].filter((r) => r.userId === userId && r.problemSlug === problemSlug).reverse().slice(0, limit),
     );
   }
+  firstSolves(since?: Date) {
+    const first = new Map<string, { userId: string; slug: string; at: Date }>();
+    for (const r of this.rows.values()) {
+      if (r.status !== "accepted" || !r.completedAt || (since && r.completedAt < since)) continue;
+      const key = `${r.userId}|${r.problemSlug}`;
+      const prev = first.get(key);
+      if (!prev || r.completedAt < prev.at) first.set(key, { userId: r.userId, slug: r.problemSlug, at: r.completedAt });
+    }
+    return Promise.resolve([...first.values()]);
+  }
+  dailyActivity(userId: string, since: Date) {
+    const days = new Map<string, number>();
+    for (const r of this.rows.values()) {
+      if (r.userId !== userId || r.createdAt < since) continue;
+      const d = r.createdAt.toISOString().slice(0, 10);
+      days.set(d, (days.get(d) ?? 0) + 1);
+    }
+    return Promise.resolve([...days].sort().map(([day, count]) => ({ day, count })));
+  }
   progress(userId: string) {
     const out = new Map<string, "solved" | "attempted">();
     for (const r of this.rows.values()) {

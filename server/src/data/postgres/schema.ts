@@ -81,3 +81,22 @@ export const certAttempts = pgTable(
   },
   (t) => [index("cert_attempts_user_exam_idx").on(t.userId, t.exam, t.answeredAt)],
 );
+
+/**
+ * Public identity on SFCode. `handle` is the /u/<handle> URL. It is never
+ * derived from the email address (that would leak it); defaults to the Clerk
+ * username, else a random learner-xxxxxx.
+ */
+export const userProfiles = pgTable(
+  "user_profiles",
+  {
+    userId: text("user_id").primaryKey(),
+    handle: text("handle").notNull(),
+    displayName: text("display_name").notNull(),
+    imageUrl: text("image_url"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  // Case-insensitive uniqueness: /u/Ada and /u/ada are the same person.
+  (t) => [uniqueIndex("user_profiles_handle_lower_idx").on(sql`lower(${t.handle})`)],
+);

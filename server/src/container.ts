@@ -15,6 +15,9 @@ import { ChallengeCatalog } from "./services/challenges/catalog.ts";
 import { QuestionBank } from "./services/certification/bank.ts";
 import { CertificationService } from "./services/certification/certification.service.ts";
 import { PgCertAttemptRepository } from "./repositories/certAttempt.repository.ts";
+import { PgProfileRepository } from "./repositories/profile.repository.ts";
+import { CommunityService } from "./services/community/community.service.ts";
+import { ClerkIdentityLookup } from "./services/identity/clerkIdentity.ts";
 import { ChallengeService, type GradingDeps } from "./services/challenges/challenge.service.ts";
 
 export interface Container {
@@ -23,6 +26,7 @@ export interface Container {
   salesforce?: SalesforceConnectionService;
   challenges?: ChallengeService;
   certification?: CertificationService;
+  community?: CommunityService;
 }
 
 /** server/certification (question banks), resolved like PROBLEMS_DIR. */
@@ -49,15 +53,27 @@ export function buildContainer(): Container {
     );
     grading = { connections: container.salesforce, sf, apiVersion };
   }
+  const catalog = ChallengeCatalog.load(PROBLEMS_DIR);
   // Loading validates every problem; a broken one stops startup on purpose.
   // Browsing needs nothing (contributors run without accounts or a database);
   // submissions need the database, and grading also needs Salesforce.
   container.challenges = new ChallengeService(
-    ChallengeCatalog.load(PROBLEMS_DIR),
+    catalog,
     container.db ? new PgChallengeSubmissionRepository(container.db) : undefined,
     grading,
     systemClock,
   );
+  // Profiles need the database; the Clerk lookup only seeds names/avatars.
+  if (container.db) {
+    container.community = new CommunityService(
+      catalog,
+      new PgChallengeSubmissionRepository(container.db),
+      new PgProfileRepository(container.db),
+      config.clerk.secretKey ? new ClerkIdentityLookup(config.clerk.secretKey) : undefined,
+      systemClock,
+    );
+  }
+
   // No database needed to practise; attempts are saved only when there is one.
   container.certification = new CertificationService(
     QuestionBank.load(CERTIFICATION_DIR),

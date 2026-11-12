@@ -10,6 +10,7 @@ import { createPgDatabase, type PgDatabase } from "../../src/data/postgres/clien
 import { PgSalesforceConnectionRepository } from "../../src/repositories/salesforceConnection.repository.ts";
 import { PgChallengeSubmissionRepository } from "../../src/repositories/challengeSubmission.repository.ts";
 import { PgCertAttemptRepository } from "../../src/repositories/certAttempt.repository.ts";
+import { PgProfileRepository } from "../../src/repositories/profile.repository.ts";
 import type { GradeResult } from "../../src/domain/challenge.ts";
 
 const url = process.env.TEST_DATABASE_URL;
@@ -136,5 +137,44 @@ describe.skipIf(!safe)("PgCertAttemptRepository", () => {
     await repo.record({ userId: "u2", exam: "pd1", questionId: "q3", correct: true });
     await repo.record({ userId: "u1", exam: "pd2", questionId: "q4", correct: true });
     expect(Object.fromEntries(await repo.latest("u1", "pd1"))).toEqual({ q1: true, q2: false });
+  });
+});
+
+describe.skipIf(!safe)("PgProfileRepository and solve queries", () => {
+  let db: PgDatabase;
+  let profiles: PgProfileRepository;
+  let subs: PgChallengeSubmissionRepository;
+
+  beforeAll(async () => {
+    db = createPgDatabase(url ?? "");
+    await migrate(db, { migrationsFolder: new URL("../../src/data/postgres/migrations", import.meta.url).pathname });
+    profiles = new PgProfileRepository(db);
+    subs = new PgChallengeSubmissionRepository(db);
+  });
+  afterAll(() => db.close());
+  beforeEach(async () => {
+    await db.execute(sql`TRUNCATE user_profiles, challenge_submissions`);
+  });
+
+  it("handles are unique regardless of case, enforced by the database", async () => {
+    expect(await profiles.create({ userId: "u1", handle: "Ada", displayName: "Ada", imageUrl: null })).toBe(true);
+    expect(await profiles.create({ userId: "u2", handle: "ada", displayName: "x", imageUrl: null })).toBe(false);
+    expect((await profiles.findByHandle("ADA"))?.userId).toBe("u1");
+    await profiles.create({ userId: "u3", handle: "grace", displayName: "Grace", imageUrl: null });
+    expect(await profiles.update("u3", { handle: "aDa" })).toBe(false);
+  });
+
+  it("firstSolves keeps the first accepted time per user and problem", async () => {
+    const result = { verdict: "accepted" as const, testsRun: 1, testsPassed: 1, tests: [], compileErrors: [], coverage: [], message: null };
+    for (const at of [new Date("2026-01-02"), new Date("2026-01-01")]) {
+      const r = await subs.createRunning({ userId: "u1", problemSlug: "p1", orgId: "00D", files: {} });
+      if (!r) throw new Error("setup");
+      await subs.complete(r.id, "accepted", result, at);
+    }
+    const rows = await subs.firstSolves();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.at.toISOString()).toBe("2026-01-01T00:00:00.000Z");
+    expect(await subs.firstSolves(new Date("2026-06-01"))).toHaveLength(0);
+    expect((await subs.dailyActivity("u1", new Date(0))).reduce((n, d) => n + d.count, 0)).toBe(2);
   });
 });

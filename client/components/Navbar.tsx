@@ -15,6 +15,7 @@ const NAV = [
   { href: "/problems", label: "Problems", match: ["/problems", "/challenges", "/soql", "/debugging", "/flows", "/lwc"] },
   { href: "/playground/apex", label: "Playground", match: ["/playground"] },
   { href: "/certification", label: "Certification", match: ["/certification"] },
+  { href: "/leaderboard", label: "Leaderboard", match: ["/leaderboard", "/u"] },
 ];
 
 export default function Navbar() {
@@ -52,7 +53,10 @@ export default function Navbar() {
           {isSignedIn && <OrgBadge />}
           <ModeToggle />
           {isSignedIn ? (
-            <UserButton />
+            <>
+              <Link href="/profile" className="text-sm text-muted-foreground hover:text-foreground">Profile</Link>
+              <UserButton />
+            </>
           ) : (
             <>
               <SignInButton>

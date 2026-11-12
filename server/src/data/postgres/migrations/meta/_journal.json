@@ -22,6 +22,13 @@
       "when": 1794491352018,
       "tag": "0002_cert_attempts",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794502159858,
+      "tag": "0003_user_profiles",
+      "breakpoints": true
     }
   ]
 }

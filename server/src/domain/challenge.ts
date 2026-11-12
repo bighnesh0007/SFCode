@@ -5,6 +5,12 @@ export type ApexFileType = "class" | "trigger" | "soql";
 /** Practice areas. The one list: catalog validation and the API schema both read it. */
 export const TRACKS = ["apex", "soql", "debug", "flow", "lwc"] as const;
 export type Track = (typeof TRACKS)[number];
+/**
+ * Tracks whose solves the server verified itself (an org deploy ran the tests).
+ * Only these earn points: LWC tests run in the learner's browser and their
+ * result can't be trusted by the server.
+ */
+export const SCORED_TRACKS: readonly Track[] = ["apex", "soql", "debug", "flow"];
 
 export interface ChallengeFile {
   name: string;
