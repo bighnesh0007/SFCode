@@ -10,7 +10,10 @@ const HINT: Partial<Record<Submission["status"], string>> = {
   coverage: "Every class and trigger needs 75% coverage from the hidden tests. Remove code the tests can't reach.",
 };
 
-export function Results({ submission, onOpenFile }: { submission: Submission | null; onOpenFile: (fileName: string) => void }) {
+const FLOW_HINT =
+  "Most flow failures come down to three things: the flow isn't Active, its API name doesn't match the statement exactly, or its entry conditions differ from what's asked. The messages below come from the hidden tests.";
+
+export function Results({ submission, isFlow = false, onOpenFile }: { submission: Submission | null; isFlow?: boolean; onOpenFile: (fileName: string) => void }) {
   if (!submission) return <p className="text-sm text-muted-foreground">Submit to grade your solution against the hidden tests.</p>;
   if (submission.status === "running")
     return (
@@ -30,7 +33,11 @@ export function Results({ submission, onOpenFile }: { submission: Submission | n
           </span>
         )}
       </div>
-      {HINT[submission.status] && <p className="text-xs text-muted-foreground">{HINT[submission.status]}</p>}
+      {isFlow && submission.status === "wrong_answer" ? (
+        <p className="text-xs text-muted-foreground">{FLOW_HINT}</p>
+      ) : (
+        HINT[submission.status] && <p className="text-xs text-muted-foreground">{HINT[submission.status]}</p>
+      )}
       {r?.message && <pre className="whitespace-pre-wrap rounded-md bg-muted/50 p-2 font-mono text-xs">{r.message}</pre>}
 
       {r && r.compileErrors.length > 0 && (

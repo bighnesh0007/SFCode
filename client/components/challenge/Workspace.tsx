@@ -247,7 +247,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
                     </Button>
                   </div>
                 </div>
-                {challenge.flow && <FlowBrief flow={challenge.flow} />}
+                {challenge.flow && <FlowBrief slug={challenge.slug} flow={challenge.flow} instanceUrl={org.kind === "connected" ? org.connection.instanceUrl : null} />}
                 {activeFile && (
                   <Editor
                     path={activeFile.fileName}
@@ -268,7 +268,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
             <ResizablePanel defaultSize="38%" minSize="15%">
               <div className="h-full overflow-auto p-3">
                 {error && <p className="mb-2 text-sm text-destructive">{error}</p>}
-                <Results submission={submission} onOpenFile={(fileName) => {
+                <Results submission={submission} isFlow={Boolean(challenge.flow)} onOpenFile={(fileName) => {
                   const f = challenge.files.find((x) => x.fileName === fileName);
                   if (f) setActive(f.name);
                 }} />
@@ -282,24 +282,62 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
 }
 
 /** Flow problems have no editor: the learner builds the flow in Salesforce. */
-function FlowBrief({ flow }: { flow: NonNullable<ChallengeView["flow"]> }) {
+function FlowBrief({ slug, flow, instanceUrl }: { slug: string; flow: NonNullable<ChallengeView["flow"]>; instanceUrl: string | null }) {
+  const key = `sfcode.flow-steps.${slug}`;
+  const [done, setDone] = useState<boolean[]>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(key) ?? "[]") as unknown;
+      return Array.isArray(saved) ? saved.map(Boolean) : [];
+    } catch {
+      return [];
+    }
+  });
+  const toggle = (i: number) =>
+    setDone((d) => {
+      const next = [...d];
+      next[i] = !next[i];
+      try {
+        localStorage.setItem(key, JSON.stringify(next));
+      } catch {
+        /* checklist just doesn't persist */
+      }
+      return next;
+    });
+
   const steps = [
-    <>In your connected org, open <span className="font-medium text-foreground">Setup → Flows → New Flow</span> and choose a {flow.kind === "record-triggered" ? "Record-Triggered" : "Autolaunched"} Flow.</>,
-    <>Build it as the statement describes, and save it with the API name <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">{flow.apiName}</code>. The name must match exactly.</>,
-    <><span className="font-medium text-foreground">Activate</span> the flow. Hidden tests only see active flows.</>,
-    <>Click <span className="font-medium text-foreground">Check my flow</span>. A check-only deploy runs the hidden tests against it and rolls back.</>,
+    <>Open Flow Builder and create {flow.kind === "record-triggered" ? "a Record-Triggered" : "an Autolaunched (No Trigger)"} Flow.</>,
+    <>Build it as the statement describes.</>,
+    <>Save it with the API name <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">{flow.apiName}</code>. The name must match exactly.</>,
+    <><span className="font-medium text-foreground">Activate</span> it. Hidden tests only see active flows.</>,
+    <>Click <span className="font-medium text-foreground">Check my flow</span>. A check-only deploy runs the hidden tests, then rolls back.</>,
   ];
   return (
     <div className="flex-1 overflow-auto p-6">
-      <h2 className="text-sm font-semibold">Build this flow in Salesforce</h2>
-      <ol className="mt-4 space-y-3 text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold">Build this flow in Salesforce</h2>
+        {instanceUrl && (
+          <div className="flex gap-3 text-xs">
+            {/* Opens the learner's own connected org; rel=noopener because it's another site. */}
+            <a href={`${instanceUrl}/builder_platform_interaction/flowBuilder.app`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+              New flow in Flow Builder ↗
+            </a>
+            <a href={`${instanceUrl}/lightning/setup/Flows/home`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+              Your flows ↗
+            </a>
+          </div>
+        )}
+      </div>
+      <ol className="mt-4 space-y-2 text-sm text-muted-foreground">
         {steps.map((step, i) => (
-          <li key={i} className="flex gap-3">
-            <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-muted text-[11px] font-medium text-foreground">{i + 1}</span>
-            <span>{step}</span>
+          <li key={i}>
+            <label className="flex cursor-pointer gap-3 rounded-md p-1.5 hover:bg-accent/50">
+              <input type="checkbox" checked={done[i] ?? false} onChange={() => toggle(i)} className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--primary)]" />
+              <span className={cn(done[i] && "line-through opacity-60")}>{step}</span>
+            </label>
           </li>
         ))}
       </ol>
+      {!instanceUrl && <p className="mt-4 text-xs text-muted-foreground">Connect your org to get direct links into its Flow Builder.</p>}
     </div>
   );
 }
