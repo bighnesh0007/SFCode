@@ -8,6 +8,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ApiError } from "@/lib/apiClient";
 import { listExams, type ExamSummary } from "@/lib/certificationApi";
+import { cn } from "@/lib/utils";
 
 export default function CertificationPage() {
   const { isLoaded, isSignedIn, getToken } = useAuthState();
@@ -49,6 +50,28 @@ export default function CertificationPage() {
                   <CardDescription>
                     {e.description} · {e.questionCount} questions
                   </CardDescription>
+                  {e.readiness !== null && (
+                    <div className="mt-3 rounded-lg border p-3">
+                      <div className="flex items-baseline justify-between text-sm">
+                        <span className="font-medium">Exam readiness</span>
+                        <span className={cn("text-lg font-semibold tabular-nums", e.readiness >= 70 ? "text-emerald-600 dark:text-emerald-400" : e.readiness >= 40 ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground")}>{e.readiness}%</span>
+                      </div>
+                      <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted">
+                        <div className={cn("h-full rounded-full transition-all duration-700", e.readiness >= 70 ? "bg-emerald-500" : e.readiness >= 40 ? "bg-amber-500" : "bg-sky-500")} style={{ width: `${e.readiness}%` }} />
+                      </div>
+                      <p className="mt-1.5 text-xs text-muted-foreground">
+                        Questions you&apos;ve got right, averaged across sections.
+                        {e.weakest && (
+                          <>
+                            {" "}Weakest:{" "}
+                            <Link href={`/certification/${e.exam}?section=${e.weakest}`} className="font-medium text-sky-600 hover:underline dark:text-sky-400">
+                              {e.sections.find((s) => s.id === e.weakest)?.title ?? e.weakest} →
+                            </Link>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-2.5">

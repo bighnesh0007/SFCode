@@ -10,6 +10,7 @@ import { listChallenges, type ChallengeSummary, type DifficultyDef, type Track }
 import { TRACK_INFO, isTrack, trackInfo } from "@/lib/tracks";
 import { TONE_TEXT } from "@/lib/verdicts";
 import { cn } from "@/lib/utils";
+import { DailyCard } from "@/components/DailyCard";
 
 type Status = "all" | "todo" | "attempted" | "solved";
 const STATUS_LABEL: Record<Status, string> = { all: "Any status", todo: "Not started", attempted: "Attempted", solved: "Solved" };
@@ -76,6 +77,9 @@ export function ProblemsHub() {
             <span className="font-medium text-foreground">{solved}</span> / {data.challenges.length} solved
           </p>
         )}
+      </div>
+      <div className="mt-5">
+        <DailyCard compact />
       </div>
 
       {/* Track tabs */}

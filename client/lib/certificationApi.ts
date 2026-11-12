@@ -9,6 +9,8 @@ export interface ExamSummary {
   description: string;
   questionCount: number;
   sections: { id: string; title: string; total: number; answered: number | null; correct: number | null }[];
+  readiness: number | null;
+  weakest: string | null;
 }
 
 export interface PracticeQuestion {

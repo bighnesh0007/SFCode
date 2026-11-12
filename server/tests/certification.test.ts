@@ -113,6 +113,26 @@ describe("CertificationService", () => {
   });
 });
 
+describe("certification readiness", () => {
+  it("averages each section's share right; unanswered counts as not known; weakest is the lowest", async () => {
+    const attempts = new MemoryAttempts();
+    const service = new CertificationService(bank, attempts);
+    const pd1 = bank.exam("pd1");
+    if (!pd1) throw new Error("pd1 missing");
+    expect((await service.list("u"))[0]).toMatchObject({ readiness: 0 });
+    // Master one whole section, get half of another right.
+    const [first, second] = pd1.sections;
+    for (const q of pd1.questions.filter((q) => q.section === first?.id)) attempts.rows.push({ userId: "u", exam: "pd1", questionId: q.id, correct: true });
+    const secondQs = pd1.questions.filter((q) => q.section === second?.id);
+    secondQs.forEach((q, i) => attempts.rows.push({ userId: "u", exam: "pd1", questionId: q.id, correct: i < secondQs.length / 2 }));
+    const half = Math.ceil(secondQs.length / 2) / secondQs.length;
+    const summary = (await service.list("u")).find((e) => e.exam === "pd1");
+    expect(summary?.readiness).toBe(Math.round((100 * (1 + half)) / pd1.sections.length));
+    expect(summary?.weakest).not.toBe(first?.id);
+    expect((await service.list(null))[0]?.readiness).toBeNull();
+  });
+});
+
 describe("certification routes", () => {
   const app = buildApp({ certification: new CertificationService(bank, undefined) });
 

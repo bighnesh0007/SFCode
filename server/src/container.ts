@@ -21,6 +21,8 @@ import { AdminService } from "./services/admin/admin.service.ts";
 import { PgAdminRepository } from "./repositories/admin.repository.ts";
 import { PgBlogRepository } from "./repositories/blog.repository.ts";
 import { BlogService } from "./services/blog/blog.service.ts";
+import { PgDailyRepository } from "./repositories/daily.repository.ts";
+import { DailyService } from "./services/daily/daily.service.ts";
 import { PgAboutRepository } from "./repositories/about.repository.ts";
 import { loadRoadmaps } from "./domain/roadmap.ts";
 import { PgOnboardingRepository } from "./repositories/onboarding.repository.ts";
@@ -44,6 +46,7 @@ export interface Container {
   contests?: ContestService;
   store?: StoreService;
   roadmaps?: RoadmapService;
+  daily?: DailyService;
 }
 
 /** server/certification (question banks), resolved like PROBLEMS_DIR. */
@@ -105,7 +108,8 @@ export function buildContainer(): Container {
   if (container.db && container.community && container.admin) {
     container.blog = new BlogService(new PgBlogRepository(container.db), new PgProfileRepository(container.db), container.community, container.admin);
     container.contests = new ContestService(contestRepo ?? new PgContestRepository(container.db), catalog, new PgProfileRepository(container.db), container.community, container.admin, systemClock);
-    container.store = new StoreService(new PgStoreRepository(container.db), new PgChallengeSubmissionRepository(container.db), catalog, container.contests);
+    container.daily = new DailyService(new PgDailyRepository(container.db), catalog, systemClock);
+    container.store = new StoreService(new PgStoreRepository(container.db), new PgChallengeSubmissionRepository(container.db), catalog, container.contests, container.daily);
     container.community.setCosmeticsSource(container.store);
     const store = container.store;
     const contests = container.contests;

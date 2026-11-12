@@ -16,6 +16,14 @@ export interface ExamSummary {
   questionCount: number;
   /** `answered`/`correct` count each question once, by its latest attempt; null when signed out. */
   sections: { id: string; title: string; total: number; answered: number | null; correct: number | null }[];
+  /**
+   * 0-100: the share of each section's questions whose latest answer is
+   * right, averaged over sections (unanswered counts as not known). null
+   * when signed out.
+   */
+  readiness: number | null;
+  /** The section with the lowest share right, to practise next. */
+  weakest: string | null;
 }
 
 export interface PracticeQuestion {
@@ -44,22 +52,20 @@ export class CertificationService {
     return Promise.all(
       this.bank.all().map(async (e) => {
         const latest = userId && this.attempts ? await this.attempts.latest(userId, e.exam) : null;
-        return {
-          exam: e.exam,
-          title: e.title,
-          description: e.description,
-          questionCount: e.questions.length,
-          sections: e.sections.map((s) => {
-            const ids = e.questions.filter((q) => q.section === s.id).map((q) => q.id);
-            return {
-              id: s.id,
-              title: s.title,
-              total: ids.length,
-              answered: latest ? ids.filter((id) => latest.has(id)).length : null,
-              correct: latest ? ids.filter((id) => latest.get(id) === true).length : null,
-            };
-          }),
-        };
+        const sections = e.sections.map((s) => {
+          const ids = e.questions.filter((q) => q.section === s.id).map((q) => q.id);
+          return {
+            id: s.id,
+            title: s.title,
+            total: ids.length,
+            answered: latest ? ids.filter((id) => latest.has(id)).length : null,
+            correct: latest ? ids.filter((id) => latest.get(id) === true).length : null,
+          };
+        });
+        const shares = sections.map((s) => ({ id: s.id, share: s.total ? (s.correct ?? 0) / s.total : 0 }));
+        const readiness = latest ? Math.round((100 * shares.reduce((n, s) => n + s.share, 0)) / Math.max(1, shares.length)) : null;
+        const weakest = latest ? ([...shares].sort((a, b) => a.share - b.share)[0]?.id ?? null) : null;
+        return { exam: e.exam, title: e.title, description: e.description, questionCount: e.questions.length, sections, readiness, weakest };
       }),
     );
   }

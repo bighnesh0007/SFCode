@@ -243,3 +243,13 @@ export const userAbout = pgTable("user_about", {
   openToWork: boolean("open_to_work").notNull().default(false),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * The problem of the day, fixed once picked so adding problems later never
+ * rewrites history (or anyone's bonus coins). `day` is a UTC date, YYYY-MM-DD.
+ */
+export const dailyChallenges = pgTable("daily_challenges", {
+  day: text("day").primaryKey(),
+  problemSlug: text("problem_slug").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

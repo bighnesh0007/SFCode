@@ -20,6 +20,7 @@ export interface PrizeSource {
 export interface Wallet {
   earnedFromSolves: number;
   earnedFromContests: number;
+  earnedFromDaily: number;
   spent: number;
   balance: number;
 }
@@ -35,6 +36,7 @@ export class StoreService {
     private readonly submissions: ChallengeSubmissionRepository,
     private readonly catalog: ChallengeCatalog,
     private readonly contests: PrizeSource,
+    private readonly daily?: { coins(userId: string): Promise<number> },
   ) {}
 
   async wallet(userId: string): Promise<Wallet> {
@@ -45,7 +47,8 @@ export class StoreService {
     }, 0);
     const earnedFromContests = (await this.contests.prizes()).get(userId) ?? 0;
     const spent = await this.repo.spent(userId);
-    return { earnedFromSolves, earnedFromContests, spent, balance: earnedFromSolves + earnedFromContests - spent };
+    const earnedFromDaily = this.daily ? await this.daily.coins(userId) : 0;
+    return { earnedFromSolves, earnedFromContests, earnedFromDaily, spent, balance: earnedFromSolves + earnedFromContests + earnedFromDaily - spent };
   }
 
   async view(userId: string | null): Promise<StoreView> {
@@ -59,7 +62,7 @@ export class StoreService {
     const item = itemById(itemId);
     if (!item) throw new NotFoundError("No such item.");
     const w = await this.wallet(userId);
-    const outcome = await this.repo.purchase(userId, item.id, item.price, w.earnedFromSolves + w.earnedFromContests);
+    const outcome = await this.repo.purchase(userId, item.id, item.price, w.earnedFromSolves + w.earnedFromContests + w.earnedFromDaily);
     if (outcome === "owned") throw new ConflictError("You already own this.");
     if (outcome === "insufficient") throw new ValidationError(`You need ${item.price} coins; you have ${w.balance}.`);
     return this.view(userId);
