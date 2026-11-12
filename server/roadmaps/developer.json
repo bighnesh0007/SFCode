@@ -22,12 +22,12 @@
     {
       "id": "apex-basics", "title": "Apex basics", "level": 2, "col": 0, "requires": ["soql-basics"],
       "summary": "Classes, methods, collections and null safety.",
-      "problems": ["text-utils", "debug-null-discount", "debug-off-by-one-buckets"], "cert": { "exam": "pd1", "section": "logic" }
+      "problems": ["text-utils", "contacts-by-account", "debug-null-discount", "debug-off-by-one-buckets"], "cert": { "exam": "pd1", "section": "logic" }
     },
     {
       "id": "soql-advanced", "title": "Aggregates & subqueries", "level": 2, "col": 1, "requires": ["soql-basics"],
       "summary": "GROUP BY, semi-joins and anti-joins.",
-      "problems": ["soql-pipeline-by-stage", "soql-accounts-without-contacts", "soql-accounts-with-won-deals"]
+      "problems": ["soql-pipeline-by-stage", "soql-busy-accounts", "soql-accounts-without-contacts", "soql-accounts-with-won-deals"]
     },
     {
       "id": "flow-advanced", "title": "Decisions, loops & after-save", "level": 2, "col": 2, "requires": ["flow-basics"],
@@ -53,7 +53,7 @@
     {
       "id": "governor-limits", "title": "Governor limits", "level": 4, "col": 0, "requires": ["triggers", "soql-advanced"],
       "summary": "No SOQL or DML in loops; work in sets and maps.",
-      "problems": ["debug-soql-in-loop"], "cert": { "exam": "pd2", "section": "performance" }
+      "problems": ["debug-soql-in-loop", "debug-dml-in-loop"], "cert": { "exam": "pd2", "section": "performance" }
     },
     {
       "id": "pd1-ready", "title": "PD I checkpoint", "level": 4, "col": 1, "requires": ["triggers", "testing", "flow-advanced", "lwc"],
