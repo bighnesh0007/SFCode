@@ -1,0 +1,5 @@
+<template>
+    <template for:each={stars} for:item="star">
+        <button key={star.n} class={star.className} data-n={star.n} onclick={handleClick}>★</button>
+    </template>
+</template>

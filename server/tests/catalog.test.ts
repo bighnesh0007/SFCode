@@ -28,8 +28,10 @@ describe("the shipped problems", () => {
       "flow-account-default-rating",
       "flow-won-next-step",
       "flow-key-account-task",
+      "flow-shipping-cost",
       "lwc-click-counter",
       "lwc-contact-filter",
+      "lwc-star-rating",
     ]);
   });
 });

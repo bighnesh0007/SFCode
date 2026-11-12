@@ -1,0 +1,2 @@
+{ "title": "Star Rating", "track": "lwc", "difficulty": "Medium", "category": "Events", "order": 403,
+  "tags": ["CustomEvent", "detail", "@api", "for:each"], "files": [], "lwc": { "component": "starRating" } }
