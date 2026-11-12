@@ -1,0 +1,9 @@
+{
+  "title": "Protect Closed Won Opportunities",
+  "difficulty": "Easy",
+  "category": "Triggers",
+  "order": 2,
+  "tags": ["before delete", "addError"],
+  "files": [{ "name": "SfcProtectClosedWon", "type": "trigger" }],
+  "testClass": "SfcProtectClosedWonTest"
+}

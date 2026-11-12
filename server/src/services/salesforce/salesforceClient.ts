@@ -60,7 +60,23 @@ export interface SalesforceClientOptions {
   fetch?: FetchLike;
 }
 
-const xml = new XMLParser({ removeNSPrefix: true, ignoreAttributes: true, parseTagValue: false });
+// Tags that may repeat in a DeployResult. Forced to arrays so one element and
+// many parse to the same shape.
+const REPEATED = new Set(["componentFailures", "componentSuccesses", "successes", "failures", "codeCoverage", "codeCoverageWarnings"]);
+const xml = new XMLParser({
+  removeNSPrefix: true,
+  ignoreAttributes: true,
+  parseTagValue: false,
+  isArray: (name) => REPEATED.has(name),
+});
+
+function metadataEnvelope(accessToken: string, bodyXml: string): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:met="http://soap.sforce.com/2006/04/metadata">
+  <soapenv:Header><met:SessionHeader><met:sessionId>${escapeXml(accessToken)}</met:sessionId></met:SessionHeader></soapenv:Header>
+  <soapenv:Body>${bodyXml}</soapenv:Body>
+</soapenv:Envelope>`;
+}
 
 function escapeXml(s: string): string {
   return s.replace(/[<>&'"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[c] ?? c);
@@ -146,25 +162,9 @@ export class SalesforceClient {
   </soapenv:Body>
 </soapenv:Envelope>`;
 
-    const res = await this.send(`${instanceUrl}/services/Soap/s/${this.opts.apiVersion}`, {
-      method: "POST",
-      headers: { "Content-Type": "text/xml; charset=UTF-8", SOAPAction: '""' },
-      body: envelope,
-    });
-    const text = await res.text();
-    const doc = xml.parse(text) as { Envelope?: { Header?: unknown; Body?: Record<string, unknown> } };
-    const body = doc.Envelope?.Body;
-
-    const fault = body?.Fault as { faultcode?: unknown; faultstring?: unknown } | undefined;
-    if (fault) {
-      const code = str(fault.faultcode) ?? "";
-      if (code.includes("INVALID_SESSION_ID")) throw new SessionExpiredError();
-      throw new UpstreamError(`Salesforce rejected the request: ${str(fault.faultstring) ?? code}`);
-    }
-    if (!res.ok || !body) throw new UpstreamError(`Salesforce Apex API failed (HTTP ${res.status}).`);
-
+    const { body, header } = await this.soap(`${instanceUrl}/services/Soap/s/${this.opts.apiVersion}`, envelope);
     const result = (body.executeAnonymousResponse as { result?: Record<string, unknown> } | undefined)?.result ?? {};
-    const header = doc.Envelope?.Header as { DebuggingInfo?: { debugLog?: unknown } } | undefined;
+    const debugging = header as { DebuggingInfo?: { debugLog?: unknown } } | undefined;
 
     return {
       compiled: result.compiled === "true",
@@ -174,8 +174,61 @@ export class SalesforceClient {
       exceptionStackTrace: str(result.exceptionStackTrace),
       line: num(result.line),
       column: num(result.column),
-      debugLog: str(header?.DebuggingInfo?.debugLog) ?? "",
+      debugLog: str(debugging?.DebuggingInfo?.debugLog) ?? "",
     };
+  }
+
+  /** Starts a check-only deploy that runs only `testClass`. Returns the async deploy id. */
+  async deployCheckOnly(instanceUrl: string, accessToken: string, zipBase64: string, testClass: string): Promise<string> {
+    // Element order follows the Metadata WSDL's DeployOptions sequence; SOAP rejects reordering.
+    const envelope = metadataEnvelope(
+      accessToken,
+      `<met:deploy>
+      <met:ZipFile>${zipBase64}</met:ZipFile>
+      <met:DeployOptions>
+        <met:checkOnly>true</met:checkOnly>
+        <met:rollbackOnError>true</met:rollbackOnError>
+        <met:runTests>${escapeXml(testClass)}</met:runTests>
+        <met:singlePackage>true</met:singlePackage>
+        <met:testLevel>RunSpecifiedTests</met:testLevel>
+      </met:DeployOptions>
+    </met:deploy>`,
+    );
+    const { body } = await this.soap(`${instanceUrl}/services/Soap/m/${this.opts.apiVersion}`, envelope);
+    const id = str((body.deployResponse as { result?: { id?: unknown } } | undefined)?.result?.id);
+    if (!id) throw new UpstreamError("Salesforce did not return a deploy id.");
+    return id;
+  }
+
+  /** Raw DeployResult (parsed XML). Interpreting it is the grader's job. */
+  async checkDeployStatus(instanceUrl: string, accessToken: string, deployId: string): Promise<Record<string, unknown>> {
+    const envelope = metadataEnvelope(
+      accessToken,
+      `<met:checkDeployStatus><met:asyncProcessId>${escapeXml(deployId)}</met:asyncProcessId><met:includeDetails>true</met:includeDetails></met:checkDeployStatus>`,
+    );
+    const { body } = await this.soap(`${instanceUrl}/services/Soap/m/${this.opts.apiVersion}`, envelope);
+    const result = (body.checkDeployStatusResponse as { result?: unknown } | undefined)?.result;
+    if (!result || typeof result !== "object") throw new UpstreamError("Salesforce returned no deploy status.");
+    return result as Record<string, unknown>;
+  }
+
+  /** POST a SOAP envelope; maps faults (expired session → SessionExpiredError). */
+  private async soap(url: string, envelope: string): Promise<{ body: Record<string, unknown>; header: unknown }> {
+    const res = await this.send(url, {
+      method: "POST",
+      headers: { "Content-Type": "text/xml; charset=UTF-8", SOAPAction: '""' },
+      body: envelope,
+    });
+    const doc = xml.parse(await res.text()) as { Envelope?: { Header?: unknown; Body?: Record<string, unknown> } };
+    const body = doc.Envelope?.Body;
+    const fault = body?.Fault as { faultcode?: unknown; faultstring?: unknown } | undefined;
+    if (fault) {
+      const code = str(fault.faultcode) ?? "";
+      if (code.includes("INVALID_SESSION_ID")) throw new SessionExpiredError();
+      throw new UpstreamError(`Salesforce rejected the request: ${str(fault.faultstring) ?? code}`);
+    }
+    if (!res.ok || !body) throw new UpstreamError(`Salesforce SOAP API failed (HTTP ${res.status}).`);
+    return { body, header: doc.Envelope?.Header };
   }
 
   private async tokenRequest(loginUrl: string, params: Record<string, string>): Promise<TokenResponse> {

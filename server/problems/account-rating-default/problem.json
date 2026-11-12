@@ -1,0 +1,9 @@
+{
+  "title": "Default Account Rating",
+  "difficulty": "Easy",
+  "category": "Triggers",
+  "order": 1,
+  "tags": ["before insert", "bulkification"],
+  "files": [{ "name": "SfcAccountRating", "type": "trigger" }],
+  "testClass": "SfcAccountRatingTest"
+}

@@ -1,0 +1,9 @@
+{
+  "title": "Sync Contact City (Queueable)",
+  "difficulty": "Medium",
+  "category": "Async Apex",
+  "order": 6,
+  "tags": ["Queueable", "System.enqueueJob"],
+  "files": [{ "name": "SfcContactCitySync", "type": "class" }],
+  "testClass": "SfcContactCitySyncTest"
+}

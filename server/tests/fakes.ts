@@ -1,3 +1,5 @@
+import type { ChallengeSubmissionRepository, SubmissionRecord } from "../src/repositories/challengeSubmission.repository.ts";
+import type { GradeResult, SubmissionStatus } from "../src/domain/challenge.ts";
 import type { PendingHandshake, SalesforceConnectionRepository, StoredConnection } from "../src/repositories/salesforceConnection.repository.ts";
 import type { Clock } from "../src/types/ports.ts";
 
@@ -56,3 +58,53 @@ export function scriptedFetch(handler: (call: Call) => Response) {
 
 export const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+
+
+export class MemorySubmissionRepository implements ChallengeSubmissionRepository {
+  readonly rows = new Map<string, SubmissionRecord>();
+  private seq = 0;
+  constructor(private readonly clock: Clock) {}
+
+  createRunning(input: { userId: string; problemSlug: string; orgId: string; files: Record<string, string> }) {
+    // Mirrors the partial unique index: one running submission per user.
+    if ([...this.rows.values()].some((r) => r.userId === input.userId && r.status === "running")) return Promise.resolve(null);
+    const id = `00000000-0000-4000-8000-${String(++this.seq).padStart(12, "0")}`;
+    const row: SubmissionRecord = { id, ...input, status: "running", deployId: null, result: null, createdAt: this.clock.now(), checkedAt: null, completedAt: null };
+    this.rows.set(id, row);
+    return Promise.resolve({ ...row });
+  }
+  setDeployId(id: string, deployId: string) {
+    const r = this.rows.get(id);
+    if (r) r.deployId = deployId;
+    return Promise.resolve();
+  }
+  markChecked(id: string, at: Date) {
+    const r = this.rows.get(id);
+    if (r) r.checkedAt = at;
+    return Promise.resolve();
+  }
+  complete(id: string, status: Exclude<SubmissionStatus, "running">, result: GradeResult, at: Date) {
+    const r = this.rows.get(id);
+    if (r?.status !== "running") return Promise.resolve(false);
+    Object.assign(r, { status, result, completedAt: at });
+    return Promise.resolve(true);
+  }
+  findById(id: string) {
+    const r = this.rows.get(id);
+    return Promise.resolve(r ? { ...r } : null);
+  }
+  listForProblem(userId: string, problemSlug: string, limit: number) {
+    return Promise.resolve(
+      [...this.rows.values()].filter((r) => r.userId === userId && r.problemSlug === problemSlug).reverse().slice(0, limit),
+    );
+  }
+  progress(userId: string) {
+    const out = new Map<string, "solved" | "attempted">();
+    for (const r of this.rows.values()) {
+      if (r.userId !== userId) continue;
+      if (r.status === "accepted") out.set(r.problemSlug, "solved");
+      else if (!out.has(r.problemSlug)) out.set(r.problemSlug, "attempted");
+    }
+    return Promise.resolve(out);
+  }
+}

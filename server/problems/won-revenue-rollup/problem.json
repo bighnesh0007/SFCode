@@ -1,0 +1,12 @@
+{
+  "title": "Won Revenue Roll-up",
+  "difficulty": "Medium",
+  "category": "Triggers",
+  "order": 4,
+  "tags": ["after triggers", "aggregate SOQL", "handler pattern"],
+  "files": [
+    { "name": "SfcRevenueRollup", "type": "trigger" },
+    { "name": "SfcRevenueRollupHandler", "type": "class" }
+  ],
+  "testClass": "SfcRevenueRollupTest"
+}

@@ -1,0 +1,9 @@
+{
+  "title": "Text Utilities",
+  "difficulty": "Easy",
+  "category": "Classes",
+  "order": 3,
+  "tags": ["strings", "static methods"],
+  "files": [{ "name": "SfcTextUtils", "type": "class" }],
+  "testClass": "SfcTextUtilsTest"
+}

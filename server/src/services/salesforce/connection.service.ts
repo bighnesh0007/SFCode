@@ -21,6 +21,13 @@ export class OrgNotConnectedError extends AppError {
   }
 }
 
+/** A live session handed to callers of `withOrg`. */
+export interface OrgSession {
+  orgId: string;
+  instanceUrl: string;
+  accessToken: string;
+}
+
 /** What the client is allowed to see about a connection. */
 export interface ConnectionView {
   orgId: string;
@@ -115,18 +122,21 @@ export class SalesforceConnectionService {
   }
 
   async executeAnonymous(userId: string, apex: string): Promise<ApexExecutionResult> {
-    const result = await this.withSession(userId, (instanceUrl, token) => this.sf.executeAnonymous(instanceUrl, token, apex));
+    const result = await this.withOrg(userId, (org) => this.sf.executeAnonymous(org.instanceUrl, org.accessToken, apex));
     logEvent("apex.executed", { compiled: result.compiled, success: result.success, chars: apex.length });
     return result;
   }
 
-  /** Runs `fn` with a live access token, refreshing once on an expired session. */
-  private async withSession<T>(userId: string, fn: (instanceUrl: string, accessToken: string) => Promise<T>): Promise<T> {
+  /**
+   * Runs `fn` against the user's org with a live access token, refreshing once
+   * on an expired session. The token never leaves this call.
+   */
+  async withOrg<T>(userId: string, fn: (org: OrgSession) => Promise<T>): Promise<T> {
     const conn = await this.repo.findByUser(userId);
     if (!conn) throw new OrgNotConnectedError();
 
     try {
-      return await fn(conn.instanceUrl, decryptToken(conn.accessTokenEnc, this.secrets.tokenKey));
+      return await fn({ orgId: conn.orgId, instanceUrl: conn.instanceUrl, accessToken: decryptToken(conn.accessTokenEnc, this.secrets.tokenKey) });
     } catch (err) {
       if (!(err instanceof SessionExpiredError)) throw err;
     }
@@ -144,7 +154,7 @@ export class SalesforceConnectionService {
     }
     await this.repo.updateAccessToken(userId, encryptToken(refreshed.accessToken, this.secrets.tokenKey), refreshed.instanceUrl);
     logEvent("salesforce.token_refreshed");
-    return fn(refreshed.instanceUrl, refreshed.accessToken);
+    return fn({ orgId: conn.orgId, instanceUrl: refreshed.instanceUrl, accessToken: refreshed.accessToken });
   }
 }
 

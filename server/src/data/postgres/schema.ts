@@ -2,7 +2,9 @@
  * PostgreSQL schema. Migrations are generated from this file with
  * `npm run db:generate` — never hand-edit a generated migration.
  */
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { index, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import type { GradeResult, SubmissionStatus } from "../../domain/challenge.ts";
 
 /**
  * One connected org per user for now. Keyed by user rather than (user, org) so
@@ -36,3 +38,32 @@ export const oauthPending = pgTable("oauth_pending", {
   codeVerifierEnc: text("code_verifier_enc").notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
 });
+
+/**
+ * Apex Challenge Arena submissions. Grading is a check-only deploy in the
+ * user's org; `deploy_id` is Salesforce's async id, polled when the client
+ * asks for the submission (no background worker, so a restart loses nothing).
+ */
+export const challengeSubmissions = pgTable(
+  "challenge_submissions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    problemSlug: text("problem_slug").notNull(),
+    orgId: text("org_id").notNull(),
+    status: text("status").$type<SubmissionStatus>().notNull(),
+    deployId: text("deploy_id"),
+    /** The user's source, keyed by file name. */
+    files: jsonb("files").$type<Record<string, string>>().notNull(),
+    result: jsonb("result").$type<GradeResult>(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    checkedAt: timestamp("checked_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (t) => [
+    index("challenge_submissions_user_problem_idx").on(t.userId, t.problemSlug, t.createdAt),
+    // One grading run per user at a time, enforced by the database rather than
+    // a check-then-insert that two quick clicks could race past.
+    uniqueIndex("challenge_submissions_one_running_idx").on(t.userId).where(sql`${t.status} = 'running'`),
+  ],
+);

@@ -1,0 +1,9 @@
+{
+  "title": "Close Stale Opportunities",
+  "difficulty": "Medium",
+  "category": "Batch Apex",
+  "order": 5,
+  "tags": ["Database.Batchable", "QueryLocator"],
+  "files": [{ "name": "SfcStaleOpportunityBatch", "type": "class" }],
+  "testClass": "SfcStaleOpportunityBatchTest"
+}

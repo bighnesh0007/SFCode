@@ -8,6 +8,8 @@ import { sql } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createPgDatabase, type PgDatabase } from "../../src/data/postgres/client.ts";
 import { PgSalesforceConnectionRepository } from "../../src/repositories/salesforceConnection.repository.ts";
+import { PgChallengeSubmissionRepository } from "../../src/repositories/challengeSubmission.repository.ts";
+import type { GradeResult } from "../../src/domain/challenge.ts";
 
 const url = process.env.TEST_DATABASE_URL;
 const safe = url !== undefined && new URL(url).pathname.endsWith("_test");
@@ -23,7 +25,7 @@ describe.skipIf(!safe)("PgSalesforceConnectionRepository", () => {
   });
   afterAll(() => db.close());
   beforeEach(async () => {
-    await db.execute(sql`TRUNCATE salesforce_connections, oauth_pending`);
+    await db.execute(sql`TRUNCATE salesforce_connections, oauth_pending, challenge_submissions`);
   });
 
   const pending = (nonce: string, expiresAt: Date) => ({ nonce, userId: "u1", loginUrl: "https://login.salesforce.com", codeVerifierEnc: "enc:v1:x", expiresAt });
@@ -50,5 +52,55 @@ describe.skipIf(!safe)("PgSalesforceConnectionRepository", () => {
     expect(await repo.findByUser("u1")).toMatchObject({ accessTokenEnc: "enc:v1:new", instanceUrl: "https://b.my.salesforce.com" });
     expect(await repo.delete("u1")).toBe(true);
     expect(await repo.delete("u1")).toBe(false);
+  });
+});
+
+describe.skipIf(!safe)("PgChallengeSubmissionRepository", () => {
+  let db: PgDatabase;
+  let repo: PgChallengeSubmissionRepository;
+  const result = (verdict: GradeResult["verdict"]): GradeResult => ({ verdict, testsRun: 1, testsPassed: verdict === "accepted" ? 1 : 0, tests: [], compileErrors: [], coverage: [], message: null });
+  const input = (userId = "u1", problemSlug = "p1") => ({ userId, problemSlug, orgId: "00D", files: { SfcA: "class SfcA {}" } });
+
+  beforeAll(async () => {
+    db = createPgDatabase(url ?? "");
+    await migrate(db, { migrationsFolder: new URL("../../src/data/postgres/migrations", import.meta.url).pathname });
+    repo = new PgChallengeSubmissionRepository(db);
+  });
+  afterAll(() => db.close());
+  beforeEach(async () => {
+    await db.execute(sql`TRUNCATE challenge_submissions`);
+  });
+
+  it("the database allows one running submission per user, even under a race", async () => {
+    const results = await Promise.all([1, 2, 3, 4].map(() => repo.createRunning(input())));
+    expect(results.filter(Boolean)).toHaveLength(1);
+    expect(await repo.createRunning(input("u2"))).not.toBeNull();
+  });
+
+  it("completes a submission once; a second completion cannot overwrite it", async () => {
+    const r = await repo.createRunning(input());
+    if (!r) throw new Error("setup");
+    expect(await repo.complete(r.id, "accepted", result("accepted"), new Date())).toBe(true);
+    expect(await repo.complete(r.id, "error", result("error"), new Date())).toBe(false);
+    expect((await repo.findById(r.id))?.status).toBe("accepted");
+    expect(await repo.createRunning(input())).not.toBeNull();
+  });
+
+  it("round-trips files and result JSON", async () => {
+    const r = await repo.createRunning(input());
+    if (!r) throw new Error("setup");
+    await repo.setDeployId(r.id, "0Af1");
+    await repo.complete(r.id, "wrong_answer", result("wrong_answer"), new Date());
+    expect(await repo.findById(r.id)).toMatchObject({ deployId: "0Af1", files: { SfcA: "class SfcA {}" }, result: { verdict: "wrong_answer" } });
+  });
+
+  it("reports progress per problem", async () => {
+    for (const [slug, status] of [["p1", "wrong_answer"], ["p1", "accepted"], ["p2", "compile_error"]] as const) {
+      const r = await repo.createRunning(input("u1", slug));
+      if (!r) throw new Error("setup");
+      await repo.complete(r.id, status, result(status), new Date());
+    }
+    expect(Object.fromEntries(await repo.progress("u1"))).toEqual({ p1: "solved", p2: "attempted" });
+    expect((await repo.listForProblem("u1", "p1", 10)).map((r) => r.status)).toEqual(["accepted", "wrong_answer"]);
   });
 });

@@ -10,12 +10,19 @@ import { ClerkTokenVerifier } from "./services/identity/clerkTokenVerifier.ts";
 import { SalesforceConnectionService } from "./services/salesforce/connection.service.ts";
 import { SalesforceClient } from "./services/salesforce/salesforceClient.ts";
 import { systemClock, type TokenVerifier } from "./types/ports.ts";
+import { PgChallengeSubmissionRepository } from "./repositories/challengeSubmission.repository.ts";
+import { ChallengeCatalog } from "./services/challenges/catalog.ts";
+import { ChallengeService, type GradingDeps } from "./services/challenges/challenge.service.ts";
 
 export interface Container {
   db?: PgDatabase;
   verifier?: TokenVerifier;
   salesforce?: SalesforceConnectionService;
+  challenges?: ChallengeService;
 }
+
+/** server/problems, resolved from this file so it works from src/ (tsx) and dist/ (node). */
+export const PROBLEMS_DIR = new URL("../problems", import.meta.url).pathname;
 
 export function buildContainer(): Container {
   const container: Container = {};
@@ -23,14 +30,22 @@ export function buildContainer(): Container {
   if (config.clerk.secretKey) container.verifier = new ClerkTokenVerifier(config.clerk.secretKey, config.clerk.authorizedParties);
 
   const { clientId, clientSecret, apiVersion, timeoutMs, redirectUri } = config.salesforce;
+  let grading: GradingDeps | undefined;
   const { tokenEncryptionKey, oauthStateSecret } = config.secrets;
   if (hasCapability("salesforce") && container.db && clientId && clientSecret && tokenEncryptionKey && oauthStateSecret) {
+    const sf = new SalesforceClient({ clientId, clientSecret, apiVersion, timeoutMs, redirectUri });
     container.salesforce = new SalesforceConnectionService(
       new PgSalesforceConnectionRepository(container.db),
-      new SalesforceClient({ clientId, clientSecret, apiVersion, timeoutMs, redirectUri }),
+      sf,
       { tokenKey: tokenEncryptionKey, stateSecret: oauthStateSecret },
       systemClock,
     );
+    grading = { connections: container.salesforce, sf, apiVersion };
+  }
+  if (container.db) {
+    // Loading validates every problem; a broken one stops startup on purpose.
+    // Browsing needs only the database; submitting also needs `grading`.
+    container.challenges = new ChallengeService(ChallengeCatalog.load(PROBLEMS_DIR), new PgChallengeSubmissionRepository(container.db), grading, systemClock);
   }
   return container;
 }
