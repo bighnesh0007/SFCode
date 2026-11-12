@@ -29,6 +29,8 @@ describe("the shipped problems", () => {
       "flow-won-next-step",
       "flow-key-account-task",
       "flow-shipping-cost",
+      "flow-revenue-tier",
+      "flow-won-total-loop",
       "lwc-click-counter",
       "lwc-contact-filter",
       "lwc-star-rating",

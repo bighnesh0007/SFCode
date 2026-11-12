@@ -1,0 +1,4 @@
+{ "title": "Total Won Amount (Loop)", "track": "flow", "difficulty": "Medium", "category": "Loops & Collections", "order": 306,
+  "tags": ["loop element", "record collection", "assignment add"],
+  "files": [], "flow": { "apiName": "SFC_Won_Total", "kind": "autolaunched" },
+  "testClass": "SfcFlowWonTotalTest" }

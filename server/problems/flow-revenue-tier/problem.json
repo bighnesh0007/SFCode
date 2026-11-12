@@ -1,0 +1,4 @@
+{ "title": "Rate by Revenue (Decision)", "track": "flow", "difficulty": "Medium", "category": "Decisions", "order": 305,
+  "tags": ["decision element", "outcomes", "before-save"],
+  "files": [], "flow": { "apiName": "SFC_Rate_By_Revenue", "kind": "record-triggered" },
+  "testClass": "SfcFlowRevenueTierTest" }
