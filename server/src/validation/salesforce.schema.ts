@@ -11,6 +11,7 @@ export const callbackQuery = z.object({
   code: z.string().max(2048).optional(),
   state: z.string().max(2048).optional(),
   error: z.string().max(256).optional(),
+  error_description: z.string().max(1024).optional(),
 });
 export type CallbackQuery = z.infer<typeof callbackQuery>;
 

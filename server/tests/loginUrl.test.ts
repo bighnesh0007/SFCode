@@ -13,6 +13,16 @@ describe("resolveLoginUrl", () => {
   });
 
   it.each([
+    ["https://orgfarm-ad76ba6cfc.lightning.force.com", "https://orgfarm-ad76ba6cfc.my.salesforce.com"],
+    ["https://orgfarm-d61df710ab-dev-ed.develop.lightning.force.com/lightning/o/Task/home", "https://orgfarm-d61df710ab-dev-ed.develop.my.salesforce.com"],
+    ["https://acme--uat.sandbox.lightning.force.com", "https://acme--uat.sandbox.my.salesforce.com"],
+    ["https://orgfarm-ad76ba6cfc.my.salesforce-setup.com/lightning/setup/SetupOneHome/home", "https://orgfarm-ad76ba6cfc.my.salesforce.com"],
+    ["orgfarm-ad76ba6cfc.my.salesforce.com", "https://orgfarm-ad76ba6cfc.my.salesforce.com"],
+  ])("maps the URL people paste, %s, to the org's login domain", (input, expected) => {
+    expect(resolveLoginUrl(input)).toBe(expected);
+  });
+
+  it.each([
     "http://acme.my.salesforce.com",
     "https://evil.com",
     "https://my.salesforce.com.evil.com",
@@ -20,6 +30,10 @@ describe("resolveLoginUrl", () => {
     "https://acme.my.salesforce.com:8443",
     "https://user:pw@acme.my.salesforce.com",
     "https://na1.salesforce.com",
+    "https://lightning.force.com",
+    "https://evil.com/.lightning.force.com",
+    "https://acme.lightning.force.com.evil.com",
+    "http://acme.lightning.force.com",
     "javascript:alert(1)",
     "",
   ])("rejects %s", (input) => {
