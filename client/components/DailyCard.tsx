@@ -58,14 +58,14 @@ export function DailyCard({ compact = false }: { compact?: boolean }) {
       <span className={cn("grid h-11 w-11 shrink-0 place-items-center rounded-lg text-white", done ? "bg-emerald-500" : "bg-gradient-to-br from-sky-400 to-indigo-500")}>
         {done ? <Check className="h-6 w-6" /> : <CalendarCheck className="h-6 w-6" />}
       </span>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-[12rem] flex-1">
         <div className="text-xs font-medium uppercase tracking-wide text-sky-600 dark:text-sky-400">Daily Challenge · {daily.day}</div>
         <div className="truncate font-semibold">{daily.problem.title}</div>
         <div className="text-xs text-muted-foreground">
           {info.label} · {daily.problem.difficulty} · {done ? "Solved today. Come back tomorrow!" : `+${daily.bonus} bonus coins if you solve it today`}
         </div>
       </div>
-      <div className="flex items-center gap-4 text-sm">
+      <div className="flex w-full items-center justify-end gap-4 text-sm sm:w-auto">
         {daily.streak !== null && daily.streak > 0 && (
           <span className="inline-flex items-center gap-1 font-medium text-orange-500" title="Days in a row you've solved the Daily Challenge">
             <Flame className="h-4 w-4" /> {daily.streak}

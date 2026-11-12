@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Check, CircleDashed, GraduationCap, Lock, SkipForward, TriangleAlert, X } from "lucide-react";
 import { useAuthState } from "@/components/auth";
@@ -88,6 +88,17 @@ export default function RoadmapPage() {
   const rows = Math.max(0, ...(view?.nodes ?? []).map((n) => n.depth)) + 1;
   const pos = (n: RoadmapNode) => ({ x: n.col * COL_W + (COL_W - BOX_W) / 2, y: n.depth * ROW_H + 8 });
   const selected = open ? byId.get(open) : undefined;
+
+  // On narrow screens the graph scrolls sideways; start it centred on the step to do next.
+  const graphRef = useRef<HTMLDivElement>(null);
+  const focusId = view?.next ?? view?.nodes[0]?.id;
+  useEffect(() => {
+    const el = graphRef.current;
+    const n = focusId ? byId.get(focusId) : undefined;
+    if (!el || !n || el.scrollWidth <= el.clientWidth) return;
+    const inner = (el.scrollWidth - COL_W * 3) / 2;
+    el.scrollLeft = inner + n.col * COL_W + COL_W / 2 - el.clientWidth / 2;
+  }, [focusId, byId]);
   const nextNode = view?.next ? byId.get(view.next) : undefined;
 
   if (error) return <div className="mx-auto max-w-3xl px-4 py-8 text-sm text-destructive">{error}</div>;
@@ -97,7 +108,8 @@ export default function RoadmapPage() {
     <div className="mx-auto w-full max-w-5xl px-4 py-8">
       <div className="flex flex-wrap items-center gap-5">
         <ProgressRing done={view.done} total={view.total} />
-        <div className="min-w-0 flex-1">
+        {/* min-w forces a wrap on phones instead of squeezing the text to one word per line. */}
+        <div className="min-w-[14rem] flex-1">
           <h1 className="text-2xl font-semibold tracking-tight">{view.title} roadmap</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{view.description}</p>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -105,7 +117,7 @@ export default function RoadmapPage() {
           </p>
         </div>
         {nextNode ? (
-          <Button onClick={() => setOpen(nextNode.id)}>Continue: {nextNode.title} <ArrowRight className="ml-1 h-4 w-4" /></Button>
+          <Button className="w-full sm:w-auto" onClick={() => setOpen(nextNode.id)}>Continue: {nextNode.title} <ArrowRight className="ml-1 h-4 w-4" /></Button>
         ) : !view.personalised ? (
           <Link href="/welcome"><Button>Personalise it</Button></Link>
         ) : null}
@@ -126,7 +138,7 @@ export default function RoadmapPage() {
         {view.personalised && <Link href="/welcome" className="ml-auto underline-offset-2 hover:underline">Retake the quiz</Link>}
       </div>
 
-      <div className="mt-4 overflow-x-auto rounded-xl border bg-[radial-gradient(circle_at_1px_1px,var(--color-border)_1px,transparent_0)] [background-size:20px_20px] p-4">
+      <div ref={graphRef} className="mt-4 overflow-x-auto rounded-xl border bg-[radial-gradient(circle_at_1px_1px,var(--color-border)_1px,transparent_0)] [background-size:20px_20px] p-4">
         <div className="relative mx-auto" style={{ width: COL_W * 3, height: rows * ROW_H }}>
           <svg className="absolute inset-0" width={COL_W * 3} height={rows * ROW_H} aria-hidden>
             {view.nodes.flatMap((n) =>
