@@ -401,6 +401,168 @@
         "b"
       ],
       "explanation": "Production deploys need 75% overall coverage and some coverage for every trigger. Assertions are best practice — coverage without assertions proves very little — but the platform doesn't enforce them."
+    },
+    {
+      "id": "pd1-master-detail-delete",
+      "section": "fundamentals",
+      "prompt": "A child object must be deleted automatically when its parent record is deleted. Which relationship provides this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Lookup"
+        },
+        {
+          "id": "b",
+          "text": "Master-detail"
+        },
+        {
+          "id": "c",
+          "text": "Hierarchical"
+        },
+        {
+          "id": "d",
+          "text": "External lookup"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Deleting a master record deletes its detail records. A lookup can be configured to clear the field or block the delete, but a master-detail relationship always cascades."
+    },
+    {
+      "id": "pd1-rollup-summary",
+      "section": "fundamentals",
+      "prompt": "Where can a declarative **roll-up summary** field be created?",
+      "options": [
+        {
+          "id": "a",
+          "text": "On the child of a lookup relationship"
+        },
+        {
+          "id": "b",
+          "text": "On the master object of a master-detail relationship"
+        },
+        {
+          "id": "c",
+          "text": "On any object with a formula field"
+        },
+        {
+          "id": "d",
+          "text": "Only on standard objects"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Roll-up summary fields live on the master side of a master-detail relationship (plus a few standard pairs such as Account → Opportunity). Lookups need Apex, flows or third-party tools to roll up."
+    },
+    {
+      "id": "pd1-set-no-duplicates",
+      "section": "logic",
+      "prompt": "Which Apex collection automatically ignores duplicate values?",
+      "options": [
+        {
+          "id": "a",
+          "text": "`List`"
+        },
+        {
+          "id": "b",
+          "text": "`Set`"
+        },
+        {
+          "id": "c",
+          "text": "`Map` values"
+        },
+        {
+          "id": "d",
+          "text": "Arrays declared with `[]`"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A `Set` holds unique elements, which is why it's the usual way to gather record Ids before a bulk query. Lists (and array syntax, which is a List) keep duplicates; Map keys are unique but values aren't."
+    },
+    {
+      "id": "pd1-lwc-for-each-key",
+      "section": "ui",
+      "prompt": "In an LWC template, what must each element rendered inside `for:each` have?",
+      "options": [
+        {
+          "id": "a",
+          "text": "An `id` attribute"
+        },
+        {
+          "id": "b",
+          "text": "A unique `key` attribute"
+        },
+        {
+          "id": "c",
+          "text": "A `data-index` attribute"
+        },
+        {
+          "id": "d",
+          "text": "Nothing extra"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The engine uses `key` to track list items between renders, and the template won't compile without one. Use a stable value such as a record Id, not the loop index."
+    },
+    {
+      "id": "pd1-lwc-child-to-parent",
+      "section": "ui",
+      "prompt": "A child Lightning Web Component needs to tell its parent that a value changed. What's the standard approach?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Set a property on the parent directly"
+        },
+        {
+          "id": "b",
+          "text": "Dispatch a `CustomEvent` that the parent handles"
+        },
+        {
+          "id": "c",
+          "text": "Call `@api` methods on the parent"
+        },
+        {
+          "id": "d",
+          "text": "Write to a shared global variable"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Data flows down through `@api` properties and up through events: the child dispatches a `CustomEvent` (often with a `detail` payload) and the parent listens with `on<eventname>`."
+    },
+    {
+      "id": "pd1-testsetup",
+      "section": "testing",
+      "prompt": "Which annotation creates test records once, for every test method in the class to use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "`@isTest(SeeAllData=true)`"
+        },
+        {
+          "id": "b",
+          "text": "`@TestSetup`"
+        },
+        {
+          "id": "c",
+          "text": "`@TestVisible`"
+        },
+        {
+          "id": "d",
+          "text": "`@future`"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A `@TestSetup` method runs once before the class's test methods. Each test method gets the records it created (rolled back between methods), which saves both time and code."
     }
   ]
 }

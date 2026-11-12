@@ -41,7 +41,7 @@ const valid = () => ({
 
 describe("question bank", () => {
   it("ships PD I and PD II, valid", () => {
-    expect(bank.all().map((e) => [e.exam, e.questions.length])).toEqual([["pd1", 14], ["pd2", 10]]);
+    expect(bank.all().map((e) => [e.exam, e.questions.length])).toEqual([["pd1", 20], ["pd2", 13]]);
   });
 
   it.each<[string, (e: ReturnType<typeof valid>) => void, RegExp]>([
@@ -79,7 +79,7 @@ describe("CertificationService", () => {
     expect(testing.every((q) => q.section === "testing")).toBe(true);
     expect(service.practice("pd1", undefined, 5)).toHaveLength(5);
     const all = service.practice("pd1", undefined, 30).map((q) => q.id);
-    expect(new Set(all).size).toBe(14);
+    expect(new Set(all).size).toBe(20);
   });
 
   it("grades multi-answer questions regardless of order, and only all-or-nothing", async () => {

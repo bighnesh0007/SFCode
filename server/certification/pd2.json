@@ -292,6 +292,87 @@
         "b"
       ],
       "explanation": "Real callouts are blocked in tests. An `HttpCalloutMock` implementation returns a fake response, which lets you test both success and error handling."
+    },
+    {
+      "id": "pd2-runas",
+      "section": "testing",
+      "prompt": "How can a test verify behaviour for a user with a particular profile or permission set?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Use `SeeAllData=true` and query an existing user"
+        },
+        {
+          "id": "b",
+          "text": "Create the user in the test and wrap the code in `System.runAs(user)`"
+        },
+        {
+          "id": "c",
+          "text": "Call `UserInfo.setUser()`"
+        },
+        {
+          "id": "d",
+          "text": "It can't be tested"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "`System.runAs` executes a block as the given user, enforcing record sharing for that user. It's only available in tests. (Field- and object-level security is enforced only where the code asks for it, e.g. `WITH USER_MODE`.)"
+    },
+    {
+      "id": "pd2-loaddata",
+      "section": "testing",
+      "prompt": "Where does `Test.loadData()` read its test records from?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A CSV file stored as a static resource"
+        },
+        {
+          "id": "b",
+          "text": "A JSON file in the test class"
+        },
+        {
+          "id": "c",
+          "text": "Existing records in the org"
+        },
+        {
+          "id": "d",
+          "text": "An external URL"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "`Test.loadData(Account.sObjectType, 'myResource')` inserts records from a CSV static resource. It's handy for large or reusable fixtures without writing them out in Apex."
+    },
+    {
+      "id": "pd2-batch-for-millions",
+      "section": "performance",
+      "prompt": "Code must update about 20 million records. Which approach stays within governor limits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A single trigger handler"
+        },
+        {
+          "id": "b",
+          "text": "A `@future` method"
+        },
+        {
+          "id": "c",
+          "text": "Batch Apex using a `Database.QueryLocator`"
+        },
+        {
+          "id": "d",
+          "text": "A Queueable that queries all records at once"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "A QueryLocator lets a batch job process up to 50 million records, each `execute` getting a fresh set of limits. The other options query in one transaction and hit SOQL row or heap limits."
     }
   ]
 }
