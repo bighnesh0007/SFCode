@@ -45,7 +45,9 @@ export interface ChallengeView {
   category: string;
   tags: string[];
   statement: string;
-  files: { name: string; type: ApexFileType; fileName: string; starter: string }[];
+  files: { name: string; type: ApexFileType | "lwc"; fileName: string; starter: string }[];
+  /** LWC problems: compiled by POST /lwc/compile and tested in the browser. */
+  lwc?: { component: string; tests: string };
   /** Flow problems: the flow to build in the learner's own org. */
   flow?: { apiName: string; kind: "record-triggered" | "autolaunched" };
 }
@@ -140,14 +142,18 @@ export class ChallengeService {
       category: c.category,
       tags: c.tags,
       statement: c.statement,
-      files: c.files.map((f) => ({ name: f.name, type: f.type, fileName: `${f.name}.${extensionFor(f.type)}`, starter: c.starter[f.name] ?? "" })),
+      files: c.lwc
+        ? (["html", "js", "css"] as const).map((ext) => ({ name: ext, type: "lwc" as const, fileName: `${c.lwc?.component ?? ""}.${ext}`, starter: c.starter[ext] ?? "" }))
+        : c.files.map((f) => ({ name: f.name, type: f.type, fileName: `${f.name}.${extensionFor(f.type)}`, starter: c.starter[f.name] ?? "" })),
       ...(c.flow ? { flow: c.flow } : {}),
+      ...(c.lwc ? { lwc: c.lwc } : {}),
     };
   }
 
   async submit(userId: string, slug: string, files: Record<string, string>): Promise<SubmissionView> {
-    const { connections, sf, apiVersion } = this.requireGrading();
     const challenge = this.require(slug);
+    if (challenge.lwc) throw new ValidationError("LWC problems are checked in your browser, not submitted to your org.");
+    const { connections, sf, apiVersion } = this.requireGrading();
     this.checkFiles(challenge, files);
 
     const connection = await connections.status(userId);

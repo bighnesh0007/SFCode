@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { ApiError } from "@/lib/apiClient";
 import { getChallenge, type ChallengeView } from "@/lib/challengesApi";
+import { LwcWorkspace } from "./LwcWorkspace";
 import { Workspace } from "./Workspace";
 
 /** Loads one problem and renders the workspace. `backHref` is the list it belongs to. */
@@ -35,5 +36,5 @@ export function ChallengePage({ slug, backHref }: { slug: string; backHref: stri
         <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
       </div>
     );
-  return <Workspace challenge={challenge} backHref={backHref} />;
+  return challenge.lwc ? <LwcWorkspace challenge={challenge} backHref={backHref} /> : <Workspace challenge={challenge} backHref={backHref} />;
 }

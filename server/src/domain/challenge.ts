@@ -3,7 +3,7 @@ import type { Difficulty } from "./difficulty.ts";
 
 export type ApexFileType = "class" | "trigger" | "soql";
 /** Practice areas. The one list: catalog validation and the API schema both read it. */
-export const TRACKS = ["apex", "soql", "debug", "flow"] as const;
+export const TRACKS = ["apex", "soql", "debug", "flow", "lwc"] as const;
 export type Track = (typeof TRACKS)[number];
 
 export interface ChallengeFile {
@@ -33,6 +33,11 @@ export interface Challenge {
    * are no editable files; the hidden tests exercise the org's active flow.
    */
   flow?: { apiName: string; kind: "record-triggered" | "autolaunched" };
+  /**
+   * LWC problems only. Compiled on the server, run and tested in the learner's
+   * browser (sandboxed iframe), so `tests` is sent to the client by design.
+   */
+  lwc?: { component: string; tests: string };
 }
 
 export const VERDICTS = ["accepted", "wrong_answer", "compile_error", "coverage", "error"] as const;

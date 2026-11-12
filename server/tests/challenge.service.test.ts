@@ -40,7 +40,12 @@ describe("ChallengeService — what clients can see", () => {
       const json = JSON.stringify(service.get(c.slug)) + JSON.stringify(await service.list(null));
       expect(json).not.toContain(c.testClass.name);
       expect(json).not.toContain("sfcAssertSameRows");
-      for (const ref of Object.values(c.reference)) expect(json).not.toContain(ref);
+      // Compare in JSON-escaped form: multi-line source with quotes appears in
+      // the response as \n and \" — matching the raw text could never fail.
+      // Empty reference files (a component with no CSS) have nothing to leak.
+      for (const ref of Object.values(c.reference).filter((r) => r.trim() !== "")) {
+        expect(json, `${c.slug} leaks its reference solution`).not.toContain(JSON.stringify(ref).slice(1, -1));
+      }
     }
   });
 
@@ -64,7 +69,8 @@ describe("ChallengeService — what clients can see", () => {
     expect((await service.list(null, "apex")).length).toBe(6);
     expect((await service.list(null, "debug")).length).toBe(4);
     expect((await service.list(null, "flow")).length).toBe(3);
-    expect((await service.list(null)).length).toBe(18);
+    expect((await service.list(null, "lwc")).length).toBe(2);
+    expect((await service.list(null)).length).toBe(20);
   });
 
   it("404s unknown problems", () => {
@@ -128,6 +134,20 @@ describe("ChallengeService — submitting and grading", () => {
     expect(names).toEqual(["classes/SfcFlowWonNextStepTest.cls", "classes/SfcFlowWonNextStepTest.cls-meta.xml", "package.xml"]);
     // A learner can't smuggle a flow (or anything) into the deploy.
     await expect(s.service.submit("u2", "flow-won-next-step", { SFC_Opportunity_Won_Next_Step: "<Flow/>" })).rejects.toThrow(/exactly these files/);
+  });
+
+  it("serves an LWC problem's component files and browser tests, but never its reference", () => {
+    const view = setup().service.get("lwc-contact-filter");
+    expect(view.files.map((f) => f.fileName)).toEqual(["contactFilter.html", "contactFilter.js", "contactFilter.css"]);
+    expect(view.lwc?.tests).toContain("const tests");
+    expect(JSON.stringify(view)).not.toContain("handleSearch(event)");
+  });
+
+  it("refuses to submit an LWC problem to the org grader", async () => {
+    const s = setup();
+    await s.connect("u1");
+    await expect(s.service.submit("u1", "lwc-click-counter", {})).rejects.toThrow(/checked in your browser/);
+    expect(s.fetch.calls).toHaveLength(0);
   });
 
   it("exposes the flow to build, but not its reference metadata", () => {

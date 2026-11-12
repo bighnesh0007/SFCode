@@ -28,6 +28,8 @@ describe("the shipped problems", () => {
       "flow-account-default-rating",
       "flow-won-next-step",
       "flow-key-account-task",
+      "lwc-click-counter",
+      "lwc-contact-filter",
     ]);
   });
 });
@@ -159,6 +161,35 @@ describe("flow problems", () => {
     const meta = JSON.parse(readFileSync(join(p, "problem.json"), "utf8")) as Record<string, unknown>;
     writeFileSync(join(p, "problem.json"), JSON.stringify({ ...meta, track: "apex" }));
     expect(() => loadChallenge(dir, "flow-won-next-step")).toThrow(/flow-track/);
+  });
+});
+
+describe("lwc problems", () => {
+  let dir: string;
+  const fresh = () => {
+    dir = mkdtempSync(join(tmpdir(), "sfc-lwc-"));
+    cpSync(join(PROBLEMS_DIR, "lwc-click-counter"), join(dir, "lwc-click-counter"), { recursive: true });
+    return join(dir, "lwc-click-counter");
+  };
+  afterEach(() => rmSync(dir, { recursive: true, force: true }));
+
+  it("need all three component files in starter and reference", () => {
+    const p = fresh();
+    rmSync(join(p, "reference", "clickCounter.css"));
+    expect(() => loadChallenge(dir, "lwc-click-counter")).toThrow(/must contain exactly clickCounter.html, clickCounter.js, clickCounter.css/);
+  });
+
+  it("need a test file that defines `const tests`", () => {
+    const p = fresh();
+    writeFileSync(join(p, "tests", "clickCounter.test.js"), "export default [];");
+    expect(() => loadChallenge(dir, "lwc-click-counter")).toThrow(/const tests/);
+  });
+
+  it("can't mix in Apex grading fields", () => {
+    const p = fresh();
+    const meta = JSON.parse(readFileSync(join(p, "problem.json"), "utf8")) as Record<string, unknown>;
+    writeFileSync(join(p, "problem.json"), JSON.stringify({ ...meta, testClass: "SfcClickTest" }));
+    expect(() => loadChallenge(dir, "lwc-click-counter")).toThrow(/no files, flow or testClass/);
   });
 });
 

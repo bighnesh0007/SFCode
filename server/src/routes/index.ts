@@ -13,6 +13,9 @@ import { callbackQuery, connectBody, executeBody } from "../validation/salesforc
 import { challengeController } from "../controllers/challenge.controller.ts";
 import { certificationController } from "../controllers/certification.controller.ts";
 import { answerBody, examParams, practiceQuery } from "../validation/certification.schema.ts";
+import { lwcCompileBody, type LwcCompileBody } from "../validation/lwc.schema.ts";
+import { compileLwc } from "../services/lwc/compiler.ts";
+import { validatedBody } from "../middleware/validate.ts";
 import { listQuery, slugParams, submissionParams, submitBody } from "../validation/challenge.schema.ts";
 
 function disabled(what: string): RequestHandler {
@@ -33,6 +36,10 @@ function limiter(perMinute: number): RequestHandler {
     handler: (_req, _res, next) => next(new RateLimitError("Too many requests.", 60)),
   });
 }
+
+const lwcCompile: RequestHandler = async (req, res) => {
+  ok(res, { code: await compileLwc(validatedBody<LwcCompileBody>(req)) });
+};
 
 export function mountRoutes(app: Application, container: Container): void {
   app.get("/health", (_req, res) => ok(res, { status: "ok" }));
@@ -91,6 +98,12 @@ export function mountRoutes(app: Application, container: Container): void {
     cert.use(disabled("Certification Prep"));
   }
   v1.use("/certification", cert);
+
+  // LWC: compile only. The learner's component runs in their own browser
+  // (sandboxed iframe), never here. Anonymous, so it is rate-limited.
+  const lwcRouter = Router();
+  lwcRouter.post("/compile", limiter(20), validate({ body: lwcCompileBody }), lwcCompile);
+  v1.use("/lwc", lwcRouter);
 
   app.use("/api/v1", v1);
   app.use(notFound);

@@ -14,7 +14,9 @@ import tseslint from "typescript-eslint";
  */
 export default tseslint.config(
   {
-    ignores: ["dist/**", "node_modules/**", "coverage/**"],
+    // problems/ holds learner-facing content (LWC source with decorators,
+    // browser tests), compiled by Salesforce's tooling, not by this project.
+    ignores: ["dist/**", "node_modules/**", "coverage/**", "problems/**", ".run/**"],
   },
 
   // Type-aware rules need a tsconfig, so they are scoped to TypeScript sources only.
