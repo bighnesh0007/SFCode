@@ -8,6 +8,7 @@ import { LocalModeBadge, SignInButton, SignUpButton, UserButton, useAuthState } 
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
 import { OrgBadge } from "@/components/OrgBadge";
+import { SearchPalette } from "@/components/SearchPalette";
 import { cn } from "@/lib/utils";
 
 /** Built sections only; unbuilt features stay out of the nav until they exist. */
@@ -49,6 +50,7 @@ export default function Navbar() {
         </nav>
 
         <div className="ml-auto hidden items-center gap-2 md:flex">
+          <SearchPalette shortcut />
           <LocalModeBadge />
           {isSignedIn && <OrgBadge />}
           <ModeToggle />
@@ -70,6 +72,7 @@ export default function Navbar() {
         </div>
 
         <div className="ml-auto flex items-center gap-1 md:hidden">
+          <SearchPalette />
           <ModeToggle />
           <Button type="button" variant="ghost" size="icon" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"}>
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
