@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
+import { Flair, accentClass, frameClass } from "@/components/Cosmetics";
 import { useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
@@ -79,7 +80,7 @@ export function ProfileView({ profile: initial, editable }: { profile: Profile; 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
       <div className="flex flex-wrap items-center gap-4">
-        <Avatar src={profile.imageUrl} name={profile.displayName} size={64} />
+        <Avatar src={profile.imageUrl} name={profile.displayName} size={64} className={frameClass(profile.cosmetics.frame)} />
         <div className="min-w-0 flex-1">
           {editing ? (
             <div className="flex flex-wrap items-center gap-2">
@@ -92,7 +93,8 @@ export function ProfileView({ profile: initial, editable }: { profile: Profile; 
           ) : (
             <>
               <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-                {profile.displayName}
+                <span className={accentClass(profile.cosmetics.accent)}>{profile.displayName}</span>
+                <Flair badge={profile.cosmetics.badge} />
                 {editable && (
                   <button type="button" onClick={() => setEditing(true)} className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label="Edit profile">
                     <Pencil className="h-4 w-4" />

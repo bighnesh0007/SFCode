@@ -19,7 +19,15 @@ const RESERVED = new Set(["admin", "administrator", "sfcode", "support", "modera
 const LEADERBOARD_TTL_MS = 30_000;
 const ACTIVITY_DAYS = 365;
 
+/** Equipped cosmetic style tokens per slot, e.g. { frame: "gold" }. */
+export type Cosmetics = Record<string, string>;
+
+export interface CosmeticsSource {
+  cosmetics(userIds: string[]): Promise<Map<string, Cosmetics>>;
+}
+
 export interface ProfileView {
+  cosmetics: Cosmetics;
   handle: string;
   displayName: string;
   imageUrl: string | null;
@@ -34,6 +42,7 @@ export interface ProfileView {
 }
 
 export interface LeaderboardRow {
+  cosmetics: Cosmetics;
   rank: number;
   handle: string;
   displayName: string;
@@ -46,6 +55,16 @@ export type LeaderboardWindow = "all" | "30d";
 
 export class CommunityService {
   private cached = new Map<LeaderboardWindow, { at: number; rows: LeaderboardRow[] }>();
+  /** Set after construction: the store depends on contests, which depend on this. */
+  private cosmeticsSource: CosmeticsSource | undefined;
+
+  setCosmeticsSource(source: CosmeticsSource): void {
+    this.cosmeticsSource = source;
+  }
+
+  private async cosmeticsOf(userIds: string[]): Promise<Map<string, Cosmetics>> {
+    return this.cosmeticsSource ? this.cosmeticsSource.cosmetics(userIds) : new Map();
+  }
 
   constructor(
     private readonly catalog: ChallengeCatalog,
@@ -119,7 +138,8 @@ export class CommunityService {
         return p ? [{ p, t }] : [];
       })
       .sort((a, b) => b.t.score - a.t.score || a.t.last - b.t.last);
-    const rows = ordered.map(({ p, t }, i) => ({ rank: i + 1, handle: p.handle, displayName: p.displayName, imageUrl: p.imageUrl, score: t.score, solved: t.solved }));
+    const looks = await this.cosmeticsOf(ordered.map(({ p }) => p.userId));
+    const rows = ordered.map(({ p, t }, i) => ({ rank: i + 1, handle: p.handle, displayName: p.displayName, imageUrl: p.imageUrl, score: t.score, solved: t.solved, cosmetics: looks.get(p.userId) ?? {} }));
     this.cached.set(window, { at: now, rows });
     return rows.slice(0, limit);
   }
@@ -133,6 +153,7 @@ export class CommunityService {
     const since = new Date(this.clock.nowMs() - ACTIVITY_DAYS * 86_400_000);
 
     return {
+      cosmetics: (await this.cosmeticsOf([p.userId])).get(p.userId) ?? {},
       handle: p.handle,
       displayName: p.displayName,
       imageUrl: p.imageUrl,

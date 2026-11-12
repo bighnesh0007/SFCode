@@ -18,6 +18,8 @@ import { compileLwc } from "../services/lwc/compiler.ts";
 import { communityController } from "../controllers/community.controller.ts";
 import { adminController } from "../controllers/admin.controller.ts";
 import { blogController } from "../controllers/blog.controller.ts";
+import { contestController, storeController } from "../controllers/contest.controller.ts";
+import { contestSlugParams, createContestBody, equipBody, storeItemBody } from "../validation/contest.schema.ts";
 import { blogListQuery, blogSlugParams, commentBody, commentParams, hideBody, postBody, postPatchBody, voteBody } from "../validation/blog.schema.ts";
 import { adminUsersQuery, roleBody } from "../validation/admin.schema.ts";
 import { handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
@@ -150,6 +152,33 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.post("/blog/:slug/comments", signedIn, limiter(10), validate({ params: blogSlugParams, body: commentBody }), b.comment);
   } else {
     v1.use("/blog", disabled("The blog"));
+  }
+
+  // Contests: public reads; joining needs sign-in; creating/deleting is admin
+  // (ContestService re-checks the actor's standing).
+  if (container.contests) {
+    const c = contestController(container.contests);
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
+    v1.get("/contests", c.list);
+    v1.post("/contests", signedIn, limiter(10), validate({ body: createContestBody }), c.create);
+    v1.get("/contests/:slug", identify, validate({ params: contestSlugParams }), c.get);
+    v1.post("/contests/:slug/join", signedIn, limiter(20), validate({ params: contestSlugParams }), c.join);
+    v1.delete("/contests/:slug", signedIn, limiter(10), validate({ params: contestSlugParams }), c.remove);
+  } else {
+    v1.use("/contests", disabled("Contests"));
+  }
+
+  // Store: browsing is public; your wallet, buying and equipping need sign-in.
+  if (container.store) {
+    const st = storeController(container.store);
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
+    v1.get("/store", identify, st.view);
+    v1.post("/store/buy", signedIn, limiter(20), validate({ body: storeItemBody }), st.buy);
+    v1.post("/store/equip", signedIn, limiter(40), validate({ body: equipBody }), st.equip);
+  } else {
+    v1.use("/store", disabled("The store"));
   }
 
   // LWC: compile only. The learner's component runs in their own browser

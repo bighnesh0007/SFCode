@@ -20,7 +20,7 @@ export interface SubmissionRecord {
 
 export interface ChallengeSubmissionRepository {
   /** Inserts a running submission; returns null if the user already has one running. */
-  createRunning(input: { userId: string; problemSlug: string; orgId: string; files: Record<string, string> }): Promise<SubmissionRecord | null>;
+  createRunning(input: { userId: string; problemSlug: string; orgId: string; files: Record<string, string>; contestId?: string | null }): Promise<SubmissionRecord | null>;
   setDeployId(id: string, deployId: string): Promise<void>;
   markChecked(id: string, at: Date): Promise<void>;
   /** Finalises only if still running, so two concurrent pollers cannot overwrite each other. */
@@ -38,10 +38,10 @@ export interface ChallengeSubmissionRepository {
 export class PgChallengeSubmissionRepository implements ChallengeSubmissionRepository {
   constructor(private readonly db: PgDatabase) {}
 
-  async createRunning(input: { userId: string; problemSlug: string; orgId: string; files: Record<string, string> }): Promise<SubmissionRecord | null> {
+  async createRunning(input: { userId: string; problemSlug: string; orgId: string; files: Record<string, string>; contestId?: string | null }): Promise<SubmissionRecord | null> {
     const rows = await this.db
       .insert(challengeSubmissions)
-      .values({ userId: input.userId, problemSlug: input.problemSlug, orgId: input.orgId, files: input.files, status: "running" })
+      .values({ userId: input.userId, problemSlug: input.problemSlug, orgId: input.orgId, files: input.files, status: "running", contestId: input.contestId ?? null })
       .onConflictDoNothing()
       .returning();
     return (rows[0] as SubmissionRecord | undefined) ?? null;

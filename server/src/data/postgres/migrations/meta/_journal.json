@@ -43,6 +43,13 @@
       "when": 1794503135963,
       "tag": "0005_blog",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794504046815,
+      "tag": "0006_contests_store",
+      "breakpoints": true
     }
   ]
 }

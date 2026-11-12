@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Avatar } from "@/components/Avatar";
+import { Flair, accentClass, frameClass } from "@/components/Cosmetics";
 import { ApiError } from "@/lib/apiClient";
 import { getLeaderboard, type LeaderboardRow } from "@/lib/communityApi";
 import { cn } from "@/lib/utils";
@@ -65,8 +66,9 @@ export default function LeaderboardPage() {
                     <td className={cn("py-3 pl-4 tabular-nums", r.rank <= 3 ? "font-semibold" : "text-muted-foreground")}>{r.rank}</td>
                     <td className="py-3">
                       <Link href={`/u/${r.handle}`} className="flex min-w-0 items-center gap-2.5 hover:text-primary">
-                        <Avatar src={r.imageUrl} name={r.displayName} size={24} />
-                        <span className="truncate font-medium">{r.displayName}</span>
+                        <Avatar src={r.imageUrl} name={r.displayName} size={24} className={frameClass(r.cosmetics.frame)} />
+                        <span className={cn("truncate font-medium", accentClass(r.cosmetics.accent))}>{r.displayName}</span>
+                        <Flair badge={r.cosmetics.badge} />
                         <span className="truncate text-xs text-muted-foreground">@{r.handle}</span>
                       </Link>
                     </td>

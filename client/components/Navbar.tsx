@@ -18,7 +18,9 @@ const NAV = [
   { href: "/playground/apex", label: "Playground", match: ["/playground"] },
   { href: "/certification", label: "Certification", match: ["/certification"] },
   { href: "/leaderboard", label: "Leaderboard", match: ["/leaderboard", "/u"] },
+  { href: "/contests", label: "Contests", match: ["/contests"] },
   { href: "/blog", label: "Blog", match: ["/blog"] },
+  { href: "/store", label: "Store", match: ["/store"] },
 ];
 
 export default function Navbar() {

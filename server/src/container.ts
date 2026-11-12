@@ -21,6 +21,10 @@ import { AdminService } from "./services/admin/admin.service.ts";
 import { PgAdminRepository } from "./repositories/admin.repository.ts";
 import { PgBlogRepository } from "./repositories/blog.repository.ts";
 import { BlogService } from "./services/blog/blog.service.ts";
+import { PgContestRepository } from "./repositories/contest.repository.ts";
+import { PgStoreRepository } from "./repositories/store.repository.ts";
+import { ContestService } from "./services/contests/contest.service.ts";
+import { StoreService } from "./services/store/store.service.ts";
 import { ClerkIdentityLookup } from "./services/identity/clerkIdentity.ts";
 import { ChallengeService, type GradingDeps } from "./services/challenges/challenge.service.ts";
 
@@ -33,6 +37,8 @@ export interface Container {
   community?: CommunityService;
   admin?: AdminService;
   blog?: BlogService;
+  contests?: ContestService;
+  store?: StoreService;
 }
 
 /** server/certification (question banks), resolved like PROBLEMS_DIR. */
@@ -63,11 +69,13 @@ export function buildContainer(): Container {
   // Loading validates every problem; a broken one stops startup on purpose.
   // Browsing needs nothing (contributors run without accounts or a database);
   // submissions need the database, and grading also needs Salesforce.
+  const contestRepo = container.db ? new PgContestRepository(container.db) : undefined;
   container.challenges = new ChallengeService(
     catalog,
     container.db ? new PgChallengeSubmissionRepository(container.db) : undefined,
     grading,
     systemClock,
+    contestRepo,
   );
   // Profiles need the database; the Clerk lookup only seeds names/avatars.
   if (container.db) {
@@ -83,6 +91,9 @@ export function buildContainer(): Container {
   if (container.db) container.admin = new AdminService(new PgAdminRepository(container.db), config.superAdminUserId, systemClock);
   if (container.db && container.community && container.admin) {
     container.blog = new BlogService(new PgBlogRepository(container.db), new PgProfileRepository(container.db), container.community, container.admin);
+    container.contests = new ContestService(contestRepo ?? new PgContestRepository(container.db), catalog, new PgProfileRepository(container.db), container.community, container.admin, systemClock);
+    container.store = new StoreService(new PgStoreRepository(container.db), new PgChallengeSubmissionRepository(container.db), catalog, container.contests);
+    container.community.setCosmeticsSource(container.store);
   }
 
   // No database needed to practise; attempts are saved only when there is one.

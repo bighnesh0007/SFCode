@@ -93,6 +93,11 @@ export interface GradingDeps {
   apiVersion: string;
 }
 
+/** Finds the live contest a submission counts for (see ContestRepository). */
+export interface ContestLookup {
+  liveContestFor(userId: string, problemSlug: string, now: Date): Promise<string | null>;
+}
+
 export class ChallengeService {
   constructor(
     private readonly catalog: ChallengeCatalog,
@@ -100,6 +105,7 @@ export class ChallengeService {
     private readonly submissions: ChallengeSubmissionRepository | undefined,
     private readonly grading: GradingDeps | undefined,
     private readonly clock: Clock,
+    private readonly contests?: ContestLookup,
   ) {}
 
   private get store(): ChallengeSubmissionRepository {
@@ -159,7 +165,9 @@ export class ChallengeService {
     const connection = await connections.status(userId);
     if (!connection) throw new OrgNotConnectedError();
 
-    const record = await this.store.createRunning({ userId, problemSlug: slug, orgId: connection.orgId, files });
+    // A joined, live contest that includes this problem claims the submission.
+    const contestId = (await this.contests?.liveContestFor(userId, slug, this.clock.now())) ?? null;
+    const record = await this.store.createRunning({ userId, problemSlug: slug, orgId: connection.orgId, files, contestId });
     if (!record) throw new ConflictError("You already have a submission being graded. Wait for it to finish.");
 
     try {

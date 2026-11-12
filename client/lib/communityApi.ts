@@ -4,7 +4,11 @@ import type { Track } from "./challengesApi";
 
 type Token = string | null;
 
+/** Equipped cosmetic style tokens per slot ("frame" | "badge" | "accent"). */
+export type Cosmetics = Partial<Record<"frame" | "badge" | "accent", string>>;
+
 export interface ProfileView {
+  cosmetics: Cosmetics;
   handle: string;
   displayName: string;
   imageUrl: string | null;
@@ -19,6 +23,7 @@ export interface ProfileView {
 }
 
 export interface LeaderboardRow {
+  cosmetics: Cosmetics;
   rank: number;
   handle: string;
   displayName: string;

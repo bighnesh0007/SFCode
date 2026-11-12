@@ -65,7 +65,7 @@ export class MemorySubmissionRepository implements ChallengeSubmissionRepository
   private seq = 0;
   constructor(private readonly clock: Clock) {}
 
-  createRunning(input: { userId: string; problemSlug: string; orgId: string; files: Record<string, string> }) {
+  createRunning(input: { userId: string; problemSlug: string; orgId: string; files: Record<string, string>; contestId?: string | null }) {
     // Mirrors the partial unique index: one running submission per user.
     if ([...this.rows.values()].some((r) => r.userId === input.userId && r.status === "running")) return Promise.resolve(null);
     const id = `00000000-0000-4000-8000-${String(++this.seq).padStart(12, "0")}`;

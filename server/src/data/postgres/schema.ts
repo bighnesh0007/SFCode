@@ -52,6 +52,8 @@ export const challengeSubmissions = pgTable(
     problemSlug: text("problem_slug").notNull(),
     orgId: text("org_id").notNull(),
     status: text("status").$type<SubmissionStatus>().notNull(),
+    /** Set when the submission counted for a live contest the user had joined. */
+    contestId: uuid("contest_id"),
     deployId: text("deploy_id"),
     /** The user's source, keyed by file name. */
     files: jsonb("files").$type<Record<string, string>>().notNull(),
@@ -62,6 +64,7 @@ export const challengeSubmissions = pgTable(
   },
   (t) => [
     index("challenge_submissions_user_problem_idx").on(t.userId, t.problemSlug, t.createdAt),
+    index("challenge_submissions_contest_idx").on(t.contestId),
     // One grading run per user at a time, enforced by the database rather than
     // a check-then-insert that two quick clicks could race past.
     uniqueIndex("challenge_submissions_one_running_idx").on(t.userId).where(sql`${t.status} = 'running'`),
@@ -152,4 +155,63 @@ export const blogComments = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("blog_comments_post_idx").on(t.postId, t.createdAt)],
+);
+
+/** Timed contests built from catalog problems. */
+export const contests = pgTable(
+  "contests",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull(),
+    title: text("title").notNull(),
+    startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+    endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+    createdBy: text("created_by").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("contests_slug_idx").on(t.slug), index("contests_starts_idx").on(t.startsAt)],
+);
+
+export const contestProblems = pgTable(
+  "contest_problems",
+  {
+    contestId: uuid("contest_id").notNull().references(() => contests.id, { onDelete: "cascade" }),
+    problemSlug: text("problem_slug").notNull(),
+    position: integer("position").notNull(),
+    points: integer("points").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.contestId, t.problemSlug] })],
+);
+
+export const contestEntries = pgTable(
+  "contest_entries",
+  {
+    contestId: uuid("contest_id").notNull().references(() => contests.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull(),
+    joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.contestId, t.userId] })],
+);
+
+/** Store purchases. Coins earned are derived; spent = sum(price) here. */
+export const storePurchases = pgTable(
+  "store_purchases",
+  {
+    userId: text("user_id").notNull(),
+    itemId: text("item_id").notNull(),
+    price: integer("price").notNull(),
+    purchasedAt: timestamp("purchased_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.itemId] })],
+);
+
+/** Which owned cosmetic is worn in each slot (frame, badge, accent). */
+export const userEquipped = pgTable(
+  "user_equipped",
+  {
+    userId: text("user_id").notNull(),
+    slot: text("slot").notNull(),
+    itemId: text("item_id").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.slot] })],
 );
