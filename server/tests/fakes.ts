@@ -65,7 +65,7 @@ export class MemorySubmissionRepository implements ChallengeSubmissionRepository
   private seq = 0;
   constructor(private readonly clock: Clock) {}
 
-  createRunning(input: { userId: string; problemSlug: string; orgId: string; files: Record<string, string> }) {
+  createRunning(input: { userId: string; problemSlug: string; orgId: string; files: Record<string, string>; contestId?: string | null }) {
     // Mirrors the partial unique index: one running submission per user.
     if ([...this.rows.values()].some((r) => r.userId === input.userId && r.status === "running")) return Promise.resolve(null);
     const id = `00000000-0000-4000-8000-${String(++this.seq).padStart(12, "0")}`;
@@ -97,6 +97,25 @@ export class MemorySubmissionRepository implements ChallengeSubmissionRepository
     return Promise.resolve(
       [...this.rows.values()].filter((r) => r.userId === userId && r.problemSlug === problemSlug).reverse().slice(0, limit),
     );
+  }
+  firstSolves(since?: Date) {
+    const first = new Map<string, { userId: string; slug: string; at: Date }>();
+    for (const r of this.rows.values()) {
+      if (r.status !== "accepted" || !r.completedAt || (since && r.completedAt < since)) continue;
+      const key = `${r.userId}|${r.problemSlug}`;
+      const prev = first.get(key);
+      if (!prev || r.completedAt < prev.at) first.set(key, { userId: r.userId, slug: r.problemSlug, at: r.completedAt });
+    }
+    return Promise.resolve([...first.values()]);
+  }
+  dailyActivity(userId: string, since: Date) {
+    const days = new Map<string, number>();
+    for (const r of this.rows.values()) {
+      if (r.userId !== userId || r.createdAt < since) continue;
+      const d = r.createdAt.toISOString().slice(0, 10);
+      days.set(d, (days.get(d) ?? 0) + 1);
+    }
+    return Promise.resolve([...days].sort().map(([day, count]) => ({ day, count })));
   }
   progress(userId: string) {
     const out = new Map<string, "solved" | "attempted">();

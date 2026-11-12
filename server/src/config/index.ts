@@ -19,6 +19,8 @@ export const config = Object.freeze({
     authorizedParties: env.CLERK_AUTHORIZED_PARTIES,
   }),
 
+  superAdminUserId: env.SUPER_ADMIN_USER_ID,
+
   salesforce: Object.freeze({
     clientId: env.SF_CLIENT_ID,
     clientSecret: env.SF_CLIENT_SECRET,

@@ -2,36 +2,59 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getStanding } from "@/lib/adminApi";
 import { Menu, X } from "lucide-react";
 import { LocalModeBadge, SignInButton, SignUpButton, UserButton, useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
+import { LogoMark } from "@/components/Logo";
 import { OrgBadge } from "@/components/OrgBadge";
+import { SearchPalette } from "@/components/SearchPalette";
 import { cn } from "@/lib/utils";
 
 /** Built sections only; unbuilt features stay out of the nav until they exist. */
 const NAV = [
-  { href: "/problems", label: "Problems", match: ["/problems", "/challenges", "/soql", "/debugging"] },
+  { href: "/problems", label: "Problems", match: ["/problems", "/challenges", "/soql", "/debugging", "/flows", "/lwc"] },
+  { href: "/roadmap", label: "Roadmap", match: ["/roadmap", "/welcome"] },
   { href: "/playground/apex", label: "Playground", match: ["/playground"] },
   { href: "/certification", label: "Certification", match: ["/certification"] },
+  { href: "/leaderboard", label: "Leaderboard", match: ["/leaderboard", "/u"] },
+  { href: "/contests", label: "Contests", match: ["/contests"] },
+  { href: "/blog", label: "Blog", match: ["/blog"] },
+  { href: "/store", label: "Store", match: ["/store"] },
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
   const { isSignedIn } = useAuthState();
   const [open, setOpen] = useState(false);
+  const { getToken } = useAuthState();
+  const [isStaff, setIsStaff] = useState(false);
+
+  // The Admin link is a convenience only; every admin API checks standing itself.
+  useEffect(() => {
+    if (!isSignedIn) return;
+    let cancelled = false;
+    getToken()
+      .then((t) => getStanding(t))
+      .then(() => !cancelled && setIsStaff(true))
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [isSignedIn, getToken]);
   const active = (match: string[]) => match.some((m) => pathname === m || pathname.startsWith(`${m}/`));
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="mx-auto flex h-12 max-w-screen-2xl items-center gap-6 px-4">
+      <div className="mx-auto flex h-12 max-w-screen-2xl items-center gap-4 px-4 xl:gap-6">
         <Link href="/" className="flex items-center gap-1.5 text-[15px] font-semibold tracking-tight">
-          <span className="grid h-6 w-6 place-items-center rounded-md bg-primary text-[11px] font-bold text-primary-foreground">SF</span>
-          SFCode
+          <LogoMark size={24} />
+          <span>SF<span className="text-sky-500">Code</span></span>
         </Link>
 
-        <nav className="hidden h-full items-center gap-5 text-sm md:flex">
+        <nav className="hidden h-full items-center gap-3.5 whitespace-nowrap text-sm lg:flex xl:gap-5">
           {NAV.map((n) => (
             <Link
               key={n.href}
@@ -47,12 +70,17 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <div className="ml-auto hidden items-center gap-2 md:flex">
+        <div className="ml-auto hidden items-center gap-2 lg:flex">
+          <SearchPalette shortcut />
           <LocalModeBadge />
           {isSignedIn && <OrgBadge />}
           <ModeToggle />
           {isSignedIn ? (
-            <UserButton />
+            <>
+              {isStaff && isSignedIn && <Link href="/admin" className={cn("text-sm hover:text-foreground", active(["/admin"]) ? "text-foreground" : "text-muted-foreground")}>Admin</Link>}
+              <Link href="/profile" className={cn("text-sm hover:text-foreground", active(["/profile"]) ? "text-foreground" : "text-muted-foreground")}>Profile</Link>
+              <UserButton />
+            </>
           ) : (
             <>
               <SignInButton>
@@ -65,7 +93,8 @@ export default function Navbar() {
           )}
         </div>
 
-        <div className="ml-auto flex items-center gap-1 md:hidden">
+        <div className="ml-auto flex items-center gap-1 lg:hidden">
+          <SearchPalette />
           <ModeToggle />
           <Button type="button" variant="ghost" size="icon" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"}>
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -74,9 +103,14 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <div className="border-t px-4 py-3 md:hidden">
+        <div className="border-t px-4 py-3 lg:hidden">
           <nav className="flex flex-col">
-            {[...NAV, { href: "/settings/org", label: "Salesforce org", match: ["/settings"] }].map((n) => (
+            {[
+              ...NAV,
+              ...(isSignedIn ? [{ href: "/profile", label: "Profile", match: ["/profile"] }] : []),
+              ...(isSignedIn && isStaff ? [{ href: "/admin", label: "Admin", match: ["/admin"] }] : []),
+              { href: "/settings/org", label: "Salesforce org", match: ["/settings"] },
+            ].map((n) => (
               <Link
                 key={n.href}
                 href={n.href}

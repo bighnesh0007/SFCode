@@ -55,7 +55,9 @@ export function toAppError(err: unknown): AppError {
   }
 
   // ── PostgreSQL unique violation ───────────────────────────────────────────
-  if (code === "23505") {
+  // Drizzle wraps driver errors; the Postgres code is on `cause`.
+  const causeCode = isRecord(err.cause) ? err.cause.code : undefined;
+  if (code === "23505" || causeCode === "23505") {
     return new ConflictError("That record already exists.", ErrorCode.ALREADY_EXISTS);
   }
   if (code === "ECONNREFUSED" || code === "57P01") {

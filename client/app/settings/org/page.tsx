@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useOrgConnection } from "@/components/useOrgConnection";
+import { notifyOrgChanged, useOrgConnection } from "@/components/useOrgConnection";
 import { ApiError } from "@/lib/apiClient";
 import { disconnect, startConnect } from "@/lib/salesforceApi";
 import { cn } from "@/lib/utils";
@@ -53,6 +53,7 @@ function OrgSettings() {
     try {
       await disconnect(await getToken());
       refresh();
+      notifyOrgChanged();
     } catch {
       setError("Could not disconnect. Try again.");
     } finally {
@@ -106,7 +107,7 @@ function OrgSettings() {
           <>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Cloud className="h-5 w-5 text-sky-500" /> {state.connection.username}
+                <span className="h-2 w-2 rounded-full bg-green-500" aria-hidden="true" /> {state.connection.username}
               </CardTitle>
               <CardDescription>
                 Org {state.connection.orgId} · {state.connection.environment} · connected{" "}

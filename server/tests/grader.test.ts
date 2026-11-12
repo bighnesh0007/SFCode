@@ -83,3 +83,17 @@ describe("interpretDeployResult", () => {
     expect(interpretDeployResult(rating, { done: "true", status: "SucceededPartial", success: "true" }).verdict).toBe("error");
   });
 });
+
+describe("flow packaging", () => {
+  const flow = catalog.get("flow-account-default-rating");
+
+  it("includes the reference flow only when one is passed (verify:problems)", () => {
+    if (!flow) throw new Error("problem missing");
+    const withRef = unzipSync(Buffer.from(buildDeployPackage(flow, flow.reference, "62.0"), "base64"));
+    expect(Object.keys(withRef)).toContain("flows/SFC_Account_Default_Rating.flow-meta.xml");
+    expect(strFromU8(withRef["package.xml"] ?? new Uint8Array())).toContain("<members>SFC_Account_Default_Rating</members><name>Flow</name>");
+    const submission = unzipSync(Buffer.from(buildDeployPackage(flow, {}, "62.0"), "base64"));
+    expect(Object.keys(submission).some((k) => k.startsWith("flows/"))).toBe(false);
+    expect(strFromU8(submission["package.xml"] ?? new Uint8Array())).not.toContain("<name>Flow</name>");
+  });
+});

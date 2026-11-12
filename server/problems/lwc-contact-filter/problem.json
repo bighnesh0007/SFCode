@@ -1,0 +1,2 @@
+{ "title": "Filterable Contact List", "track": "lwc", "difficulty": "Medium", "category": "Lists & Getters", "order": 402,
+  "tags": ["for:each", "getters", "input events"], "files": [], "lwc": { "component": "contactFilter" } }

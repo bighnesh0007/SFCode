@@ -34,6 +34,9 @@ const envSchema = z.object({
   // ── Clerk ──────────────────────────────────────────────────────────────────
   CLERK_SECRET_KEY: z.string().min(1).optional(),
   CLERK_AUTHORIZED_PARTIES: csv.optional(),
+  // The site owner's Clerk user id: always admin, and the only one who can
+  // grant or revoke the admin role. Config, so it can't be revoked in-app.
+  SUPER_ADMIN_USER_ID: z.string().min(1).optional(),
 
   // ── Salesforce External Client App ─────────────────────────────────────────
   SF_CLIENT_ID: z.string().min(1).optional(),

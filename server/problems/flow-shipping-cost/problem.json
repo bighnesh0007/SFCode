@@ -1,0 +1,4 @@
+{ "title": "Shipping Cost Calculator", "track": "flow", "difficulty": "Medium", "category": "Autolaunched Flows", "order": 304,
+  "tags": ["autolaunched", "input/output variables", "formula", "Flow.Interview"],
+  "files": [], "flow": { "apiName": "SFC_Shipping_Cost", "kind": "autolaunched" },
+  "testClass": "SfcFlowShippingCostTest" }

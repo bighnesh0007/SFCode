@@ -78,6 +78,18 @@ function readEnv(path) {
 const serverEnv = readEnv(join(ROOT, "server", ".env"));
 const clientEnv = readEnv(join(ROOT, "client", ".env.local"));
 
+// ── dependencies ──────────────────────────────────────────────────────────────
+// This launcher builds but never installs (installing on boot would make a
+// reboot change what's deployed). A pull that adds packages therefore needs a
+// manual install — refuse to start without one rather than crash the API.
+{
+  const lock = join(ROOT, "package-lock.json");
+  const installed = join(ROOT, "node_modules", ".package-lock.json");
+  if (!existsSync(installed) || statSync(lock).mtimeMs > statSync(installed).mtimeMs) {
+    fail("dependencies are out of date with package-lock.json — run: npx npm@11 install");
+  }
+}
+
 // ── postgres ──────────────────────────────────────────────────────────────────
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const compose = (...argv) => spawnSync("docker", ["compose", ...argv], { cwd: ROOT, encoding: "utf8" });

@@ -65,12 +65,22 @@ export function buildDeployPackage(challenge: Challenge, sources: Record<string,
     entries[`${path}-meta.xml`] = strToU8(metaXml(f.type === "class" ? "ApexClass" : "ApexTrigger", apiVersion));
     (f.type === "class" ? classes : triggers).push(f.name);
   }
+  // Flow problems: the learner's flow is already in their org. Only
+  // verify:problems passes the reference flow, to prove the problem solvable;
+  // a submission can't carry one (its allowed file set is empty).
+  const flows: string[] = [];
+  const flowXml = challenge.flow ? sources[challenge.flow.apiName] : undefined;
+  if (challenge.flow && flowXml !== undefined) {
+    entries[`flows/${challenge.flow.apiName}.flow-meta.xml`] = strToU8(flowXml);
+    flows.push(challenge.flow.apiName);
+  }
   entries[`classes/${challenge.testClass.name}.cls`] = strToU8(materialiseTests(challenge, soqlCompare));
   entries[`classes/${challenge.testClass.name}.cls-meta.xml`] = strToU8(metaXml("ApexClass", apiVersion));
 
   const types = [
     ["ApexClass", classes],
     ["ApexTrigger", triggers],
+    ["Flow", flows],
   ] as const;
   entries["package.xml"] = strToU8(
     `<?xml version="1.0" encoding="UTF-8"?>\n<Package xmlns="${MD_NS}">\n` +

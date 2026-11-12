@@ -25,6 +25,15 @@ describe("the shipped problems", () => {
       "debug-null-discount",
       "debug-recursive-trigger",
       "debug-off-by-one-buckets",
+      "flow-account-default-rating",
+      "flow-won-next-step",
+      "flow-key-account-task",
+      "flow-shipping-cost",
+      "flow-revenue-tier",
+      "flow-won-total-loop",
+      "lwc-click-counter",
+      "lwc-contact-filter",
+      "lwc-star-rating",
     ]);
   });
 });
@@ -123,6 +132,68 @@ describe("SOQL problem rules", () => {
     const c = ChallengeCatalog.load(PROBLEMS_DIR).get("soql-contacts-in-city");
     if (!c) throw new Error("fixture");
     expect(() => new ChallengeCatalog([c], "")).toThrow(/soqlCompare.apex/);
+  });
+});
+
+describe("flow problems", () => {
+  let dir: string;
+  const fresh = () => {
+    dir = mkdtempSync(join(tmpdir(), "sfc-flow-"));
+    cpSync(join(PROBLEMS_DIR, "flow-won-next-step"), join(dir, "flow-won-next-step"), { recursive: true });
+    return join(dir, "flow-won-next-step");
+  };
+  afterEach(() => rmSync(dir, { recursive: true, force: true }));
+
+  it("must not declare editable files", () => {
+    const p = fresh();
+    const meta = JSON.parse(readFileSync(join(p, "problem.json"), "utf8")) as Record<string, unknown>;
+    writeFileSync(join(p, "problem.json"), JSON.stringify({ ...meta, files: [{ name: "SfcX", type: "class" }] }));
+    expect(() => loadChallenge(dir, "flow-won-next-step")).toThrow(/flow-track problem has a "flow" block and no files/);
+  });
+
+  it("needs its reference flow, active", () => {
+    const p = fresh();
+    const ref = join(p, "reference", "SFC_Opportunity_Won_Next_Step.flow-meta.xml");
+    writeFileSync(ref, readFileSync(ref, "utf8").replace("<status>Active</status>", "<status>Draft</status>"));
+    expect(() => loadChallenge(dir, "flow-won-next-step")).toThrow(/Active/);
+    rmSync(ref);
+    expect(() => loadChallenge(dir, "flow-won-next-step")).toThrow(/must contain exactly SFC_Opportunity_Won_Next_Step.flow-meta.xml/);
+  });
+
+  it("only flow-track problems may have a flow block", () => {
+    const p = fresh();
+    const meta = JSON.parse(readFileSync(join(p, "problem.json"), "utf8")) as Record<string, unknown>;
+    writeFileSync(join(p, "problem.json"), JSON.stringify({ ...meta, track: "apex" }));
+    expect(() => loadChallenge(dir, "flow-won-next-step")).toThrow(/flow-track/);
+  });
+});
+
+describe("lwc problems", () => {
+  let dir: string;
+  const fresh = () => {
+    dir = mkdtempSync(join(tmpdir(), "sfc-lwc-"));
+    cpSync(join(PROBLEMS_DIR, "lwc-click-counter"), join(dir, "lwc-click-counter"), { recursive: true });
+    return join(dir, "lwc-click-counter");
+  };
+  afterEach(() => rmSync(dir, { recursive: true, force: true }));
+
+  it("need all three component files in starter and reference", () => {
+    const p = fresh();
+    rmSync(join(p, "reference", "clickCounter.css"));
+    expect(() => loadChallenge(dir, "lwc-click-counter")).toThrow(/must contain exactly clickCounter.html, clickCounter.js, clickCounter.css/);
+  });
+
+  it("need a test file that defines `const tests`", () => {
+    const p = fresh();
+    writeFileSync(join(p, "tests", "clickCounter.test.js"), "export default [];");
+    expect(() => loadChallenge(dir, "lwc-click-counter")).toThrow(/const tests/);
+  });
+
+  it("can't mix in Apex grading fields", () => {
+    const p = fresh();
+    const meta = JSON.parse(readFileSync(join(p, "problem.json"), "utf8")) as Record<string, unknown>;
+    writeFileSync(join(p, "problem.json"), JSON.stringify({ ...meta, testClass: "SfcClickTest" }));
+    expect(() => loadChallenge(dir, "lwc-click-counter")).toThrow(/no files, flow or testClass/);
   });
 });
 

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <assignments>
+        <name>Add_Amount</name>
+        <label>Add Amount</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>wonTotal</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Each_Opportunity.Amount</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Each_Opportunity</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <name>Is_Won</name>
+        <label>Is Won</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Each_Opportunity</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Not won</defaultConnectorLabel>
+        <rules>
+            <name>Won</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Each_Opportunity.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Closed Won</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Add_Amount</targetReference>
+            </connector>
+            <label>Won</label>
+        </rules>
+    </decisions>
+    <environments>Default</environments>
+    <interviewLabel>SFC Won Total {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SFC Won Total</label>
+    <loops>
+        <name>Each_Opportunity</name>
+        <label>Each Opportunity</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>opportunities</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Is_Won</targetReference>
+        </nextValueConnector>
+    </loops>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Each_Opportunity</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <name>opportunities</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Opportunity</objectType>
+    </variables>
+    <variables>
+        <name>wonTotal</name>
+        <dataType>Currency</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+        <scale>2</scale>
+        <value>
+            <numberValue>0.0</numberValue>
+        </value>
+    </variables>
+</Flow>

@@ -15,6 +15,20 @@ import { ChallengeCatalog } from "./services/challenges/catalog.ts";
 import { QuestionBank } from "./services/certification/bank.ts";
 import { CertificationService } from "./services/certification/certification.service.ts";
 import { PgCertAttemptRepository } from "./repositories/certAttempt.repository.ts";
+import { PgProfileRepository } from "./repositories/profile.repository.ts";
+import { CommunityService } from "./services/community/community.service.ts";
+import { AdminService } from "./services/admin/admin.service.ts";
+import { PgAdminRepository } from "./repositories/admin.repository.ts";
+import { PgBlogRepository } from "./repositories/blog.repository.ts";
+import { BlogService } from "./services/blog/blog.service.ts";
+import { loadRoadmaps } from "./domain/roadmap.ts";
+import { PgOnboardingRepository } from "./repositories/onboarding.repository.ts";
+import { RoadmapService } from "./services/roadmap/roadmap.service.ts";
+import { PgContestRepository } from "./repositories/contest.repository.ts";
+import { PgStoreRepository } from "./repositories/store.repository.ts";
+import { ContestService } from "./services/contests/contest.service.ts";
+import { StoreService } from "./services/store/store.service.ts";
+import { ClerkIdentityLookup } from "./services/identity/clerkIdentity.ts";
 import { ChallengeService, type GradingDeps } from "./services/challenges/challenge.service.ts";
 
 export interface Container {
@@ -23,12 +37,20 @@ export interface Container {
   salesforce?: SalesforceConnectionService;
   challenges?: ChallengeService;
   certification?: CertificationService;
+  community?: CommunityService;
+  admin?: AdminService;
+  blog?: BlogService;
+  contests?: ContestService;
+  store?: StoreService;
+  roadmaps?: RoadmapService;
 }
 
 /** server/certification (question banks), resolved like PROBLEMS_DIR. */
 export const CERTIFICATION_DIR = new URL("../certification", import.meta.url).pathname;
 
 /** server/problems, resolved from this file so it works from src/ (tsx) and dist/ (node). */
+/** server/roadmaps (learning paths), resolved like PROBLEMS_DIR. */
+export const ROADMAPS_DIR = new URL("../roadmaps", import.meta.url).pathname;
 export const PROBLEMS_DIR = new URL("../problems", import.meta.url).pathname;
 
 export function buildContainer(): Container {
@@ -49,15 +71,42 @@ export function buildContainer(): Container {
     );
     grading = { connections: container.salesforce, sf, apiVersion };
   }
+  const catalog = ChallengeCatalog.load(PROBLEMS_DIR);
   // Loading validates every problem; a broken one stops startup on purpose.
   // Browsing needs nothing (contributors run without accounts or a database);
   // submissions need the database, and grading also needs Salesforce.
+  // Loaded even without a database so broken roadmap content fails startup and tests.
+  const roadmaps = loadRoadmaps(ROADMAPS_DIR, (slug) => catalog.get(slug) !== undefined);
+  if (container.db) {
+    container.roadmaps = new RoadmapService(roadmaps, catalog, new PgOnboardingRepository(container.db), new PgChallengeSubmissionRepository(container.db));
+  }
+  const contestRepo = container.db ? new PgContestRepository(container.db) : undefined;
   container.challenges = new ChallengeService(
-    ChallengeCatalog.load(PROBLEMS_DIR),
+    catalog,
     container.db ? new PgChallengeSubmissionRepository(container.db) : undefined,
     grading,
     systemClock,
+    contestRepo,
   );
+  // Profiles need the database; the Clerk lookup only seeds names/avatars.
+  if (container.db) {
+    container.community = new CommunityService(
+      catalog,
+      new PgChallengeSubmissionRepository(container.db),
+      new PgProfileRepository(container.db),
+      config.clerk.secretKey ? new ClerkIdentityLookup(config.clerk.secretKey) : undefined,
+      systemClock,
+    );
+  }
+
+  if (container.db) container.admin = new AdminService(new PgAdminRepository(container.db), config.superAdminUserId, systemClock);
+  if (container.db && container.community && container.admin) {
+    container.blog = new BlogService(new PgBlogRepository(container.db), new PgProfileRepository(container.db), container.community, container.admin);
+    container.contests = new ContestService(contestRepo ?? new PgContestRepository(container.db), catalog, new PgProfileRepository(container.db), container.community, container.admin, systemClock);
+    container.store = new StoreService(new PgStoreRepository(container.db), new PgChallengeSubmissionRepository(container.db), catalog, container.contests);
+    container.community.setCosmeticsSource(container.store);
+  }
+
   // No database needed to practise; attempts are saved only when there is one.
   container.certification = new CertificationService(
     QuestionBank.load(CERTIFICATION_DIR),

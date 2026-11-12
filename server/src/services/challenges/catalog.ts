@@ -36,8 +36,18 @@ const problemJson = z.strictObject({
   category: z.string().min(2).max(40),
   order: z.number().int().positive(),
   tags: z.array(z.string().min(1).max(40)).max(8).default([]),
-  files: z.array(z.union([apexFile, soqlFile])).min(1).max(5),
-  testClass: apexName,
+  // Flow problems have none: the learner builds the flow in Salesforce.
+  files: z.array(z.union([apexFile, soqlFile])).max(5),
+  flow: z
+    .strictObject({
+      // Flow API names: letters, digits, underscores; SFC_ keeps them clear of the learner's own.
+      apiName: z.string().regex(/^SFC_[A-Za-z0-9_]{1,76}$/, "must start with SFC_"),
+      kind: z.enum(["record-triggered", "autolaunched"]),
+    })
+    .optional(),
+  // Apex test class; LWC problems use tests/<component>.test.js instead.
+  testClass: apexName.optional(),
+  lwc: z.strictObject({ component: z.string().regex(/^[a-z][a-zA-Z0-9]{0,39}$/) }).optional(),
 });
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -58,6 +68,57 @@ function readSources(dir: string, files: ChallengeFile[], what: string): Record<
   return out;
 }
 
+/**
+ * A flow problem's reference is the flow's metadata, used only by
+ * verify:problems to prove the problem is solvable. Keyed by API name.
+ */
+function readFlowReference(dir: string, apiName: string, where: string): Record<string, string> {
+  const file = `${apiName}.flow-meta.xml`;
+  const present = existsSync(dir) ? readdirSync(dir) : [];
+  if (present.length !== 1 || present[0] !== file) throw new Error(`${where}/reference must contain exactly ${file}`);
+  const xml = readFileSync(join(dir, file), "utf8");
+  if (!/<Flow\b/.test(xml) || !xml.includes("<status>Active</status>")) throw new Error(`${where}: reference flow must be a <Flow> with <status>Active</status>`);
+  return { [apiName]: xml };
+}
+
+export const LWC_PARTS = ["html", "js", "css"] as const;
+
+/** An LWC problem's three component files, keyed by extension. */
+function readLwcSources(dir: string, component: string, what: string): Record<string, string> {
+  const expected = LWC_PARTS.map((ext) => `${component}.${ext}`);
+  const present = existsSync(dir) ? readdirSync(dir).sort() : [];
+  if (present.join() !== [...expected].sort().join()) throw new Error(`${what} must contain exactly ${expected.join(", ")}`);
+  return Object.fromEntries(LWC_PARTS.map((ext) => [ext, readFileSync(join(dir, `${component}.${ext}`), "utf8")]));
+}
+
+/** LWC problems share the catalog but nothing of the Apex grading path. */
+function loadLwcChallenge(dir: string, slug: string, meta: z.infer<typeof problemJson>, component: string): Challenge {
+  const where = `problems/${slug}`;
+  if (meta.files.length > 0 || meta.flow || meta.testClass) throw new Error(`${where}: an lwc problem has an "lwc" block and no files, flow or testClass`);
+  const testsPath = join(dir, "tests", `${component}.test.js`);
+  if (!existsSync(testsPath)) throw new Error(`${where}: missing tests/${component}.test.js`);
+  const tests = readFileSync(testsPath, "utf8");
+  if (!/\bconst tests\s*=/.test(tests)) throw new Error(`${where}: the test file must define \`const tests = [...]\``);
+  const starter = readLwcSources(join(dir, "starter"), component, `${where}/starter`);
+  const reference = readLwcSources(join(dir, "reference"), component, `${where}/reference`);
+  return {
+    slug,
+    title: meta.title,
+    track: meta.track,
+    difficulty: meta.difficulty,
+    category: meta.category,
+    order: meta.order,
+    tags: meta.tags,
+    statement: readFileSync(join(dir, "statement.md"), "utf8"),
+    files: [],
+    starter,
+    reference,
+    // Unused for LWC (no Apex deploy); kept so Challenge has one shape.
+    testClass: { name: `${component}.test.js`, source: tests },
+    lwc: { component, tests },
+  };
+}
+
 export function loadChallenge(root: string, slug: string): Challenge {
   if (!SLUG.test(slug)) throw new Error(`problem folder "${slug}" is not a kebab-case slug`);
   const dir = join(root, slug);
@@ -66,7 +127,16 @@ export function loadChallenge(root: string, slug: string): Challenge {
   if (!parsed.success) throw new Error(`${where}/problem.json: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`);
   const meta = parsed.data;
 
-  const names = [...meta.files.map((f) => f.name), meta.testClass];
+  if ((meta.track === "lwc") !== (meta.lwc !== undefined)) throw new Error(`${where}: the "lwc" block belongs to lwc-track problems only`);
+  if (meta.lwc) return loadLwcChallenge(dir, slug, meta, meta.lwc.component);
+  if (!meta.testClass) throw new Error(`${where}: testClass is required`);
+  const testClass = meta.testClass;
+
+  if (meta.track === "flow" ? !meta.flow || meta.files.length > 0 : meta.flow !== undefined || meta.files.length === 0) {
+    throw new Error(`${where}: a flow-track problem has a "flow" block and no files; other problems have files and no "flow"`);
+  }
+
+  const names = [...meta.files.map((f) => f.name), testClass];
   if (new Set(names).size !== names.length) throw new Error(`${where}: file and test class names must be unique`);
   const reserved = names.find((n) => RESERVED.has(n.toLowerCase()));
   if (reserved) throw new Error(`${where}: ${reserved} is reserved for the SOQL grader`);
@@ -75,8 +145,8 @@ export function loadChallenge(root: string, slug: string): Challenge {
     throw new Error(`${where}: a soql-track problem has exactly one soql file, and only soql-track problems have one`);
   }
 
-  const testPath = join(dir, "tests", `${meta.testClass}.cls`);
-  if (!existsSync(testPath)) throw new Error(`${where}: missing tests/${meta.testClass}.cls`);
+  const testPath = join(dir, "tests", `${testClass}.cls`);
+  if (!existsSync(testPath)) throw new Error(`${where}: missing tests/${testClass}.cls`);
   const testSource = readFileSync(testPath, "utf8");
   if (!/@isTest/i.test(testSource)) throw new Error(`${where}: hidden test class has no @isTest`);
   if (/SeeAllData\s*=\s*true/i.test(testSource)) throw new Error(`${where}: hidden tests must not use SeeAllData=true`);
@@ -85,7 +155,7 @@ export function loadChallenge(root: string, slug: string): Challenge {
   if (/\bWHERE\b[^\]]*\bDescription\b/i.test(testSource)) throw new Error(`${where}: hidden tests filter on Description (a long text area — not filterable)`);
 
   const starter = readSources(join(dir, "starter"), meta.files, `${where}/starter`);
-  const reference = readSources(join(dir, "reference"), meta.files, `${where}/reference`);
+  const reference = meta.flow ? readFlowReference(join(dir, "reference"), meta.flow.apiName, where) : readSources(join(dir, "reference"), meta.files, `${where}/reference`);
   // Each file must declare the type and name problem.json promises, or the deploy fails confusingly.
   for (const f of meta.files) {
     const decl =
@@ -122,7 +192,8 @@ export function loadChallenge(root: string, slug: string): Challenge {
     files: meta.files,
     starter,
     reference,
-    testClass: { name: meta.testClass, source: testSource },
+    testClass: { name: testClass, source: testSource },
+    ...(meta.flow ? { flow: meta.flow } : {}),
   };
 }
 
@@ -149,7 +220,9 @@ export class ChallengeCatalog {
       if (orders.has(c.order)) throw new Error(`problems/${c.slug}: duplicate order ${c.order}`);
       orders.add(c.order);
       // Apex names are org-global; two problems sharing one would grade against each other's code.
-      for (const n of [...c.files.filter((f) => f.type !== "soql").map((f) => f.name), c.testClass.name]) {
+      // Apex names are org-global; LWC problems never deploy, so they have none.
+      const orgNames = c.lwc ? [] : [...c.files.filter((f) => f.type !== "soql").map((f) => f.name), c.testClass.name, ...(c.flow ? [c.flow.apiName] : [])];
+      for (const n of orgNames) {
         const other = apexNames.get(n.toLowerCase());
         if (other) throw new Error(`problems/${c.slug}: Apex name ${n} is also used by ${other}`);
         apexNames.set(n.toLowerCase(), c.slug);

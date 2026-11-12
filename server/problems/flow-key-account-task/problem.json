@@ -1,0 +1,4 @@
+{ "title": "Review Task for Key Accounts", "track": "flow", "difficulty": "Medium", "category": "After-Save Flows", "order": 303,
+  "tags": ["record-triggered", "create records", "entry criteria"],
+  "files": [], "flow": { "apiName": "SFC_Key_Account_Review", "kind": "record-triggered" },
+  "testClass": "SfcFlowKeyAccountTest" }

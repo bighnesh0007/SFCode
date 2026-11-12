@@ -45,7 +45,11 @@ export interface ChallengeView {
   category: string;
   tags: string[];
   statement: string;
-  files: { name: string; type: ApexFileType; fileName: string; starter: string }[];
+  files: { name: string; type: ApexFileType | "lwc"; fileName: string; starter: string }[];
+  /** LWC problems: compiled by POST /lwc/compile and tested in the browser. */
+  lwc?: { component: string; tests: string };
+  /** Flow problems: the flow to build in the learner's own org. */
+  flow?: { apiName: string; kind: "record-triggered" | "autolaunched" };
 }
 
 export interface SubmissionView {
@@ -89,6 +93,11 @@ export interface GradingDeps {
   apiVersion: string;
 }
 
+/** Finds the live contest a submission counts for (see ContestRepository). */
+export interface ContestLookup {
+  liveContestFor(userId: string, problemSlug: string, now: Date): Promise<string | null>;
+}
+
 export class ChallengeService {
   constructor(
     private readonly catalog: ChallengeCatalog,
@@ -96,6 +105,7 @@ export class ChallengeService {
     private readonly submissions: ChallengeSubmissionRepository | undefined,
     private readonly grading: GradingDeps | undefined,
     private readonly clock: Clock,
+    private readonly contests?: ContestLookup,
   ) {}
 
   private get store(): ChallengeSubmissionRepository {
@@ -138,19 +148,26 @@ export class ChallengeService {
       category: c.category,
       tags: c.tags,
       statement: c.statement,
-      files: c.files.map((f) => ({ name: f.name, type: f.type, fileName: `${f.name}.${extensionFor(f.type)}`, starter: c.starter[f.name] ?? "" })),
+      files: c.lwc
+        ? (["html", "js", "css"] as const).map((ext) => ({ name: ext, type: "lwc" as const, fileName: `${c.lwc?.component ?? ""}.${ext}`, starter: c.starter[ext] ?? "" }))
+        : c.files.map((f) => ({ name: f.name, type: f.type, fileName: `${f.name}.${extensionFor(f.type)}`, starter: c.starter[f.name] ?? "" })),
+      ...(c.flow ? { flow: c.flow } : {}),
+      ...(c.lwc ? { lwc: c.lwc } : {}),
     };
   }
 
   async submit(userId: string, slug: string, files: Record<string, string>): Promise<SubmissionView> {
-    const { connections, sf, apiVersion } = this.requireGrading();
     const challenge = this.require(slug);
+    if (challenge.lwc) throw new ValidationError("LWC problems are checked in your browser, not submitted to your org.");
+    const { connections, sf, apiVersion } = this.requireGrading();
     this.checkFiles(challenge, files);
 
     const connection = await connections.status(userId);
     if (!connection) throw new OrgNotConnectedError();
 
-    const record = await this.store.createRunning({ userId, problemSlug: slug, orgId: connection.orgId, files });
+    // A joined, live contest that includes this problem claims the submission.
+    const contestId = (await this.contests?.liveContestFor(userId, slug, this.clock.now())) ?? null;
+    const record = await this.store.createRunning({ userId, problemSlug: slug, orgId: connection.orgId, files, contestId });
     if (!record) throw new ConflictError("You already have a submission being graded. Wait for it to finish.");
 
     try {

@@ -1,0 +1,4 @@
+{ "title": "Default Rating with a Flow", "track": "flow", "difficulty": "Easy", "category": "Before-Save Flows", "order": 301,
+  "tags": ["record-triggered", "fast field update"],
+  "files": [], "flow": { "apiName": "SFC_Account_Default_Rating", "kind": "record-triggered" },
+  "testClass": "SfcFlowDefaultRatingTest" }

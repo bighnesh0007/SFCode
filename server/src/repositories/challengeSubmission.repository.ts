@@ -1,5 +1,5 @@
 /** Persistence for challenge submissions. */
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, gte, sql } from "drizzle-orm";
 import type { PgDatabase } from "../data/postgres/client.ts";
 import { challengeSubmissions } from "../data/postgres/schema.ts";
 import type { GradeResult, SubmissionStatus } from "../domain/challenge.ts";
@@ -20,7 +20,7 @@ export interface SubmissionRecord {
 
 export interface ChallengeSubmissionRepository {
   /** Inserts a running submission; returns null if the user already has one running. */
-  createRunning(input: { userId: string; problemSlug: string; orgId: string; files: Record<string, string> }): Promise<SubmissionRecord | null>;
+  createRunning(input: { userId: string; problemSlug: string; orgId: string; files: Record<string, string>; contestId?: string | null }): Promise<SubmissionRecord | null>;
   setDeployId(id: string, deployId: string): Promise<void>;
   markChecked(id: string, at: Date): Promise<void>;
   /** Finalises only if still running, so two concurrent pollers cannot overwrite each other. */
@@ -29,15 +29,19 @@ export interface ChallengeSubmissionRepository {
   listForProblem(userId: string, problemSlug: string, limit: number): Promise<SubmissionRecord[]>;
   /** Per problem: whether the user has an accepted submission, or only attempts. */
   progress(userId: string): Promise<Map<string, "solved" | "attempted">>;
+  /** First accepted time per (user, problem), optionally for solves since a date. All users. */
+  firstSolves(since?: Date): Promise<{ userId: string; slug: string; at: Date }[]>;
+  /** Submissions per UTC day for one user since a date (any verdict). */
+  dailyActivity(userId: string, since: Date): Promise<{ day: string; count: number }[]>;
 }
 
 export class PgChallengeSubmissionRepository implements ChallengeSubmissionRepository {
   constructor(private readonly db: PgDatabase) {}
 
-  async createRunning(input: { userId: string; problemSlug: string; orgId: string; files: Record<string, string> }): Promise<SubmissionRecord | null> {
+  async createRunning(input: { userId: string; problemSlug: string; orgId: string; files: Record<string, string>; contestId?: string | null }): Promise<SubmissionRecord | null> {
     const rows = await this.db
       .insert(challengeSubmissions)
-      .values({ userId: input.userId, problemSlug: input.problemSlug, orgId: input.orgId, files: input.files, status: "running" })
+      .values({ userId: input.userId, problemSlug: input.problemSlug, orgId: input.orgId, files: input.files, status: "running", contestId: input.contestId ?? null })
       .onConflictDoNothing()
       .returning();
     return (rows[0] as SubmissionRecord | undefined) ?? null;
@@ -85,5 +89,27 @@ export class PgChallengeSubmissionRepository implements ChallengeSubmissionRepos
       .where(eq(challengeSubmissions.userId, userId))
       .groupBy(challengeSubmissions.problemSlug);
     return new Map(rows.map((r) => [r.slug, r.solved ? "solved" : "attempted"]));
+  }
+
+  async firstSolves(since?: Date): Promise<{ userId: string; slug: string; at: Date }[]> {
+    const t = challengeSubmissions;
+    // completed_at is set on every finished submission, so min() is the first solve.
+    const rows = await this.db
+      .select({ userId: t.userId, slug: t.problemSlug, at: sql<Date>`min(${t.completedAt})`.mapWith((v: string | Date) => new Date(v)) })
+      .from(t)
+      .where(and(eq(t.status, "accepted"), ...(since ? [gte(t.completedAt, since)] : [])))
+      .groupBy(t.userId, t.problemSlug);
+    return rows;
+  }
+
+  async dailyActivity(userId: string, since: Date): Promise<{ day: string; count: number }[]> {
+    const t = challengeSubmissions;
+    const day = sql<string>`to_char(${t.createdAt} at time zone 'UTC', 'YYYY-MM-DD')`;
+    return this.db
+      .select({ day, count: sql<number>`count(*)::int` })
+      .from(t)
+      .where(and(eq(t.userId, userId), gte(t.createdAt, since)))
+      .groupBy(day)
+      .orderBy(day);
   }
 }

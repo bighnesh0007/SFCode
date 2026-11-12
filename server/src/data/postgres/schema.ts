@@ -3,7 +3,7 @@
  * `npm run db:generate` — never hand-edit a generated migration.
  */
 import { sql } from "drizzle-orm";
-import { boolean, index, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import type { GradeResult, SubmissionStatus } from "../../domain/challenge.ts";
 
 /**
@@ -52,6 +52,8 @@ export const challengeSubmissions = pgTable(
     problemSlug: text("problem_slug").notNull(),
     orgId: text("org_id").notNull(),
     status: text("status").$type<SubmissionStatus>().notNull(),
+    /** Set when the submission counted for a live contest the user had joined. */
+    contestId: uuid("contest_id"),
     deployId: text("deploy_id"),
     /** The user's source, keyed by file name. */
     files: jsonb("files").$type<Record<string, string>>().notNull(),
@@ -62,6 +64,7 @@ export const challengeSubmissions = pgTable(
   },
   (t) => [
     index("challenge_submissions_user_problem_idx").on(t.userId, t.problemSlug, t.createdAt),
+    index("challenge_submissions_contest_idx").on(t.contestId),
     // One grading run per user at a time, enforced by the database rather than
     // a check-then-insert that two quick clicks could race past.
     uniqueIndex("challenge_submissions_one_running_idx").on(t.userId).where(sql`${t.status} = 'running'`),
@@ -81,3 +84,148 @@ export const certAttempts = pgTable(
   },
   (t) => [index("cert_attempts_user_exam_idx").on(t.userId, t.exam, t.answeredAt)],
 );
+
+/**
+ * Public identity on SFCode. `handle` is the /u/<handle> URL. It is never
+ * derived from the email address (that would leak it); defaults to the Clerk
+ * username, else a random learner-xxxxxx.
+ */
+export const userProfiles = pgTable(
+  "user_profiles",
+  {
+    userId: text("user_id").primaryKey(),
+    handle: text("handle").notNull(),
+    displayName: text("display_name").notNull(),
+    imageUrl: text("image_url"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  // Case-insensitive uniqueness: /u/Ada and /u/ada are the same person.
+  (t) => [uniqueIndex("user_profiles_handle_lower_idx").on(sql`lower(${t.handle})`)],
+);
+
+/** Granted roles. The owner (SUPER_ADMIN_USER_ID) is config, not a row. */
+export const userRoles = pgTable(
+  "user_roles",
+  {
+    userId: text("user_id").notNull(),
+    role: text("role").$type<"admin" | "moderator">().notNull(),
+    grantedBy: text("granted_by").notNull(),
+    grantedAt: timestamp("granted_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.role] })],
+);
+
+/** Community blog. Markdown, rendered client-side through DOMPurify. */
+export const blogPosts = pgTable(
+  "blog_posts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull(),
+    authorId: text("author_id").notNull(),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    /** "hidden" = removed by a moderator; kept for the record, never listed. */
+    status: text("status").$type<"published" | "hidden">().notNull().default("published"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("blog_posts_slug_idx").on(t.slug), index("blog_posts_created_idx").on(t.createdAt)],
+);
+
+/** One vote per user per post: +1 or -1 (absent = no vote). */
+export const blogVotes = pgTable(
+  "blog_votes",
+  {
+    postId: uuid("post_id").notNull().references(() => blogPosts.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull(),
+    value: integer("value").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.postId, t.userId] })],
+);
+
+export const blogComments = pgTable(
+  "blog_comments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    postId: uuid("post_id").notNull().references(() => blogPosts.id, { onDelete: "cascade" }),
+    authorId: text("author_id").notNull(),
+    body: text("body").notNull(),
+    status: text("status").$type<"published" | "hidden">().notNull().default("published"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("blog_comments_post_idx").on(t.postId, t.createdAt)],
+);
+
+/** Timed contests built from catalog problems. */
+export const contests = pgTable(
+  "contests",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull(),
+    title: text("title").notNull(),
+    startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+    endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+    createdBy: text("created_by").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("contests_slug_idx").on(t.slug), index("contests_starts_idx").on(t.startsAt)],
+);
+
+export const contestProblems = pgTable(
+  "contest_problems",
+  {
+    contestId: uuid("contest_id").notNull().references(() => contests.id, { onDelete: "cascade" }),
+    problemSlug: text("problem_slug").notNull(),
+    position: integer("position").notNull(),
+    points: integer("points").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.contestId, t.problemSlug] })],
+);
+
+export const contestEntries = pgTable(
+  "contest_entries",
+  {
+    contestId: uuid("contest_id").notNull().references(() => contests.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull(),
+    joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.contestId, t.userId] })],
+);
+
+/** Store purchases. Coins earned are derived; spent = sum(price) here. */
+export const storePurchases = pgTable(
+  "store_purchases",
+  {
+    userId: text("user_id").notNull(),
+    itemId: text("item_id").notNull(),
+    price: integer("price").notNull(),
+    purchasedAt: timestamp("purchased_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.itemId] })],
+);
+
+/** Which owned cosmetic is worn in each slot (frame, badge, accent). */
+export const userEquipped = pgTable(
+  "user_equipped",
+  {
+    userId: text("user_id").notNull(),
+    slot: text("slot").notNull(),
+    itemId: text("item_id").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.slot] })],
+);
+
+/** One row per user, written once by the welcome quiz (and again if they redo it). */
+export const userOnboarding = pgTable("user_onboarding", {
+  userId: text("user_id").primaryKey(),
+  role: text("role").notNull(),
+  level: text("level").notNull(),
+  goal: text("goal").notNull(),
+  hours: text("hours").notNull(),
+  roadmapId: text("roadmap_id").notNull(),
+  /** Lesson-only nodes the user marked as read (problem nodes complete by solving). */
+  readNodes: jsonb("read_nodes").$type<string[]>().notNull().default([]),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});

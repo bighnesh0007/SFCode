@@ -1,5 +1,6 @@
-import { ComingSoon } from "@/components/ComingSoon";
+import { redirect } from "next/navigation";
 
+// The LWC playground became the LWC track of the Problems hub.
 export default function Page() {
-  return <ComingSoon id="lwc" />;
+  redirect("/problems?track=lwc");
 }

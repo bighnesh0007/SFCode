@@ -1,5 +1,6 @@
-import { ComingSoon } from "@/components/ComingSoon";
+import { redirect } from "next/navigation";
 
+// Flow problems live in the Problems hub; old links keep working.
 export default function Page() {
-  return <ComingSoon id="flows" />;
+  redirect("/problems?track=flow");
 }

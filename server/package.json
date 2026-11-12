@@ -23,6 +23,11 @@
   },
   "dependencies": {
     "@clerk/backend": "3.26.1",
+    "@lwc/compiler": "^9.5.3",
+    "@lwc/engine-dom": "^9.5.3",
+    "@lwc/rollup-plugin": "^9.5.3",
+    "@lwc/synthetic-shadow": "^9.5.3",
+    "@lwc/wire-service": "^9.5.3",
     "compression": "^1.8.0",
     "cors": "^2.8.6",
     "drizzle-orm": "^0.45.4",
@@ -33,6 +38,7 @@
     "helmet": "^8.0.0",
     "pg": "^8.23.1",
     "pino": "^10.4.0",
+    "rollup": "^4.68.2",
     "zod": "^4.0.0"
   },
   "devDependencies": {

@@ -13,6 +13,17 @@ import { callbackQuery, connectBody, executeBody } from "../validation/salesforc
 import { challengeController } from "../controllers/challenge.controller.ts";
 import { certificationController } from "../controllers/certification.controller.ts";
 import { answerBody, examParams, practiceQuery } from "../validation/certification.schema.ts";
+import { lwcCompileBody, type LwcCompileBody } from "../validation/lwc.schema.ts";
+import { compileLwc } from "../services/lwc/compiler.ts";
+import { communityController } from "../controllers/community.controller.ts";
+import { adminController } from "../controllers/admin.controller.ts";
+import { blogController } from "../controllers/blog.controller.ts";
+import { contestController, roadmapController, storeController } from "../controllers/contest.controller.ts";
+import { contestSlugParams, createContestBody, equipBody, onboardingBody, roadmapParams, roadmapReadBody, storeItemBody } from "../validation/contest.schema.ts";
+import { blogListQuery, blogSlugParams, commentBody, commentParams, hideBody, postBody, postPatchBody, voteBody } from "../validation/blog.schema.ts";
+import { adminUsersQuery, roleBody } from "../validation/admin.schema.ts";
+import { handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
+import { validatedBody } from "../middleware/validate.ts";
 import { listQuery, slugParams, submissionParams, submitBody } from "../validation/challenge.schema.ts";
 
 function disabled(what: string): RequestHandler {
@@ -33,6 +44,10 @@ function limiter(perMinute: number): RequestHandler {
     handler: (_req, _res, next) => next(new RateLimitError("Too many requests.", 60)),
   });
 }
+
+const lwcCompile: RequestHandler = async (req, res) => {
+  ok(res, { code: await compileLwc(validatedBody<LwcCompileBody>(req)) });
+};
 
 export function mountRoutes(app: Application, container: Container): void {
   app.get("/health", (_req, res) => ok(res, { status: "ok" }));
@@ -91,6 +106,100 @@ export function mountRoutes(app: Application, container: Container): void {
     cert.use(disabled("Certification Prep"));
   }
   v1.use("/certification", cert);
+
+  // Profiles and leaderboard: public reads; your own profile needs sign-in.
+  // Mounted on their own paths: a router at "/" with a catch-all "not
+  // configured" handler swallowed every unknown /api/v1 path as a 503.
+  if (container.community) {
+    const c = communityController(container.community);
+    const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
+    v1.get("/profile/me", signedIn, c.me);
+    v1.patch("/profile/me", signedIn, limiter(20), validate({ body: profileUpdateBody }), c.updateMe);
+    v1.get("/profile/:handle", validate({ params: handleParams }), c.byHandle);
+    v1.get("/leaderboard", validate({ query: leaderboardQuery }), c.leaderboard);
+  } else {
+    v1.use(["/profile", "/leaderboard"], disabled("Profiles and the leaderboard"));
+  }
+
+  // Admin: every handler re-checks the actor's standing in AdminService.
+  if (container.admin && verifier) {
+    const a = adminController(container.admin);
+    const auth = requireAuth(verifier);
+    v1.get("/admin/me", auth, a.me);
+    v1.get("/admin/overview", auth, a.overview);
+    v1.get("/admin/users", auth, validate({ query: adminUsersQuery }), a.users);
+    v1.post("/admin/roles", auth, limiter(30), validate({ body: roleBody }), a.grant);
+    v1.delete("/admin/roles", auth, limiter(30), validate({ body: roleBody }), a.revoke);
+  } else {
+    v1.use("/admin", disabled("Admin"));
+  }
+
+  // Blog: public reads (a moderator viewing also sees hidden comments);
+  // writes need sign-in and are rate-limited against spam.
+  if (container.blog) {
+    const b = blogController(container.blog);
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
+    const s = validate({ params: blogSlugParams });
+    v1.get("/blog", validate({ query: blogListQuery }), b.list);
+    v1.post("/blog", signedIn, limiter(5), validate({ body: postBody }), b.create);
+    v1.delete("/blog/comments/:id", signedIn, limiter(30), validate({ params: commentParams }), b.removeComment);
+    v1.get("/blog/:slug", identify, s, b.get);
+    v1.patch("/blog/:slug", signedIn, limiter(20), validate({ params: blogSlugParams, body: postPatchBody }), b.update);
+    v1.delete("/blog/:slug", signedIn, limiter(20), s, b.remove);
+    v1.post("/blog/:slug/hide", signedIn, limiter(30), validate({ params: blogSlugParams, body: hideBody }), b.hide);
+    v1.post("/blog/:slug/vote", signedIn, limiter(60), validate({ params: blogSlugParams, body: voteBody }), b.vote);
+    v1.post("/blog/:slug/comments", signedIn, limiter(10), validate({ params: blogSlugParams, body: commentBody }), b.comment);
+  } else {
+    v1.use("/blog", disabled("The blog"));
+  }
+
+  // Contests: public reads; joining needs sign-in; creating/deleting is admin
+  // (ContestService re-checks the actor's standing).
+  if (container.contests) {
+    const c = contestController(container.contests);
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
+    v1.get("/contests", c.list);
+    v1.post("/contests", signedIn, limiter(10), validate({ body: createContestBody }), c.create);
+    v1.get("/contests/:slug", identify, validate({ params: contestSlugParams }), c.get);
+    v1.post("/contests/:slug/join", signedIn, limiter(20), validate({ params: contestSlugParams }), c.join);
+    v1.delete("/contests/:slug", signedIn, limiter(10), validate({ params: contestSlugParams }), c.remove);
+  } else {
+    v1.use("/contests", disabled("Contests"));
+  }
+
+  // Store: browsing is public; your wallet, buying and equipping need sign-in.
+  if (container.store) {
+    const st = storeController(container.store);
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
+    v1.get("/store", identify, st.view);
+    v1.post("/store/buy", signedIn, limiter(20), validate({ body: storeItemBody }), st.buy);
+    v1.post("/store/equip", signedIn, limiter(40), validate({ body: equipBody }), st.equip);
+  } else {
+    v1.use("/store", disabled("The store"));
+  }
+
+  // Onboarding quiz and roadmaps: roadmaps are public; progress and the quiz need sign-in.
+  if (container.roadmaps) {
+    const r = roadmapController(container.roadmaps);
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
+    v1.get("/onboarding", signedIn, r.onboarding);
+    v1.put("/onboarding", signedIn, limiter(20), validate({ body: onboardingBody }), r.saveOnboarding);
+    v1.get("/roadmaps", r.list);
+    v1.get("/roadmaps/:id", identify, validate({ params: roadmapParams }), r.view);
+    v1.post("/roadmaps/:id/read", signedIn, limiter(60), validate({ params: roadmapParams, body: roadmapReadBody }), r.read);
+  } else {
+    v1.use(["/onboarding", "/roadmaps"], disabled("Roadmaps"));
+  }
+
+  // LWC: compile only. The learner's component runs in their own browser
+  // (sandboxed iframe), never here. Anonymous, so it is rate-limited.
+  const lwcRouter = Router();
+  lwcRouter.post("/compile", limiter(20), validate({ body: lwcCompileBody }), lwcCompile);
+  v1.use("/lwc", lwcRouter);
 
   app.use("/api/v1", v1);
   app.use(notFound);

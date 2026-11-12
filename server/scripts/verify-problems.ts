@@ -13,6 +13,7 @@ import { buildContainer, PROBLEMS_DIR } from "../src/container.ts";
 import { ChallengeCatalog } from "../src/services/challenges/catalog.ts";
 import { buildDeployPackage, interpretDeployResult, isDeployDone } from "../src/services/challenges/grader.ts";
 import { SalesforceClient } from "../src/services/salesforce/salesforceClient.ts";
+import { compileLwc } from "../src/services/lwc/compiler.ts";
 
 const args = process.argv.slice(2);
 const userIdx = args.indexOf("--user");
@@ -49,6 +50,17 @@ async function grade(slug: string, sources: Record<string, string>) {
 
 let failed = 0;
 for (const c of catalog.all().filter((x) => only.length === 0 || only.includes(x.slug))) {
+  if (c.lwc) {
+    // LWC tests run in a browser; here we can only prove both versions compile.
+    const { component } = c.lwc;
+    const compiles = async (s: Record<string, string>) =>
+      compileLwc({ component, html: s.html ?? "", js: s.js ?? "", css: s.css ?? "" }).then(() => "compiled", (e: unknown) => `compile error: ${e instanceof Error ? e.message : String(e)}`);
+    const ref = await compiles(c.reference);
+    const starter = await compiles(c.starter);
+    if (ref !== "compiled") failed++;
+    console.log(`${ref === "compiled" ? "✓" : "✗"} ${c.slug.padEnd(28)} reference=${ref}  starter=${starter}  (tests run in the browser)`);
+    continue;
+  }
   const ref = await grade(c.slug, c.reference);
   const starter = await grade(c.slug, c.starter);
   const ok = ref.verdict === "accepted" && starter.verdict !== "accepted";

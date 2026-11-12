@@ -1,0 +1,14 @@
+<template>
+    <input class="search" type="search" placeholder="Search contacts" oninput={handleSearch} />
+    <p class="summary">{matches.length} of {total} contacts</p>
+    <template lwc:if={hasMatches}>
+        <ul>
+            <template for:each={matches} for:item="contact">
+                <li key={contact.id} class="contact">{contact.name}</li>
+            </template>
+        </ul>
+    </template>
+    <template lwc:else>
+        <p class="empty">No contacts match.</p>
+    </template>
+</template>
