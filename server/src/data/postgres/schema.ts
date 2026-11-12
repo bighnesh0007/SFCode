@@ -229,3 +229,17 @@ export const userOnboarding = pgTable("user_onboarding", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/** The optional "about" section of a public profile. */
+export const userAbout = pgTable("user_about", {
+  userId: text("user_id").primaryKey(),
+  bio: text("bio").notNull().default(""),
+  company: text("company").notNull().default(""),
+  location: text("location").notNull().default(""),
+  trailheadUrl: text("trailhead_url"),
+  linkedinUrl: text("linkedin_url"),
+  githubUrl: text("github_url"),
+  certifications: jsonb("certifications").$type<string[]>().notNull().default([]),
+  openToWork: boolean("open_to_work").notNull().default(false),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});

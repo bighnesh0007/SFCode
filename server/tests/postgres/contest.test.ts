@@ -97,6 +97,11 @@ describe.skipIf(!safe)("Contests and store on Postgres", () => {
       ["bob", 100, 20],
     ]);
     expect(JSON.stringify(v)).not.toContain('"userId"');
+
+    expect(await contests.history("bob")).toEqual([]); // still live
+    clock.advance(200 * MIN);
+    expect(await contests.history("bob")).toEqual([expect.objectContaining({ slug: c.slug, rank: 2, entrants: 2, score: 100 })]);
+    expect(await contests.history("carol")).toEqual([]);
   });
 
   it("the purchase lock stops parallel buys from overspending", async () => {

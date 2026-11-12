@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Celebration } from "@/components/Celebration";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
@@ -40,6 +41,9 @@ function readDraft(challenge: ChallengeView): Record<string, string> {
   }
 }
 
+/** Mirrors the server's pointsFor; display only. */
+const POINTS: Record<string, number> = { Easy: 10, Medium: 20, Hard: 40 };
+
 export function Workspace({ challenge, backHref }: { challenge: ChallengeView; backHref: string }) {
   const { resolvedTheme } = useTheme();
   const { isSignedIn, getToken } = useAuthState();
@@ -50,6 +54,13 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
   const [leftTab, setLeftTab] = useState<"description" | "submissions">("description");
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [history, setHistory] = useState<SubmissionSummary[]>([]);
+  const [celebrate, setCelebrate] = useState<{ first: boolean } | null>(null);
+  const endCelebration = useCallback(() => setCelebrate(null), []);
+  // Read inside the poller without restarting it: was this already solved before this submission?
+  const solvedBefore = useRef(false);
+  useEffect(() => {
+    if (submission?.status !== "running") solvedBefore.current = history.some((h) => h.status === "accepted" && h.id !== submission?.id);
+  }, [history, submission]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const monacoRef = useRef<Monaco | null>(null);
@@ -107,6 +118,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
         try {
           const next = await getSubmission(await getToken(), running);
           setSubmission(next);
+          if (next.status === "accepted") setCelebrate({ first: !solvedBefore.current });
           if (next.status !== "running") void refreshHistory();
         } catch {
           /* transient; keep polling */
@@ -163,6 +175,13 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
 
   return (
     <div className="flex h-[calc(100vh-3rem)] flex-col">
+      {celebrate && (
+        <Celebration
+          title="Accepted!"
+          detail={celebrate.first ? `+${POINTS[challenge.difficulty] ?? 0} points and coins. Nice work.` : "Solved again. Your best stands."}
+          onDone={endCelebration}
+        />
+      )}
       <ResizablePanelGroup orientation="horizontal" className="flex-1">
         {/* ── statement / submissions ─────────────────────────────────── */}
         <ResizablePanel defaultSize="40%" minSize="25%">

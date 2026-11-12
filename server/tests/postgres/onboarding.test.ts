@@ -3,6 +3,7 @@ import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { sql } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createPgDatabase, type PgDatabase } from "../../src/data/postgres/client.ts";
+import { EMPTY_ABOUT, PgAboutRepository } from "../../src/repositories/about.repository.ts";
 import { PgOnboardingRepository } from "../../src/repositories/onboarding.repository.ts";
 
 const url = process.env.TEST_DATABASE_URL;
@@ -20,7 +21,7 @@ describe.skipIf(!safe)("PgOnboardingRepository", () => {
   });
   afterAll(() => db.close());
   beforeEach(async () => {
-    await db.execute(sql`TRUNCATE user_onboarding`);
+    await db.execute(sql`TRUNCATE user_onboarding, user_about`);
   });
 
   it("marks are a set, survive redoing the quiz, and parallel marks aren't lost", async () => {
@@ -33,5 +34,17 @@ describe.skipIf(!safe)("PgOnboardingRepository", () => {
     const row = await repo.get("u");
     expect(row?.level).toBe("production");
     expect(row?.readNodes.sort()).toEqual(["a", "c"]);
+  });
+
+  it("about: save, overwrite, and read many", async () => {
+    const about = new PgAboutRepository(db);
+    expect(await about.get("u")).toBeNull();
+    await about.save("u", { ...EMPTY_ABOUT, bio: "Hi", certifications: ["Platform Developer I"], openToWork: true });
+    await about.save("u", { ...EMPTY_ABOUT, bio: "Hello", githubUrl: "https://github.com/u" });
+    await about.save("v", { ...EMPTY_ABOUT, company: "Acme" });
+    const many = await about.getMany(["u", "v", "w"]);
+    expect(many.get("u")).toEqual({ ...EMPTY_ABOUT, bio: "Hello", githubUrl: "https://github.com/u" });
+    expect(many.get("v")?.company).toBe("Acme");
+    expect(many.has("w")).toBe(false);
   });
 });

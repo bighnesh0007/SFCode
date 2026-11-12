@@ -21,6 +21,7 @@ import { AdminService } from "./services/admin/admin.service.ts";
 import { PgAdminRepository } from "./repositories/admin.repository.ts";
 import { PgBlogRepository } from "./repositories/blog.repository.ts";
 import { BlogService } from "./services/blog/blog.service.ts";
+import { PgAboutRepository } from "./repositories/about.repository.ts";
 import { loadRoadmaps } from "./domain/roadmap.ts";
 import { PgOnboardingRepository } from "./repositories/onboarding.repository.ts";
 import { RoadmapService } from "./services/roadmap/roadmap.service.ts";
@@ -96,6 +97,7 @@ export function buildContainer(): Container {
       new PgProfileRepository(container.db),
       config.clerk.secretKey ? new ClerkIdentityLookup(config.clerk.secretKey) : undefined,
       systemClock,
+      new PgAboutRepository(container.db),
     );
   }
 
@@ -105,6 +107,18 @@ export function buildContainer(): Container {
     container.contests = new ContestService(contestRepo ?? new PgContestRepository(container.db), catalog, new PgProfileRepository(container.db), container.community, container.admin, systemClock);
     container.store = new StoreService(new PgStoreRepository(container.db), new PgChallengeSubmissionRepository(container.db), catalog, container.contests);
     container.community.setCosmeticsSource(container.store);
+    const store = container.store;
+    const contests = container.contests;
+    const roadmapSvc = container.roadmaps;
+    container.community.setExtras({
+      coins: async (userId) => (await store.wallet(userId)).balance,
+      contestHistory: (userId) => contests.history(userId),
+      roadmapProgress: async (userId) => {
+        if (!roadmapSvc || !(await roadmapSvc.onboarding(userId))) return null;
+        const v = await roadmapSvc.view("developer", userId);
+        return { done: v.done, total: v.total };
+      },
+    });
   }
 
   // No database needed to practise; attempts are saved only when there is one.

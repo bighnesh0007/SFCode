@@ -7,8 +7,59 @@ type Token = string | null;
 /** Equipped cosmetic style tokens per slot ("frame" | "badge" | "accent"). */
 export type Cosmetics = Partial<Record<"frame" | "badge" | "accent", string>>;
 
+export const CERTIFICATIONS = [
+  "Administrator",
+  "Advanced Administrator",
+  "Platform App Builder",
+  "Platform Developer I",
+  "Platform Developer II",
+  "JavaScript Developer I",
+  "Sales Cloud Consultant",
+  "Service Cloud Consultant",
+  "Experience Cloud Consultant",
+  "Data Cloud Consultant",
+  "Agentforce Specialist",
+  "Application Architect",
+  "System Architect",
+  "Technical Architect",
+] as const;
+
+export interface About {
+  bio: string;
+  company: string;
+  location: string;
+  trailheadUrl: string | null;
+  linkedinUrl: string | null;
+  githubUrl: string | null;
+  certifications: string[];
+  openToWork: boolean;
+}
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  earned: boolean;
+  progress: { current: number; target: number };
+}
+
+export interface ContestResult {
+  slug: string;
+  title: string;
+  endsAt: string;
+  rank: number;
+  entrants: number;
+  score: number;
+}
+
 export interface ProfileView {
   cosmetics: Cosmetics;
+  about: About;
+  stats: { streak: number; longestStreak: number; coins: number | null; contests: number; bestPlacement: number | null; activeDays: number };
+  achievements: Achievement[];
+  contests: ContestResult[];
+  roadmap: { done: number; total: number } | null;
   handle: string;
   displayName: string;
   imageUrl: string | null;
@@ -37,3 +88,6 @@ export const getProfile = (handle: string) => apiRequest<ProfileView>(`/api/v1/p
 export const updateMyProfile = (token: Token, changes: { handle?: string; displayName?: string }) =>
   apiRequest<ProfileView>("/api/v1/profile/me", { method: "PATCH", token, body: changes });
 export const getLeaderboard = (window: "all" | "30d") => apiRequest<LeaderboardRow[]>(`/api/v1/leaderboard?window=${window}`);
+
+export const updateMyAbout = (token: Token, about: { bio: string; company: string; location: string; trailheadUrl: string; linkedinUrl: string; githubUrl: string; certifications: string[]; openToWork: boolean }) =>
+  apiRequest<ProfileView>("/api/v1/profile/me/about", { method: "PUT", token, body: about });

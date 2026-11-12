@@ -22,7 +22,7 @@ import { contestController, roadmapController, storeController } from "../contro
 import { contestSlugParams, createContestBody, equipBody, onboardingBody, roadmapParams, roadmapReadBody, storeItemBody } from "../validation/contest.schema.ts";
 import { blogListQuery, blogSlugParams, commentBody, commentParams, hideBody, postBody, postPatchBody, voteBody } from "../validation/blog.schema.ts";
 import { adminUsersQuery, roleBody } from "../validation/admin.schema.ts";
-import { handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
+import { aboutBody, handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
 import { validatedBody } from "../middleware/validate.ts";
 import { listQuery, slugParams, submissionParams, submitBody } from "../validation/challenge.schema.ts";
 
@@ -115,6 +115,7 @@ export function mountRoutes(app: Application, container: Container): void {
     const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
     v1.get("/profile/me", signedIn, c.me);
     v1.patch("/profile/me", signedIn, limiter(20), validate({ body: profileUpdateBody }), c.updateMe);
+    v1.put("/profile/me/about", signedIn, limiter(20), validate({ body: aboutBody }), c.updateAbout);
     v1.get("/profile/:handle", validate({ params: handleParams }), c.byHandle);
     v1.get("/leaderboard", validate({ query: leaderboardQuery }), c.leaderboard);
   } else {
