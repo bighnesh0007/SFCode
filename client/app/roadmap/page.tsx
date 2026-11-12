@@ -4,11 +4,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Check, CircleDashed, GraduationCap, Lock, SkipForward, TriangleAlert, X } from "lucide-react";
 import { useAuthState } from "@/components/auth";
+import { WeeklyPlan } from "@/components/WeeklyPlan";
 import { Markdown } from "@/components/Markdown";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
 import type { Track } from "@/lib/challengesApi";
-import { getOnboarding, getRoadmap, listRoadmaps, markRead, submitQuiz, type NodeState, type QuizResult, type RoadmapNode, type RoadmapView } from "@/lib/roadmapApi";
+import { getOnboarding, getRoadmap, listRoadmaps, markRead, submitQuiz, type Hours, type NodeState, type QuizResult, type RoadmapNode, type RoadmapView } from "@/lib/roadmapApi";
 import { trackInfo } from "@/lib/tracks";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +56,9 @@ export default function RoadmapPage() {
   const [roadmaps, setRoadmaps] = useState<{ id: string; title: string }[]>([]);
   /** null until we know: the learner's own roadmap if they did the quiz, else Developer. */
   const [roadmapId, setRoadmapId] = useState<string | null>(null);
+  const [hours, setHours] = useState<Hours | null>(null);
+  /** The path the learner was given; the weekly plan only shows on that one. */
+  const [myRoadmap, setMyRoadmap] = useState<string | null>(null);
 
   useEffect(() => {
     listRoadmaps().then(setRoadmaps).catch(() => {});
@@ -68,7 +72,12 @@ export default function RoadmapPage() {
     }
     getToken()
       .then((t) => getOnboarding(t))
-      .then((ob) => !cancelled && setRoadmapId((cur) => cur ?? ob?.roadmapId ?? "developer"))
+      .then((ob) => {
+        if (cancelled) return;
+        setHours(ob?.hours ?? null);
+        setMyRoadmap(ob?.roadmapId ?? null);
+        setRoadmapId((cur) => cur ?? ob?.roadmapId ?? "developer");
+      })
       .catch(fallback);
     return () => {
       cancelled = true;
@@ -132,6 +141,8 @@ export default function RoadmapPage() {
           ))}
         </div>
       )}
+
+      {view.personalised && hours && view.id === myRoadmap && <WeeklyPlan view={view} hours={hours} onOpen={setOpen} />}
 
       <div className="mt-6 flex flex-wrap gap-3 text-xs text-muted-foreground">
         {(Object.keys(STATE_LABEL) as NodeState[]).map((s) => <span key={s} className="inline-flex items-center gap-1"><StateIcon state={s} className="h-3.5 w-3.5" />{STATE_LABEL[s]}</span>)}
