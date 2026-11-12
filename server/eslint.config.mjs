@@ -81,7 +81,7 @@ export default tseslint.config(
   // points that run outside the app (the Drizzle CLI config) and tests, which
   // set env before importing config.
   {
-    files: ["src/config/**/*.ts", "drizzle.config.ts", "tests/**/*.ts", "scripts/**/*.ts"],
+    files: ["src/config/**/*.ts", "drizzle.config.ts", "vitest.config.ts", "tests/**/*.ts", "scripts/**/*.ts"],
     rules: { "no-restricted-properties": "off" },
   },
 

@@ -17,6 +17,8 @@ import { lwcCompileBody, type LwcCompileBody } from "../validation/lwc.schema.ts
 import { compileLwc } from "../services/lwc/compiler.ts";
 import { communityController } from "../controllers/community.controller.ts";
 import { adminController } from "../controllers/admin.controller.ts";
+import { blogController } from "../controllers/blog.controller.ts";
+import { blogListQuery, blogSlugParams, commentBody, commentParams, hideBody, postBody, postPatchBody, voteBody } from "../validation/blog.schema.ts";
 import { adminUsersQuery, roleBody } from "../validation/admin.schema.ts";
 import { handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
 import { validatedBody } from "../middleware/validate.ts";
@@ -128,6 +130,26 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.delete("/admin/roles", auth, limiter(30), validate({ body: roleBody }), a.revoke);
   } else {
     v1.use("/admin", disabled("Admin"));
+  }
+
+  // Blog: public reads (a moderator viewing also sees hidden comments);
+  // writes need sign-in and are rate-limited against spam.
+  if (container.blog) {
+    const b = blogController(container.blog);
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
+    const s = validate({ params: blogSlugParams });
+    v1.get("/blog", validate({ query: blogListQuery }), b.list);
+    v1.post("/blog", signedIn, limiter(5), validate({ body: postBody }), b.create);
+    v1.delete("/blog/comments/:id", signedIn, limiter(30), validate({ params: commentParams }), b.removeComment);
+    v1.get("/blog/:slug", identify, s, b.get);
+    v1.patch("/blog/:slug", signedIn, limiter(20), validate({ params: blogSlugParams, body: postPatchBody }), b.update);
+    v1.delete("/blog/:slug", signedIn, limiter(20), s, b.remove);
+    v1.post("/blog/:slug/hide", signedIn, limiter(30), validate({ params: blogSlugParams, body: hideBody }), b.hide);
+    v1.post("/blog/:slug/vote", signedIn, limiter(60), validate({ params: blogSlugParams, body: voteBody }), b.vote);
+    v1.post("/blog/:slug/comments", signedIn, limiter(10), validate({ params: blogSlugParams, body: commentBody }), b.comment);
+  } else {
+    v1.use("/blog", disabled("The blog"));
   }
 
   // LWC: compile only. The learner's component runs in their own browser

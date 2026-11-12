@@ -3,7 +3,7 @@
  * `npm run db:generate` — never hand-edit a generated migration.
  */
 import { sql } from "drizzle-orm";
-import { boolean, index, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import type { GradeResult, SubmissionStatus } from "../../domain/challenge.ts";
 
 /**
@@ -111,4 +111,45 @@ export const userRoles = pgTable(
     grantedAt: timestamp("granted_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.role] })],
+);
+
+/** Community blog. Markdown, rendered client-side through DOMPurify. */
+export const blogPosts = pgTable(
+  "blog_posts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull(),
+    authorId: text("author_id").notNull(),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    /** "hidden" = removed by a moderator; kept for the record, never listed. */
+    status: text("status").$type<"published" | "hidden">().notNull().default("published"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("blog_posts_slug_idx").on(t.slug), index("blog_posts_created_idx").on(t.createdAt)],
+);
+
+/** One vote per user per post: +1 or -1 (absent = no vote). */
+export const blogVotes = pgTable(
+  "blog_votes",
+  {
+    postId: uuid("post_id").notNull().references(() => blogPosts.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull(),
+    value: integer("value").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.postId, t.userId] })],
+);
+
+export const blogComments = pgTable(
+  "blog_comments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    postId: uuid("post_id").notNull().references(() => blogPosts.id, { onDelete: "cascade" }),
+    authorId: text("author_id").notNull(),
+    body: text("body").notNull(),
+    status: text("status").$type<"published" | "hidden">().notNull().default("published"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("blog_comments_post_idx").on(t.postId, t.createdAt)],
 );

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
+import { listPosts } from "@/lib/blogApi";
 import { listChallenges, type ChallengeSummary } from "@/lib/challengesApi";
 import { TRACK_INFO, trackInfo } from "@/lib/tracks";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,7 @@ const PAGES: Item[] = [
   { href: "/leaderboard", title: "Leaderboard", detail: "Rankings", group: "Pages" },
   { href: "/profile", title: "My profile", detail: "Progress and activity", group: "Pages" },
   { href: "/settings/org", title: "Salesforce org", detail: "Connect or disconnect", group: "Pages" },
+  { href: "/blog", title: "Blog", detail: "Community posts", group: "Pages" },
 ].map((p) => ({ ...p, haystack: `${p.title} ${p.detail}`.toLowerCase() }));
 
 function problemItem(c: ChallengeSummary): Item {
@@ -76,8 +78,11 @@ export function SearchPalette({ shortcut = false }: { shortcut?: boolean }) {
     input.current?.focus();
     if (problems !== null) return;
     // One request per track; the list endpoint filters by track.
-    Promise.all(TRACK_INFO.map((t) => listChallenges(null, t.id).then((d) => d.challenges).catch(() => [])))
-      .then((lists) => setProblems(lists.flat().map(problemItem)))
+    const posts = listPosts("new")
+      .then((ps) => ps.map((p): Item => ({ href: `/blog/${p.slug}`, title: p.title, detail: `Blog · ${p.author.displayName}`, group: "Blog", haystack: `${p.title} ${p.excerpt} blog`.toLowerCase() })))
+      .catch(() => [] as Item[]);
+    Promise.all([...TRACK_INFO.map((t) => listChallenges(null, t.id).then((d) => d.challenges.map(problemItem)).catch(() => [] as Item[])), posts])
+      .then((lists) => setProblems(lists.flat()))
       .catch(() => setProblems([]));
   }, [open, problems]);
 

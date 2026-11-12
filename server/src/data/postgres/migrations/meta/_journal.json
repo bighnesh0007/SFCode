@@ -36,6 +36,13 @@
       "when": 1794502803542,
       "tag": "0004_user_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794503135963,
+      "tag": "0005_blog",
+      "breakpoints": true
     }
   ]
 }
