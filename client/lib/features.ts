@@ -30,7 +30,7 @@ export const FEATURES: readonly Feature[] = [
   { id: "contests", href: "/contests", title: "Timed Contests", nav: "Contests", description: "Competitive, timed Salesforce coding rounds with a leaderboard.", icon: Trophy, status: "soon", primary: true },
   { id: "generator", href: "/generator", title: "AI Problem Generator", nav: "Generator", description: "Generate fresh Salesforce challenges on any topic and difficulty.", icon: Sparkles, status: "soon", primary: false },
   { id: "interview", href: "/interview", title: "Mock Interviews", nav: "Interview", description: "AI-powered Salesforce technical interviews with feedback.", icon: Bot, status: "soon", primary: false },
-  { id: "certification", href: "/certification", title: "Certification Prep", nav: "Cert Prep", description: "Practice questions for Platform Developer I and II.", icon: GraduationCap, status: "soon", primary: false },
+  { id: "certification", href: "/certification", title: "Certification Prep", nav: "Cert Prep", description: "Original practice questions for Platform Developer I and II, with an explanation for every answer.", icon: GraduationCap, status: "live", primary: false },
 ];
 
 export function featureById(id: string): Feature {

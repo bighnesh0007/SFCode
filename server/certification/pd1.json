@@ -1,0 +1,406 @@
+{
+  "exam": "pd1",
+  "title": "Platform Developer I",
+  "order": 1,
+  "description": "Apex, SOQL, triggers, testing and Lightning Web Components fundamentals.",
+  "sections": [
+    {
+      "id": "fundamentals",
+      "title": "Developer Fundamentals"
+    },
+    {
+      "id": "logic",
+      "title": "Process Automation and Logic"
+    },
+    {
+      "id": "ui",
+      "title": "User Interface"
+    },
+    {
+      "id": "testing",
+      "title": "Testing, Debugging and Deployment"
+    }
+  ],
+  "questions": [
+    {
+      "id": "pd1-limits-soql",
+      "section": "logic",
+      "prompt": "How many SOQL queries can a **synchronous** Apex transaction issue before it fails?",
+      "options": [
+        {
+          "id": "a",
+          "text": "50"
+        },
+        {
+          "id": "b",
+          "text": "100"
+        },
+        {
+          "id": "c",
+          "text": "150"
+        },
+        {
+          "id": "d",
+          "text": "200"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The synchronous limit is 100 SOQL queries per transaction (asynchronous Apex gets 200). Hitting it throws an uncatchable `System.LimitException`, which is why queries belong outside loops."
+    },
+    {
+      "id": "pd1-limits-dml",
+      "section": "logic",
+      "prompt": "What is the maximum number of **DML statements** in one Apex transaction?",
+      "options": [
+        {
+          "id": "a",
+          "text": "100"
+        },
+        {
+          "id": "b",
+          "text": "150"
+        },
+        {
+          "id": "c",
+          "text": "200"
+        },
+        {
+          "id": "d",
+          "text": "10,000"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "150 DML statements per transaction. 10,000 is the limit on the number of *records* processed by DML, a different limit."
+    },
+    {
+      "id": "pd1-before-insert-newmap",
+      "section": "logic",
+      "prompt": "In a `before insert` trigger, which statement is true?",
+      "options": [
+        {
+          "id": "a",
+          "text": "`Trigger.old` contains the records as they were before the insert"
+        },
+        {
+          "id": "b",
+          "text": "`Trigger.newMap` is null because the records do not have Ids yet"
+        },
+        {
+          "id": "c",
+          "text": "Field changes to `Trigger.new` require an `update` DML statement to save"
+        },
+        {
+          "id": "d",
+          "text": "`Trigger.new` is read-only"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Records have no Ids before insert, so there is no `newMap`; `Trigger.old` only exists for update and delete. In *before* triggers you change `Trigger.new` directly — no DML needed."
+    },
+    {
+      "id": "pd1-order-of-execution",
+      "section": "logic",
+      "prompt": "When a record is saved, which of these runs **first**?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A before trigger"
+        },
+        {
+          "id": "b",
+          "text": "A before-save (fast field update) record-triggered flow"
+        },
+        {
+          "id": "c",
+          "text": "A custom validation rule"
+        },
+        {
+          "id": "d",
+          "text": "An after trigger"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Before-save record-triggered flows run before Apex before triggers. Custom validation rules run after before triggers, and after triggers run once the record is saved to the database (not yet committed)."
+    },
+    {
+      "id": "pd1-chunks-of-200",
+      "section": "logic",
+      "prompt": "A single DML statement inserts **1,000** Account records. How many times does an Account trigger execute?",
+      "options": [
+        {
+          "id": "a",
+          "text": "1"
+        },
+        {
+          "id": "b",
+          "text": "5"
+        },
+        {
+          "id": "c",
+          "text": "10"
+        },
+        {
+          "id": "d",
+          "text": "1,000"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Triggers process records in chunks of 200, so 1,000 records invoke the trigger 5 times. Governor limits are shared across those chunks within the transaction — another reason to bulkify."
+    },
+    {
+      "id": "pd1-uncatchable",
+      "section": "logic",
+      "prompt": "Which exception **cannot** be caught with a `try/catch` block?",
+      "options": [
+        {
+          "id": "a",
+          "text": "`System.DmlException`"
+        },
+        {
+          "id": "b",
+          "text": "`System.QueryException`"
+        },
+        {
+          "id": "c",
+          "text": "`System.LimitException`"
+        },
+        {
+          "id": "d",
+          "text": "`System.NullPointerException`"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Exceeding a governor limit throws `System.LimitException`, which always terminates the transaction. Prevent it (check `Limits` methods, bulkify) rather than catching it."
+    },
+    {
+      "id": "pd1-partial-success",
+      "section": "logic",
+      "prompt": "What does `Database.insert(records, false)` do differently from `insert records`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It runs without enforcing validation rules"
+        },
+        {
+          "id": "b",
+          "text": "It allows partial success: valid records are saved and failures are reported in the results"
+        },
+        {
+          "id": "c",
+          "text": "It skips triggers"
+        },
+        {
+          "id": "d",
+          "text": "It runs asynchronously"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The second argument is `allOrNone`. With `false`, records that pass are committed and each failure is returned in a `Database.SaveResult` instead of throwing a `DmlException`."
+    },
+    {
+      "id": "pd1-sharing-inherit",
+      "section": "fundamentals",
+      "prompt": "A class declared **without** any sharing keyword is called from a `with sharing` class. Which sharing rules apply to its code?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Always `without sharing`"
+        },
+        {
+          "id": "b",
+          "text": "The sharing mode of the calling class (`with sharing` here)"
+        },
+        {
+          "id": "c",
+          "text": "Always `with sharing`"
+        },
+        {
+          "id": "d",
+          "text": "It fails to compile"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A class with no sharing declaration runs in the sharing mode of whatever called it. Declaring `inherited sharing` makes that explicit — the recommended practice for utility classes."
+    },
+    {
+      "id": "pd1-soql-injection",
+      "section": "fundamentals",
+      "prompt": "Which **two** techniques protect dynamic SOQL built from user input against SOQL injection? *(Choose 2)*",
+      "options": [
+        {
+          "id": "a",
+          "text": "Using bind variables such as `:name` in `Database.query`"
+        },
+        {
+          "id": "b",
+          "text": "Using `String.escapeSingleQuotes()` on the input"
+        },
+        {
+          "id": "c",
+          "text": "Wrapping the query in `try/catch`"
+        },
+        {
+          "id": "d",
+          "text": "Running the class `without sharing`"
+        }
+      ],
+      "answer": [
+        "a",
+        "b"
+      ],
+      "explanation": "Bind variables keep input as data; `String.escapeSingleQuotes` neutralises quotes when concatenation is unavoidable. Exception handling and sharing modes do nothing against injection."
+    },
+    {
+      "id": "pd1-lwc-api",
+      "section": "ui",
+      "prompt": "Which decorator makes a Lightning Web Component property settable by its **parent** component?",
+      "options": [
+        {
+          "id": "a",
+          "text": "`@track`"
+        },
+        {
+          "id": "b",
+          "text": "`@wire`"
+        },
+        {
+          "id": "c",
+          "text": "`@api`"
+        },
+        {
+          "id": "d",
+          "text": "`@public`"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "`@api` marks a public property or method. `@wire` binds data from an adapter or Apex; `@track` is only needed for deep reactivity of objects and arrays."
+    },
+    {
+      "id": "pd1-lwc-wire-cacheable",
+      "section": "ui",
+      "prompt": "An Apex method will be called from an LWC with `@wire`. What must its annotation include?",
+      "options": [
+        {
+          "id": "a",
+          "text": "`@AuraEnabled`"
+        },
+        {
+          "id": "b",
+          "text": "`@AuraEnabled(cacheable=true)`"
+        },
+        {
+          "id": "c",
+          "text": "`@RemoteAction`"
+        },
+        {
+          "id": "d",
+          "text": "`@InvocableMethod`"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Wired Apex methods must be `@AuraEnabled(cacheable=true)`, which also means they cannot perform DML. Methods that change data are called imperatively instead."
+    },
+    {
+      "id": "pd1-test-seealldata",
+      "section": "testing",
+      "prompt": "In a test class with the default `SeeAllData=false`, which existing org records can the test query?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Accounts"
+        },
+        {
+          "id": "b",
+          "text": "Opportunities"
+        },
+        {
+          "id": "c",
+          "text": "Users"
+        },
+        {
+          "id": "d",
+          "text": "Contacts"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Tests are isolated from org data by default, but some setup data stays visible — including User and Profile records. Business data such as Accounts must be created by the test."
+    },
+    {
+      "id": "pd1-stoptest",
+      "section": "testing",
+      "prompt": "What happens when `Test.stopTest()` is called?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Governor limits are reset to their original values"
+        },
+        {
+          "id": "b",
+          "text": "Asynchronous work enqueued since `Test.startTest()` runs synchronously before execution continues"
+        },
+        {
+          "id": "c",
+          "text": "All test data is rolled back"
+        },
+        {
+          "id": "d",
+          "text": "The test method ends"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "`Test.startTest()` gives the code under test a fresh set of limits; `Test.stopTest()` forces queued async work (future, Queueable, Batch) to finish so you can assert on its results."
+    },
+    {
+      "id": "pd1-deploy-coverage",
+      "section": "testing",
+      "prompt": "Which coverage rules must be met to deploy Apex to production? *(Choose 2)*",
+      "options": [
+        {
+          "id": "a",
+          "text": "At least 75% of all Apex code is covered by tests"
+        },
+        {
+          "id": "b",
+          "text": "Every trigger has some test coverage"
+        },
+        {
+          "id": "c",
+          "text": "Every class has 100% coverage"
+        },
+        {
+          "id": "d",
+          "text": "Every test method contains at least one assertion"
+        }
+      ],
+      "answer": [
+        "a",
+        "b"
+      ],
+      "explanation": "Production deploys need 75% overall coverage and some coverage for every trigger. Assertions are best practice — coverage without assertions proves very little — but the platform doesn't enforce them."
+    }
+  ]
+}

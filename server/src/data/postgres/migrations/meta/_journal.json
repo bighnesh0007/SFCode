@@ -15,6 +15,13 @@
       "when": 1794487533958,
       "tag": "0001_challenge_submissions",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794491352018,
+      "tag": "0002_cert_attempts",
+      "breakpoints": true
     }
   ]
 }

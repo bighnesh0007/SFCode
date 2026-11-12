@@ -9,6 +9,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createPgDatabase, type PgDatabase } from "../../src/data/postgres/client.ts";
 import { PgSalesforceConnectionRepository } from "../../src/repositories/salesforceConnection.repository.ts";
 import { PgChallengeSubmissionRepository } from "../../src/repositories/challengeSubmission.repository.ts";
+import { PgCertAttemptRepository } from "../../src/repositories/certAttempt.repository.ts";
 import type { GradeResult } from "../../src/domain/challenge.ts";
 
 const url = process.env.TEST_DATABASE_URL;
@@ -102,5 +103,30 @@ describe.skipIf(!safe)("PgChallengeSubmissionRepository", () => {
     }
     expect(Object.fromEntries(await repo.progress("u1"))).toEqual({ p1: "solved", p2: "attempted" });
     expect((await repo.listForProblem("u1", "p1", 10)).map((r) => r.status)).toEqual(["accepted", "wrong_answer"]);
+  });
+});
+
+describe.skipIf(!safe)("PgCertAttemptRepository", () => {
+  let db: PgDatabase;
+  let repo: PgCertAttemptRepository;
+
+  beforeAll(async () => {
+    db = createPgDatabase(url ?? "");
+    await migrate(db, { migrationsFolder: new URL("../../src/data/postgres/migrations", import.meta.url).pathname });
+    repo = new PgCertAttemptRepository(db);
+  });
+  afterAll(() => db.close());
+  beforeEach(async () => {
+    await db.execute(sql`TRUNCATE cert_attempts`);
+  });
+
+  it("latest() keeps only the most recent outcome per question, per user and exam", async () => {
+    await repo.record({ userId: "u1", exam: "pd1", questionId: "q1", correct: false });
+    await new Promise((r) => setTimeout(r, 5));
+    await repo.record({ userId: "u1", exam: "pd1", questionId: "q1", correct: true });
+    await repo.record({ userId: "u1", exam: "pd1", questionId: "q2", correct: false });
+    await repo.record({ userId: "u2", exam: "pd1", questionId: "q3", correct: true });
+    await repo.record({ userId: "u1", exam: "pd2", questionId: "q4", correct: true });
+    expect(Object.fromEntries(await repo.latest("u1", "pd1"))).toEqual({ q1: true, q2: false });
   });
 });

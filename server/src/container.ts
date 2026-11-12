@@ -12,6 +12,9 @@ import { SalesforceClient } from "./services/salesforce/salesforceClient.ts";
 import { systemClock, type TokenVerifier } from "./types/ports.ts";
 import { PgChallengeSubmissionRepository } from "./repositories/challengeSubmission.repository.ts";
 import { ChallengeCatalog } from "./services/challenges/catalog.ts";
+import { QuestionBank } from "./services/certification/bank.ts";
+import { CertificationService } from "./services/certification/certification.service.ts";
+import { PgCertAttemptRepository } from "./repositories/certAttempt.repository.ts";
 import { ChallengeService, type GradingDeps } from "./services/challenges/challenge.service.ts";
 
 export interface Container {
@@ -19,7 +22,11 @@ export interface Container {
   verifier?: TokenVerifier;
   salesforce?: SalesforceConnectionService;
   challenges?: ChallengeService;
+  certification?: CertificationService;
 }
+
+/** server/certification (question banks), resolved like PROBLEMS_DIR. */
+export const CERTIFICATION_DIR = new URL("../certification", import.meta.url).pathname;
 
 /** server/problems, resolved from this file so it works from src/ (tsx) and dist/ (node). */
 export const PROBLEMS_DIR = new URL("../problems", import.meta.url).pathname;
@@ -47,5 +54,10 @@ export function buildContainer(): Container {
     // Browsing needs only the database; submitting also needs `grading`.
     container.challenges = new ChallengeService(ChallengeCatalog.load(PROBLEMS_DIR), new PgChallengeSubmissionRepository(container.db), grading, systemClock);
   }
+  // No database needed to practise; attempts are saved only when there is one.
+  container.certification = new CertificationService(
+    QuestionBank.load(CERTIFICATION_DIR),
+    container.db ? new PgCertAttemptRepository(container.db) : undefined,
+  );
   return container;
 }

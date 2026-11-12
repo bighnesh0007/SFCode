@@ -3,7 +3,7 @@
  * `npm run db:generate` — never hand-edit a generated migration.
  */
 import { sql } from "drizzle-orm";
-import { index, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import type { GradeResult, SubmissionStatus } from "../../domain/challenge.ts";
 
 /**
@@ -66,4 +66,18 @@ export const challengeSubmissions = pgTable(
     // a check-then-insert that two quick clicks could race past.
     uniqueIndex("challenge_submissions_one_running_idx").on(t.userId).where(sql`${t.status} = 'running'`),
   ],
+);
+
+/** One answered Certification Prep question. Signed-in users only. */
+export const certAttempts = pgTable(
+  "cert_attempts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    exam: text("exam").notNull(),
+    questionId: text("question_id").notNull(),
+    correct: boolean("correct").notNull(),
+    answeredAt: timestamp("answered_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("cert_attempts_user_exam_idx").on(t.userId, t.exam, t.answeredAt)],
 );

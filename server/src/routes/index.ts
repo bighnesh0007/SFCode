@@ -11,6 +11,8 @@ import { validate } from "../middleware/validate.ts";
 import { ok } from "../utils/respond.ts";
 import { callbackQuery, connectBody, executeBody } from "../validation/salesforce.schema.ts";
 import { challengeController } from "../controllers/challenge.controller.ts";
+import { certificationController } from "../controllers/certification.controller.ts";
+import { answerBody, examParams, practiceQuery } from "../validation/certification.schema.ts";
 import { listQuery, slugParams, submissionParams, submitBody } from "../validation/challenge.schema.ts";
 
 function disabled(what: string): RequestHandler {
@@ -72,6 +74,19 @@ export function mountRoutes(app: Application, container: Container): void {
     ch.post("/:slug/submissions", requireAuth(verifier), limiter(6), validate({ params: slugParams, body: submitBody }), c.submit);
   }
   v1.use("/challenges", ch);
+
+  // Certification Prep works signed out; signing in only adds saved progress.
+  const cert = Router();
+  if (container.certification) {
+    const c = certificationController(container.certification);
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    cert.get("/", identify, c.list);
+    cert.get("/:exam/questions", validate({ params: examParams, query: practiceQuery }), c.practice);
+    cert.post("/answers", identify, limiter(60), validate({ body: answerBody }), c.answer);
+  } else {
+    cert.use(disabled("Certification Prep"));
+  }
+  v1.use("/certification", cert);
 
   app.use("/api/v1", v1);
   app.use(notFound);

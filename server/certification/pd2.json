@@ -1,0 +1,297 @@
+{
+  "exam": "pd2",
+  "title": "Platform Developer II",
+  "order": 2,
+  "description": "Advanced Apex, asynchronous processing, integration, performance and testing.",
+  "sections": [
+    {
+      "id": "advanced",
+      "title": "Advanced Developer Fundamentals"
+    },
+    {
+      "id": "integration",
+      "title": "Process Automation, Logic and Integration"
+    },
+    {
+      "id": "performance",
+      "title": "Performance"
+    },
+    {
+      "id": "testing",
+      "title": "Testing, Debugging and Deployment"
+    }
+  ],
+  "questions": [
+    {
+      "id": "pd2-queueable-vs-future",
+      "section": "integration",
+      "prompt": "Which **two** capabilities does Queueable Apex have that `@future` methods do not? *(Choose 2)*",
+      "options": [
+        {
+          "id": "a",
+          "text": "Accepting non-primitive types such as sObjects as job state"
+        },
+        {
+          "id": "b",
+          "text": "Chaining another job from `execute`"
+        },
+        {
+          "id": "c",
+          "text": "Making HTTP callouts"
+        },
+        {
+          "id": "d",
+          "text": "Running asynchronously"
+        }
+      ],
+      "answer": [
+        "a",
+        "b"
+      ],
+      "explanation": "Queueable jobs can hold complex state and enqueue a follow-up job, and `System.enqueueJob` returns a job Id to monitor. Both mechanisms can make callouts and both run asynchronously."
+    },
+    {
+      "id": "pd2-batch-default-scope",
+      "section": "integration",
+      "prompt": "What is the default number of records passed to each `execute` call of a Batch Apex job?",
+      "options": [
+        {
+          "id": "a",
+          "text": "100"
+        },
+        {
+          "id": "b",
+          "text": "200"
+        },
+        {
+          "id": "c",
+          "text": "2,000"
+        },
+        {
+          "id": "d",
+          "text": "50,000"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The default scope is 200. With a `QueryLocator` you can pass up to 2,000 as the second argument to `Database.executeBatch`."
+    },
+    {
+      "id": "pd2-callout-from-trigger",
+      "section": "integration",
+      "prompt": "A trigger must send record data to an external REST API. How should the callout be made?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Directly in the trigger with `Http.send()`"
+        },
+        {
+          "id": "b",
+          "text": "From an asynchronous context, e.g. `@future(callout=true)` or a Queueable that implements `Database.AllowsCallouts`"
+        },
+        {
+          "id": "c",
+          "text": "Inside `Test.startTest()`"
+        },
+        {
+          "id": "d",
+          "text": "Using a `with sharing` class"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Synchronous callouts aren't allowed from triggers, because the transaction would hold database locks while waiting on the network. Move the callout to async Apex."
+    },
+    {
+      "id": "pd2-mixed-dml",
+      "section": "advanced",
+      "prompt": "Code inserts a `User` and an `Account` in the same transaction and fails with `MIXED_DML_OPERATION`. Which fix is valid?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Insert them in the opposite order"
+        },
+        {
+          "id": "b",
+          "text": "Perform one of the DML operations in a separate transaction, e.g. a `@future` method"
+        },
+        {
+          "id": "c",
+          "text": "Use `Database.insert(records, false)`"
+        },
+        {
+          "id": "d",
+          "text": "Declare the class `without sharing`"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Setup objects (User, Group, PermissionSetAssignment…) and non-setup objects can't be modified in the same transaction. Split the work across transactions; in tests, `System.runAs` also separates them."
+    },
+    {
+      "id": "pd2-custom-metadata",
+      "section": "advanced",
+      "prompt": "Configuration records must move between orgs with the rest of a release through the Metadata API. Which feature fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Custom settings"
+        },
+        {
+          "id": "b",
+          "text": "Custom metadata types"
+        },
+        {
+          "id": "c",
+          "text": "Static resources containing JSON"
+        },
+        {
+          "id": "d",
+          "text": "A custom object"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Custom metadata type **records** are metadata, so they deploy with packages and change sets. Custom settings data and custom object records are data and have to be loaded separately."
+    },
+    {
+      "id": "pd2-platform-event-commit",
+      "section": "integration",
+      "prompt": "A platform event must be published **only if** the publishing transaction commits. Which publish behavior should the event use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Publish Immediately"
+        },
+        {
+          "id": "b",
+          "text": "Publish After Commit"
+        },
+        {
+          "id": "c",
+          "text": "Either — events always wait for commit"
+        },
+        {
+          "id": "d",
+          "text": "Neither; use a trigger on the event"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "With **Publish After Commit**, the event is sent only if the transaction succeeds. **Publish Immediately** sends it even when the transaction later rolls back — useful for logging, but wrong for business events."
+    },
+    {
+      "id": "pd2-finalizer",
+      "section": "integration",
+      "prompt": "How can a Queueable job reliably run clean-up or retry logic even when it fails with an uncatchable limit exception?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Wrap `execute` in `try/catch`"
+        },
+        {
+          "id": "b",
+          "text": "Attach a Transaction Finalizer with `System.attachFinalizer()`"
+        },
+        {
+          "id": "c",
+          "text": "Use a `finally` block"
+        },
+        {
+          "id": "d",
+          "text": "Chain a second Queueable at the end of `execute`"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A class implementing `System.Finalizer`, attached inside `execute`, runs after the job finishes, whether it succeeded or failed — including failures that `try/catch` and `finally` can't intercept."
+    },
+    {
+      "id": "pd2-selective-index",
+      "section": "performance",
+      "prompt": "Which field is **not** indexed by default, and so may make a filter non-selective on a large object?",
+      "options": [
+        {
+          "id": "a",
+          "text": "`Id`"
+        },
+        {
+          "id": "b",
+          "text": "`CreatedDate`"
+        },
+        {
+          "id": "c",
+          "text": "A lookup field"
+        },
+        {
+          "id": "d",
+          "text": "A custom text field that is not an External ID or unique"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Standard indexes cover `Id`, `Name`, `OwnerId`, `CreatedDate`, `SystemModstamp`, `RecordTypeId`, lookup and master-detail fields, plus custom fields marked External ID or unique. Other custom fields need a custom index."
+    },
+    {
+      "id": "pd2-continuation",
+      "section": "performance",
+      "prompt": "An LWC calls Apex that waits on a slow external service (around 60 seconds). Which approach avoids holding a synchronous Apex thread while waiting?",
+      "options": [
+        {
+          "id": "a",
+          "text": "`@future(callout=true)`"
+        },
+        {
+          "id": "b",
+          "text": "A `Continuation` returned from an `@AuraEnabled(continuation=true)` method"
+        },
+        {
+          "id": "c",
+          "text": "Batch Apex"
+        },
+        {
+          "id": "d",
+          "text": "Increasing the callout timeout"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Continuations make the callout asynchronously and resume Apex in a callback when the response arrives, so long waits don't count against the org's concurrent long-running request limit. A future method can't return a result to the UI."
+    },
+    {
+      "id": "pd2-callout-mock",
+      "section": "testing",
+      "prompt": "How do you test Apex that makes an HTTP callout?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Tests can make real callouts if the endpoint is in Remote Site Settings"
+        },
+        {
+          "id": "b",
+          "text": "Register a mock with `Test.setMock(HttpCalloutMock.class, new MyMock())`"
+        },
+        {
+          "id": "c",
+          "text": "Use `SeeAllData=true`"
+        },
+        {
+          "id": "d",
+          "text": "Callout code can't be covered by tests"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Real callouts are blocked in tests. An `HttpCalloutMock` implementation returns a fake response, which lets you test both success and error handling."
+    }
+  ]
+}
