@@ -1,0 +1,2 @@
+{ "title": "Accounts With a Busy Pipeline", "track": "soql", "difficulty": "Medium", "category": "Aggregates", "order": 106,
+  "tags": ["GROUP BY", "HAVING", "COUNT", "IsClosed"], "files": [{ "name": "query", "type": "soql" }], "testClass": "SfcSoqlBusyAccountsTest" }

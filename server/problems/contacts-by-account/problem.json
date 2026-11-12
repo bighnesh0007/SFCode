@@ -1,0 +1,9 @@
+{
+  "title": "Contacts by Account",
+  "difficulty": "Easy",
+  "category": "Collections",
+  "order": 7,
+  "tags": ["Map", "List", "grouping", "null safety"],
+  "files": [{ "name": "SfcContactIndex", "type": "class" }],
+  "testClass": "SfcContactIndexTest"
+}

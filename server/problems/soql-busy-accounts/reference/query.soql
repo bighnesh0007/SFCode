@@ -1,0 +1,1 @@
+SELECT AccountId, COUNT(Id) openDeals FROM Opportunity WHERE IsClosed = false GROUP BY AccountId HAVING COUNT(Id) >= 2
