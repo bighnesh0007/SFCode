@@ -35,6 +35,7 @@ export interface ContestView extends ContestSummary {
 export interface Wallet {
   earnedFromSolves: number;
   earnedFromContests: number;
+  earnedFromDaily: number;
   spent: number;
   balance: number;
 }

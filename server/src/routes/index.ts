@@ -197,6 +197,15 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.use(["/onboarding", "/roadmaps"], disabled("Roadmaps"));
   }
 
+  // Daily Challenge: public; signed-in viewers also get their own status.
+  if (container.daily) {
+    const daily = container.daily;
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    v1.get("/daily", identify, (async (req, res) => ok(res, await daily.view(req.auth?.userId ?? null))) as RequestHandler);
+  } else {
+    v1.use("/daily", disabled("The Daily Challenge"));
+  }
+
   // LWC: compile only. The learner's component runs in their own browser
   // (sandboxed iframe), never here. Anonymous, so it is rate-limited.
   const lwcRouter = Router();
