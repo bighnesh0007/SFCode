@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
-import { SignInButton, useAuth } from "@clerk/nextjs";
+import { SignInButton, useAuthState } from "@/components/auth";
 // The namespace handed to onMount; imported for its type only (no bundle cost).
 type Monaco = typeof import("monaco-editor");
 import { ChevronLeft, Cloud, Info, Loader2, RotateCcw, Send } from "lucide-react";
@@ -42,7 +42,7 @@ function readDraft(challenge: ChallengeView): Record<string, string> {
 
 export function Workspace({ challenge, backHref }: { challenge: ChallengeView; backHref: string }) {
   const { resolvedTheme } = useTheme();
-  const { isSignedIn, getToken } = useAuth();
+  const { isSignedIn, getToken } = useAuthState();
   const { state: org } = useOrgConnection();
   // Lazy init: the editor is client-only, so this never reaches server-rendered markup.
   const [sources, setSources] = useState<Record<string, string>>(() => readDraft(challenge));
@@ -167,7 +167,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
         {/* ── statement / submissions ─────────────────────────────────── */}
         <ResizablePanel defaultSize="40%" minSize="25%">
           <div className="flex h-full flex-col">
-            <div className="flex items-center gap-1 border-b px-2 py-1.5">
+            <div className="flex h-10 items-center gap-1 border-b px-2">
               <Link href={backHref} className="mr-1 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label="Back to the list">
                 <ChevronLeft className="h-4 w-4" />
               </Link>
@@ -207,7 +207,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
                   </div>
                 </>
               ) : (
-                <SubmissionList history={history} signedIn={Boolean(isSignedIn)} onOpen={(id) => void openSubmission(id)} selected={submission?.id ?? null} />
+                <SubmissionList history={history} signedIn={isSignedIn} onOpen={(id) => void openSubmission(id)} selected={submission?.id ?? null} />
               )}
             </div>
           </div>
@@ -219,13 +219,16 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
           <ResizablePanelGroup orientation="vertical">
             <ResizablePanel defaultSize="62%" minSize="20%">
               <div className="flex h-full flex-col">
-                <div className="flex flex-wrap items-center gap-1 border-b px-2 py-1.5">
-                  {challenge.files.map((f) => (
-                    <button key={f.name} type="button" onClick={() => setActive(f.name)} className={cn("rounded-md px-2.5 py-1 font-mono text-xs", active === f.name ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground")}>
-                      {f.fileName}
-                    </button>
-                  ))}
-                  <div className="ml-auto flex items-center gap-2">
+                {/* One row: file tabs scroll sideways rather than wrapping the toolbar. */}
+                <div className="flex h-10 items-center gap-2 border-b px-2">
+                  <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
+                    {challenge.files.map((f) => (
+                      <button key={f.name} type="button" onClick={() => setActive(f.name)} className={cn("shrink-0 rounded-md px-2.5 py-1 font-mono text-xs", active === f.name ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground")}>
+                        {f.fileName}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
                     <OrgGate org={org} />
                     <Button size="sm" variant="ghost" onClick={reset} title="Reset to starter code">
                       <RotateCcw className="h-3.5 w-3.5" />
@@ -275,7 +278,7 @@ function OrgGate({ org }: { org: ReturnType<typeof useOrgConnection>["state"] })
       return <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />;
     case "signed-out":
       return (
-        <SignInButton mode="modal">
+        <SignInButton>
           <Button size="sm" variant="outline">Sign in to submit</Button>
         </SignInButton>
       );

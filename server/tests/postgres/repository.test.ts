@@ -15,6 +15,12 @@ import type { GradeResult } from "../../src/domain/challenge.ts";
 const url = process.env.TEST_DATABASE_URL;
 const safe = url !== undefined && new URL(url).pathname.endsWith("_test");
 
+// Locally these skip without a test database. In CI a skip would be a silent
+// pass, so it is an error instead.
+if (process.env.CI && !safe) {
+  throw new Error("CI must set TEST_DATABASE_URL to a database whose name ends in _test");
+}
+
 describe.skipIf(!safe)("PgSalesforceConnectionRepository", () => {
   let db: PgDatabase;
   let repo: PgSalesforceConnectionRepository;

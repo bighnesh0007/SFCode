@@ -3,130 +3,98 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Cloud, Menu, X } from "lucide-react";
-import { SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/nextjs";
+import { Menu, X } from "lucide-react";
+import { LocalModeBadge, SignInButton, SignUpButton, UserButton, useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "@/components/mode-toggle";
 import { OrgBadge } from "@/components/OrgBadge";
-import { FEATURES } from "@/lib/features";
 import { cn } from "@/lib/utils";
 
-const PRIMARY = FEATURES.filter((f) => f.primary);
-const MORE = FEATURES.filter((f) => !f.primary);
+/** Built sections only; unbuilt features stay out of the nav until they exist. */
+const NAV = [
+  { href: "/problems", label: "Problems", match: ["/problems", "/challenges", "/soql", "/debugging"] },
+  { href: "/playground/apex", label: "Playground", match: ["/playground"] },
+  { href: "/certification", label: "Certification", match: ["/certification"] },
+];
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { isSignedIn } = useAuth();
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { isSignedIn } = useAuthState();
+  const [open, setOpen] = useState(false);
+  const active = (match: string[]) => match.some((m) => pathname === m || pathname.startsWith(`${m}/`));
 
   return (
-    <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container flex h-14 items-center max-w-screen-2xl mx-auto px-3 sm:px-4">
-        <div className="mr-2 flex min-w-0 items-center md:mr-4">
-          <Link href="/" className="mr-2 flex items-center space-x-2 md:mr-5">
-            <Cloud className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold tracking-tight text-primary sm:text-xl">SFCode</span>
-          </Link>
-          <nav className="hidden items-center space-x-0.5 text-sm font-medium md:flex">
-            {PRIMARY.map(({ href, nav, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                className={cn(
-                  "flex items-center px-2.5 py-1.5 rounded-md transition-colors hover:text-foreground hover:bg-accent text-[13px]",
-                  pathname.startsWith(href) ? "text-foreground font-semibold bg-accent/60" : "text-foreground/60",
-                )}
-              >
-                <Icon className="w-3.5 h-3.5 mr-1" />
-                {nav}
-              </Link>
-            ))}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center px-2.5 py-1.5 rounded-md text-[13px] text-foreground/60 transition-colors hover:bg-accent hover:text-foreground">
-                More
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                {MORE.map(({ href, title, icon: Icon }) => (
-                  <DropdownMenuItem key={href} render={<Link href={href} />}>
-                    <Icon className="w-3.5 h-3.5" />
-                    {title}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </nav>
-        </div>
+    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <div className="mx-auto flex h-12 max-w-screen-2xl items-center gap-6 px-4">
+        <Link href="/" className="flex items-center gap-1.5 text-[15px] font-semibold tracking-tight">
+          <span className="grid h-6 w-6 place-items-center rounded-md bg-primary text-[11px] font-bold text-primary-foreground">SF</span>
+          SFCode
+        </Link>
 
-        <div className="hidden flex-1 items-center justify-end space-x-2 md:flex">
-          <nav className="flex items-center gap-1">
-            <ModeToggle />
-            {!isSignedIn ? (
-              <>
-                <SignInButton mode="modal">
-                  <Button variant="ghost" size="sm" className="text-[13px] font-medium text-foreground/60 hover:text-foreground">
-                    Sign In
-                  </Button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <Button size="sm" className="text-[13px] font-medium">
-                    Sign Up
-                  </Button>
-                </SignUpButton>
-              </>
-            ) : (
-              <>
-                <OrgBadge />
-                <UserButton />
-              </>
-            )}
-          </nav>
+        <nav className="hidden h-full items-center gap-5 text-sm md:flex">
+          {NAV.map((n) => (
+            <Link
+              key={n.href}
+              href={n.href}
+              aria-current={active(n.match) ? "page" : undefined}
+              className={cn(
+                "flex h-full items-center border-b-2 transition-colors",
+                active(n.match) ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {n.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="ml-auto hidden items-center gap-2 md:flex">
+          <LocalModeBadge />
+          {isSignedIn && <OrgBadge />}
+          <ModeToggle />
+          {isSignedIn ? (
+            <UserButton />
+          ) : (
+            <>
+              <SignInButton>
+                <Button variant="ghost" size="sm">Sign in</Button>
+              </SignInButton>
+              <SignUpButton>
+                <Button size="sm">Sign up</Button>
+              </SignUpButton>
+            </>
+          )}
         </div>
 
         <div className="ml-auto flex items-center gap-1 md:hidden">
           <ModeToggle />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => setMobileOpen((open) => !open)}
-            aria-expanded={mobileOpen}
-            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          <Button type="button" variant="ghost" size="icon" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"}>
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
       </div>
 
-      {mobileOpen && (
-        <div className="border-t bg-background/98 px-3 py-3 shadow-lg md:hidden">
-          <nav className="grid grid-cols-2 gap-1">
-            {[...FEATURES, { href: "/settings/org", nav: "Salesforce Org" }].map(({ href, nav }) => (
+      {open && (
+        <div className="border-t px-4 py-3 md:hidden">
+          <nav className="flex flex-col">
+            {[...NAV, { href: "/settings/org", label: "Salesforce org", match: ["/settings"] }].map((n) => (
               <Link
-                key={href}
-                href={href}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  "rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                  pathname.startsWith(href) ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
+                key={n.href}
+                href={n.href}
+                onClick={() => setOpen(false)}
+                className={cn("rounded-md px-2 py-2 text-sm", active(n.match) ? "bg-accent font-medium" : "text-muted-foreground")}
               >
-                {nav}
+                {n.label}
               </Link>
             ))}
           </nav>
           <div className="mt-3 flex items-center gap-2 border-t pt-3">
-            {!isSignedIn ? (
-              <>
-                <SignInButton mode="modal">
-                  <Button variant="outline" className="flex-1">Sign In</Button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <Button className="flex-1">Sign Up</Button>
-                </SignUpButton>
-              </>
-            ) : (
+            <LocalModeBadge />
+            {isSignedIn ? (
               <UserButton />
+            ) : (
+              <SignInButton>
+                <Button variant="outline" size="sm" className="w-full">Sign in</Button>
+              </SignInButton>
             )}
           </div>
         </div>

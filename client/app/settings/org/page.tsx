@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { SignInButton, useAuth } from "@clerk/nextjs";
+import { SignInButton, useAuthState } from "@/components/auth";
 import { AlertTriangle, CheckCircle2, Cloud, Loader2, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,7 +25,7 @@ type Env = "production" | "sandbox" | "custom";
 
 function OrgSettings() {
   const params = useSearchParams();
-  const { getToken } = useAuth();
+  const { getToken } = useAuthState();
   const { state, refresh } = useOrgConnection();
   const [env, setEnv] = useState<Env>("production");
   const [domain, setDomain] = useState("");
@@ -89,7 +89,7 @@ function OrgSettings() {
           <CardHeader>
             <CardTitle>Sign in first</CardTitle>
             <CardDescription>Your org connection is tied to your SFCode account.</CardDescription>
-            <SignInButton mode="modal">
+            <SignInButton>
               <Button className="mt-4 w-fit">Sign in</Button>
             </SignInButton>
           </CardHeader>

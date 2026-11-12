@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAuthState } from "@/components/auth";
 import { useCallback, useEffect, useState } from "react";
 import { ApiError } from "@/lib/apiClient";
 import { getConnection, type OrgConnection } from "@/lib/salesforceApi";
@@ -14,7 +14,7 @@ export type OrgState =
 
 /** The signed-in user's org connection, re-fetchable after connect/disconnect. */
 export function useOrgConnection(): { state: OrgState; refresh: () => void } {
-  const { isLoaded, isSignedIn, getToken } = useAuth();
+  const { isLoaded, isSignedIn, getToken } = useAuthState();
   const [fetched, setFetched] = useState<OrgState>({ kind: "loading" });
   const [tick, setTick] = useState(0);
 

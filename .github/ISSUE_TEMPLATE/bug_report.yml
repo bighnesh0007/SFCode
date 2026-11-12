@@ -1,0 +1,25 @@
+name: Bug report
+description: Something on SFCode doesn't work as it should.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations: { required: true }
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Go to /challenges/text-utils\n2. Submit …\n3. See …"
+    validations: { required: true }
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: URL or "local", plus browser.
+  - type: textarea
+    id: extra
+    attributes:
+      label: Request id, logs or screenshots
+      description: API errors include a requestId — paste it. Never paste tokens or keys.

@@ -1,5 +1,5 @@
 import express, { Router, type Application, type RequestHandler } from "express";
-import { rateLimit } from "express-rate-limit";
+import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 import { hasCapability } from "../config/index.ts";
 import type { Container } from "../container.ts";
 import { salesforceController } from "../controllers/salesforce.controller.ts";
@@ -26,7 +26,10 @@ function limiter(perMinute: number): RequestHandler {
     limit: perMinute,
     standardHeaders: "draft-8",
     legacyHeaders: false,
-    keyGenerator: (req) => req.auth?.userId ?? req.ip ?? "unknown",
+    // Signed-in users by id; anonymous ones by IP, with IPv6 grouped to its /56
+    // (ipKeyGenerator) — keying on the raw address let a client rotate through
+    // its own IPv6 block to bypass the limit.
+    keyGenerator: (req) => req.auth?.userId ?? ipKeyGenerator(req.ip ?? "unknown"),
     handler: (_req, _res, next) => next(new RateLimitError("Too many requests.", 60)),
   });
 }
@@ -59,19 +62,20 @@ export function mountRoutes(app: Application, container: Container): void {
 
   const ch = Router();
   const { challenges } = container;
-  if (!verifier) {
-    ch.use(disabled("Sign-in"));
-  } else if (!challenges) {
+  if (!challenges) {
     ch.use(disabled("The Apex Challenge Arena"));
   } else {
     const c = challengeController(challenges);
-    // Browsing is public; progress markers appear when signed in.
-    ch.get("/", optionalAuth(verifier), validate({ query: listQuery }), c.list);
+    // Browsing never needs an account (contributors run without Clerk);
+    // progress markers appear when someone is signed in.
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
+    ch.get("/", identify, validate({ query: listQuery }), c.list);
     // Static path before /:slug so "submissions" is never read as a slug.
-    ch.get("/submissions/:id", requireAuth(verifier), validate({ params: submissionParams }), c.submission);
+    ch.get("/submissions/:id", signedIn, validate({ params: submissionParams }), c.submission);
     ch.get("/:slug", validate({ params: slugParams }), c.get);
-    ch.get("/:slug/submissions", requireAuth(verifier), validate({ params: slugParams }), c.history);
-    ch.post("/:slug/submissions", requireAuth(verifier), limiter(6), validate({ params: slugParams, body: submitBody }), c.submit);
+    ch.get("/:slug/submissions", signedIn, validate({ params: slugParams }), c.history);
+    ch.post("/:slug/submissions", signedIn, limiter(6), validate({ params: slugParams, body: submitBody }), c.submit);
   }
   v1.use("/challenges", ch);
 

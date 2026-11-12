@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
-import { SignInButton, useAuth } from "@clerk/nextjs";
+import { SignInButton, useAuthState } from "@/components/auth";
 import { AlertTriangle, CheckCircle2, Cloud, Loader2, Play, XCircle } from "lucide-react";
 import type { OnMount } from "@monaco-editor/react";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -39,7 +39,7 @@ function readDraft(): string {
 
 export default function ApexPlayground() {
   const { resolvedTheme } = useTheme();
-  const { getToken } = useAuth();
+  const { getToken } = useAuthState();
   const { state: org } = useOrgConnection();
   // Lazy init: the editor is client-only (ssr: false), so a server/client
   // difference in this value never reaches hydrated markup.
@@ -154,7 +154,7 @@ function OrgStatus({ org }: { org: ReturnType<typeof useOrgConnection>["state"] 
       return <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />;
     case "signed-out":
       return (
-        <SignInButton mode="modal">
+        <SignInButton>
           <Button size="sm" variant="outline">Sign in to run</Button>
         </SignInButton>
       );
