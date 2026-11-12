@@ -108,8 +108,8 @@ export function SearchPalette({ shortcut = false }: { shortcut?: boolean }) {
         aria-label="Search (Ctrl+K)"
       >
         <Search className="h-3.5 w-3.5" />
-        <span className="hidden lg:inline">Search</span>
-        <kbd className="hidden rounded border px-1 font-mono text-[10px] lg:inline">⌘K</kbd>
+        <span className="hidden xl:inline">Search</span>
+        <kbd className="hidden rounded border px-1 font-mono text-[10px] xl:inline">⌘K</kbd>
       </button>
 
       {open && (

@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 /** Built sections only; unbuilt features stay out of the nav until they exist. */
 const NAV = [
   { href: "/problems", label: "Problems", match: ["/problems", "/challenges", "/soql", "/debugging", "/flows", "/lwc"] },
+  { href: "/roadmap", label: "Roadmap", match: ["/roadmap", "/welcome"] },
   { href: "/playground/apex", label: "Playground", match: ["/playground"] },
   { href: "/certification", label: "Certification", match: ["/certification"] },
   { href: "/leaderboard", label: "Leaderboard", match: ["/leaderboard", "/u"] },
@@ -47,13 +48,13 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="mx-auto flex h-12 max-w-screen-2xl items-center gap-6 px-4">
+      <div className="mx-auto flex h-12 max-w-screen-2xl items-center gap-4 px-4 xl:gap-6">
         <Link href="/" className="flex items-center gap-1.5 text-[15px] font-semibold tracking-tight">
           <LogoMark size={24} />
           <span>SF<span className="text-sky-500">Code</span></span>
         </Link>
 
-        <nav className="hidden h-full items-center gap-5 whitespace-nowrap text-sm lg:flex">
+        <nav className="hidden h-full items-center gap-3.5 whitespace-nowrap text-sm lg:flex xl:gap-5">
           {NAV.map((n) => (
             <Link
               key={n.href}

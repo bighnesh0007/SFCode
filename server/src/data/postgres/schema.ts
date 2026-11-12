@@ -215,3 +215,17 @@ export const userEquipped = pgTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.slot] })],
 );
+
+/** One row per user, written once by the welcome quiz (and again if they redo it). */
+export const userOnboarding = pgTable("user_onboarding", {
+  userId: text("user_id").primaryKey(),
+  role: text("role").notNull(),
+  level: text("level").notNull(),
+  goal: text("goal").notNull(),
+  hours: text("hours").notNull(),
+  roadmapId: text("roadmap_id").notNull(),
+  /** Lesson-only nodes the user marked as read (problem nodes complete by solving). */
+  readNodes: jsonb("read_nodes").$type<string[]>().notNull().default([]),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});

@@ -1,0 +1,76 @@
+{
+  "id": "developer",
+  "title": "Salesforce Developer",
+  "description": "From the data model to PD II: SOQL, Flows, Apex, triggers, limits, async and LWC, practised on real problems graded in your org.",
+  "nodes": [
+    {
+      "id": "data-model", "title": "Data model", "level": 1, "col": 1, "requires": [],
+      "summary": "Objects, fields, relationships and how records connect.",
+      "lesson": "Everything in Salesforce is a **record** of an **object** (Account, Contact, Opportunity, or your own `Thing__c`). Objects have **fields**; custom ones end in `__c`.\n\nRelationships link objects:\n\n- **Lookup**: a loose link (a Contact *looks up* to an Account). Deleting the parent doesn't delete the child.\n- **Master-detail**: a tight link. The child inherits sharing and is deleted with the parent; the parent can have **roll-up summary** fields.\n\nYou'll query these relationships in SOQL next: child-to-parent with dots (`Account.Name`), parent-to-child with subqueries (`(SELECT Id FROM Contacts)`).",
+      "problems": [], "cert": { "exam": "pd1", "section": "fundamentals" }
+    },
+    {
+      "id": "soql-basics", "title": "SOQL basics", "level": 1, "col": 0, "requires": ["data-model"],
+      "summary": "SELECT, WHERE, ORDER BY and parent fields.",
+      "problems": ["soql-hot-tech-accounts", "soql-contacts-in-city"]
+    },
+    {
+      "id": "flow-basics", "title": "Before-save Flows", "level": 1, "col": 2, "requires": ["data-model"],
+      "summary": "Automate field updates without code.",
+      "problems": ["flow-account-default-rating", "flow-won-next-step"]
+    },
+    {
+      "id": "apex-basics", "title": "Apex basics", "level": 2, "col": 0, "requires": ["soql-basics"],
+      "summary": "Classes, methods, collections and null safety.",
+      "problems": ["text-utils", "debug-null-discount", "debug-off-by-one-buckets"], "cert": { "exam": "pd1", "section": "logic" }
+    },
+    {
+      "id": "soql-advanced", "title": "Aggregates & subqueries", "level": 2, "col": 1, "requires": ["soql-basics"],
+      "summary": "GROUP BY, semi-joins and anti-joins.",
+      "problems": ["soql-pipeline-by-stage", "soql-accounts-without-contacts", "soql-accounts-with-won-deals"]
+    },
+    {
+      "id": "flow-advanced", "title": "Decisions, loops & after-save", "level": 2, "col": 2, "requires": ["flow-basics"],
+      "summary": "Branching, collections and autolaunched flows.",
+      "problems": ["flow-key-account-task", "flow-shipping-cost", "flow-revenue-tier", "flow-won-total-loop"]
+    },
+    {
+      "id": "triggers", "title": "Triggers", "level": 3, "col": 0, "requires": ["apex-basics"],
+      "summary": "Before/after context, bulk-safe patterns, recursion.",
+      "problems": ["account-rating-default", "protect-closed-won", "won-revenue-rollup", "debug-recursive-trigger"]
+    },
+    {
+      "id": "testing", "title": "Apex testing", "level": 3, "col": 1, "requires": ["apex-basics"],
+      "summary": "Test classes, test data, asserts and 75% coverage.",
+      "lesson": "Every SFCode problem is graded by a hidden **test class**, the same way Salesforce gates production deploys.\n\n- Mark classes `@IsTest`; methods `@IsTest static void ...`.\n- Create your own data in the test. Never rely on org data (`SeeAllData=true`).\n- Wrap the action in `Test.startTest()` / `Test.stopTest()`: you get fresh governor limits, and async work runs at `stopTest`.\n- Assert outcomes with `Assert.areEqual(expected, actual, message)`.\n- Production deploys need **75%** coverage overall and every trigger covered.\n\nTest **bulk**: insert 200 records, not 1.",
+      "problems": [], "cert": { "exam": "pd1", "section": "testing" }
+    },
+    {
+      "id": "lwc", "title": "Lightning Web Components", "level": 3, "col": 2, "requires": ["apex-basics"],
+      "summary": "Reactivity, events and rendering lists.",
+      "problems": ["lwc-click-counter", "lwc-star-rating", "lwc-contact-filter"], "cert": { "exam": "pd1", "section": "ui" }
+    },
+    {
+      "id": "governor-limits", "title": "Governor limits", "level": 4, "col": 0, "requires": ["triggers", "soql-advanced"],
+      "summary": "No SOQL or DML in loops; work in sets and maps.",
+      "problems": ["debug-soql-in-loop"], "cert": { "exam": "pd2", "section": "performance" }
+    },
+    {
+      "id": "pd1-ready", "title": "PD I checkpoint", "level": 4, "col": 1, "requires": ["triggers", "testing", "flow-advanced", "lwc"],
+      "summary": "You've covered the PD I syllabus. Drill the exam questions.",
+      "lesson": "Time to test yourself. Do a full **PD I practice exam** in Certification Prep, then review every miss: the explanation tells you which roadmap node to revisit.",
+      "problems": [], "cert": { "exam": "pd1" }
+    },
+    {
+      "id": "async", "title": "Async Apex", "level": 4, "col": 2, "requires": ["governor-limits"],
+      "summary": "Queueable, future and Batch Apex.",
+      "problems": ["sync-contact-city", "close-stale-opportunities"], "cert": { "exam": "pd2", "section": "advanced" }
+    },
+    {
+      "id": "pd2-ready", "title": "PD II checkpoint", "level": 4, "col": 1, "requires": ["async", "pd1-ready"],
+      "summary": "Advanced Apex, integration and performance.",
+      "lesson": "PD II leans on design judgement: which async tool, how to stay under limits at scale, and how to integrate. Do a **PD II practice exam** and revisit the nodes behind each miss.",
+      "problems": [], "cert": { "exam": "pd2" }
+    }
+  ]
+}

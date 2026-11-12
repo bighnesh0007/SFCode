@@ -18,8 +18,8 @@ import { compileLwc } from "../services/lwc/compiler.ts";
 import { communityController } from "../controllers/community.controller.ts";
 import { adminController } from "../controllers/admin.controller.ts";
 import { blogController } from "../controllers/blog.controller.ts";
-import { contestController, storeController } from "../controllers/contest.controller.ts";
-import { contestSlugParams, createContestBody, equipBody, storeItemBody } from "../validation/contest.schema.ts";
+import { contestController, roadmapController, storeController } from "../controllers/contest.controller.ts";
+import { contestSlugParams, createContestBody, equipBody, onboardingBody, roadmapParams, roadmapReadBody, storeItemBody } from "../validation/contest.schema.ts";
 import { blogListQuery, blogSlugParams, commentBody, commentParams, hideBody, postBody, postPatchBody, voteBody } from "../validation/blog.schema.ts";
 import { adminUsersQuery, roleBody } from "../validation/admin.schema.ts";
 import { handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
@@ -179,6 +179,20 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.post("/store/equip", signedIn, limiter(40), validate({ body: equipBody }), st.equip);
   } else {
     v1.use("/store", disabled("The store"));
+  }
+
+  // Onboarding quiz and roadmaps: roadmaps are public; progress and the quiz need sign-in.
+  if (container.roadmaps) {
+    const r = roadmapController(container.roadmaps);
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
+    v1.get("/onboarding", signedIn, r.onboarding);
+    v1.put("/onboarding", signedIn, limiter(20), validate({ body: onboardingBody }), r.saveOnboarding);
+    v1.get("/roadmaps", r.list);
+    v1.get("/roadmaps/:id", identify, validate({ params: roadmapParams }), r.view);
+    v1.post("/roadmaps/:id/read", signedIn, limiter(60), validate({ params: roadmapParams, body: roadmapReadBody }), r.read);
+  } else {
+    v1.use(["/onboarding", "/roadmaps"], disabled("Roadmaps"));
   }
 
   // LWC: compile only. The learner's component runs in their own browser

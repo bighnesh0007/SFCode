@@ -21,6 +21,9 @@ import { AdminService } from "./services/admin/admin.service.ts";
 import { PgAdminRepository } from "./repositories/admin.repository.ts";
 import { PgBlogRepository } from "./repositories/blog.repository.ts";
 import { BlogService } from "./services/blog/blog.service.ts";
+import { loadRoadmaps } from "./domain/roadmap.ts";
+import { PgOnboardingRepository } from "./repositories/onboarding.repository.ts";
+import { RoadmapService } from "./services/roadmap/roadmap.service.ts";
 import { PgContestRepository } from "./repositories/contest.repository.ts";
 import { PgStoreRepository } from "./repositories/store.repository.ts";
 import { ContestService } from "./services/contests/contest.service.ts";
@@ -39,12 +42,15 @@ export interface Container {
   blog?: BlogService;
   contests?: ContestService;
   store?: StoreService;
+  roadmaps?: RoadmapService;
 }
 
 /** server/certification (question banks), resolved like PROBLEMS_DIR. */
 export const CERTIFICATION_DIR = new URL("../certification", import.meta.url).pathname;
 
 /** server/problems, resolved from this file so it works from src/ (tsx) and dist/ (node). */
+/** server/roadmaps (learning paths), resolved like PROBLEMS_DIR. */
+export const ROADMAPS_DIR = new URL("../roadmaps", import.meta.url).pathname;
 export const PROBLEMS_DIR = new URL("../problems", import.meta.url).pathname;
 
 export function buildContainer(): Container {
@@ -69,6 +75,11 @@ export function buildContainer(): Container {
   // Loading validates every problem; a broken one stops startup on purpose.
   // Browsing needs nothing (contributors run without accounts or a database);
   // submissions need the database, and grading also needs Salesforce.
+  // Loaded even without a database so broken roadmap content fails startup and tests.
+  const roadmaps = loadRoadmaps(ROADMAPS_DIR, (slug) => catalog.get(slug) !== undefined);
+  if (container.db) {
+    container.roadmaps = new RoadmapService(roadmaps, catalog, new PgOnboardingRepository(container.db), new PgChallengeSubmissionRepository(container.db));
+  }
   const contestRepo = container.db ? new PgContestRepository(container.db) : undefined;
   container.challenges = new ChallengeService(
     catalog,
