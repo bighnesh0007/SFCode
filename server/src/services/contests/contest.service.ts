@@ -21,6 +21,8 @@ export const PENALTY_PER_WRONG = 5;
 const COUNTED_WRONG = new Set(["wrong_answer", "compile_error", "coverage"]);
 /** Coins for the top three of a finished contest with a positive score. */
 export const PRIZES = [100, 50, 25] as const;
+/** After this long past the end, a contest's results are final and cached. */
+const SETTLE_MS = 60 * 60_000;
 
 export type ContestPhase = "upcoming" | "live" | "ended";
 
@@ -141,12 +143,27 @@ export class ContestService {
   }
 
   /** Final placements of every ended contest: userId → coins won. */
+  /**
+   * Final results of a finished contest. Cached once settled (an hour past the
+   * end, so in-window submissions have finished grading): results can't
+   * change after that, and prizes() / history() would otherwise recompute
+   * every past contest on each wallet or profile read.
+   */
+  private settled = new Map<string, { userId: string; rank: number; score: number }[]>();
+  private async finalRows(c: ContestRecord): Promise<{ userId: string; rank: number; score: number }[]> {
+    const hit = this.settled.get(c.id);
+    if (hit) return hit;
+    const rows = (await this.standings(c)).map((r) => ({ userId: r.userId, rank: r.rank, score: r.score }));
+    if (this.clock.nowMs() >= c.endsAt.getTime() + SETTLE_MS) this.settled.set(c.id, rows);
+    return rows;
+  }
+
   /** Finished contests the user entered, newest first, with their rank. */
   async history(userId: string): Promise<{ slug: string; title: string; endsAt: string; rank: number; entrants: number; score: number }[]> {
     const out: { slug: string; title: string; endsAt: string; rank: number; entrants: number; score: number }[] = [];
     for (const c of await this.repo.list()) {
       if (this.phase(c) !== "ended") continue;
-      const rows = await this.standings(c);
+      const rows = await this.finalRows(c);
       const mine = rows.find((r) => r.userId === userId);
       if (mine) out.push({ slug: c.slug, title: c.title, endsAt: c.endsAt.toISOString(), rank: mine.rank, entrants: rows.length, score: mine.score });
     }
@@ -157,7 +174,7 @@ export class ContestService {
     const won = new Map<string, number>();
     for (const c of await this.repo.list()) {
       if (this.phase(c) !== "ended") continue;
-      (await this.standings(c)).forEach((row, i) => {
+      (await this.finalRows(c)).forEach((row, i) => {
         const prize = PRIZES[i];
         if (prize !== undefined && row.score > 0) won.set(row.userId, (won.get(row.userId) ?? 0) + prize);
       });

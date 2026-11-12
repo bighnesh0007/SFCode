@@ -40,7 +40,7 @@ export class StoreService {
   ) {}
 
   async wallet(userId: string): Promise<Wallet> {
-    const solves = (await this.submissions.firstSolves()).filter((s) => s.userId === userId);
+    const solves = await this.submissions.firstSolves(undefined, userId);
     const earnedFromSolves = solves.reduce((n, s) => {
       const c = this.catalog.get(s.slug);
       return c && SCORED_TRACKS.includes(c.track) ? n + pointsFor(c.difficulty) : n;
