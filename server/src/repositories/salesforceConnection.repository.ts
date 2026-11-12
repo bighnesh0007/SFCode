@@ -29,7 +29,12 @@ export interface PendingHandshake {
 export interface SalesforceConnectionRepository {
   findByUser(userId: string): Promise<StoredConnection | null>;
   upsert(conn: Omit<StoredConnection, "connectedAt">): Promise<void>;
-  updateAccessToken(userId: string, accessTokenEnc: string, instanceUrl: string): Promise<void>;
+  /**
+   * Store the result of a token refresh. `refreshTokenEnc` is set when the
+   * org rotates refresh tokens: the old one stops working once a new one is
+   * issued, so it must be replaced in the same write.
+   */
+  updateTokens(userId: string, tokens: { accessTokenEnc: string; instanceUrl: string; refreshTokenEnc?: string }): Promise<void>;
   delete(userId: string): Promise<boolean>;
   savePending(p: PendingHandshake): Promise<void>;
   /** Atomically delete and return an unexpired handshake; null if absent, expired or already used. */
@@ -75,10 +80,15 @@ export class PgSalesforceConnectionRepository implements SalesforceConnectionRep
       .onConflictDoUpdate({ target: salesforceConnections.userId, set: { ...values, connectedAt: now, updatedAt: now } });
   }
 
-  async updateAccessToken(userId: string, accessTokenEnc: string, instanceUrl: string): Promise<void> {
+  async updateTokens(userId: string, tokens: { accessTokenEnc: string; instanceUrl: string; refreshTokenEnc?: string }): Promise<void> {
     await this.db
       .update(salesforceConnections)
-      .set({ accessTokenEnc, instanceUrl, updatedAt: new Date() })
+      .set({
+        accessTokenEnc: tokens.accessTokenEnc,
+        instanceUrl: tokens.instanceUrl,
+        ...(tokens.refreshTokenEnc ? { refreshTokenEnc: tokens.refreshTokenEnc } : {}),
+        updatedAt: new Date(),
+      })
       .where(eq(salesforceConnections.userId, userId));
   }
 

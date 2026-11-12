@@ -14,9 +14,9 @@ export class MemoryConnectionRepository implements SalesforceConnectionRepositor
     this.connections.set(conn.userId, { ...conn, connectedAt: new Date(0) });
     return Promise.resolve();
   }
-  updateAccessToken(userId: string, accessTokenEnc: string, instanceUrl: string) {
+  updateTokens(userId: string, tokens: { accessTokenEnc: string; instanceUrl: string; refreshTokenEnc?: string }) {
     const c = this.connections.get(userId);
-    if (c) this.connections.set(userId, { ...c, accessTokenEnc, instanceUrl });
+    if (c) this.connections.set(userId, { ...c, accessTokenEnc: tokens.accessTokenEnc, instanceUrl: tokens.instanceUrl, ...(tokens.refreshTokenEnc ? { refreshTokenEnc: tokens.refreshTokenEnc } : {}) });
     return Promise.resolve();
   }
   delete(userId: string) {

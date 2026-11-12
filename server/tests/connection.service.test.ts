@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it } from "vitest";
-import { decryptToken } from "../src/lib/crypto/tokenCipher.ts";
+import { decryptToken, encryptToken } from "../src/lib/crypto/tokenCipher.ts";
 import { OrgNotConnectedError, SalesforceConnectionService } from "../src/services/salesforce/connection.service.ts";
 import { SalesforceClient } from "../src/services/salesforce/salesforceClient.ts";
 import { fixedClock, json, MemoryConnectionRepository, scriptedFetch } from "./fakes.ts";
@@ -138,6 +138,48 @@ describe("SalesforceConnectionService — executeAnonymous", () => {
     expect((await s.service.executeAnonymous("user_1", "x")).success).toBe(true);
     expect(soapCalls).toBe(2);
     expect(decryptToken(s.repo.connections.get("user_1")?.accessTokenEnc ?? "", tokenKey)).toBe("AT2");
+  });
+
+  it("stores a rotated refresh token, so the next refresh uses it", async () => {
+    let soapCalls = 0;
+    const refreshTokensSent: string[] = [];
+    const s = setup((c) => {
+      if (c.url.includes("/services/Soap/")) return ++soapCalls % 2 === 1 ? xml(500, fixture("invalidSession.xml")) : xml(200, fixture("executeAnonymous-success.xml"));
+      const form = new URLSearchParams(c.body);
+      if (form.get("grant_type") === "refresh_token") {
+        const sent = form.get("refresh_token") ?? "";
+        refreshTokensSent.push(sent);
+        // Rotation: each refresh token works once and yields a new one.
+        if (sent !== `RT${refreshTokensSent.length}`) return json(400, { error: "invalid_grant" });
+        return json(200, { access_token: `AT${refreshTokensSent.length + 1}`, refresh_token: `RT${refreshTokensSent.length + 1}`, instance_url: INSTANCE });
+      }
+      return happyOAuth(c);
+    });
+    await connect(s);
+    expect((await s.service.executeAnonymous("user_1", "x")).success).toBe(true);
+    expect((await s.service.executeAnonymous("user_1", "x")).success).toBe(true);
+    expect(refreshTokensSent).toEqual(["RT1", "RT2"]);
+    expect(decryptToken(s.repo.connections.get("user_1")?.refreshTokenEnc ?? "", tokenKey)).toBe("RT3");
+  });
+
+  it("keeps the connection when a concurrent request already rotated the token", async () => {
+    const s = setup((c) => {
+      if (c.url.includes("/services/Soap/")) {
+        // Only the stale token's session is expired; the rotated one works.
+        return c.body.includes("AT-fresh") ? xml(200, fixture("executeAnonymous-success.xml")) : xml(500, fixture("invalidSession.xml"));
+      }
+      const form = new URLSearchParams(c.body);
+      if (form.get("grant_type") === "refresh_token") {
+        // Simulate the other request winning the race while ours was in flight.
+        const conn = s.repo.connections.get("user_1");
+        if (conn) s.repo.connections.set("user_1", { ...conn, accessTokenEnc: encryptToken("AT-fresh", tokenKey), refreshTokenEnc: encryptToken("RT-fresh", tokenKey) });
+        return json(400, { error: "invalid_grant" });
+      }
+      return happyOAuth(c);
+    });
+    await connect(s);
+    expect((await s.service.executeAnonymous("user_1", "x")).success).toBe(true);
+    expect(s.repo.connections.has("user_1")).toBe(true);
   });
 
   it("drops a connection whose refresh token was revoked", async () => {
