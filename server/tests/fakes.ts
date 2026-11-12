@@ -98,10 +98,10 @@ export class MemorySubmissionRepository implements ChallengeSubmissionRepository
       [...this.rows.values()].filter((r) => r.userId === userId && r.problemSlug === problemSlug).reverse().slice(0, limit),
     );
   }
-  firstSolves(since?: Date) {
+  firstSolves(since?: Date, userId?: string) {
     const first = new Map<string, { userId: string; slug: string; at: Date }>();
     for (const r of this.rows.values()) {
-      if (r.status !== "accepted" || !r.completedAt || (since && r.completedAt < since)) continue;
+      if (r.status !== "accepted" || !r.completedAt || (since && r.completedAt < since) || (userId && r.userId !== userId)) continue;
       const key = `${r.userId}|${r.problemSlug}`;
       const prev = first.get(key);
       if (!prev || r.completedAt < prev.at) first.set(key, { userId: r.userId, slug: r.problemSlug, at: r.completedAt });

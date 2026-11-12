@@ -139,4 +139,28 @@ describe.skipIf(!safe)("Contests and store on Postgres", () => {
     await expect(store.equip("alice", "frame-gold", true)).rejects.toThrow();
     expect((await store.cosmetics(["alice"])).get("alice")).toMatchObject({ frame: expect.any(String) });
   });
+
+  it("firstSolves can be scoped to one user", async () => {
+    await submit("alice", p1, "accepted", clock.nowMs(), null);
+    await submit("bob", p1, "accepted", clock.nowMs(), null);
+    const subs = new PgChallengeSubmissionRepository(db);
+    expect((await subs.firstSolves()).length).toBe(2);
+    expect((await subs.firstSolves(undefined, "bob")).map((r) => r.userId)).toEqual(["bob"]);
+  });
+
+  it("results are cached only once a contest has settled", async () => {
+    const { c, start } = await liveContest();
+    clock.advance(61 * MIN);
+    await contests.join("alice", c.slug);
+    const id = (await repo.findBySlug(c.slug))?.id ?? null;
+    clock.advance(100 * MIN); // ended 10 minutes ago: not settled
+    expect((await contests.history("alice"))[0]?.score).toBe(0);
+    // A late-graded in-window solve still counts before settling…
+    await submit("alice", p1, "accepted", start + 30 * MIN, id);
+    expect((await contests.history("alice"))[0]?.score).toBe(100);
+    clock.advance(60 * MIN); // settled: cached from here
+    expect((await contests.history("alice"))[0]?.score).toBe(100);
+    await submit("alice", p2, "accepted", start + 40 * MIN, id);
+    expect((await contests.history("alice"))[0]?.score).toBe(100);
+  });
 });

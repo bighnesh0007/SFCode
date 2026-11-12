@@ -192,7 +192,7 @@ export class CommunityService {
 
   private async view(p: ProfileRecord): Promise<ProfileView> {
     const scored = this.catalog.all().filter((c) => SCORED_TRACKS.includes(c.track));
-    const mine = (await this.submissions.firstSolves()).filter((s) => s.userId === p.userId);
+    const mine = await this.submissions.firstSolves(undefined, p.userId);
     const solvedSlugs = new Set(mine.map((s) => s.slug));
     const solvedScored = scored.filter((c) => solvedSlugs.has(c.slug));
     const board = await this.leaderboard("all", Number.MAX_SAFE_INTEGER);
