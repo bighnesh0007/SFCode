@@ -25,6 +25,9 @@ describe("the shipped problems", () => {
       "debug-null-discount",
       "debug-recursive-trigger",
       "debug-off-by-one-buckets",
+      "flow-account-default-rating",
+      "flow-won-next-step",
+      "flow-key-account-task",
     ]);
   });
 });
@@ -123,6 +126,39 @@ describe("SOQL problem rules", () => {
     const c = ChallengeCatalog.load(PROBLEMS_DIR).get("soql-contacts-in-city");
     if (!c) throw new Error("fixture");
     expect(() => new ChallengeCatalog([c], "")).toThrow(/soqlCompare.apex/);
+  });
+});
+
+describe("flow problems", () => {
+  let dir: string;
+  const fresh = () => {
+    dir = mkdtempSync(join(tmpdir(), "sfc-flow-"));
+    cpSync(join(PROBLEMS_DIR, "flow-won-next-step"), join(dir, "flow-won-next-step"), { recursive: true });
+    return join(dir, "flow-won-next-step");
+  };
+  afterEach(() => rmSync(dir, { recursive: true, force: true }));
+
+  it("must not declare editable files", () => {
+    const p = fresh();
+    const meta = JSON.parse(readFileSync(join(p, "problem.json"), "utf8")) as Record<string, unknown>;
+    writeFileSync(join(p, "problem.json"), JSON.stringify({ ...meta, files: [{ name: "SfcX", type: "class" }] }));
+    expect(() => loadChallenge(dir, "flow-won-next-step")).toThrow(/flow-track problem has a "flow" block and no files/);
+  });
+
+  it("needs its reference flow, active", () => {
+    const p = fresh();
+    const ref = join(p, "reference", "SFC_Opportunity_Won_Next_Step.flow-meta.xml");
+    writeFileSync(ref, readFileSync(ref, "utf8").replace("<status>Active</status>", "<status>Draft</status>"));
+    expect(() => loadChallenge(dir, "flow-won-next-step")).toThrow(/Active/);
+    rmSync(ref);
+    expect(() => loadChallenge(dir, "flow-won-next-step")).toThrow(/must contain exactly SFC_Opportunity_Won_Next_Step.flow-meta.xml/);
+  });
+
+  it("only flow-track problems may have a flow block", () => {
+    const p = fresh();
+    const meta = JSON.parse(readFileSync(join(p, "problem.json"), "utf8")) as Record<string, unknown>;
+    writeFileSync(join(p, "problem.json"), JSON.stringify({ ...meta, track: "apex" }));
+    expect(() => loadChallenge(dir, "flow-won-next-step")).toThrow(/flow-track/);
   });
 });
 

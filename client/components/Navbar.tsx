@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 /** Built sections only; unbuilt features stay out of the nav until they exist. */
 const NAV = [
-  { href: "/problems", label: "Problems", match: ["/problems", "/challenges", "/soql", "/debugging"] },
+  { href: "/problems", label: "Problems", match: ["/problems", "/challenges", "/soql", "/debugging", "/flows"] },
   { href: "/playground/apex", label: "Playground", match: ["/playground"] },
   { href: "/certification", label: "Certification", match: ["/certification"] },
 ];

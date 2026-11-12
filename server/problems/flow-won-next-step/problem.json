@@ -1,0 +1,4 @@
+{ "title": "Next Step for Won Deals", "track": "flow", "difficulty": "Easy", "category": "Before-Save Flows", "order": 302,
+  "tags": ["record-triggered", "create and update"],
+  "files": [], "flow": { "apiName": "SFC_Opportunity_Won_Next_Step", "kind": "record-triggered" },
+  "testClass": "SfcFlowWonNextStepTest" }

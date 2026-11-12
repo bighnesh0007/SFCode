@@ -63,7 +63,8 @@ describe("ChallengeService — what clients can see", () => {
     expect((await service.list(null, "soql")).length).toBe(5);
     expect((await service.list(null, "apex")).length).toBe(6);
     expect((await service.list(null, "debug")).length).toBe(4);
-    expect((await service.list(null)).length).toBe(15);
+    expect((await service.list(null, "flow")).length).toBe(3);
+    expect((await service.list(null)).length).toBe(18);
   });
 
   it("404s unknown problems", () => {
@@ -114,6 +115,25 @@ describe("ChallengeService — submitting and grading", () => {
     await s.connect("u1");
     await s.service.submit("u1", "account-rating-default", RATING);
     await expect(s.service.submit("u1", "account-rating-default", RATING)).rejects.toThrow(/already have a submission/);
+  });
+
+  it("grades a flow problem with the hidden tests only — never a submitted flow", async () => {
+    const s = setup();
+    await s.connect("u1");
+    const sub = await s.service.submit("u1", "flow-won-next-step", {});
+    expect(sub.status).toBe("running");
+    const deploy = s.fetch.calls.find((c) => c.body.includes("<met:deploy>"));
+    const zipB64 = /<met:ZipFile>([^<]+)<\/met:ZipFile>/.exec(deploy?.body ?? "")?.[1] ?? "";
+    const names = Object.keys(unzipSync(Buffer.from(zipB64, "base64"))).sort();
+    expect(names).toEqual(["classes/SfcFlowWonNextStepTest.cls", "classes/SfcFlowWonNextStepTest.cls-meta.xml", "package.xml"]);
+    // A learner can't smuggle a flow (or anything) into the deploy.
+    await expect(s.service.submit("u2", "flow-won-next-step", { SFC_Opportunity_Won_Next_Step: "<Flow/>" })).rejects.toThrow(/exactly these files/);
+  });
+
+  it("exposes the flow to build, but not its reference metadata", () => {
+    const view = setup().service.get("flow-key-account-task");
+    expect(view.flow).toEqual({ apiName: "SFC_Key_Account_Review", kind: "record-triggered" });
+    expect(JSON.stringify(view)).not.toContain("recordCreates");
   });
 
   it("requires exactly the problem's files", async () => {

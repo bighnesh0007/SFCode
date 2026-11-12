@@ -5,7 +5,7 @@ type Token = string | null;
 
 export type Tone = "green" | "amber" | "red";
 // Mirrors server/src/domain/challenge.ts TRACKS.
-export type Track = "apex" | "soql" | "debug";
+export type Track = "apex" | "soql" | "debug" | "flow";
 export interface DifficultyDef {
   id: string;
   rank: number;
@@ -38,6 +38,8 @@ export interface ChallengeView {
   tags: string[];
   statement: string;
   files: ChallengeFile[];
+  /** Flow problems: built in the learner's org; there are no files. */
+  flow?: { apiName: string; kind: "record-triggered" | "autolaunched" };
 }
 
 export type Verdict = "accepted" | "wrong_answer" | "compile_error" | "coverage" | "error";

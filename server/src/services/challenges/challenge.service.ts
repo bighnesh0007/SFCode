@@ -46,6 +46,8 @@ export interface ChallengeView {
   tags: string[];
   statement: string;
   files: { name: string; type: ApexFileType; fileName: string; starter: string }[];
+  /** Flow problems: the flow to build in the learner's own org. */
+  flow?: { apiName: string; kind: "record-triggered" | "autolaunched" };
 }
 
 export interface SubmissionView {
@@ -139,6 +141,7 @@ export class ChallengeService {
       tags: c.tags,
       statement: c.statement,
       files: c.files.map((f) => ({ name: f.name, type: f.type, fileName: `${f.name}.${extensionFor(f.type)}`, starter: c.starter[f.name] ?? "" })),
+      ...(c.flow ? { flow: c.flow } : {}),
     };
   }
 

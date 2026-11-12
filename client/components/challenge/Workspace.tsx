@@ -191,7 +191,13 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
                   <Markdown source={challenge.statement} className="markdown mt-5" />
                   <div className="mt-6 flex gap-2 rounded-lg border bg-muted/30 p-3 text-xs text-muted-foreground">
                     <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                    {challenge.track === "soql" ? (
+                    {challenge.flow ? (
+                      <p>
+                        Checking runs hidden Apex tests in your connected org that create and update records, so your active
+                        flow fires, and then verify the results. It&apos;s a check-only deploy: test records are rolled back, and
+                        your flow is left as it is.
+                      </p>
+                    ) : challenge.track === "soql" ? (
                       <p>
                         Grading runs your query inside a hidden Apex test in your connected org, against records the test
                         creates itself, and compares the rows with the expected answer. Nothing is left behind in the org,
@@ -230,15 +236,18 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     <OrgGate org={org} />
-                    <Button size="sm" variant="ghost" onClick={reset} title="Reset to starter code">
-                      <RotateCcw className="h-3.5 w-3.5" />
-                    </Button>
+                    {!challenge.flow && (
+                      <Button size="sm" variant="ghost" onClick={reset} title="Reset to starter code">
+                        <RotateCcw className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                     <Button size="sm" disabled={!canSubmit} onClick={() => void submit()}>
                       {submitting || submission?.status === "running" ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" /> : <Send className="mr-1 h-3.5 w-3.5" />}
-                      Submit
+                      {challenge.flow ? "Check my flow" : "Submit"}
                     </Button>
                   </div>
                 </div>
+                {challenge.flow && <FlowBrief flow={challenge.flow} />}
                 {activeFile && (
                   <Editor
                     path={activeFile.fileName}
@@ -268,6 +277,29 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
           </ResizablePanelGroup>
         </ResizablePanel>
       </ResizablePanelGroup>
+    </div>
+  );
+}
+
+/** Flow problems have no editor: the learner builds the flow in Salesforce. */
+function FlowBrief({ flow }: { flow: NonNullable<ChallengeView["flow"]> }) {
+  const steps = [
+    <>In your connected org, open <span className="font-medium text-foreground">Setup → Flows → New Flow</span> and choose a {flow.kind === "record-triggered" ? "Record-Triggered" : "Autolaunched"} Flow.</>,
+    <>Build it as the statement describes, and save it with the API name <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">{flow.apiName}</code>. The name must match exactly.</>,
+    <><span className="font-medium text-foreground">Activate</span> the flow. Hidden tests only see active flows.</>,
+    <>Click <span className="font-medium text-foreground">Check my flow</span>. A check-only deploy runs the hidden tests against it and rolls back.</>,
+  ];
+  return (
+    <div className="flex-1 overflow-auto p-6">
+      <h2 className="text-sm font-semibold">Build this flow in Salesforce</h2>
+      <ol className="mt-4 space-y-3 text-sm text-muted-foreground">
+        {steps.map((step, i) => (
+          <li key={i} className="flex gap-3">
+            <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-muted text-[11px] font-medium text-foreground">{i + 1}</span>
+            <span>{step}</span>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

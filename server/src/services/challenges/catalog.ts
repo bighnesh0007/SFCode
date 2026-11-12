@@ -36,7 +36,15 @@ const problemJson = z.strictObject({
   category: z.string().min(2).max(40),
   order: z.number().int().positive(),
   tags: z.array(z.string().min(1).max(40)).max(8).default([]),
-  files: z.array(z.union([apexFile, soqlFile])).min(1).max(5),
+  // Flow problems have none: the learner builds the flow in Salesforce.
+  files: z.array(z.union([apexFile, soqlFile])).max(5),
+  flow: z
+    .strictObject({
+      // Flow API names: letters, digits, underscores; SFC_ keeps them clear of the learner's own.
+      apiName: z.string().regex(/^SFC_[A-Za-z0-9_]{1,76}$/, "must start with SFC_"),
+      kind: z.enum(["record-triggered", "autolaunched"]),
+    })
+    .optional(),
   testClass: apexName,
 });
 
@@ -58,6 +66,19 @@ function readSources(dir: string, files: ChallengeFile[], what: string): Record<
   return out;
 }
 
+/**
+ * A flow problem's reference is the flow's metadata, used only by
+ * verify:problems to prove the problem is solvable. Keyed by API name.
+ */
+function readFlowReference(dir: string, apiName: string, where: string): Record<string, string> {
+  const file = `${apiName}.flow-meta.xml`;
+  const present = existsSync(dir) ? readdirSync(dir) : [];
+  if (present.length !== 1 || present[0] !== file) throw new Error(`${where}/reference must contain exactly ${file}`);
+  const xml = readFileSync(join(dir, file), "utf8");
+  if (!/<Flow\b/.test(xml) || !xml.includes("<status>Active</status>")) throw new Error(`${where}: reference flow must be a <Flow> with <status>Active</status>`);
+  return { [apiName]: xml };
+}
+
 export function loadChallenge(root: string, slug: string): Challenge {
   if (!SLUG.test(slug)) throw new Error(`problem folder "${slug}" is not a kebab-case slug`);
   const dir = join(root, slug);
@@ -65,6 +86,10 @@ export function loadChallenge(root: string, slug: string): Challenge {
   const parsed = problemJson.safeParse(JSON.parse(readFileSync(join(dir, "problem.json"), "utf8")));
   if (!parsed.success) throw new Error(`${where}/problem.json: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`);
   const meta = parsed.data;
+
+  if (meta.track === "flow" ? !meta.flow || meta.files.length > 0 : meta.flow !== undefined || meta.files.length === 0) {
+    throw new Error(`${where}: a flow-track problem has a "flow" block and no files; other problems have files and no "flow"`);
+  }
 
   const names = [...meta.files.map((f) => f.name), meta.testClass];
   if (new Set(names).size !== names.length) throw new Error(`${where}: file and test class names must be unique`);
@@ -85,7 +110,7 @@ export function loadChallenge(root: string, slug: string): Challenge {
   if (/\bWHERE\b[^\]]*\bDescription\b/i.test(testSource)) throw new Error(`${where}: hidden tests filter on Description (a long text area — not filterable)`);
 
   const starter = readSources(join(dir, "starter"), meta.files, `${where}/starter`);
-  const reference = readSources(join(dir, "reference"), meta.files, `${where}/reference`);
+  const reference = meta.flow ? readFlowReference(join(dir, "reference"), meta.flow.apiName, where) : readSources(join(dir, "reference"), meta.files, `${where}/reference`);
   // Each file must declare the type and name problem.json promises, or the deploy fails confusingly.
   for (const f of meta.files) {
     const decl =
@@ -123,6 +148,7 @@ export function loadChallenge(root: string, slug: string): Challenge {
     starter,
     reference,
     testClass: { name: meta.testClass, source: testSource },
+    ...(meta.flow ? { flow: meta.flow } : {}),
   };
 }
 
@@ -149,7 +175,7 @@ export class ChallengeCatalog {
       if (orders.has(c.order)) throw new Error(`problems/${c.slug}: duplicate order ${c.order}`);
       orders.add(c.order);
       // Apex names are org-global; two problems sharing one would grade against each other's code.
-      for (const n of [...c.files.filter((f) => f.type !== "soql").map((f) => f.name), c.testClass.name]) {
+      for (const n of [...c.files.filter((f) => f.type !== "soql").map((f) => f.name), c.testClass.name, ...(c.flow ? [c.flow.apiName] : [])]) {
         const other = apexNames.get(n.toLowerCase());
         if (other) throw new Error(`problems/${c.slug}: Apex name ${n} is also used by ${other}`);
         apexNames.set(n.toLowerCase(), c.slug);

@@ -3,7 +3,7 @@ import type { Difficulty } from "./difficulty.ts";
 
 export type ApexFileType = "class" | "trigger" | "soql";
 /** Practice areas. The one list: catalog validation and the API schema both read it. */
-export const TRACKS = ["apex", "soql", "debug"] as const;
+export const TRACKS = ["apex", "soql", "debug", "flow"] as const;
 export type Track = (typeof TRACKS)[number];
 
 export interface ChallengeFile {
@@ -28,6 +28,11 @@ export interface Challenge {
   reference: Record<string, string>;
   /** Hidden. Never sent to a client. */
   testClass: { name: string; source: string };
+  /**
+   * Flow problems only: the flow the learner builds in their own org. There
+   * are no editable files; the hidden tests exercise the org's active flow.
+   */
+  flow?: { apiName: string; kind: "record-triggered" | "autolaunched" };
 }
 
 export const VERDICTS = ["accepted", "wrong_answer", "compile_error", "coverage", "error"] as const;
