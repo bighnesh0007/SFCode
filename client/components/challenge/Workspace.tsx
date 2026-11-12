@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
-import { SignInButton, useAuth } from "@clerk/nextjs";
+import { SignInButton, useAuthState } from "@/components/auth";
 // The namespace handed to onMount; imported for its type only (no bundle cost).
 type Monaco = typeof import("monaco-editor");
 import { ChevronLeft, Cloud, Info, Loader2, RotateCcw, Send } from "lucide-react";
@@ -42,7 +42,7 @@ function readDraft(challenge: ChallengeView): Record<string, string> {
 
 export function Workspace({ challenge, backHref }: { challenge: ChallengeView; backHref: string }) {
   const { resolvedTheme } = useTheme();
-  const { isSignedIn, getToken } = useAuth();
+  const { isSignedIn, getToken } = useAuthState();
   const { state: org } = useOrgConnection();
   // Lazy init: the editor is client-only, so this never reaches server-rendered markup.
   const [sources, setSources] = useState<Record<string, string>>(() => readDraft(challenge));
@@ -207,7 +207,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
                   </div>
                 </>
               ) : (
-                <SubmissionList history={history} signedIn={Boolean(isSignedIn)} onOpen={(id) => void openSubmission(id)} selected={submission?.id ?? null} />
+                <SubmissionList history={history} signedIn={isSignedIn} onOpen={(id) => void openSubmission(id)} selected={submission?.id ?? null} />
               )}
             </div>
           </div>
@@ -275,7 +275,7 @@ function OrgGate({ org }: { org: ReturnType<typeof useOrgConnection>["state"] })
       return <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />;
     case "signed-out":
       return (
-        <SignInButton mode="modal">
+        <SignInButton>
           <Button size="sm" variant="outline">Sign in to submit</Button>
         </SignInButton>
       );

@@ -92,10 +92,16 @@ export interface GradingDeps {
 export class ChallengeService {
   constructor(
     private readonly catalog: ChallengeCatalog,
-    private readonly submissions: ChallengeSubmissionRepository,
+    /** Absent without a database: browsing still works, submitting does not. */
+    private readonly submissions: ChallengeSubmissionRepository | undefined,
     private readonly grading: GradingDeps | undefined,
     private readonly clock: Clock,
   ) {}
+
+  private get store(): ChallengeSubmissionRepository {
+    if (!this.submissions) throw new NotConfiguredError("Submissions (database)");
+    return this.submissions;
+  }
 
   private requireGrading(): GradingDeps {
     if (!this.grading) throw new NotConfiguredError("Grading (Salesforce org connection)");
@@ -107,7 +113,7 @@ export class ChallengeService {
   }
 
   async list(userId: string | null, track?: Track): Promise<ChallengeSummary[]> {
-    const progress = userId ? await this.submissions.progress(userId) : new Map<string, "solved" | "attempted">();
+    const progress = userId && this.submissions ? await this.submissions.progress(userId) : new Map<string, "solved" | "attempted">();
     return this.catalog
       .all()
       .filter((c) => track === undefined || c.track === track)
@@ -144,18 +150,18 @@ export class ChallengeService {
     const connection = await connections.status(userId);
     if (!connection) throw new OrgNotConnectedError();
 
-    const record = await this.submissions.createRunning({ userId, problemSlug: slug, orgId: connection.orgId, files });
+    const record = await this.store.createRunning({ userId, problemSlug: slug, orgId: connection.orgId, files });
     if (!record) throw new ConflictError("You already have a submission being graded. Wait for it to finish.");
 
     try {
       const zip = buildDeployPackage(challenge, files, apiVersion, this.catalog.soqlCompare);
       const deployId = await connections.withOrg(userId, (org) => sf.deployCheckOnly(org.instanceUrl, org.accessToken, zip, challenge.testClass.name));
-      await this.submissions.setDeployId(record.id, deployId);
+      await this.store.setDeployId(record.id, deployId);
       logEvent("challenge.submitted", { slug, submissionId: record.id });
       return toView({ ...record, deployId });
     } catch (err) {
       const message = err instanceof AppError && err.expose ? err.message : "Could not start grading in your org.";
-      await this.submissions.complete(record.id, "error", errorResult(message), this.clock.now());
+      await this.store.complete(record.id, "error", errorResult(message), this.clock.now());
       if (err instanceof OrgNotConnectedError) throw err;
       contextLogger().warn({ err, submissionId: record.id }, "deploy could not be started");
       return toView({ ...record, status: "error", result: errorResult(message), completedAt: this.clock.now() });
@@ -164,7 +170,7 @@ export class ChallengeService {
 
   /** The submission, advanced by one status check if it is still running. */
   async view(userId: string, id: string): Promise<SubmissionView> {
-    const record = await this.submissions.findById(id);
+    const record = await this.store.findById(id);
     // Someone else's submission is reported as absent, not forbidden: don't confirm it exists.
     if (record?.userId !== userId) throw new NotFoundError("Submission not found.");
     if (record.status !== "running" || !this.grading) return toView(record);
@@ -173,7 +179,7 @@ export class ChallengeService {
 
   async history(userId: string, slug: string): Promise<SubmissionSummary[]> {
     this.require(slug);
-    const rows = await this.submissions.listForProblem(userId, slug, 20);
+    const rows = await this.store.listForProblem(userId, slug, 20);
     return rows.map((r) => ({
       id: r.id,
       status: r.status,
@@ -186,9 +192,9 @@ export class ChallengeService {
   private async advance(record: SubmissionRecord, { connections, sf }: GradingDeps): Promise<SubmissionRecord> {
     const now = this.clock.now();
     const finish = async (status: Exclude<SubmissionStatus, "running">, result: GradeResult): Promise<SubmissionRecord> => {
-      await this.submissions.complete(record.id, status, result, now);
+      await this.store.complete(record.id, status, result, now);
       // Re-read: a concurrent poll may have completed it first, and its result wins.
-      return (await this.submissions.findById(record.id)) ?? record;
+      return (await this.store.findById(record.id)) ?? record;
     };
 
     if (now.getTime() - record.createdAt.getTime() > GRADE_TIMEOUT_MS) {
@@ -207,7 +213,7 @@ export class ChallengeService {
     const challenge = this.catalog.get(record.problemSlug);
     if (!challenge) return finish("error", errorResult("This problem no longer exists."));
 
-    await this.submissions.markChecked(record.id, now);
+    await this.store.markChecked(record.id, now);
     let raw: Record<string, unknown>;
     try {
       raw = await connections.withOrg(record.userId, async (org) => {

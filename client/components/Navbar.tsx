@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Cloud, Menu, X } from "lucide-react";
-import { SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/nextjs";
+import { LocalModeBadge, SignInButton, SignUpButton, UserButton, useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -17,7 +17,7 @@ const MORE = FEATURES.filter((f) => !f.primary);
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { isSignedIn } = useAuth();
+  const { isSignedIn } = useAuthState();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -60,15 +60,16 @@ export default function Navbar() {
 
         <div className="hidden flex-1 items-center justify-end space-x-2 md:flex">
           <nav className="flex items-center gap-1">
+            <LocalModeBadge />
             <ModeToggle />
             {!isSignedIn ? (
               <>
-                <SignInButton mode="modal">
+                <SignInButton>
                   <Button variant="ghost" size="sm" className="text-[13px] font-medium text-foreground/60 hover:text-foreground">
                     Sign In
                   </Button>
                 </SignInButton>
-                <SignUpButton mode="modal">
+                <SignUpButton>
                   <Button size="sm" className="text-[13px] font-medium">
                     Sign Up
                   </Button>
@@ -118,10 +119,10 @@ export default function Navbar() {
           <div className="mt-3 flex items-center gap-2 border-t pt-3">
             {!isSignedIn ? (
               <>
-                <SignInButton mode="modal">
+                <SignInButton>
                   <Button variant="outline" className="flex-1">Sign In</Button>
                 </SignInButton>
-                <SignUpButton mode="modal">
+                <SignUpButton>
                   <Button className="flex-1">Sign Up</Button>
                 </SignUpButton>
               </>

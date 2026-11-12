@@ -1,68 +1,73 @@
 # SFCode
 
-A LeetCode-style practice platform for Salesforce developers. Same look and
-stack as DWCode: a Next.js client and an Express API in one npm workspace.
+[![CI](https://github.com/bighnesh0007/SFCode/actions/workflows/ci.yml/badge.svg)](https://github.com/bighnesh0007/SFCode/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**Status: Phase 0.** Live: the site shell, connecting a Salesforce org, and the
-**Apex Playground** (run anonymous Apex in your org and see the debug log).
-Everything else in the navbar is a placeholder page.
+**Open-source, LeetCode-style practice for Salesforce developers.** Write Apex,
+SOQL and fixes for broken code, graded by hidden tests in *your own* connected
+org. Prepare for Platform Developer I and II too.
 
-## Layout
+Live at **https://sf.bighnesh.space**
 
-```
-client/   Next.js 16 (App Router), Tailwind 4, shadcn/base-ui, Clerk, Monaco  :8100
-server/   Express 5, zod, Drizzle + Postgres, pino                            :4100
-```
+| | |
+|---|---|
+| **Apex Challenge Arena** | Triggers, classes, Batch and async Apex, graded by a check-only deploy (nothing stays in your org) |
+| **SOQL Practice** | One query per problem, checked row by row against the expected answer |
+| **Debugging Arena** | Start from broken Apex: governor limits, recursion, nulls, off-by-ones |
+| **Apex Playground** | Run anonymous Apex in your org and read the debug log |
+| **Certification Prep** | Original PD I / PD II questions with explanations |
 
-The browser only talks to `:8100`; Next proxies `/backend/*` to the API.
-The product catalogue (nav, home grid, footer, placeholders) is one list:
-`client/lib/features.ts`.
+## Contributing
 
-## Run it locally
+Contributions are welcome, especially **new problems and certification
+questions**, which need no Salesforce or Clerk account to write and test.
+
+- [CONTRIBUTING.md](CONTRIBUTING.md): run it locally in two commands, the checks, and conventions
+- [Adding a problem](docs/adding-a-problem.md) · [Adding a question](docs/adding-a-question.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md) · [Security policy](SECURITY.md)
 
 ```bash
-npx npm@11 install          # npm 10.9 crashes resolving this tree (arborist edgesOut bug)
-docker compose up -d        # Postgres on 127.0.0.1:5433
-cp server/.env.example server/.env    # then fill in, see below
-cp client/.env.example client/.env.local
-npm run db:migrate -w sfcode-server
-npm run dev
+npx npm@11 install
+npm run dev        # http://localhost:8100, runs in "local mode" with no keys
 ```
 
-### Secrets
+## How it's built
 
-Generate `TOKEN_ENCRYPTION_KEY` and `OAUTH_STATE_SECRET` with `openssl rand -hex 32`.
-Clerk keys go in both env files (same Clerk app).
+```
+client/   Next.js 16 (App Router), Tailwind 4, shadcn/base-ui, Monaco      :8100
+server/   Express 5, zod, Drizzle + Postgres, pino                         :4100
+```
 
-### Salesforce External Client App (one-time)
+The browser only talks to the site; Next proxies `/backend/*` to the API.
 
-In any org you administer (a Developer Edition is fine): **Setup → External
-Client App Manager → New External Client App**.
+**Grading.** A submission is deployed to the learner's org together with a
+hidden test class as a **check-only** Metadata API deploy (`RunSpecifiedTests`).
+Salesforce compiles everything, runs the tests and rolls back. The verdict comes
+from Salesforce's own report. SOQL problems wrap the query, escaped, in a
+generated class and compare its rows with a reference query's rows on records
+the test creates.
 
-- Enable OAuth. Callback URL: `http://localhost:8100/backend/api/v1/salesforce/oauth/callback`
-  and `https://sf.bighnesh.space/backend/api/v1/salesforce/oauth/callback` (it is `APP_URL` + that path).
+**Org connection.** OAuth 2.0 web-server flow with PKCE. The verifier is kept
+server-side (single-use, 10-minute expiry) and `state` is HMAC-signed. Tokens are
+stored AES-256-GCM encrypted and never reach the browser. Login and instance
+hosts are restricted to Salesforce domains, and outbound requests refuse
+redirects.
+
+## Self-hosting: Salesforce External Client App
+
+Needed only to run or grade Apex. In an org you administer (a Developer Edition
+is fine): **Setup → External Client App Manager → New External Client App**.
+
+- Enable OAuth. Callback URL: `<APP_URL>/backend/api/v1/salesforce/oauth/callback`
+  (e.g. `http://localhost:8100/backend/api/v1/salesforce/oauth/callback`).
 - Scopes: **Manage user data via APIs (`api`)** and **Perform requests at any
   time (`refresh_token`, `offline_access`)**.
 - Require PKCE: on. Require secret for Web Server Flow: on.
-- Distribution: make it available to **other orgs** (so learners can connect
-  their own orgs), then copy the consumer key/secret into `SF_CLIENT_ID` /
-  `SF_CLIENT_SECRET`.
+- Distribution: available to **other orgs**, so learners can connect their own.
+- Put the consumer key and secret in `server/.env` as `SF_CLIENT_ID` and
+  `SF_CLIENT_SECRET`. Generate `TOKEN_ENCRYPTION_KEY` and `OAUTH_STATE_SECRET`
+  with `openssl rand -hex 32`.
 
-## Checks
+## License
 
-```bash
-npm run typecheck && npm run lint && npm test && npm run build
-# Postgres repository tests (need a database whose name ends in _test):
-TEST_DATABASE_URL=postgres://sfcode:sfcode@127.0.0.1:5433/sfcode_test npm test
-```
-
-## How the org connection works
-
-OAuth 2.0 web-server flow with PKCE. The PKCE verifier is kept server-side
-(`oauth_pending`, single-use, 10-minute expiry); `state` is HMAC-signed and
-carries the user and return path. Access and refresh tokens are stored
-AES-256-GCM encrypted and are never sent to the browser. Login and instance
-hosts are restricted to Salesforce domains, and outbound requests refuse
-redirects, so tokens can only go to Salesforce. Anonymous Apex runs through
-the Apex SOAP API so the debug log comes back in the same call; an expired
-session is refreshed once, and a revoked refresh token deletes the connection.
+[MIT](LICENSE)

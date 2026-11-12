@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@clerk/nextjs";
+import { useAuthState } from "@/components/auth";
 import { CheckCircle2, Circle, CircleDot } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -15,7 +15,7 @@ const ALL = "All";
 
 /** The problem table for one track; /challenges and /soql are thin wrappers around it. */
 export function ChallengeList({ track, title, intro, basePath }: { track: Track; title: string; intro: string; basePath: string }) {
-  const { isLoaded, getToken } = useAuth();
+  const { isLoaded, getToken } = useAuthState();
   const [data, setData] = useState<{ difficulties: DifficultyDef[]; challenges: ChallengeSummary[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState(ALL);
