@@ -8,6 +8,7 @@ export interface ExamSummary {
   title: string;
   description: string;
   questionCount: number;
+  mock: { questions: number; minutes: number; passPercent: number } | null;
   sections: { id: string; title: string; total: number; answered: number | null; correct: number | null }[];
   readiness: number | null;
   weakest: string | null;
@@ -44,3 +45,28 @@ export interface ReviewQueue {
   mastered: number;
 }
 export const getReview = (token: Token) => apiRequest<ReviewQueue>("/api/v1/certification/review", { token });
+
+export interface MockExam {
+  exam: string;
+  title: string;
+  minutes: number;
+  passPercent: number;
+  realQuestions: number;
+  realMinutes: number;
+  questions: PracticeQuestion[];
+}
+
+export interface MockResult {
+  score: number;
+  passed: boolean;
+  passPercent: number;
+  correct: number;
+  total: number;
+  sections: { id: string; title: string; correct: number; total: number }[];
+  results: { id: string; correct: boolean; selected: string[]; answer: string[]; explanation: string }[];
+}
+
+export const getMock = (exam: string) => apiRequest<MockExam>(`/api/v1/certification/${encodeURIComponent(exam)}/mock`);
+
+export const gradeMock = (token: Token, exam: string, answers: Record<string, string[]>) =>
+  apiRequest<MockResult>(`/api/v1/certification/${encodeURIComponent(exam)}/mock/grade`, { method: "POST", token, body: { answers } });

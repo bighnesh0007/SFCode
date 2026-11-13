@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuthState } from "@/components/auth";
-import { GraduationCap, Play } from "lucide-react";
+import { GraduationCap, Play, Timer } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ApiError } from "@/lib/apiClient";
@@ -33,15 +33,15 @@ export default function CertificationPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Certification Prep</h1>
         <p className="mt-1 text-muted-foreground">
-          Original practice questions for the Salesforce Platform Developer exams, organised by the official exam
-          sections. Every answer comes with an explanation.{!isSignedIn && " Sign in to save your progress."}
+          Original practice questions for Salesforce certifications, organised by the official exam sections. Every
+          answer comes with an explanation, and each exam has a timed mock weighted like the real one.{!isSignedIn && " Sign in to save your progress."}
         </p>
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
       <ReviewCard />
       <div className="grid gap-4 md:grid-cols-2">
         {exams === null && !error
-          ? [0, 1].map((i) => <div key={i} className="h-64 animate-pulse rounded-xl bg-muted/50" />)
+          ? [0, 1, 2].map((i) => <div key={i} className="h-64 animate-pulse rounded-xl bg-muted/50" />)
           : exams?.map((e) => (
               <Card key={e.exam}>
                 <CardHeader>
@@ -98,9 +98,16 @@ export default function CertificationPage() {
                       );
                     })}
                   </ul>
-                  <Link href={`/certification/${e.exam}`} className={buttonVariants({ className: "w-full" })}>
-                    <Play className="mr-1 h-4 w-4" /> Practice 10 mixed questions
-                  </Link>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <Link href={`/certification/${e.exam}`} className={buttonVariants({ className: "flex-1" })}>
+                      <Play className="mr-1 h-4 w-4" /> Practice 10 questions
+                    </Link>
+                    {e.mock && (
+                      <Link href={`/certification/${e.exam}/mock`} className={buttonVariants({ variant: "outline", className: "flex-1" })}>
+                        <Timer className="mr-1 h-4 w-4" /> Timed mock exam
+                      </Link>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ))}

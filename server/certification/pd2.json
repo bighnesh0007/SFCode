@@ -1,8 +1,8 @@
 {
   "exam": "pd2",
   "title": "Platform Developer II",
-  "order": 2,
-  "description": "Advanced Apex, asynchronous processing, integration, performance and testing.",
+  "order": 3,
+  "description": "Advanced Apex, asynchronous processing, integration, Lightning UI, performance and testing.",
   "sections": [
     {
       "id": "advanced",
@@ -19,8 +19,24 @@
     {
       "id": "testing",
       "title": "Testing, Debugging and Deployment"
+    },
+    {
+      "id": "ui",
+      "title": "User Interface"
     }
   ],
+  "mock": {
+    "questions": 60,
+    "minutes": 120,
+    "passPercent": 70,
+    "weights": {
+      "advanced": 15,
+      "integration": 27,
+      "ui": 20,
+      "testing": 20,
+      "performance": 18
+    }
+  },
   "questions": [
     {
       "id": "pd2-queueable-vs-future",
@@ -373,6 +389,168 @@
         "c"
       ],
       "explanation": "A QueryLocator lets a batch job process up to 50 million records, each `execute` getting a fresh set of limits. The other options query in one transaction and hit SOQL row or heap limits."
+    },
+    {
+      "id": "pd2-lms",
+      "section": "ui",
+      "prompt": "An LWC must send a message to an Aura component and a Visualforce page on the same Lightning page, with no parent-child relationship. What should be used?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Custom DOM events"
+        },
+        {
+          "id": "b",
+          "text": "Lightning Message Service"
+        },
+        {
+          "id": "c",
+          "text": "A pubsub module"
+        },
+        {
+          "id": "d",
+          "text": "Platform Events"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Lightning Message Service communicates across the DOM between LWC, Aura and Visualforce on a Lightning page. DOM events only travel up the containment tree."
+    },
+    {
+      "id": "pd2-cacheable-dml",
+      "section": "ui",
+      "prompt": "An Apex method annotated `@AuraEnabled(cacheable=true)` must also update a record. What happens?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It works but isn't cached"
+        },
+        {
+          "id": "b",
+          "text": "It fails: cacheable methods can't perform DML"
+        },
+        {
+          "id": "c",
+          "text": "It works only when called imperatively"
+        },
+        {
+          "id": "d",
+          "text": "It works only with @wire"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Cacheable methods must not change data; DML in them throws an exception. Use a separate non-cacheable method, called imperatively."
+    },
+    {
+      "id": "pd2-refresh-apex",
+      "section": "ui",
+      "prompt": "A component shows a list from `@wire(getContacts)` and updates one contact through an imperative Apex call. The list stays stale. What refreshes it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "this.connectedCallback()"
+        },
+        {
+          "id": "b",
+          "text": "refreshApex() on the wired result"
+        },
+        {
+          "id": "c",
+          "text": "window.location.reload()"
+        },
+        {
+          "id": "d",
+          "text": "Setting @track on the list"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "refreshApex(valueProvisionedByWire) re-runs the wired Apex call and replaces the cached data."
+    },
+    {
+      "id": "pd2-lds-shared-cache",
+      "section": "ui",
+      "prompt": "Two components on one page show the same record with `getRecord`. One updates it with `updateRecord`. What happens to the other?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Nothing until the page is reloaded"
+        },
+        {
+          "id": "b",
+          "text": "It gets the new values automatically from the shared Lightning Data Service cache"
+        },
+        {
+          "id": "c",
+          "text": "It throws an error"
+        },
+        {
+          "id": "d",
+          "text": "It must call refreshApex"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Lightning Data Service keeps one cache per record, so a change made through LDS is pushed to every component using that record."
+    },
+    {
+      "id": "pd2-std-set-controller",
+      "section": "ui",
+      "prompt": "A Visualforce page must paginate through 10,000 Accounts 20 at a time. What's the simplest server-side approach?",
+      "options": [
+        {
+          "id": "a",
+          "text": "StandardSetController"
+        },
+        {
+          "id": "b",
+          "text": "A wrapper class with OFFSET"
+        },
+        {
+          "id": "c",
+          "text": "A component with JavaScript remoting"
+        },
+        {
+          "id": "d",
+          "text": "Apex:repeat with LIMIT 10000"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "StandardSetController provides built-in pagination (next, previous, page size) over up to 10,000 records."
+    },
+    {
+      "id": "pd2-lws",
+      "section": "ui",
+      "prompt": "What stops one Lightning web component from reading another namespace's component's DOM?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Content Security Policy only"
+        },
+        {
+          "id": "b",
+          "text": "Lightning Web Security (or Lightning Locker)"
+        },
+        {
+          "id": "c",
+          "text": "The Shadow DOM polyfill"
+        },
+        {
+          "id": "d",
+          "text": "CORS"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Lightning Web Security, and Lightning Locker before it, isolates components by namespace so they can't reach into each other's DOM or globals."
     }
   ]
 }
