@@ -11,7 +11,10 @@ export function communityController(service: CommunityService) {
     ok(res, await service.updateProfile(req.auth?.userId ?? "", { ...(handle !== undefined ? { handle } : {}), ...(displayName !== undefined ? { displayName } : {}) }));
   };
   const byHandle: RequestHandler = async (req, res) => ok(res, await service.byHandle(validatedParams<HandleParams>(req).handle));
-  const leaderboard: RequestHandler = async (req, res) => ok(res, await service.leaderboard(validatedQuery<LeaderboardQuery>(req).window));
+  const leaderboard: RequestHandler = async (req, res) => {
+    const q = validatedQuery<LeaderboardQuery>(req);
+    ok(res, await service.leaderboard(q.window, 100, q.track));
+  };
   const updateAbout: RequestHandler = async (req, res) => {
     const b = validatedBody<AboutBody>(req);
     ok(res, await service.updateAbout(req.auth?.userId ?? "", { ...b, trailheadUrl: b.trailheadUrl || null, linkedinUrl: b.linkedinUrl || null, githubUrl: b.githubUrl || null }));

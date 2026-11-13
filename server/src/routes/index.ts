@@ -187,6 +187,8 @@ export function mountRoutes(app: Application, container: Container): void {
     const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
     const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
     v1.get("/contests", c.list);
+    const contestsForBoard = container.contests;
+    v1.get("/leaderboard/rating", limiter(60), (async (_req, res) => ok(res, await contestsForBoard.ratingBoard())) as RequestHandler);
     v1.post("/contests", signedIn, limiter(10), validate({ body: createContestBody }), c.create);
     v1.get("/contests/:slug", identify, validate({ params: contestSlugParams }), c.get);
     v1.post("/contests/:slug/join", signedIn, limiter(20), validate({ params: contestSlugParams }), c.join);

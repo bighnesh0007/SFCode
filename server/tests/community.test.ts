@@ -127,6 +127,20 @@ describe("scoring and leaderboard", () => {
     expect((await service.leaderboard("30d"))[0]?.score).toBe(3);
   });
 
+  it("the 7-day board and per-track boards", async () => {
+    const { service, solve } = setup();
+    for (const u of ["ada", "bob"]) await service.ensureProfile(u);
+    await solve("ada", "text-utils", 10); // apex Easy, 3 pts, outside 7 days
+    await solve("ada", "soql-hot-tech-accounts", 2); // soql Easy, 1 pt
+    await solve("bob", "protect-closed-won", 1); // apex Easy, 3 pts
+    // Only "ada" gets a handle from the fake identity lookup; everyone else is learner-xxxx.
+    const handles = (rows: { handle: string; score: number }[]) => rows.map((r) => [r.handle === "ada" ? "ada" : "bob", r.score]);
+    expect(handles(await service.leaderboard("7d"))).toEqual([["bob", 3], ["ada", 1]]);
+    expect(handles(await service.leaderboard("all", 100, "apex"))).toEqual([["ada", 3], ["bob", 3]]);
+    expect(handles(await service.leaderboard("all", 100, "soql"))).toEqual([["ada", 1]]);
+    expect(handles(await service.leaderboard("7d", 100, "apex"))).toEqual([["bob", 3]]);
+  });
+
   it("site stats: problems, learners and this week's first solves", async () => {
     const { service, solve } = setup();
     for (const u of ["ada", "bob"]) await service.ensureProfile(u);

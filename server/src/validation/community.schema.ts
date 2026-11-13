@@ -1,3 +1,4 @@
+import { SCORED_TRACKS } from "../domain/challenge.ts";
 import { z } from "zod";
 import { CERTIFICATIONS } from "../domain/achievements.ts";
 
@@ -9,7 +10,10 @@ export const profileUpdateBody = z
   .refine((b) => b.handle !== undefined || b.displayName !== undefined, "Change at least one field.");
 export type ProfileUpdateBody = z.infer<typeof profileUpdateBody>;
 
-export const leaderboardQuery = z.object({ window: z.enum(["all", "30d"]).default("all") });
+export const leaderboardQuery = z.object({
+  window: z.enum(["all", "30d", "7d"]).default("all"),
+  track: z.enum(SCORED_TRACKS).optional(),
+});
 export type LeaderboardQuery = z.infer<typeof leaderboardQuery>;
 
 /** An https URL on one of the given hosts (or their subdomains), or empty to clear. */
