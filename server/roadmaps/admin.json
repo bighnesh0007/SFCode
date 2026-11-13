@@ -1,5 +1,6 @@
 {
   "id": "admin",
+  "order": 2,
   "title": "Salesforce Admin",
   "description": "From your first org to the Administrator certification: data model, data quality, security and sharing, Sales and Service Cloud, page design, Flow and approvals, reports and dashboards, data tools, sandboxes and auditing.",
   "nodes": [

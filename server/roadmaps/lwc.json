@@ -1,5 +1,6 @@
 {
   "id": "lwc",
+  "order": 3,
   "title": "Lightning Web Components",
   "description": "Modern JavaScript to production-ready components: templates, events, data, lifecycle, styling, testing, accessibility and security.",
   "nodes": [

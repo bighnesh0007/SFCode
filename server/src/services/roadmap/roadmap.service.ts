@@ -63,7 +63,7 @@ export class RoadmapService {
   ) {}
 
   list(): { id: string; title: string; description: string; nodes: number }[] {
-    return [...this.roadmaps.values()].map((r) => ({ id: r.id, title: r.title, description: r.description, nodes: r.nodes.length }));
+    return [...this.roadmaps.values()].sort((a, b) => a.order - b.order).map((r) => ({ id: r.id, title: r.title, description: r.description, nodes: r.nodes.length }));
   }
 
   onboarding(userId: string): Promise<OnboardingRecord | null> {
