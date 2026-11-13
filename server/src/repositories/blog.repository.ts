@@ -2,6 +2,7 @@
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import type { PgDatabase } from "../data/postgres/client.ts";
 import { blogComments, blogPosts, blogVotes } from "../data/postgres/schema.ts";
+import { isUniqueViolation } from "./pgErrors.ts";
 
 export type BlogStatus = "published" | "hidden";
 
@@ -44,11 +45,6 @@ export interface BlogRepository {
   setCommentStatus(id: string, status: BlogStatus): Promise<void>;
   deleteComment(id: string): Promise<void>;
 }
-
-const isUniqueViolation = (err: unknown): boolean => {
-  const e = err as { code?: unknown; cause?: { code?: unknown } } | null;
-  return e?.code === "23505" || e?.cause?.code === "23505";
-};
 
 export class PgBlogRepository implements BlogRepository {
   constructor(private readonly db: PgDatabase) {}

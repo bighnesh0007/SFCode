@@ -71,6 +71,13 @@
       "when": 1794517173662,
       "tag": "0009_daily",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794540849032,
+      "tag": "0010_roles_points",
+      "breakpoints": true
     }
   ]
 }

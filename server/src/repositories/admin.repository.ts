@@ -3,7 +3,9 @@ import { and, eq, gte, ilike, inArray, or, sql } from "drizzle-orm";
 import type { PgDatabase } from "../data/postgres/client.ts";
 import { challengeSubmissions, salesforceConnections, userProfiles, userRoles } from "../data/postgres/schema.ts";
 
-export type StaffRole = "admin" | "moderator";
+export type StaffRole = "admin" | "reviewer" | "buddy";
+/** What may be stored: StaffRole plus the pre-rename "moderator" (read as reviewer). */
+export type StoredRole = StaffRole | "moderator";
 
 export interface AdminUserRow {
   userId: string;
@@ -14,9 +16,10 @@ export interface AdminUserRow {
 }
 
 export interface AdminRepository {
-  rolesOf(userId: string): Promise<StaffRole[]>;
+  rolesOf(userId: string): Promise<StoredRole[]>;
+  countRole(role: StaffRole): Promise<number>;
   grant(userId: string, role: StaffRole, by: string): Promise<void>;
-  revoke(userId: string, role: StaffRole): Promise<boolean>;
+  revoke(userId: string, role: StoredRole): Promise<boolean>;
   overview(since24h: Date): Promise<{ learners: number; connectedOrgs: number; submissions: number; submissions24h: number; byStatus: Record<string, number> }>;
   users(query: string, limit: number): Promise<AdminUserRow[]>;
   profileExists(userId: string): Promise<boolean>;
@@ -25,7 +28,12 @@ export interface AdminRepository {
 export class PgAdminRepository implements AdminRepository {
   constructor(private readonly db: PgDatabase) {}
 
-  async rolesOf(userId: string): Promise<StaffRole[]> {
+  async countRole(role: StaffRole): Promise<number> {
+    const [row] = await this.db.select({ n: sql<number>`count(*)::int` }).from(userRoles).where(eq(userRoles.role, role));
+    return row?.n ?? 0;
+  }
+
+  async rolesOf(userId: string): Promise<StoredRole[]> {
     const rows = await this.db.select({ role: userRoles.role }).from(userRoles).where(eq(userRoles.userId, userId));
     return rows.map((r) => r.role);
   }
@@ -34,7 +42,7 @@ export class PgAdminRepository implements AdminRepository {
     await this.db.insert(userRoles).values({ userId, role, grantedBy: by }).onConflictDoNothing();
   }
 
-  async revoke(userId: string, role: StaffRole): Promise<boolean> {
+  async revoke(userId: string, role: StoredRole): Promise<boolean> {
     const rows = await this.db.delete(userRoles).where(and(eq(userRoles.userId, userId), eq(userRoles.role, role))).returning({ userId: userRoles.userId });
     return rows.length > 0;
   }
@@ -71,7 +79,8 @@ export class PgAdminRepository implements AdminRepository {
       handle: p.handle,
       displayName: p.displayName,
       joined: p.createdAt,
-      roles: roles.filter((r) => r.userId === p.userId).map((r) => r.role),
+      // Pre-rename "moderator" rows show as reviewer.
+      roles: [...new Set(roles.filter((r) => r.userId === p.userId).map((r): StaffRole => (r.role === "moderator" ? "reviewer" : r.role)))],
     }));
   }
 

@@ -6,9 +6,10 @@
 import { randomBytes } from "node:crypto";
 import { ConflictError, NotConfiguredError, NotFoundError, ValidationError } from "../../errors/AppError.ts";
 import { SCORED_TRACKS, type Track } from "../../domain/challenge.ts";
-import { DIFFICULTIES, pointsFor, type Difficulty } from "../../domain/difficulty.ts";
+import { DIFFICULTIES, type Difficulty } from "../../domain/difficulty.ts";
 import { achievements, streaks, type Achievement } from "../../domain/achievements.ts";
 import { EMPTY_ABOUT, type AboutRecord, type AboutRepository } from "../../repositories/about.repository.ts";
+import { PointsService } from "../points/points.service.ts";
 import type { ChallengeSubmissionRepository } from "../../repositories/challengeSubmission.repository.ts";
 import type { ProfileRecord, ProfileRepository } from "../../repositories/profile.repository.ts";
 import type { Clock } from "../../types/ports.ts";
@@ -118,6 +119,7 @@ export class CommunityService {
     private readonly identity: IdentityLookup | undefined,
     private readonly clock: Clock,
     private readonly about?: AboutRepository,
+    private readonly points: PointsService = new PointsService(undefined, undefined),
   ) {}
 
   /** The caller's profile, created on first use from their public Clerk identity. */
@@ -166,12 +168,13 @@ export class CommunityService {
     if (hit !== undefined && now - hit.at < LEADERBOARD_TTL_MS) return hit.rows.slice(0, limit);
 
     const since = window === "30d" ? new Date(now - 30 * 86_400_000) : undefined;
+    const table = await this.points.table();
     const totals = new Map<string, { score: number; solved: number; last: number }>();
     for (const s of await this.submissions.firstSolves(since)) {
       const c = this.catalog.get(s.slug);
       if (!c || !SCORED_TRACKS.includes(c.track)) continue;
       const t = totals.get(s.userId) ?? { score: 0, solved: 0, last: 0 };
-      t.score += pointsFor(c.difficulty);
+      t.score += table.points(c.track, c.difficulty);
       t.solved += 1;
       t.last = Math.max(t.last, s.at.getTime());
       totals.set(s.userId, t);
@@ -206,7 +209,8 @@ export class CommunityService {
       this.about ? this.about.get(p.userId) : Promise.resolve(null),
     ]);
     const bestPlacement = contests.length ? Math.min(...contests.map((c) => c.rank)) : null;
-    const score = solvedScored.reduce((sum, c) => sum + pointsFor(c.difficulty), 0);
+    const table = await this.points.table();
+    const score = solvedScored.reduce((sum, c) => sum + table.points(c.track, c.difficulty), 0);
 
     return {
       about: about ?? EMPTY_ABOUT,

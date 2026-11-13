@@ -109,7 +109,8 @@ export const userRoles = pgTable(
   "user_roles",
   {
     userId: text("user_id").notNull(),
-    role: text("role").$type<"admin" | "moderator">().notNull(),
+    /** "moderator" rows predate the rename and read as reviewer. */
+    role: text("role").$type<"admin" | "reviewer" | "buddy" | "moderator">().notNull(),
     grantedBy: text("granted_by").notNull(),
     grantedAt: timestamp("granted_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -253,3 +254,29 @@ export const dailyChallenges = pgTable("daily_challenges", {
   problemSlug: text("problem_slug").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/** Small admin-editable settings, one JSON value per key (e.g. "points"). */
+export const appSettings = pgTable("app_settings", {
+  key: text("key").primaryKey(),
+  value: jsonb("value").notNull(),
+  updatedBy: text("updated_by"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** "I'd like to be a Buddy" requests, decided by reviewers or admins. */
+export const buddyApplications = pgTable(
+  "buddy_applications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    motivation: text("motivation").notNull(),
+    link: text("link"),
+    status: text("status").$type<"pending" | "approved" | "rejected">().notNull().default("pending"),
+    decidedBy: text("decided_by"),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+  },
+  // At most one pending application per user.
+  (t) => [uniqueIndex("buddy_applications_one_pending_idx").on(t.userId).where(sql`status = 'pending'`)],
+);

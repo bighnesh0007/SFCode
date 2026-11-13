@@ -22,8 +22,10 @@ import { contestController, roadmapController, storeController } from "../contro
 import { contestSlugParams, createContestBody, equipBody, onboardingBody, roadmapParams, roadmapQuizBody, roadmapReadBody, storeItemBody } from "../validation/contest.schema.ts";
 import { blogListQuery, blogSlugParams, commentBody, commentParams, hideBody, postBody, postPatchBody, voteBody } from "../validation/blog.schema.ts";
 import { adminUsersQuery, roleBody } from "../validation/admin.schema.ts";
-import { aboutBody, handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
-import { validatedBody } from "../middleware/validate.ts";
+import { aboutBody, applicationParams, buddyApplyBody, decideBody, handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
+import { validatedBody, validatedParams } from "../middleware/validate.ts";
+import { z } from "zod";
+import { pointsMatrixSchema } from "../services/points/points.service.ts";
 import { listQuery, slugParams, submissionParams, submitBody } from "../validation/challenge.schema.ts";
 
 function disabled(what: string): RequestHandler {
@@ -195,6 +197,41 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.post("/roadmaps/:id/read", signedIn, limiter(60), validate({ params: roadmapParams, body: roadmapReadBody }), r.read);
   } else {
     v1.use(["/onboarding", "/roadmaps"], disabled("Roadmaps"));
+  }
+
+  // Points table: public read (the UI shows what each problem is worth); admins edit.
+  if (container.points) {
+    const points = container.points;
+    v1.get("/points", (async (_req, res) => {
+      const { matrix, coinsPerPoint } = (await points.table()).settings;
+      ok(res, { matrix, coinsPerPoint });
+    }) as RequestHandler);
+    if (verifier && container.db) {
+      const body = z.strictObject({ matrix: pointsMatrixSchema, coinsPerPoint: z.number().int().min(0).max(100) });
+      v1.put("/admin/points", requireAuth(verifier), limiter(20), validate({ body }), (async (req, res) => {
+        ok(res, await points.update(req.auth?.userId ?? "", validatedBody<z.infer<typeof body>>(req)));
+      }) as RequestHandler);
+    }
+  }
+
+  // Contributors: apply to be a Buddy; reviewers and admins decide.
+  if (container.buddies && verifier) {
+    const buddies = container.buddies;
+    const auth = requireAuth(verifier);
+    const user = (req: { auth?: { userId: string } }) => req.auth?.userId ?? "";
+    v1.get("/contribute/me", auth, (async (req, res) => ok(res, await buddies.me(user(req)))) as RequestHandler);
+    v1.post("/contribute/apply", auth, limiter(5), validate({ body: buddyApplyBody }), (async (req, res) => {
+      const b = validatedBody<z.infer<typeof buddyApplyBody>>(req);
+      ok(res, await buddies.apply(user(req), b.motivation, b.link));
+    }) as RequestHandler);
+    v1.get("/admin/applications", auth, (async (req, res) => ok(res, await buddies.pending(user(req)))) as RequestHandler);
+    v1.post("/admin/applications/:id/decide", auth, limiter(60), validate({ params: applicationParams, body: decideBody }), (async (req, res) => {
+      const b = validatedBody<z.infer<typeof decideBody>>(req);
+      await buddies.decide(user(req), validatedParams<z.infer<typeof applicationParams>>(req).id, b.approve, b.note);
+      ok(res, { ok: true });
+    }) as RequestHandler);
+  } else {
+    v1.use("/contribute", disabled("Contributing"));
   }
 
   // Daily Challenge: public; signed-in viewers also get their own status.

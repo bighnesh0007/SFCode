@@ -3,7 +3,7 @@
  * - anyone reads published posts and comments
  * - signed-in users write posts and comments, and vote (not on their own posts)
  * - authors edit their posts and delete their own posts and comments
- * - moderators and up hide any post or comment (kept, never listed) and can see hidden ones
+ * - buddies and up hide any post or comment (kept, never listed) and can see hidden ones
  */
 import { randomBytes } from "node:crypto";
 import { ForbiddenError, NotFoundError, ValidationError } from "../../errors/AppError.ts";
@@ -133,7 +133,7 @@ export class BlogService {
     return this.get(slug, userId);
   }
 
-  /** Authors delete their own post; moderators hide (or unhide) anyone's. */
+  /** Authors delete their own post; buddies and up hide (or unhide) anyone's. */
   async remove(userId: string, slug: string): Promise<void> {
     const post = await this.mustFind(slug);
     if (post.authorId === userId) return this.repo.deletePost(post.id);
@@ -144,7 +144,7 @@ export class BlogService {
   async setHidden(userId: string, slug: string, hidden: boolean): Promise<void> {
     const post = await this.repo.findBySlug(slug);
     if (!post) throw new NotFoundError("Post not found.");
-    await this.admin.require(userId, "moderator");
+    await this.admin.require(userId, "buddy");
     await this.repo.setPostStatus(post.id, hidden ? "hidden" : "published");
   }
 

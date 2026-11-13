@@ -3,6 +3,7 @@ import { and, asc, desc, eq, gt, inArray, lte, sql } from "drizzle-orm";
 import type { PgDatabase } from "../data/postgres/client.ts";
 import { challengeSubmissions, contestEntries, contestProblems, contests } from "../data/postgres/schema.ts";
 import type { SubmissionStatus } from "../domain/challenge.ts";
+import { isUniqueViolation } from "./pgErrors.ts";
 
 export interface ContestRecord {
   id: string;
@@ -34,11 +35,6 @@ export interface ContestRepository {
   liveContestFor(userId: string, problemSlug: string, now: Date): Promise<string | null>;
   attempts(contestId: string): Promise<ContestAttempt[]>;
 }
-
-const isUniqueViolation = (err: unknown): boolean => {
-  const e = err as { code?: unknown; cause?: { code?: unknown } } | null;
-  return e?.code === "23505" || e?.cause?.code === "23505";
-};
 
 export class PgContestRepository implements ContestRepository {
   constructor(private readonly db: PgDatabase) {}

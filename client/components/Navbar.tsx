@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getStanding } from "@/lib/adminApi";
+import { getStanding, isStaff as isStaffStanding } from "@/lib/adminApi";
 import { Menu, X } from "lucide-react";
 import { LocalModeBadge, SignInButton, SignUpButton, UserButton, useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,7 @@ export default function Navbar() {
     let cancelled = false;
     getToken()
       .then((t) => getStanding(t))
-      .then(() => !cancelled && setIsStaff(true))
+      .then((st) => !cancelled && setIsStaff(isStaffStanding(st)))
       .catch(() => {});
     return () => {
       cancelled = true;

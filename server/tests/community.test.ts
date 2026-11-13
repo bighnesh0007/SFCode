@@ -89,13 +89,13 @@ describe("scoring and leaderboard", () => {
   it("scores each problem once, by difficulty, on server-graded tracks only", async () => {
     const { service, solve } = setup();
     await service.ensureProfile("ada");
-    await solve("ada", "text-utils"); // Easy 10
+    await solve("ada", "text-utils"); // Apex Easy 3
     await solve("ada", "text-utils"); // repeat: no extra points
-    await solve("ada", "won-revenue-rollup"); // Medium 20
-    await solve("ada", "soql-accounts-with-won-deals"); // Hard 40
-    await solve("ada", "lwc-click-counter"); // LWC: never scores
+    await solve("ada", "won-revenue-rollup"); // Apex Medium 6
+    await solve("ada", "soql-accounts-with-won-deals"); // SOQL Hard 3
+    await solve("ada", "lwc-click-counter"); // LWC: not scored until it's graded on the server
     const me = await service.me("ada");
-    expect(me).toMatchObject({ score: 70, solved: 3, rank: 1 });
+    expect(me).toMatchObject({ score: 12, solved: 3, rank: 1 });
     expect(me.byTrack.map((t) => t.track)).not.toContain("lwc");
     expect(me.recent.map((r) => r.slug)).not.toContain("lwc-click-counter");
   });
@@ -107,8 +107,8 @@ describe("scoring and leaderboard", () => {
     await solve("ada", "account-rating-default", 1);
     const board = await service.leaderboard("all");
     expect(board.map((r) => [r.rank, r.handle.startsWith("learner") ? "anon" : r.handle, r.score])).toEqual([
-      [1, "anon", 10],
-      [2, "ada", 10],
+      [1, "anon", 3],
+      [2, "ada", 3],
     ]);
   });
 
@@ -117,8 +117,8 @@ describe("scoring and leaderboard", () => {
     await service.ensureProfile("ada");
     await solve("ada", "text-utils", 60);
     await solve("ada", "protect-closed-won", 3);
-    expect((await service.leaderboard("all"))[0]?.score).toBe(20);
-    expect((await service.leaderboard("30d"))[0]?.score).toBe(10);
+    expect((await service.leaderboard("all"))[0]?.score).toBe(6);
+    expect((await service.leaderboard("30d"))[0]?.score).toBe(3);
   });
 
   it("404s an unknown handle", async () => {

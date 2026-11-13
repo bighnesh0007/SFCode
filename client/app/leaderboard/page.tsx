@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Avatar } from "@/components/Avatar";
+import { pointsSummary, usePoints } from "@/components/usePoints";
 import { Flair, accentClass, frameClass } from "@/components/Cosmetics";
 import { ApiError } from "@/lib/apiClient";
 import { getLeaderboard, type LeaderboardRow } from "@/lib/communityApi";
 import { cn } from "@/lib/utils";
 
 export default function LeaderboardPage() {
+  const points = usePoints();
   const [window, setWindow] = useState<"all" | "30d">("all");
   const [rows, setRows] = useState<LeaderboardRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +35,7 @@ export default function LeaderboardPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Leaderboard</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Points for each problem solved once: Easy 10, Medium 20, Hard 40. Ties go to whoever got there first.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Points for each problem solved once, by track and difficulty (Easy/Medium/Hard){points ? `: ${pointsSummary(points)}` : ""}. Ties go to whoever got there first.</p>
         </div>
         <div role="tablist" aria-label="Time window" className="flex rounded-md border p-0.5 text-xs">
           {(["all", "30d"] as const).map((w) => (

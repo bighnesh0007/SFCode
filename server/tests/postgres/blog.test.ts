@@ -73,9 +73,9 @@ describe.skipIf(!safe)("BlogService on Postgres", () => {
     await expect(blog.get(p.slug, null)).rejects.toMatchObject({ status: 404 });
   });
 
-  it("moderators hide posts and comments: gone for everyone else, visible to them", async () => {
+  it("buddies and up hide posts and comments: gone for everyone else, visible to them", async () => {
     await blog.create("mod", { title: "Seed for the mod profile", body });
-    await admin.grant("owner", "mod", "moderator");
+    await admin.grant("owner", "mod", "buddy");
     const p = await blog.create("alice", { title: "Spammy post", body });
     const withComment = await blog.comment("bob", p.slug, "spam comment");
     const commentId = withComment.comments[0]?.id ?? "";

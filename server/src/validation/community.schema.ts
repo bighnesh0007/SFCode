@@ -38,3 +38,15 @@ export const aboutBody = z.strictObject({
   openToWork: z.boolean(),
 });
 export type AboutBody = z.infer<typeof aboutBody>;
+
+export const buddyApplyBody = z.strictObject({
+  motivation: z.string().max(1000),
+  link: linkOn(["trailblazer.me", "salesforce.com", "trailhead.com", "linkedin.com", "github.com"], "Trailblazer, LinkedIn or GitHub"),
+});
+export type BuddyApplyBody = z.infer<typeof buddyApplyBody>;
+
+export const applicationParams = z.strictObject({ id: z.uuid() });
+export type ApplicationParams = z.infer<typeof applicationParams>;
+
+export const decideBody = z.strictObject({ approve: z.boolean(), note: z.string().max(500).default("") });
+export type DecideBody = z.infer<typeof decideBody>;

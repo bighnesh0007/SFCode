@@ -7,8 +7,8 @@
  */
 import { ConflictError, NotFoundError, ValidationError } from "../../errors/AppError.ts";
 import { SCORED_TRACKS } from "../../domain/challenge.ts";
-import { pointsFor } from "../../domain/difficulty.ts";
 import { itemById, STORE_ITEMS, type StoreItem } from "../../domain/store.ts";
+import { PointsService } from "../points/points.service.ts";
 import type { ChallengeSubmissionRepository } from "../../repositories/challengeSubmission.repository.ts";
 import type { StoreRepository } from "../../repositories/store.repository.ts";
 import type { ChallengeCatalog } from "../challenges/catalog.ts";
@@ -37,13 +37,15 @@ export class StoreService {
     private readonly catalog: ChallengeCatalog,
     private readonly contests: PrizeSource,
     private readonly daily?: { coins(userId: string): Promise<number> },
+    private readonly points: PointsService = new PointsService(undefined, undefined),
   ) {}
 
   async wallet(userId: string): Promise<Wallet> {
     const solves = await this.submissions.firstSolves(undefined, userId);
+    const table = await this.points.table();
     const earnedFromSolves = solves.reduce((n, s) => {
       const c = this.catalog.get(s.slug);
-      return c && SCORED_TRACKS.includes(c.track) ? n + pointsFor(c.difficulty) : n;
+      return c && SCORED_TRACKS.includes(c.track) ? n + table.coins(c.track, c.difficulty, s.at) : n;
     }, 0);
     const earnedFromContests = (await this.contests.prizes()).get(userId) ?? 0;
     const spent = await this.repo.spent(userId);
