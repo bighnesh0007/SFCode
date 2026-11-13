@@ -8,12 +8,16 @@ import { LwcWorkspace } from "./LwcWorkspace";
 import { Workspace } from "./Workspace";
 import { WorkspaceSkeleton } from "@/components/ui/skeleton";
 
-/** Loads one problem and renders the workspace. `backHref` is the list it belongs to. */
-export function ChallengePage({ slug, backHref }: { slug: string; backHref: string }) {
-  const [challenge, setChallenge] = useState<ChallengeView | null>(null);
+/**
+ * Loads one problem and renders the workspace. `backHref` is the list it belongs to.
+ * `initial` is the problem as rendered on the server; without it, it's fetched here.
+ */
+export function ChallengePage({ slug, backHref, initial }: { slug: string; backHref: string; initial?: ChallengeView }) {
+  const [challenge, setChallenge] = useState<ChallengeView | null>(initial ?? null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (initial?.slug === slug) return;
     let cancelled = false;
     getChallenge(slug)
       .then((c) => !cancelled && setChallenge(c))
@@ -21,7 +25,7 @@ export function ChallengePage({ slug, backHref }: { slug: string; backHref: stri
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, initial]);
 
   if (error)
     return (

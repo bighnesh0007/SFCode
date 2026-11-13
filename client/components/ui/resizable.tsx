@@ -53,10 +53,14 @@ export { ResizableHandle, ResizablePanel, ResizablePanelGroup }
  * Remembers a group's panel sizes in localStorage under `id`. Spread the result
  * onto ResizablePanelGroup; every Panel inside needs a stable `id`.
  */
+// The library falls back to localStorage when storage is undefined, which throws
+// during server rendering; this stands in until the browser takes over.
+const noStorage = { getItem: () => null, setItem: () => {} }
+
 function useSavedLayout(id: string) {
   const { defaultLayout, onLayoutChanged } = ResizablePrimitive.useDefaultLayout({
     id: `sfcode.layout.${id}`,
-    storage: typeof window === "undefined" ? undefined : window.localStorage,
+    storage: typeof window === "undefined" ? noStorage : window.localStorage,
     onlySaveAfterUserInteractions: true,
   })
   return { defaultLayout, onLayoutChanged }

@@ -1,8 +1,12 @@
-"use client";
+import type { Metadata } from "next";
+import { ProblemRoute, problemMetadata } from "@/components/challenge/problemRoute";
 
-import { use } from "react";
-import { ChallengePage } from "@/components/challenge/ChallengePage";
+type Props = { params: Promise<{ slug: string }> };
 
-export default function Page({ params }: { params: Promise<{ slug: string }> }) {
-  return <ChallengePage slug={use(params).slug} backHref="/problems?track=debug" />;
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  return problemMetadata((await params).slug);
+}
+
+export default async function Page({ params }: Props) {
+  return <ProblemRoute slug={(await params).slug} track="debug" />;
 }

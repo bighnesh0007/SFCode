@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
+import { TrackLanding } from "@/components/TrackLanding";
 
-// The per-track list moved into the Problems hub; old links keep working.
+// Server-rendered so search engines see the problem list; the interactive version is /problems?track=debug.
 export default function Page() {
-  redirect("/problems?track=debug");
+  return <TrackLanding track="debug" />;
 }

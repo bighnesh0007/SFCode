@@ -9,7 +9,7 @@ import { Markdown } from "@/components/Markdown";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
 import type { Track } from "@/lib/challengesApi";
-import { diagramUrl, getOnboarding, getRoadmap, listRoadmaps, markRead, submitQuiz, type Hours, type NodeState, type QuizResult, type RoadmapNode, type RoadmapView } from "@/lib/roadmapApi";
+import { STAGE, diagramUrl, getOnboarding, getRoadmap, listRoadmaps, markRead, submitQuiz, type Hours, type NodeState, type QuizResult, type RoadmapNode, type RoadmapView } from "@/lib/roadmapApi";
 import { trackInfo } from "@/lib/tracks";
 import { cn } from "@/lib/utils";
 
@@ -62,6 +62,13 @@ export default function RoadmapPage() {
 
   useEffect(() => {
     listRoadmaps().then(setRoadmaps).catch(() => {});
+    // Links from the roadmap and step pages: /roadmap?r=developer&step=triggers.
+    const q = new URLSearchParams(window.location.search);
+    const r = q.get("r");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the URL isn't readable during server rendering
+    if (r) setRoadmapId(r);
+    const step = q.get("step");
+    if (step) setOpen(step);
   }, []);
   useEffect(() => {
     let cancelled = false;
@@ -124,7 +131,8 @@ export default function RoadmapPage() {
           <h1 className="text-2xl font-semibold tracking-tight">{view.title} roadmap</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{view.description}</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            {view.personalised ? `${view.done} of ${view.total} steps on your path done. Steps finish when you solve their problems, not by ticking boxes.` : "Sign in and take the welcome quiz to track progress and skip what you already know."}
+            {view.personalised ? `${view.done} of ${view.total} steps on your path done. Steps finish when you solve their problems, not by ticking boxes.` : "Sign in and take the welcome quiz to track progress and skip what you already know."}{" "}
+            <Link href={`/roadmap/${view.id}`} className="underline hover:text-foreground">Read it as a list</Link>
           </p>
         </div>
         {nextNode ? (
@@ -329,7 +337,6 @@ function NodePanel({ node, view, onClose, onChange }: { node: RoadmapNode; view:
 }
 
 /** Level 1-4 as the roadmap stage it belongs to. */
-const STAGE: Record<number, string> = { 1: "Foundations", 2: "Core", 3: "Advanced", 4: "Expert" };
 
 const RESOURCE_KIND: Record<string, string> = { docs: "Docs", trailhead: "Trailhead", guide: "Guide", video: "Video" };
 

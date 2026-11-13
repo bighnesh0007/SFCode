@@ -88,4 +88,7 @@ export const gradePlacement = (track: PlacementTrack, answers: Record<string, nu
   apiRequest<PlacementResult>(`/api/v1/placement/${track}`, { method: "POST", body: { answers } });
 
 /** Where a roadmap diagram is served (an SVG; shown with <img>, so it can't run scripts). */
+/** Names for node levels, shared by the interactive roadmap and the step pages. */
+export const STAGE: Record<number, string> = { 1: "Foundations", 2: "Core", 3: "Advanced", 4: "Expert" };
+
 export const diagramUrl = (name: string) => `${API_BASE_URL}/api/v1/roadmaps/diagrams/${encodeURIComponent(name)}.svg`;
