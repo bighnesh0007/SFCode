@@ -42,6 +42,14 @@ export interface Announcement {
   updatedAt: string;
 }
 
+export interface ProblemInfo {
+  slug: string;
+  title: string;
+  track: string;
+  difficulty: string;
+  community: boolean;
+}
+
 export interface ProblemRow extends ProblemStat {
   title: string;
   /** 0-100, or null below MIN_ATTEMPTS_FOR_RATE. */
@@ -58,6 +66,11 @@ export class AdminService {
   ) {}
 
   private titleOf: (slug: string) => string = (slug) => slug;
+  private problemList: () => ProblemInfo[] = () => [];
+  /** Every problem currently in the catalog (built-in and community), for the problems tab. */
+  setProblemList(fn: () => ProblemInfo[]) {
+    this.problemList = fn;
+  }
   /** Set after the catalog loads, so the dashboard can show titles instead of slugs. */
   setProblemTitles(fn: (slug: string) => string | undefined) {
     this.titleOf = (slug) => fn(slug) ?? slug;
@@ -135,6 +148,20 @@ export class AdminService {
       .sort((a, b) => (a.rate ?? 0) - (b.rate ?? 0) || b.submissions - a.submissions)
       .slice(0, 8);
     return { days, top, hardest };
+  }
+
+  /**
+   * Every problem with its numbers, including ones nobody has tried. Solve rate
+   * is solvers / attempters (people), not per submission.
+   */
+  async problems(actor: string): Promise<(ProblemInfo & ProblemStat & { solveRate: number | null })[]> {
+    await this.require(actor, "reviewer");
+    const { problems } = await this.repo.dashboard(new Date(this.clock.nowMs()));
+    const stats = new Map(problems.map((p) => [p.slug, p]));
+    return this.problemList().map((info) => {
+      const s = stats.get(info.slug) ?? { slug: info.slug, submissions: 0, accepted: 0, solvers: 0, attempters: 0 };
+      return { ...info, ...s, solveRate: s.attempters > 0 ? Math.round((100 * s.solvers) / s.attempters) : null };
+    });
   }
 
   async user(actor: string, target: string): Promise<Omit<UserDetail, "joined" | "lastActive" | "org" | "recent"> & {

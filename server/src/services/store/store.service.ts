@@ -11,6 +11,8 @@ import { isFreezeId, itemById, MAX_FREEZES, STORE_ITEMS, STREAK_FREEZE, type Sto
 import { PointsService } from "../points/points.service.ts";
 import type { ChallengeSubmissionRepository } from "../../repositories/challengeSubmission.repository.ts";
 import type { StoreRepository } from "../../repositories/store.repository.ts";
+import type { SettingsRepository } from "../../repositories/settings.repository.ts";
+import type { AdminService } from "../admin/admin.service.ts";
 import type { ChallengeCatalog } from "../challenges/catalog.ts";
 
 export interface PrizeSource {
@@ -58,6 +60,13 @@ export interface LearningView {
   hasEditorial: boolean;
 }
 
+/** Admin changes to a built-in item: a new price, or retired from sale. Stored in app settings. */
+export interface ItemOverride {
+  price?: number;
+  retired?: boolean;
+}
+export const STORE_OVERRIDES_KEY = "store-overrides";
+
 export class StoreService {
   constructor(
     private readonly repo: StoreRepository,
@@ -81,6 +90,56 @@ export class StoreService {
     return { earnedFromSolves, earnedFromContests, earnedFromDaily, spent, balance: earnedFromSolves + earnedFromContests + earnedFromDaily - spent };
   }
 
+  private overridesSource: (() => Promise<Record<string, ItemOverride>>) | undefined;
+  /** Where admin price and retirement changes come from (app settings); wired after construction. */
+  setOverrides(fn: () => Promise<Record<string, ItemOverride>>): void {
+    this.overridesSource = fn;
+  }
+
+  /** Every item with its current price and whether it's still for sale. */
+  async pricedItems(): Promise<(StoreItem & { retired: boolean; basePrice: number })[]> {
+    const overrides = this.overridesSource ? await this.overridesSource().catch(() => ({})) : {};
+    return STORE_ITEMS.map((i) => {
+      const o = (overrides as Record<string, ItemOverride>)[i.id] ?? {};
+      return { ...i, basePrice: i.price, price: o.price ?? i.price, retired: o.retired === true };
+    });
+  }
+
+  private adminTools: { admin: AdminService; settings: SettingsRepository } | undefined;
+  /** For the admin store tab: who may change prices, and where changes are saved. */
+  setAdminTools(tools: { admin: AdminService; settings: SettingsRepository }): void {
+    this.adminTools = tools;
+    this.setOverrides(async () => ((await tools.settings.get(STORE_OVERRIDES_KEY)) as Record<string, ItemOverride> | null) ?? {});
+  }
+
+  private tools() {
+    if (!this.adminTools) throw new ConflictError("Store administration needs the database.");
+    return this.adminTools;
+  }
+
+  /** Every item with its base and current price, whether it's retired, and how many own it. Admins only. */
+  async adminItems(actor: string): Promise<(StoreItem & { retired: boolean; basePrice: number; owners: number })[]> {
+    await this.tools().admin.require(actor, "admin");
+    const [items, owners] = await Promise.all([this.pricedItems(), this.repo.ownerCounts()]);
+    return items.map((i) => ({ ...i, owners: owners.get(i.id) ?? 0 }));
+  }
+
+  /** Changes an item's price or takes it off sale. Owners keep what they bought. */
+  async setItem(actor: string, itemId: string, change: { price: number; retired: boolean }): Promise<void> {
+    const { admin, settings } = this.tools();
+    await admin.require(actor, "admin");
+    const base = STORE_ITEMS.find((i) => i.id === itemId);
+    if (!base) throw new NotFoundError("No such item.");
+    if (!Number.isInteger(change.price) || change.price < 0 || change.price > 100_000) throw new ValidationError("Price must be a whole number from 0 to 100,000.");
+    const current = ((await settings.get(STORE_OVERRIDES_KEY)) as Record<string, ItemOverride> | null) ?? {};
+    const next: ItemOverride = {};
+    if (change.price !== base.price) next.price = change.price;
+    if (change.retired) next.retired = true;
+    const rest = Object.fromEntries(Object.entries(current).filter(([id]) => id !== itemId));
+    await settings.set(STORE_OVERRIDES_KEY, Object.keys(next).length ? { ...rest, [itemId]: next } : rest, actor);
+    await admin.record(actor, "store.update", null, { itemId, price: change.price, retired: change.retired });
+  }
+
   private freezeUsage: ((userId: string) => Promise<number>) | undefined;
   /** How many freezes the user's current streak is using (from the community service; wired after construction). */
   setFreezeUsage(fn: (userId: string) => Promise<number>): void {
@@ -94,22 +153,26 @@ export class StoreService {
 
   async view(userId: string | null): Promise<StoreView> {
     const freezeOffer = { ...STREAK_FREEZE, max: MAX_FREEZES };
-    if (!userId) return { wallet: null, items: STORE_ITEMS.map((i) => ({ ...i, owned: false, equipped: false })), freeze: { ...freezeOffer, owned: 0, available: 0 } };
+    const strip = ({ retired: _r, basePrice: _b, ...item }: StoreItem & { retired: boolean; basePrice: number }) => item;
+    const items = await this.pricedItems();
+    // Retired items leave the shop window, but anyone who bought one still sees and can wear it.
+    if (!userId) return { wallet: null, items: items.filter((i) => !i.retired).map((i) => ({ ...strip(i), owned: false, equipped: false })), freeze: { ...freezeOffer, owned: 0, available: 0 } };
     const [wallet, owned, equipped] = await Promise.all([this.wallet(userId), this.repo.owned(userId), this.repo.equipped([userId])]);
     const mine = equipped.get(userId) ?? {};
     const freezes = owned.filter(isFreezeId).length;
     const used = this.freezeUsage ? await this.freezeUsage(userId) : 0;
     return {
       wallet,
-      items: STORE_ITEMS.map((i) => ({ ...i, owned: owned.includes(i.id), equipped: mine[i.slot] === i.id })),
+      items: items.filter((i) => !i.retired || owned.includes(i.id)).map((i) => ({ ...strip(i), owned: owned.includes(i.id), equipped: mine[i.slot] === i.id })),
       freeze: { ...freezeOffer, owned: freezes, available: Math.max(0, freezes - used) },
     };
   }
 
   async buy(userId: string, itemId: string): Promise<StoreView> {
     if (itemId === STREAK_FREEZE.id) return this.buyFreeze(userId);
-    const item = itemById(itemId);
+    const item = (await this.pricedItems()).find((i) => i.id === itemId);
     if (!item) throw new NotFoundError("No such item.");
+    if (item.retired) throw new ConflictError("This item is no longer for sale.");
     const w = await this.wallet(userId);
     const outcome = await this.repo.purchase(userId, item.id, item.price, w.earnedFromSolves + w.earnedFromContests + w.earnedFromDaily);
     if (outcome === "owned") throw new ConflictError("You already own this.");

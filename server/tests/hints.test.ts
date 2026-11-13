@@ -1,34 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { Challenge } from "../src/domain/challenge.ts";
 import type { ChallengeSubmissionRepository } from "../src/repositories/challengeSubmission.repository.ts";
-import type { PurchaseOutcome, StoreRepository } from "../src/repositories/store.repository.ts";
 import type { ChallengeCatalog } from "../src/services/challenges/catalog.ts";
 import { hintPrice, StoreService } from "../src/services/store/store.service.ts";
+import { MemoryStore } from "./fakes.ts";
 
-class MemoryStore implements StoreRepository {
-  rows: { userId: string; itemId: string; price: number }[] = [];
-  owned(userId: string) {
-    return Promise.resolve(this.rows.filter((r) => r.userId === userId).map((r) => r.itemId));
-  }
-  spent(userId: string) {
-    return Promise.resolve(this.rows.filter((r) => r.userId === userId).reduce((n, r) => n + r.price, 0));
-  }
-  async purchase(userId: string, itemId: string, price: number, earned: number): Promise<PurchaseOutcome> {
-    if ((await this.owned(userId)).includes(itemId)) return "owned";
-    if (earned - (await this.spent(userId)) < price) return "insufficient";
-    this.rows.push({ userId, itemId, price });
-    return "bought";
-  }
-  equipped() {
-    return Promise.resolve(new Map<string, Record<string, string>>());
-  }
-  equip() {
-    return Promise.resolve();
-  }
-  unequip() {
-    return Promise.resolve();
-  }
-}
 
 const problem = (slug: string, extra: Partial<Challenge>): Challenge =>
   ({ slug, title: slug, track: "apex", difficulty: "Easy", category: "x", order: 1, tags: [], statement: "", files: [], starter: {}, reference: {}, testClass: { name: "T", source: "" }, ...extra });

@@ -227,9 +227,9 @@ describe("admin tools", () => {
     repo.stats = {
       days: [],
       problems: [
-        { slug: "easy", submissions: 10, accepted: 9, solvers: 9 },
-        { slug: "hard", submissions: 8, accepted: 1, solvers: 1 },
-        { slug: "rare", submissions: 4, accepted: 0, solvers: 0 },
+        { slug: "easy", submissions: 10, accepted: 9, solvers: 9, attempters: 10 },
+        { slug: "hard", submissions: 8, accepted: 1, solvers: 1, attempters: 5 },
+        { slug: "rare", submissions: 4, accepted: 0, solvers: 0, attempters: 2 },
       ],
     };
     const d = await service.dashboard("alice");
@@ -250,5 +250,23 @@ describe("admin tools", () => {
     await service.setAnnouncement("alice", { text: "   ", tone: "info" });
     expect(await service.announcement()).toBeNull();
     expect(repo.log[0]?.action).toBe("announcement.clear");
+  });
+});
+
+describe("problem statistics", () => {
+  it("lists every problem, untried ones included, with solve rate by people", async () => {
+    const { repo, service } = fullSetup();
+    await service.grant("owner", "alice", "admin");
+    service.setProblemList(() => [
+      { slug: "easy", title: "Easy one", track: "apex", difficulty: "Easy", community: false },
+      { slug: "untried", title: "Nobody yet", track: "soql", difficulty: "Hard", community: true },
+    ]);
+    repo.stats = { days: [], problems: [{ slug: "easy", submissions: 12, accepted: 6, solvers: 3, attempters: 4 }] };
+    const rows = await service.problems("alice");
+    expect(rows).toEqual([
+      { slug: "easy", title: "Easy one", track: "apex", difficulty: "Easy", community: false, submissions: 12, accepted: 6, solvers: 3, attempters: 4, solveRate: 75 },
+      { slug: "untried", title: "Nobody yet", track: "soql", difficulty: "Hard", community: true, submissions: 0, accepted: 0, solvers: 0, attempters: 0, solveRate: null },
+    ]);
+    await expect(service.problems("dave")).rejects.toThrow(/Admin access/);
   });
 });

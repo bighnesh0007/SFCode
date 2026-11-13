@@ -18,6 +18,10 @@ export function contestController(service: ContestService) {
       const c = await service.create(user(req), { title: b.title, startsAt: new Date(b.startsAt), endsAt: new Date(b.endsAt), problems: b.problems });
       created(res, c, `/api/v1/contests/${c.slug}`);
     }) as RequestHandler,
+    update: (async (req, res) => {
+      const b = validatedBody<CreateContestBody>(req);
+      ok(res, await service.update(user(req), slug(req), { title: b.title, startsAt: new Date(b.startsAt), endsAt: new Date(b.endsAt), problems: b.problems }));
+    }) as RequestHandler,
     remove: (async (req, res) => {
       await service.remove(user(req), slug(req));
       noContent(res);

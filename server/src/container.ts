@@ -128,6 +128,7 @@ export function buildContainer(): Container {
       config.clerk.secretKey ? new ClerkIdentityLookup(config.clerk.secretKey) : undefined,
     );
     container.admin.setProblemTitles((slug) => catalog.get(slug)?.title);
+    container.admin.setProblemList(() => catalog.all().map((c) => ({ slug: c.slug, title: c.title, track: c.track, difficulty: c.difficulty, community: c.authorId !== undefined })));
     const telemetry = new TelemetryService(new PgTelemetryRepository(container.db), container.admin, systemClock);
     container.telemetry = telemetry;
     setErrorSink((e) => void telemetry.report({ source: "server", ...e }));
@@ -152,6 +153,7 @@ export function buildContainer(): Container {
     container.contests = new ContestService(contestRepo ?? new PgContestRepository(container.db), catalog, new PgProfileRepository(container.db), container.community, container.admin, systemClock);
     container.daily = new DailyService(new PgDailyRepository(container.db), catalog, systemClock);
     container.store = new StoreService(new PgStoreRepository(container.db), new PgChallengeSubmissionRepository(container.db), catalog, container.contests, container.daily, container.points);
+    container.store.setAdminTools({ admin: container.admin, settings: new PgSettingsRepository(container.db) });
     if (config.lwcRunnerImage) {
       const sandbox = new LwcSandbox(config.lwcRunnerImage);
       container.challenges.setLwcGrader({ run: (code, tests) => sandbox.run(code, tests), compile: compileLwc });

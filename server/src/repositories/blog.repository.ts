@@ -44,6 +44,10 @@ export interface BlogRepository {
   findComment(id: string): Promise<CommentRecord | null>;
   setCommentStatus(id: string, status: BlogStatus): Promise<void>;
   deleteComment(id: string): Promise<void>;
+  /** Newest posts, hidden ones included, for moderators. */
+  recentPosts(limit: number): Promise<PostRecord[]>;
+  /** Newest comments, hidden ones included, with their post's slug and title. */
+  recentComments(limit: number): Promise<(CommentRecord & { postSlug: string; postTitle: string })[]>;
 }
 
 export class PgBlogRepository implements BlogRepository {
@@ -143,5 +147,27 @@ export class PgBlogRepository implements BlogRepository {
 
   async deleteComment(id: string): Promise<void> {
     await this.db.delete(blogComments).where(eq(blogComments.id, id));
+  }
+
+  async recentPosts(limit: number): Promise<PostRecord[]> {
+    return this.db.select(this.withCounts).from(blogPosts).orderBy(desc(blogPosts.createdAt)).limit(limit);
+  }
+
+  async recentComments(limit: number): Promise<(CommentRecord & { postSlug: string; postTitle: string })[]> {
+    return this.db
+      .select({
+        id: blogComments.id,
+        postId: blogComments.postId,
+        authorId: blogComments.authorId,
+        body: blogComments.body,
+        status: blogComments.status,
+        createdAt: blogComments.createdAt,
+        postSlug: blogPosts.slug,
+        postTitle: blogPosts.title,
+      })
+      .from(blogComments)
+      .innerJoin(blogPosts, eq(blogPosts.id, blogComments.postId))
+      .orderBy(desc(blogComments.createdAt))
+      .limit(limit);
   }
 }

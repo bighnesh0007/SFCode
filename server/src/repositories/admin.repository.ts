@@ -28,6 +28,8 @@ export interface ProblemStat {
   submissions: number;
   accepted: number;
   solvers: number;
+  /** Distinct learners who submitted at least once. */
+  attempters: number;
 }
 
 export interface Dashboard {
@@ -162,6 +164,7 @@ export class PgAdminRepository implements AdminRepository {
         submissions: n,
         accepted: sql<number>`count(*) filter (where ${challengeSubmissions.status} = 'accepted')::int`,
         solvers: sql<number>`count(distinct ${challengeSubmissions.userId}) filter (where ${challengeSubmissions.status} = 'accepted')::int`,
+        attempters: sql<number>`count(distinct ${challengeSubmissions.userId})::int`,
       })
       .from(challengeSubmissions)
       .where(sql`${challengeSubmissions.status} <> 'running'`)

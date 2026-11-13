@@ -77,3 +77,15 @@ export const createContest = (token: Token, body: { title: string; startsAt: str
 export const getStore = (token: Token) => apiRequest<StoreView>("/api/v1/store", { token });
 export const buyItem = (token: Token, itemId: string) => apiRequest<StoreView>("/api/v1/store/buy", { method: "POST", token, body: { itemId } });
 export const equipItem = (token: Token, itemId: string, on: boolean) => apiRequest<StoreView>("/api/v1/store/equip", { method: "POST", token, body: { itemId, on } });
+
+export const updateContest = (token: Token, slug: string, body: { title: string; startsAt: string; endsAt: string; problems: { slug: string; points: number }[] }) =>
+  apiRequest<ContestView>(`/api/v1/contests/${enc(slug)}`, { method: "PATCH", token, body });
+
+export async function deleteContest(token: Token, slug: string): Promise<void> {
+  // 204 has no body, so this doesn't go through apiRequest's JSON unwrapping.
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "/backend"}/api/v1/contests/${enc(slug)}`, { method: "DELETE", headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+    throw new Error(body?.error?.message ?? `Request failed (HTTP ${res.status}).`);
+  }
+}
