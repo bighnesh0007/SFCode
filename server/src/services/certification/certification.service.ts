@@ -3,6 +3,7 @@
  * in the response to an answer — never with the question — so they can't be
  * read off the page before answering.
  */
+import { reviewSchedule } from "../../domain/review.ts";
 import { NotFoundError, ValidationError } from "../../errors/AppError.ts";
 import type { CertAttemptRepository } from "../../repositories/certAttempt.repository.ts";
 import type { QuestionBank } from "./bank.ts";
@@ -39,6 +40,11 @@ export interface AnswerResult {
   correct: boolean;
   answer: string[];
   explanation: string;
+}
+
+/** A question as learners see it: never the answer or the explanation. */
+function toPractice(q: { id: string; section: string; prompt: string; options: { id: string; text: string }[]; answer: string[] }): PracticeQuestion {
+  return { id: q.id, section: q.section, prompt: q.prompt, options: q.options.map((o) => ({ id: o.id, text: o.text })), choose: q.answer.length };
 }
 
 export class CertificationService {
@@ -86,13 +92,21 @@ export class CertificationService {
         pool[j] = a;
       }
     }
-    return pool.slice(0, Math.min(count, MAX_SESSION_QUESTIONS)).map((q) => ({
-      id: q.id,
-      section: q.section,
-      prompt: q.prompt,
-      options: q.options,
-      choose: q.answer.length,
-    }));
+    return pool.slice(0, Math.min(count, MAX_SESSION_QUESTIONS)).map(toPractice);
+  }
+
+  /** Missed questions due for review now (answers stripped), plus what's coming and what's mastered. */
+  async review(userId: string, now: Date = new Date()): Promise<{ due: PracticeQuestion[]; upcoming: number; nextDueAt: string | null; mastered: number }> {
+    if (!this.attempts) return { due: [], upcoming: 0, nextDueAt: null, mastered: 0 };
+    const schedule = reviewSchedule(await this.attempts.history(userId));
+    const due = schedule.due(now);
+    const later = schedule.states.filter((s) => s.dueAt > now).sort((a, b) => a.dueAt.getTime() - b.dueAt.getTime());
+    const questions = due.slice(0, MAX_SESSION_QUESTIONS).flatMap((s) => {
+      const found = this.bank.question(s.questionId);
+      if (!found) return []; // a question removed from the bank
+      return [toPractice(found.question)];
+    });
+    return { due: questions, upcoming: later.length, nextDueAt: later[0]?.dueAt.toISOString() ?? null, mastered: schedule.mastered };
   }
 
   async answer(userId: string | null, questionId: string, selected: string[]): Promise<AnswerResult> {

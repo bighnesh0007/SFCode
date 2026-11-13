@@ -4,12 +4,16 @@ import { buildApp } from "../src/app.ts";
 import { CERTIFICATION_DIR } from "../src/container.ts";
 import type { CertAttemptRepository } from "../src/repositories/certAttempt.repository.ts";
 import { QuestionBank, validateExam } from "../src/services/certification/bank.ts";
+import { reviewSchedule } from "../src/domain/review.ts";
 import { CertificationService } from "../src/services/certification/certification.service.ts";
 
 const bank = QuestionBank.load(CERTIFICATION_DIR);
 
 class MemoryAttempts implements CertAttemptRepository {
-  readonly rows: { userId: string; exam: string; questionId: string; correct: boolean }[] = [];
+  readonly rows: { userId: string; exam: string; questionId: string; correct: boolean; at?: Date }[] = [];
+  history(userId: string) {
+    return Promise.resolve(this.rows.filter((r) => r.userId === userId).map((r, i) => ({ questionId: r.questionId, correct: r.correct, at: r.at ?? new Date(1_700_000_000_000 + i * 1000) })));
+  }
   record(input: { userId: string; exam: string; questionId: string; correct: boolean }) {
     this.rows.push(input);
     return Promise.resolve();
@@ -130,6 +134,38 @@ describe("certification readiness", () => {
     expect(summary?.readiness).toBe(Math.round((100 * (1 + half)) / pd1.sections.length));
     expect(summary?.weakest).not.toBe(first?.id);
     expect((await service.list(null))[0]?.readiness).toBeNull();
+  });
+});
+
+describe("spaced review", () => {
+  const DAY = 86_400_000;
+  const t0 = new Date("2026-03-01T10:00:00Z");
+  const at = (days: number) => new Date(t0.getTime() + days * DAY);
+
+  it("schedule: a miss is due now; each correct answer waits longer; five in a row graduates", () => {
+    const miss = [{ questionId: "q", correct: false, at: at(0) }];
+    expect(reviewSchedule(miss).due(at(0)).map((s) => s.box)).toEqual([0]);
+    const once = [...miss, { questionId: "q", correct: true, at: at(0) }];
+    expect(reviewSchedule(once).due(at(0.9))).toHaveLength(0); // box 1: wait a day
+    expect(reviewSchedule(once).due(at(1))).toHaveLength(1);
+    const backToZero = [...once, { questionId: "q", correct: false, at: at(1) }];
+    expect(reviewSchedule(backToZero).states[0]?.box).toBe(0);
+    const streak = [...miss, ...[1, 2, 5, 12, 26].map((d) => ({ questionId: "q", correct: true, at: at(d) }))];
+    expect(reviewSchedule(streak)).toMatchObject({ mastered: 1, states: [] });
+    expect(reviewSchedule([{ questionId: "never-missed", correct: true, at: at(0) }]).states).toEqual([]);
+  });
+
+  it("the service returns due questions without answers, and counts upcoming and mastered", async () => {
+    const attempts = new MemoryAttempts();
+    const service = new CertificationService(bank, attempts);
+    const [q1, q2] = bank.exam("pd1")?.questions ?? [];
+    if (!q1 || !q2) throw new Error("fixture");
+    attempts.rows.push({ userId: "u", exam: "pd1", questionId: q1.id, correct: false, at: at(0) });
+    attempts.rows.push({ userId: "u", exam: "pd1", questionId: q2.id, correct: false, at: at(0) }, { userId: "u", exam: "pd1", questionId: q2.id, correct: true, at: at(0) });
+    const r = await service.review("u", at(0.5));
+    expect(r.due.map((q) => q.id)).toEqual([q1.id]);
+    expect(r).toMatchObject({ upcoming: 1, mastered: 0, nextDueAt: at(1).toISOString() });
+    expect(JSON.stringify(r)).not.toMatch(/"answer"|"explanation"/);
   });
 });
 

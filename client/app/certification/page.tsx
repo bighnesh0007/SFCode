@@ -7,8 +7,9 @@ import { GraduationCap, Play } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ApiError } from "@/lib/apiClient";
-import { listExams, type ExamSummary } from "@/lib/certificationApi";
+import { getReview, listExams, type ExamSummary, type ReviewQueue } from "@/lib/certificationApi";
 import { cn } from "@/lib/utils";
+import { BrainCircuit } from "lucide-react";
 
 export default function CertificationPage() {
   const { isLoaded, isSignedIn, getToken } = useAuthState();
@@ -37,6 +38,7 @@ export default function CertificationPage() {
         </p>
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
+      <ReviewCard />
       <div className="grid gap-4 md:grid-cols-2">
         {exams === null && !error
           ? [0, 1].map((i) => <div key={i} className="h-64 animate-pulse rounded-xl bg-muted/50" />)
@@ -104,5 +106,33 @@ export default function CertificationPage() {
             ))}
       </div>
     </div>
+  );
+}
+
+/** Missed questions due for spaced review (signed-in only). */
+function ReviewCard() {
+  const { isSignedIn, getToken } = useAuthState();
+  const [q, setQ] = useState<ReviewQueue | null>(null);
+  useEffect(() => {
+    if (!isSignedIn) return;
+    let cancelled = false;
+    getToken()
+      .then((t) => getReview(t))
+      .then((r) => !cancelled && setQ(r))
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [isSignedIn, getToken]);
+  if (!q || (q.due.length === 0 && q.upcoming === 0)) return null;
+  return (
+    <Link href="/certification/review" className="mb-6 flex items-center gap-4 rounded-xl border border-sky-500/40 bg-sky-500/5 p-4 transition-colors hover:bg-sky-500/10">
+      <BrainCircuit className="h-8 w-8 shrink-0 text-sky-500" />
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold">{q.due.length > 0 ? `${q.due.length} question${q.due.length === 1 ? "" : "s"} to review` : "All caught up"}</p>
+        <p className="text-xs text-muted-foreground">Questions you missed come back on a schedule until they stick. {q.upcoming} waiting · {q.mastered} mastered</p>
+      </div>
+      {q.due.length > 0 && <span className="rounded-md bg-sky-500 px-3 py-1.5 text-sm font-medium text-white">Review</span>}
+    </Link>
   );
 }

@@ -36,3 +36,11 @@ export const getPractice = (exam: string, section: string | null, count = 10) =>
 
 export const submitAnswer = (token: Token, questionId: string, selected: string[]) =>
   apiRequest<AnswerResult>("/api/v1/certification/answers", { method: "POST", token, body: { questionId, selected } });
+
+export interface ReviewQueue {
+  due: PracticeQuestion[];
+  upcoming: number;
+  nextDueAt: string | null;
+  mastered: number;
+}
+export const getReview = (token: Token) => apiRequest<ReviewQueue>("/api/v1/certification/review", { token });
