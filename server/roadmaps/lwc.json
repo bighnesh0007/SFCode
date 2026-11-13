@@ -35,32 +35,32 @@
         {
           "q": "Which creates a new array with one more item, leaving the old one unchanged?",
           "options": [
-            "items.push(x)",
-            "[...items, x]",
             "items.length++",
-            "items.add(x)"
+            "items.add(x)",
+            "[...items, x]",
+            "items.push(x)"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Spread copies the array into a new one; push changes the original."
         },
         {
           "q": "What does `await` do inside an async function?",
           "options": [
             "Runs code in parallel",
-            "Waits for a Promise to settle and gives its value",
+            "Retries on failure",
             "Creates a new thread",
-            "Retries on failure"
+            "Waits for a Promise to settle and gives its value"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "await pauses the function until the Promise resolves (or throws if it rejects)."
         },
         {
           "q": "Why do LWC handlers often use arrow functions?",
           "options": [
-            "They're faster",
+            "They return arrays",
             "They keep `this` from the surrounding code",
-            "They're required by LWC",
-            "They return arrays"
+            "They're faster",
+            "They're required by LWC"
           ],
           "answer": 1,
           "why": "Arrow functions don't rebind `this`."
@@ -89,10 +89,10 @@
         {
           "q": "A component's folder is `accountCard`. How do you use it in another template?",
           "options": [
-            "<accountCard>",
-            "<c-account-card>",
             "<c:accountCard>",
-            "<lwc-account-card>"
+            "<c-account-card>",
+            "<lwc-account-card>",
+            "<accountCard>"
           ],
           "answer": 1,
           "why": "Namespace `c`, kebab-case name."
@@ -100,21 +100,21 @@
         {
           "q": "Which file decides where a component can be placed in Lightning App Builder?",
           "options": [
-            "accountCard.html",
-            "accountCard.js-meta.xml",
+            "package.xml",
             "accountCard.css",
-            "package.xml"
+            "accountCard.html",
+            "accountCard.js-meta.xml"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "js-meta.xml holds isExposed and targets."
         },
         {
           "q": "Which command deploys your components to an org?",
           "options": [
             "sf project deploy start",
+            "npm run lwc",
             "sf org open",
-            "sf data query",
-            "npm run lwc"
+            "sf data query"
           ],
           "answer": 0,
           "why": "Components are metadata and deploy like any other source."
@@ -202,34 +202,34 @@
         {
           "q": "Why doesn't a CSS rule in a parent change the inside of a child component?",
           "options": [
-            "CSS is disabled in LWC",
-            "Shadow DOM scopes each component's styles",
             "Only inline styles work",
-            "The child must import it"
+            "The child must import it",
+            "CSS is disabled in LWC",
+            "Shadow DOM scopes each component's styles"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Each component's styles are encapsulated."
         },
         {
           "q": "How do you change a lightning-button's brand colour?",
           "options": [
+            "Inline JavaScript",
             "A deep CSS selector",
-            "A styling hook (CSS custom property)",
             "Editing SLDS",
-            "Inline JavaScript"
+            "A styling hook (CSS custom property)"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Styling hooks are the supported way to customise base components."
         },
         {
           "q": "What does SLDS provide?",
           "options": [
+            "A database",
             "A JavaScript framework",
-            "Salesforce's design system: CSS classes and patterns",
             "A testing tool",
-            "A database"
+            "Salesforce's design system: CSS classes and patterns"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "SLDS is the CSS and design guidance for the Salesforce look."
         }
       ]
@@ -291,12 +291,12 @@
         {
           "q": "Look at the diagram. Where do you subscribe to a message channel?",
           "options": [
+            "renderedCallback()",
             "constructor()",
             "connectedCallback()",
-            "renderedCallback()",
             "errorCallback()"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Subscribe once the component is in the page; unsubscribe in disconnectedCallback.",
           "image": "lwc-lifecycle",
           "imageAlt": "Lifecycle diagram: connectedCallback is labelled 'Inserted into the page: load data, subscribe'."
@@ -306,8 +306,8 @@
           "options": [
             "connectedCallback()",
             "renderedCallback()",
-            "constructor()",
-            "disconnectedCallback()"
+            "disconnectedCallback()",
+            "constructor()"
           ],
           "answer": 1,
           "why": "renderedCallback runs after each render, so guard work inside it.",
@@ -317,10 +317,10 @@
         {
           "q": "What should disconnectedCallback do?",
           "options": [
-            "Load data",
-            "Unsubscribe and clear timers",
             "Render the template",
-            "Set @api properties"
+            "Unsubscribe and clear timers",
+            "Set @api properties",
+            "Load data"
           ],
           "answer": 1,
           "why": "Clean up so nothing keeps running after the component is gone."
@@ -363,11 +363,11 @@
           "q": "Two components show the same record; one updates it with updateRecord. What happens to the other?",
           "options": [
             "Nothing until reload",
-            "It refreshes from the shared LDS cache",
             "It errors",
-            "It must call refreshApex"
+            "It must call refreshApex",
+            "It refreshes from the shared LDS cache"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "LDS shares one cache per record."
         },
         {
@@ -375,8 +375,8 @@
           "options": [
             "lightning-datatable",
             "lightning-record-edit-form",
-            "lightning-input",
-            "lightning-card"
+            "lightning-card",
+            "lightning-input"
           ],
           "answer": 1,
           "why": "Record forms use LDS, which respects FLS and sharing."
@@ -384,12 +384,12 @@
         {
           "q": "When is Apex the better choice than LDS?",
           "options": [
-            "Reading one record by Id",
             "Querying many records with filters",
+            "Showing a record form",
             "Updating one field",
-            "Showing a record form"
+            "Reading one record by Id"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "LDS works with single records; lists and complex queries need Apex (or the list APIs)."
         }
       ]
@@ -422,34 +422,34 @@
         {
           "q": "Which Apex methods can be used with @wire?",
           "options": [
-            "Any public method",
             "@AuraEnabled(cacheable=true) methods",
-            "Methods with DML",
-            "@future methods"
+            "@future methods",
+            "Any public method",
+            "Methods with DML"
           ],
-          "answer": 1,
-          "why": "Wired Apex must be cacheable."
+          "answer": 0,
+          "why": "@wire calls are cached and can be re-run at any time, so the method must be @AuraEnabled(cacheable=true), which also rules out DML. Call other methods imperatively."
         },
         {
           "q": "What does `$recordId` in a wire's parameters mean?",
           "options": [
             "A literal string",
+            "An Apex variable",
             "A reactive reference: the wire re-runs when recordId changes",
-            "A global variable",
-            "An Apex variable"
+            "A global variable"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "The $ prefix makes the parameter reactive."
         },
         {
           "q": "A list is wired; you update a contact imperatively. What refreshes the list?",
           "options": [
+            "Nothing is needed",
             "Reloading the page",
-            "refreshApex on the wired result",
             "connectedCallback",
-            "Nothing is needed"
+            "refreshApex on the wired result"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "refreshApex re-runs the wired call."
         }
       ]
@@ -487,10 +487,10 @@
         {
           "q": "Look at the diagram. Two components with no parent-child link need to share a selected record. How?",
           "options": [
-            "@api properties",
-            "A Lightning Message Service channel",
             "CustomEvent with bubbles",
-            "A shared variable"
+            "A Lightning Message Service channel",
+            "A shared variable",
+            "@api properties"
           ],
           "answer": 1,
           "why": "Unrelated components publish and subscribe on a message channel.",
@@ -500,12 +500,12 @@
         {
           "q": "Using the diagram, how does data reach c-child from c-parent?",
           "options": [
+            "Platform events",
             "Events",
-            "@api properties",
             "LMS",
-            "Platform events"
+            "@api properties"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Data flows down through @api properties.",
           "image": "lwc-communication",
           "imageAlt": "Diagram: an arrow labelled '@api props down' from c-parent to c-child."
@@ -514,11 +514,11 @@
           "q": "Can LMS reach Aura components and Visualforce pages on the same Lightning page?",
           "options": [
             "No, only LWC",
-            "Yes",
+            "Only in Experience Cloud",
             "Only Visualforce",
-            "Only in Experience Cloud"
+            "Yes"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "LMS works across LWC, Aura and Visualforce on a Lightning page."
         }
       ],
@@ -548,10 +548,10 @@
         {
           "q": "How do you open a record page from a component?",
           "options": [
-            "window.location = '/lightning/r/...'",
+            "An href to the Id",
             "NavigationMixin.Navigate with a standard__recordPage reference",
-            "A toast",
-            "An href to the Id"
+            "window.location = '/lightning/r/...'",
+            "A toast"
           ],
           "answer": 1,
           "why": "The mixin builds the right URL for the current context."
@@ -560,22 +560,22 @@
           "q": "Which shows a short confirmation like 'Contact saved'?",
           "options": [
             "ShowToastEvent",
+            "A validation rule",
             "A modal",
-            "console.log",
-            "A validation rule"
+            "console.log"
           ],
           "answer": 0,
-          "why": "Toasts give brief feedback."
+          "why": "ShowToastEvent from lightning/platformShowToastEvent shows a brief, self-dismissing message. A modal blocks the user, and console.log is invisible to them."
         },
         {
           "q": "Why avoid hard-coded URLs?",
           "options": [
-            "They're slower",
-            "They break across orgs, Experience sites and mobile",
+            "They need Apex",
             "They aren't allowed",
-            "They need Apex"
+            "They're slower",
+            "They break across orgs, Experience sites and mobile"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Page references adapt to where the component runs."
         }
       ]
@@ -613,34 +613,34 @@
         {
           "q": "Where do you query a component's rendered elements in Jest?",
           "options": [
-            "document.querySelector",
             "el.shadowRoot.querySelector",
-            "el.querySelector",
-            "window.find"
+            "window.find",
+            "document.querySelector",
+            "el.querySelector"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "The component's DOM is in its shadow root."
         },
         {
           "q": "You set a property then check the text immediately and it's stale. Why?",
           "options": [
-            "Jest is slow",
             "Re-rendering is asynchronous: await a microtask first",
-            "Properties can't be set in tests",
-            "The test needs an org"
+            "The test needs an org",
+            "Jest is slow",
+            "Properties can't be set in tests"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Wait for the re-render, e.g. `await Promise.resolve()`."
         },
         {
           "q": "How do tests handle a wired Apex method?",
           "options": [
-            "Call the org",
             "Mock the adapter and emit test data",
-            "Skip the component",
-            "Use SeeAllData"
+            "Use SeeAllData",
+            "Call the org",
+            "Skip the component"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Jest tests never reach an org; adapters are mocked."
         }
       ]
@@ -670,9 +670,9 @@
         {
           "q": "A row of tabs must work with the keyboard. Which roles do they need?",
           "options": [
-            "role=button on each",
-            "role=tablist, role=tab and role=tabpanel",
             "No roles",
+            "role=tablist, role=tab and role=tabpanel",
+            "role=button on each",
             "role=menu"
           ],
           "answer": 1,
@@ -682,9 +682,9 @@
           "q": "Why keep getters cheap?",
           "options": [
             "They run on every render",
-            "They can't call functions",
+            "They block Apex",
             "They only run once",
-            "They block Apex"
+            "They can't call functions"
           ],
           "answer": 0,
           "why": "Getters recompute each render, so heavy work slows the component."
@@ -693,11 +693,11 @@
           "q": "What should you use for an action a user clicks?",
           "options": [
             "<div onclick>",
-            "<button>",
+            "<p>",
             "<span>",
-            "<p>"
+            "<button>"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Buttons are focusable and keyboard-accessible by default."
         }
       ]
@@ -727,10 +727,10 @@
         {
           "q": "How should a component show user-entered text?",
           "options": [
-            "innerHTML",
+            "document.write",
             "Bind it in the template ({text}), which escapes it",
-            "eval",
-            "document.write"
+            "innerHTML",
+            "eval"
           ],
           "answer": 1,
           "why": "Template bindings render text safely."
@@ -740,8 +740,8 @@
           "options": [
             "A script tag to a CDN",
             "Upload it as a static resource and loadScript it",
-            "Paste it into an Apex class",
-            "It isn't possible"
+            "It isn't possible",
+            "Paste it into an Apex class"
           ],
           "answer": 1,
           "why": "Static resources plus loadScript work within the platform's CSP."
@@ -749,9 +749,9 @@
         {
           "q": "What stops a component from reading another namespace's DOM?",
           "options": [
-            "CSS",
-            "Lightning Web Security (or Locker)",
             "The js-meta.xml",
+            "Lightning Web Security (or Locker)",
+            "CSS",
             "SLDS"
           ],
           "answer": 1,

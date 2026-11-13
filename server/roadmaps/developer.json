@@ -34,32 +34,32 @@
         {
           "q": "Which of these is metadata rather than data?",
           "options": [
-            "An Account named Acme",
             "A custom field on Account",
             "A Contact record",
-            "A closed Case"
+            "A closed Case",
+            "An Account named Acme"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Fields, objects, layouts, Flows and code describe the org's shape: that's metadata. Records are data."
         },
         {
           "q": "Why does Salesforce enforce governor limits?",
           "options": [
-            "To sell more licences",
             "Orgs share servers, so no one org may use more than its share",
+            "Only for security",
             "To stop Apex being used",
-            "Only for security"
+            "To sell more licences"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Multi-tenancy: limits keep one org's code from slowing everyone else."
         },
         {
           "q": "Where should new Apex be written and tested?",
           "options": [
-            "Directly in production",
-            "In a sandbox or scratch org, then deployed",
             "In the Developer Console in production",
-            "Anywhere: it's the same"
+            "In a sandbox or scratch org, then deployed",
+            "Anywhere: it's the same",
+            "Directly in production"
           ],
           "answer": 1,
           "why": "Production can't even compile new Apex directly; it's built elsewhere and deployed with tests."
@@ -96,32 +96,32 @@
         {
           "q": "Which command sends your local metadata to an org?",
           "options": [
-            "sf project retrieve start",
-            "sf project deploy start",
             "sf org list",
-            "sf data query"
+            "sf project retrieve start",
+            "sf data query",
+            "sf project deploy start"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "deploy sends local source to the org; retrieve brings the org's metadata down to files."
         },
         {
           "q": "What is a scratch org best for?",
           "options": [
-            "Storing production data",
             "A short-lived, reproducible org for one feature",
+            "Replacing sandboxes for UAT with real data",
             "Running reports for executives",
-            "Replacing sandboxes for UAT with real data"
+            "Storing production data"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Scratch orgs are created from a definition file and source, used briefly, then deleted."
         },
         {
           "q": "Where should your Salesforce project's source live?",
           "options": [
-            "Only in the org",
+            "In the Developer Console",
             "In Git, as source-format files",
             "In a spreadsheet",
-            "In the Developer Console"
+            "Only in the org"
           ],
           "answer": 1,
           "why": "Source format in Git gives history, review and reproducible deploys."
@@ -164,12 +164,12 @@
         {
           "q": "In the diagram, what happens to Expense__c records when their Project__c is deleted?",
           "options": [
-            "Nothing",
             "They're deleted too",
-            "They're reassigned to another project",
-            "The delete is blocked"
+            "The delete is blocked",
+            "Nothing",
+            "They're reassigned to another project"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Master-detail children can't exist without their master, so they're deleted with it.",
           "image": "relationships",
           "imageAlt": "Relationships diagram: Expense__c is the detail side of a master-detail relationship to Project__c."
@@ -177,10 +177,10 @@
         {
           "q": "Using the diagram: how do Students relate to Courses?",
           "options": [
-            "A lookup from Student to Course",
+            "They don't relate",
             "Through Enrollment__c, a junction object with two master-details",
-            "A multi-select picklist",
-            "They don't relate"
+            "A lookup from Student to Course",
+            "A multi-select picklist"
           ],
           "answer": 1,
           "why": "Many-to-many goes through a junction object with a master-detail to each side.",
@@ -190,20 +190,20 @@
         {
           "q": "Which relationship lets a parent have roll-up summary fields?",
           "options": [
-            "Lookup",
             "Master-detail",
+            "External lookup",
             "Hierarchical",
-            "External lookup"
+            "Lookup"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Roll-up summaries need master-detail (a few standard lookups, like Account to Opportunity, are special cases)."
         },
         {
           "q": "Contact has a lookup to Account. Which SOQL gets each contact's account name?",
           "options": [
-            "SELECT Name, Account FROM Contact",
-            "SELECT LastName, Account.Name FROM Contact",
             "SELECT LastName, (SELECT Name FROM Account) FROM Contact",
+            "SELECT LastName, Account.Name FROM Contact",
+            "SELECT Name, Account FROM Contact",
             "SELECT LastName FROM Contact JOIN Account"
           ],
           "answer": 1,
@@ -284,12 +284,12 @@
         {
           "q": "Look at the diagram. Organization-wide default is Private. Can a sharing rule make a record invisible to someone the role hierarchy already lets see it?",
           "options": [
-            "Yes",
             "No: every layer after the defaults only adds access",
-            "Only for admins",
-            "Only with Apex"
+            "Yes",
+            "Only with Apex",
+            "Only for admins"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Sharing is additive: the layers above the defaults grant access; none of them take it away.",
           "image": "sharing-layers",
           "imageAlt": "Diagram of access layers: organization-wide defaults first, then four layers that each add access."
@@ -297,10 +297,10 @@
         {
           "q": "Using the diagram, which layer sets the most restrictive baseline?",
           "options": [
-            "Role hierarchy",
+            "Apex managed sharing",
             "Organization-wide defaults",
-            "Sharing rules",
-            "Apex managed sharing"
+            "Role hierarchy",
+            "Sharing rules"
           ],
           "answer": 1,
           "why": "Organization-wide defaults are layer 1, the baseline everything else builds on.",
@@ -310,23 +310,23 @@
         {
           "q": "A Salary field must be hidden from support users in reports and the API too. What do you use?",
           "options": [
-            "Remove it from the page layout",
             "Field-level security",
-            "A sharing rule",
-            "A validation rule"
+            "A validation rule",
+            "Remove it from the page layout",
+            "A sharing rule"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Field-level security applies everywhere; layouts only affect that page."
         },
         {
           "q": "By default, which mode does Apex run in?",
           "options": [
-            "User mode: it respects the user's permissions",
             "System mode: it ignores object and field permissions",
-            "Read-only mode",
-            "Guest mode"
+            "Guest mode",
+            "User mode: it respects the user's permissions",
+            "Read-only mode"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Apex runs in system mode unless you use user-mode queries or other enforcement."
         }
       ]
@@ -509,33 +509,33 @@
           "q": "You need every Account and Contact whose name contains 'acme'. Which fits best?",
           "options": [
             "Two SOQL queries with LIKE",
+            "A Flow",
             "One SOSL search returning Account and Contact",
-            "A report",
-            "A Flow"
+            "A report"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Searching text across several objects at once is what SOSL is for."
         },
         {
           "q": "What does a SOSL query return in Apex?",
           "options": [
-            "List<SObject>",
             "List<List<SObject>>",
-            "Map<Id, SObject>",
-            "AggregateResult[]"
+            "List<SObject>",
+            "AggregateResult[]",
+            "Map<Id, SObject>"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "One list per object named in RETURNING."
         },
         {
           "q": "Which is true of SOSL compared with SOQL?",
           "options": [
-            "SOSL can filter on any field exactly",
-            "SOSL uses the search index, so very new records may not appear yet",
             "SOSL can't search Contacts",
-            "SOSL has no limits"
+            "SOSL has no limits",
+            "SOSL can filter on any field exactly",
+            "SOSL uses the search index, so very new records may not appear yet"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "SOSL reads the search index, which updates shortly after records change."
         }
       ]
@@ -598,10 +598,10 @@
         {
           "q": "Which exception can never be caught?",
           "options": [
-            "DmlException",
+            "NullPointerException",
             "QueryException",
             "LimitException",
-            "NullPointerException"
+            "DmlException"
           ],
           "answer": 2,
           "why": "Exceeding a governor limit ends the transaction; catch blocks don't run."
@@ -609,32 +609,32 @@
         {
           "q": "Which is a valid custom exception?",
           "options": [
-            "public class BudgetError extends Exception {}",
-            "public class BudgetException extends Exception {}",
             "public exception Budget {}",
-            "public class BudgetException implements Exception {}"
+            "public class BudgetException implements Exception {}",
+            "public class BudgetError extends Exception {}",
+            "public class BudgetException extends Exception {}"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Custom exceptions extend Exception and their name must end in Exception."
         },
         {
           "q": "In a before trigger, how do you stop one bad record from saving with a friendly message?",
           "options": [
+            "delete the record",
             "throw new Exception()",
-            "record.addError('message')",
             "System.abort()",
-            "delete the record"
+            "record.addError('message')"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "addError blocks that record and shows the message; other records in a partial save still succeed."
         },
         {
           "q": "What happens to the transaction when an exception isn't caught?",
           "options": [
-            "Only the last statement is undone",
-            "Everything in the transaction rolls back",
             "Nothing: it continues",
-            "The data is saved but flagged"
+            "Everything in the transaction rolls back",
+            "The data is saved but flagged",
+            "Only the last statement is undone"
           ],
           "answer": 1,
           "why": "An unhandled exception rolls back all DML in the transaction."
@@ -679,44 +679,44 @@
           "q": "What does Test.stopTest() do for asynchronous Apex queued in the test?",
           "options": [
             "Cancels it",
-            "Runs it before the next line",
             "Schedules it for later",
-            "Nothing"
+            "Nothing",
+            "Runs it before the next line"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Async work queued between startTest and stopTest runs synchronously at stopTest."
         },
         {
           "q": "What coverage does a production deploy require?",
           "options": [
-            "50% org-wide",
-            "75% org-wide, and every trigger covered",
             "100% of each class",
-            "None"
+            "50% org-wide",
+            "None",
+            "75% org-wide, and every trigger covered"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "75% overall across the Apex being deployed, and every trigger must have some coverage."
         },
         {
           "q": "Why avoid SeeAllData=true?",
           "options": [
-            "It's slower to type",
-            "Tests then depend on org data and break when it changes",
             "It's not allowed in sandboxes",
-            "It disables assertions"
+            "It disables assertions",
+            "Tests then depend on org data and break when it changes",
+            "It's slower to type"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Tests should create their own data so they pass the same everywhere."
         },
         {
           "q": "Which tests sharing as a specific user?",
           "options": [
-            "Test.setMock",
-            "System.runAs(user)",
             "@TestSetup",
-            "Test.isRunningTest()"
+            "Test.isRunningTest()",
+            "System.runAs(user)",
+            "Test.setMock"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "runAs executes the block as that user, applying their sharing."
         }
       ]
@@ -820,12 +820,12 @@
           "image": "order-of-execution",
           "imageAlt": "The order of execution: before-save flows run first, then before triggers, then validation rules.",
           "options": [
-            "The flow's",
             "The trigger's",
             "Whichever was deployed last",
+            "The flow's",
             "Salesforce raises an error"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Before-save flows run first (step 1) and before triggers run after them (step 2), so the trigger's assignment is the one that's saved."
         },
         {
@@ -833,34 +833,34 @@
           "image": "order-of-execution",
           "imageAlt": "The order of execution: validation rules are step 3, after triggers are step 6.",
           "options": [
-            "Yes, after triggers always run",
-            "No: validation fails before the save, and after triggers come after it",
             "Only in bulk inserts",
-            "Only if the trigger is active"
+            "Only if the trigger is active",
+            "No: validation fails before the save, and after triggers come after it",
+            "Yes, after triggers always run"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Validation runs before the record is saved (step 3). A failure stops the save, so steps 5 onwards, including after triggers, never run."
         },
         {
           "q": "Where should you set a field on the same record that's being inserted?",
           "options": [
-            "After insert trigger with an update statement",
             "Before insert trigger, assigning on Trigger.new",
             "A @future method",
-            "A scheduled job"
+            "A scheduled job",
+            "After insert trigger with an update statement"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Before triggers can change Trigger.new directly; the save writes the change with no extra DML."
         },
         {
           "q": "Which context variable is null in an insert trigger?",
           "options": [
-            "Trigger.new",
-            "Trigger.old",
             "Trigger.isInsert",
-            "Trigger.size"
+            "Trigger.size",
+            "Trigger.old",
+            "Trigger.new"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "There's no previous version of a record being inserted, so Trigger.old and Trigger.oldMap are null."
         }
       ]
@@ -895,33 +895,33 @@
           "q": "Which clause enforces object permissions, field-level security and sharing in a query?",
           "options": [
             "WITH SECURITY_ENFORCED",
-            "WITH USER_MODE",
             "WITH SYSTEM_MODE",
+            "WITH USER_MODE",
             "FOR VIEW"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "USER_MODE applies the running user's CRUD, FLS and sharing."
         },
         {
           "q": "What stops SOQL injection?",
           "options": [
-            "Upper-casing input",
             "Bind variables (:value) instead of joining strings",
-            "Using LIMIT",
-            "Running in system mode"
+            "Upper-casing input",
+            "Running in system mode",
+            "Using LIMIT"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Binds send input as a value, so it can't change the query's structure."
         },
         {
           "q": "A class has no sharing keyword. Is sharing enforced?",
           "options": [
             "Always",
-            "Never",
             "It depends on the calling context; declare it explicitly",
-            "Only in triggers"
+            "Only in triggers",
+            "Never"
           ],
-          "answer": 2,
+          "answer": 1,
           "why": "Without a keyword the class takes its sharing from context, which is easy to get wrong. Be explicit."
         }
       ]
@@ -952,33 +952,33 @@
           "q": "Which debug log event shows your System.debug output?",
           "options": [
             "SOQL_EXECUTE_BEGIN",
-            "USER_DEBUG",
             "DML_BEGIN",
-            "CODE_UNIT_STARTED"
+            "CODE_UNIT_STARTED",
+            "USER_DEBUG"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "System.debug writes USER_DEBUG lines."
         },
         {
           "q": "What must exist before a user's actions produce debug logs?",
           "options": [
             "A sandbox refresh",
-            "A trace flag for that user",
             "A permission set",
-            "A custom setting"
+            "A custom setting",
+            "A trace flag for that user"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Trace flags turn logging on for a user, class or trigger for a period of time."
         },
         {
           "q": "Why turn log levels down rather than up when a log is huge?",
           "options": [
+            "Higher levels hide errors",
             "Lower levels are faster to download",
             "Logs have a size cap; too much detail truncates the part you need",
-            "Higher levels hide errors",
             "It doesn't matter"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Logs over the size limit are truncated, often losing the end where the error is."
         }
       ]
@@ -1051,12 +1051,12 @@
         {
           "q": "Look at the diagram. Where does the business logic live?",
           "options": [
+            "In the recursion guard",
             "In AccountTrigger",
             "In the handler and the service and selector classes it calls",
-            "In the recursion guard",
             "In a Flow"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "The trigger is one line; the handler routes to classes that hold the logic and queries.",
           "image": "trigger-handler",
           "imageAlt": "Diagram: AccountTrigger calls AccountTriggerHandler, which calls AccountService and AccountSelector, with a recursion guard."
@@ -1064,12 +1064,12 @@
         {
           "q": "Using the diagram, what does the recursion guard store?",
           "options": [
-            "A Boolean flag",
-            "A static Set<Id> of records already processed",
             "The last error",
-            "A list of triggers"
+            "A Boolean flag",
+            "A list of triggers",
+            "A static Set<Id> of records already processed"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Tracking Ids handles bulk loads correctly, where a single flag would skip later chunks.",
           "image": "trigger-handler",
           "imageAlt": "Diagram: the recursion guard box reads 'static Set<Id> already processed'."
@@ -1157,12 +1157,12 @@
         {
           "q": "Look at the diagram. Where should the API's URL and credentials live?",
           "options": [
-            "In the Apex class",
             "In the Named Credential",
             "In a custom label",
+            "In the Apex class",
             "In the test class"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Named Credentials hold the endpoint and auth so code never contains secrets.",
           "image": "callout-flow",
           "imageAlt": "Diagram: Apex calls a Named Credential, which holds URL and auth and calls the external API."
@@ -1170,10 +1170,10 @@
         {
           "q": "Using the diagram's notes: what answers callouts during a test?",
           "options": [
-            "The real API",
+            "A Named Credential",
             "An HttpCalloutMock set with Test.setMock",
             "Nothing; tests skip callouts",
-            "A Named Credential"
+            "The real API"
           ],
           "answer": 1,
           "why": "Tests can't make real callouts; a mock returns the response.",
@@ -1183,9 +1183,9 @@
         {
           "q": "A trigger must call an external API. What do you do?",
           "options": [
-            "Call Http.send in the trigger",
-            "Enqueue a Queueable (or @future(callout=true)) that makes the callout",
             "Use a validation rule",
+            "Enqueue a Queueable (or @future(callout=true)) that makes the callout",
+            "Call Http.send in the trigger",
             "It's impossible"
           ],
           "answer": 1,
@@ -1223,12 +1223,12 @@
         {
           "q": "Look at the diagram. A child must tell its parent a star was clicked. How?",
           "options": [
-            "Set a property on the parent",
             "Dispatch a CustomEvent the parent listens for",
-            "Publish to a message channel",
-            "Use @wire"
+            "Set a property on the parent",
+            "Use @wire",
+            "Publish to a message channel"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Children send changes up as events; properties only flow down.",
           "image": "lwc-communication",
           "imageAlt": "Diagram: arrows show @api props down from c-parent to c-child and CustomEvent up from child to parent."
@@ -1236,10 +1236,10 @@
         {
           "q": "Using the diagram, how do c-child and c-unrelated communicate?",
           "options": [
-            "Through @api",
+            "Through the parent's template",
             "Through a Lightning Message Service channel: one publishes, the other subscribes",
-            "They can't",
-            "Through the parent's template"
+            "Through @api",
+            "They can't"
           ],
           "answer": 1,
           "why": "Components with no parent-child link use a message channel.",
@@ -1250,11 +1250,11 @@
           "q": "Which event name will a parent's `onitemselect` handler receive?",
           "options": [
             "itemSelect",
-            "item-select",
             "itemselect",
+            "item-select",
             "ItemSelect"
           ],
-          "answer": 2,
+          "answer": 1,
           "why": "Event names are lower-case, and `on` plus the name forms the handler attribute."
         }
       ]
@@ -1300,12 +1300,12 @@
         {
           "q": "Look at the diagram. You need to pass a List<Account> to code that runs later and then start a second job. Which tool?",
           "options": [
-            "@future",
             "Queueable",
-            "Schedulable",
-            "A trigger"
+            "@future",
+            "A trigger",
+            "Schedulable"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Queueable takes objects as arguments and can chain jobs.",
           "image": "async-choice",
           "imageAlt": "Diagram: Queueable is labelled 'Run later, objects as args, chain jobs'."
@@ -1313,12 +1313,12 @@
         {
           "q": "Using the diagram, which tool processes millions of records in chunks?",
           "options": [
-            "@future",
             "Queueable",
-            "Batch Apex",
-            "Platform Events"
+            "Platform Events",
+            "@future",
+            "Batch Apex"
           ],
-          "answer": 2,
+          "answer": 3,
           "why": "Batch Apex splits a large dataset into chunks, each with its own limits.",
           "image": "async-choice",
           "imageAlt": "Diagram: Batch Apex is labelled 'Millions of records in chunks'."
@@ -1326,12 +1326,12 @@
         {
           "q": "How many SOQL queries may an asynchronous transaction run?",
           "options": [
-            "100",
-            "150",
             "200",
-            "Unlimited"
+            "150",
+            "Unlimited",
+            "100"
           ],
-          "answer": 2,
+          "answer": 0,
           "why": "Async limits are higher: 200 queries instead of 100."
         }
       ]
@@ -1403,22 +1403,22 @@
           "q": "How do you publish a platform event from Apex?",
           "options": [
             "insert event;",
-            "EventBus.publish(event)",
             "System.enqueueJob(event)",
-            "Database.publish(event)"
+            "Database.publish(event)",
+            "EventBus.publish(event)"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "EventBus.publish sends the event and returns SaveResults."
         },
         {
           "q": "With 'Publish After Commit', what happens if the publishing transaction rolls back?",
           "options": [
+            "It's delivered to admins only",
             "The event is still delivered",
             "The event isn't delivered",
-            "It's delivered twice",
-            "It's delivered to admins only"
+            "It's delivered twice"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "After-commit events are only sent when the transaction succeeds."
         },
         {
@@ -1426,8 +1426,8 @@
           "options": [
             "Only Apex triggers",
             "Triggers, Flows, LWC and external systems",
-            "Only external systems",
-            "Only Flows"
+            "Only Flows",
+            "Only external systems"
           ],
           "answer": 1,
           "why": "Platform events support many subscriber types, which is what makes them good for decoupling."
@@ -1478,23 +1478,23 @@
         {
           "q": "What is data skew?",
           "options": [
-            "Records with bad data",
-            "One parent or owner with a huge number of child or owned records",
             "Unbalanced test data",
-            "A sandbox out of date"
+            "A sandbox out of date",
+            "Records with bad data",
+            "One parent or owner with a huge number of child or owned records"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Skew causes locking and slow sharing calculations."
         },
         {
           "q": "You must load 5 million records. What's appropriate?",
           "options": [
             "Data Import Wizard",
+            "One insert in a trigger",
             "Bulk API or Data Loader in bulk mode, with heavy automation paused",
-            "Anonymous Apex",
-            "One insert in a trigger"
+            "Anonymous Apex"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Bulk API is built for large volumes; pausing non-essential automation avoids limits and locks."
         }
       ]
@@ -1535,12 +1535,12 @@
         {
           "q": "Look at the diagram. Where should automated tests run before anything reaches production?",
           "options": [
+            "They don't need to",
             "In production",
-            "In CI, after the change is committed to Git",
             "Only in the scratch org",
-            "They don't need to"
+            "In CI, after the change is committed to Git"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "CI runs the tests on every change, before UAT and production.",
           "image": "deploy-pipeline",
           "imageAlt": "Diagram: Scratch org, Git, CI (tests, scans), UAT sandbox, Production."
@@ -1548,12 +1548,12 @@
         {
           "q": "Using the diagram's note: what must be true for a production deploy?",
           "options": [
-            "50% coverage",
             "75% overall coverage, every trigger covered, all tests pass",
+            "100% coverage",
             "No tests needed with change sets",
-            "100% coverage"
+            "50% coverage"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Production deploys enforce those test rules.",
           "image": "deploy-pipeline",
           "imageAlt": "Diagram note: production deploys need 75% org-wide coverage, every trigger covered, all tests passing."
@@ -1561,12 +1561,12 @@
         {
           "q": "Which is versioned and installable as a module?",
           "options": [
-            "A change set",
             "An unlocked package",
             "A sandbox",
-            "A report"
+            "A report",
+            "A change set"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Packages are versioned units of metadata."
         }
       ]
@@ -1619,23 +1619,23 @@
         {
           "q": "Which layer exposes business operations to LWC, REST and batch alike?",
           "options": [
-            "Selector",
-            "Service",
+            "Trigger",
             "Domain",
-            "Trigger"
+            "Service",
+            "Selector"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Service methods are the single entry point for an operation, whoever calls it."
         },
         {
           "q": "What does a Unit of Work do?",
           "options": [
             "Schedules jobs",
-            "Collects DML and commits it once, in order",
+            "Formats JSON",
             "Runs tests",
-            "Formats JSON"
+            "Collects DML and commits it once, in order"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "It batches DML across objects into one ordered commit."
         }
       ]
@@ -1673,32 +1673,32 @@
         {
           "q": "Which annotation exposes an Apex class as a REST endpoint?",
           "options": [
+            "@HttpCallout",
             "@AuraEnabled",
-            "@RestResource",
             "@InvocableMethod",
-            "@HttpCallout"
+            "@RestResource"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "@RestResource with a urlMapping publishes the class under /services/apexrest/."
         },
         {
           "q": "Where does an Apex REST class live in the URL?",
           "options": [
-            "/services/data/",
             "/services/apexrest/",
             "/apex/",
+            "/services/data/",
             "/rest/"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Custom Apex REST endpoints are under /services/apexrest/."
         },
         {
           "q": "When should you use the standard REST API instead of Apex REST?",
           "options": [
-            "Never",
+            "Only in sandboxes",
             "When it already covers the operation, such as plain record CRUD",
-            "Only for reads",
-            "Only in sandboxes"
+            "Never",
+            "Only for reads"
           ],
           "answer": 1,
           "why": "Custom endpoints are code to maintain; use them for custom logic only."

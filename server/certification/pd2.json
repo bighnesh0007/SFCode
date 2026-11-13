@@ -45,15 +45,15 @@
       "options": [
         {
           "id": "a",
-          "text": "Accepting non-primitive types such as sObjects as job state"
-        },
-        {
-          "id": "b",
           "text": "Chaining another job from `execute`"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "Making HTTP callouts"
+        },
+        {
+          "id": "c",
+          "text": "Accepting non-primitive types such as sObjects as job state"
         },
         {
           "id": "d",
@@ -62,7 +62,7 @@
       ],
       "answer": [
         "a",
-        "b"
+        "c"
       ],
       "explanation": "Queueable jobs can hold complex state and enqueue a follow-up job, and `System.enqueueJob` returns a job Id to monitor. Both mechanisms can make callouts and both run asynchronously."
     },
@@ -73,23 +73,23 @@
       "options": [
         {
           "id": "a",
-          "text": "100"
-        },
-        {
-          "id": "b",
-          "text": "200"
-        },
-        {
-          "id": "c",
           "text": "2,000"
         },
         {
-          "id": "d",
+          "id": "b",
+          "text": "100"
+        },
+        {
+          "id": "c",
           "text": "50,000"
+        },
+        {
+          "id": "d",
+          "text": "200"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "The default scope is 200. With a `QueryLocator` you can pass up to 2,000 as the second argument to `Database.executeBatch`."
     },
@@ -100,11 +100,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Directly in the trigger with `Http.send()`"
+          "text": "Using a `with sharing` class"
         },
         {
           "id": "b",
-          "text": "From an asynchronous context, e.g. `@future(callout=true)` or a Queueable that implements `Database.AllowsCallouts`"
+          "text": "Directly in the trigger with `Http.send()`"
         },
         {
           "id": "c",
@@ -112,11 +112,11 @@
         },
         {
           "id": "d",
-          "text": "Using a `with sharing` class"
+          "text": "From an asynchronous context, e.g. `@future(callout=true)` or a Queueable that implements `Database.AllowsCallouts`"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Synchronous callouts aren't allowed from triggers, because the transaction would hold database locks while waiting on the network. Move the callout to async Apex."
     },
@@ -127,23 +127,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Insert them in the opposite order"
-        },
-        {
-          "id": "b",
           "text": "Perform one of the DML operations in a separate transaction, e.g. a `@future` method"
         },
         {
+          "id": "b",
+          "text": "Declare the class `without sharing`"
+        },
+        {
           "id": "c",
-          "text": "Use `Database.insert(records, false)`"
+          "text": "Insert them in the opposite order"
         },
         {
           "id": "d",
-          "text": "Declare the class `without sharing`"
+          "text": "Use `Database.insert(records, false)`"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Setup objects (User, Group, PermissionSetAssignment…) and non-setup objects can't be modified in the same transaction. Split the work across transactions; in tests, `System.runAs` also separates them."
     },
@@ -154,11 +154,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Custom settings"
+          "text": "Custom metadata types"
         },
         {
           "id": "b",
-          "text": "Custom metadata types"
+          "text": "A custom object"
         },
         {
           "id": "c",
@@ -166,11 +166,11 @@
         },
         {
           "id": "d",
-          "text": "A custom object"
+          "text": "Custom settings"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Custom metadata type **records** are metadata, so they deploy with packages and change sets. Custom settings data and custom object records are data and have to be loaded separately."
     },
@@ -181,7 +181,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Publish Immediately"
+          "text": "Neither; use a trigger on the event"
         },
         {
           "id": "b",
@@ -189,11 +189,11 @@
         },
         {
           "id": "c",
-          "text": "Either — events always wait for commit"
+          "text": "Publish Immediately"
         },
         {
           "id": "d",
-          "text": "Neither; use a trigger on the event"
+          "text": "Either — events always wait for commit"
         }
       ],
       "answer": [
@@ -208,11 +208,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Wrap `execute` in `try/catch`"
+          "text": "Attach a Transaction Finalizer with `System.attachFinalizer()`"
         },
         {
           "id": "b",
-          "text": "Attach a Transaction Finalizer with `System.attachFinalizer()`"
+          "text": "Chain a second Queueable at the end of `execute`"
         },
         {
           "id": "c",
@@ -220,11 +220,11 @@
         },
         {
           "id": "d",
-          "text": "Chain a second Queueable at the end of `execute`"
+          "text": "Wrap `execute` in `try/catch`"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "A class implementing `System.Finalizer`, attached inside `execute`, runs after the job finishes, whether it succeeded or failed — including failures that `try/catch` and `finally` can't intercept."
     },
@@ -235,23 +235,23 @@
       "options": [
         {
           "id": "a",
-          "text": "`Id`"
-        },
-        {
-          "id": "b",
           "text": "`CreatedDate`"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "A lookup field"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "A custom text field that is not an External ID or unique"
+        },
+        {
+          "id": "d",
+          "text": "`Id`"
         }
       ],
       "answer": [
-        "d"
+        "c"
       ],
       "explanation": "Standard indexes cover `Id`, `Name`, `OwnerId`, `CreatedDate`, `SystemModstamp`, `RecordTypeId`, lookup and master-detail fields, plus custom fields marked External ID or unique. Other custom fields need a custom index."
     },
@@ -262,7 +262,7 @@
       "options": [
         {
           "id": "a",
-          "text": "`@future(callout=true)`"
+          "text": "Increasing the callout timeout"
         },
         {
           "id": "b",
@@ -274,7 +274,7 @@
         },
         {
           "id": "d",
-          "text": "Increasing the callout timeout"
+          "text": "`@future(callout=true)`"
         }
       ],
       "answer": [
@@ -289,7 +289,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Tests can make real callouts if the endpoint is in Remote Site Settings"
+          "text": "Callout code can't be covered by tests"
         },
         {
           "id": "b",
@@ -297,11 +297,11 @@
         },
         {
           "id": "c",
-          "text": "Use `SeeAllData=true`"
+          "text": "Tests can make real callouts if the endpoint is in Remote Site Settings"
         },
         {
           "id": "d",
-          "text": "Callout code can't be covered by tests"
+          "text": "Use `SeeAllData=true`"
         }
       ],
       "answer": [
@@ -316,23 +316,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Use `SeeAllData=true` and query an existing user"
-        },
-        {
-          "id": "b",
-          "text": "Create the user in the test and wrap the code in `System.runAs(user)`"
-        },
-        {
-          "id": "c",
           "text": "Call `UserInfo.setUser()`"
         },
         {
-          "id": "d",
+          "id": "b",
+          "text": "Use `SeeAllData=true` and query an existing user"
+        },
+        {
+          "id": "c",
           "text": "It can't be tested"
+        },
+        {
+          "id": "d",
+          "text": "Create the user in the test and wrap the code in `System.runAs(user)`"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "`System.runAs` executes a block as the given user, enforcing record sharing for that user. It's only available in tests. (Field- and object-level security is enforced only where the code asks for it, e.g. `WITH USER_MODE`.)"
     },
@@ -343,23 +343,23 @@
       "options": [
         {
           "id": "a",
-          "text": "A CSV file stored as a static resource"
-        },
-        {
-          "id": "b",
           "text": "A JSON file in the test class"
         },
         {
+          "id": "b",
+          "text": "A CSV file stored as a static resource"
+        },
+        {
           "id": "c",
-          "text": "Existing records in the org"
+          "text": "An external URL"
         },
         {
           "id": "d",
-          "text": "An external URL"
+          "text": "Existing records in the org"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "`Test.loadData(Account.sObjectType, 'myResource')` inserts records from a CSV static resource. It's handy for large or reusable fixtures without writing them out in Apex."
     },
@@ -370,11 +370,11 @@
       "options": [
         {
           "id": "a",
-          "text": "A single trigger handler"
+          "text": "A `@future` method"
         },
         {
           "id": "b",
-          "text": "A `@future` method"
+          "text": "A Queueable that queries all records at once"
         },
         {
           "id": "c",
@@ -382,7 +382,7 @@
         },
         {
           "id": "d",
-          "text": "A Queueable that queries all records at once"
+          "text": "A single trigger handler"
         }
       ],
       "answer": [
@@ -401,7 +401,7 @@
         },
         {
           "id": "b",
-          "text": "Lightning Message Service"
+          "text": "Platform Events"
         },
         {
           "id": "c",
@@ -409,11 +409,11 @@
         },
         {
           "id": "d",
-          "text": "Platform Events"
+          "text": "Lightning Message Service"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Lightning Message Service communicates across the DOM between LWC, Aura and Visualforce on a Lightning page. DOM events only travel up the containment tree."
     },
@@ -424,7 +424,7 @@
       "options": [
         {
           "id": "a",
-          "text": "It works but isn't cached"
+          "text": "It works only with @wire"
         },
         {
           "id": "b",
@@ -436,7 +436,7 @@
         },
         {
           "id": "d",
-          "text": "It works only with @wire"
+          "text": "It works but isn't cached"
         }
       ],
       "answer": [
@@ -455,19 +455,19 @@
         },
         {
           "id": "b",
-          "text": "refreshApex() on the wired result"
-        },
-        {
-          "id": "c",
           "text": "window.location.reload()"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "Setting @track on the list"
+        },
+        {
+          "id": "d",
+          "text": "refreshApex() on the wired result"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "refreshApex(valueProvisionedByWire) re-runs the wired Apex call and replaces the cached data."
     },
@@ -478,15 +478,15 @@
       "options": [
         {
           "id": "a",
-          "text": "Nothing until the page is reloaded"
-        },
-        {
-          "id": "b",
           "text": "It gets the new values automatically from the shared Lightning Data Service cache"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "It throws an error"
+        },
+        {
+          "id": "c",
+          "text": "Nothing until the page is reloaded"
         },
         {
           "id": "d",
@@ -494,7 +494,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Lightning Data Service keeps one cache per record, so a change made through LDS is pushed to every component using that record."
     },
@@ -513,11 +513,11 @@
         },
         {
           "id": "c",
-          "text": "A component with JavaScript remoting"
+          "text": "Apex:repeat with LIMIT 10000"
         },
         {
           "id": "d",
-          "text": "Apex:repeat with LIMIT 10000"
+          "text": "A component with JavaScript remoting"
         }
       ],
       "answer": [
@@ -540,11 +540,11 @@
         },
         {
           "id": "c",
-          "text": "The Shadow DOM polyfill"
+          "text": "CORS"
         },
         {
           "id": "d",
-          "text": "CORS"
+          "text": "The Shadow DOM polyfill"
         }
       ],
       "answer": [
@@ -559,23 +559,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Type.forName(name).newInstance()"
-        },
-        {
-          "id": "b",
           "text": "new Object(name)"
         },
         {
+          "id": "b",
+          "text": "Schema.newClass(name)"
+        },
+        {
           "id": "c",
-          "text": "Class.create(name)"
+          "text": "Type.forName(name).newInstance()"
         },
         {
           "id": "d",
-          "text": "Schema.newClass(name)"
+          "text": "Class.create(name)"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Type.forName returns the class's type and newInstance creates an instance; cast it to an interface the class implements."
     },
@@ -586,23 +586,23 @@
       "options": [
         {
           "id": "a",
-          "text": "A static variable"
-        },
-        {
-          "id": "b",
-          "text": "Platform Cache (org cache)"
-        },
-        {
-          "id": "c",
           "text": "A custom label"
         },
         {
-          "id": "d",
+          "id": "b",
+          "text": "A static variable"
+        },
+        {
+          "id": "c",
           "text": "The view state"
+        },
+        {
+          "id": "d",
+          "text": "Platform Cache (org cache)"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Platform Cache's org partition shares values across transactions and users until they expire; static variables last only one transaction."
     },
@@ -613,15 +613,15 @@
       "options": [
         {
           "id": "a",
-          "text": "Database.setSavepoint() and Database.rollback(sp)"
+          "text": "Without sharing"
         },
         {
           "id": "b",
-          "text": "A @future method"
+          "text": "Database.setSavepoint() and Database.rollback(sp)"
         },
         {
           "id": "c",
-          "text": "Without sharing"
+          "text": "A @future method"
         },
         {
           "id": "d",
@@ -629,7 +629,7 @@
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Savepoints let you undo DML back to a known point inside the transaction."
     },
@@ -640,11 +640,11 @@
       "options": [
         {
           "id": "a",
-          "text": "One class with a big if/else"
+          "text": "A custom setting per method"
         },
         {
           "id": "b",
-          "text": "An interface implemented by each provider, created with Type.forName"
+          "text": "One class with a big if/else"
         },
         {
           "id": "c",
@@ -652,11 +652,11 @@
         },
         {
           "id": "d",
-          "text": "A custom setting per method"
+          "text": "An interface implemented by each provider, created with Type.forName"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "An interface plus dynamic instantiation is the strategy pattern: add a provider without changing callers."
     },
@@ -667,7 +667,7 @@
       "options": [
         {
           "id": "a",
-          "text": "RowCause set to a custom Apex sharing reason"
+          "text": "AccessLevel All"
         },
         {
           "id": "b",
@@ -675,7 +675,7 @@
         },
         {
           "id": "c",
-          "text": "AccessLevel All"
+          "text": "RowCause set to a custom Apex sharing reason"
         },
         {
           "id": "d",
@@ -683,7 +683,7 @@
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Shares with a custom Apex sharing reason survive owner changes; Manual shares are removed when the owner changes."
     },
@@ -698,15 +698,15 @@
         },
         {
           "id": "b",
-          "text": "Speeds up the job"
-        },
-        {
-          "id": "c",
           "text": "Prevents the job from failing"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "Schedules the job"
+        },
+        {
+          "id": "d",
+          "text": "Speeds up the job"
         }
       ],
       "answer": [
@@ -721,23 +721,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Concatenate the term"
+          "text": "Remove spaces"
         },
         {
           "id": "b",
-          "text": "Use a bind variable (:term) in Database.query or queryWithBinds"
-        },
-        {
-          "id": "c",
           "text": "Upper-case the term"
         },
         {
+          "id": "c",
+          "text": "Concatenate the term"
+        },
+        {
           "id": "d",
-          "text": "Remove spaces"
+          "text": "Use a bind variable (:term) in Database.query or queryWithBinds"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Binds keep input as data; concatenation allows SOQL injection."
     },
@@ -752,7 +752,7 @@
         },
         {
           "id": "b",
-          "text": "In a Named Credential (with an External Credential)"
+          "text": "In a static resource"
         },
         {
           "id": "c",
@@ -760,11 +760,11 @@
         },
         {
           "id": "d",
-          "text": "In a static resource"
+          "text": "In a Named Credential (with an External Credential)"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Named Credentials keep endpoints and secrets out of code and handle authentication."
     },
@@ -775,23 +775,23 @@
       "options": [
         {
           "id": "a",
-          "text": "It works"
+          "text": "The callout is queued"
         },
         {
           "id": "b",
-          "text": "It fails with 'You have uncommitted work pending'"
-        },
-        {
-          "id": "c",
           "text": "The DML is rolled back automatically"
         },
         {
+          "id": "c",
+          "text": "It works"
+        },
+        {
           "id": "d",
-          "text": "The callout is queued"
+          "text": "It fails with 'You have uncommitted work pending'"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Callouts can't follow uncommitted DML in the same transaction; do the callout first or move it to async Apex."
     },
@@ -802,23 +802,23 @@
       "options": [
         {
           "id": "a",
-          "text": "10"
+          "text": "Unlimited"
         },
         {
           "id": "b",
-          "text": "50"
+          "text": "10"
         },
         {
           "id": "c",
-          "text": "100"
+          "text": "50"
         },
         {
           "id": "d",
-          "text": "Unlimited"
+          "text": "100"
         }
       ],
       "answer": [
-        "c"
+        "d"
       ],
       "explanation": "The limit is 100 callouts per transaction, with a cumulative timeout of 120 seconds."
     },
@@ -833,15 +833,15 @@
         },
         {
           "id": "b",
-          "text": "@RestResource"
+          "text": "@InvocableMethod"
         },
         {
           "id": "c",
-          "text": "@AuraEnabled"
+          "text": "@RestResource"
         },
         {
           "id": "d",
-          "text": "@InvocableMethod"
+          "text": "@AuraEnabled"
         }
       ],
       "answer": [
@@ -856,7 +856,7 @@
       "options": [
         {
           "id": "a",
-          "text": "String.split"
+          "text": "Regular expressions"
         },
         {
           "id": "b",
@@ -864,7 +864,7 @@
         },
         {
           "id": "c",
-          "text": "Regular expressions"
+          "text": "String.split"
         },
         {
           "id": "d",
@@ -883,11 +883,11 @@
       "options": [
         {
           "id": "a",
-          "text": "External Services, registered from an OpenAPI specification"
+          "text": "Platform events"
         },
         {
           "id": "b",
-          "text": "Platform events"
+          "text": "External Services, registered from an OpenAPI specification"
         },
         {
           "id": "c",
@@ -899,7 +899,7 @@
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "External Services generate invocable actions from an API's OpenAPI spec."
     },
@@ -914,15 +914,15 @@
         },
         {
           "id": "b",
-          "text": "A scheduled report"
+          "text": "A workflow outbound message per field"
         },
         {
           "id": "c",
-          "text": "Bulk API every minute"
+          "text": "A scheduled report"
         },
         {
           "id": "d",
-          "text": "A workflow outbound message per field"
+          "text": "Bulk API every minute"
         }
       ],
       "answer": [
@@ -937,23 +937,23 @@
       "options": [
         {
           "id": "a",
-          "text": "REST API, one call per record"
-        },
-        {
-          "id": "b",
           "text": "Bulk API 2.0"
         },
         {
+          "id": "b",
+          "text": "REST API, one call per record"
+        },
+        {
           "id": "c",
-          "text": "SOAP API, one call per record"
+          "text": "Streaming API"
         },
         {
           "id": "d",
-          "text": "Streaming API"
+          "text": "SOAP API, one call per record"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Bulk API processes large data sets asynchronously in batches."
     },
@@ -964,15 +964,15 @@
       "options": [
         {
           "id": "a",
-          "text": "The trigger, directly"
+          "text": "A validation rule"
         },
         {
           "id": "b",
-          "text": "A Queueable implementing Database.AllowsCallouts, enqueued from the trigger"
+          "text": "The trigger, directly"
         },
         {
           "id": "c",
-          "text": "A validation rule"
+          "text": "A Queueable implementing Database.AllowsCallouts, enqueued from the trigger"
         },
         {
           "id": "d",
@@ -980,7 +980,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Triggers can't call out synchronously; async Apex can."
     },
@@ -991,23 +991,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Longer timeouts"
-        },
-        {
-          "id": "b",
-          "text": "Send the system's own order number and upsert on an External ID field"
-        },
-        {
-          "id": "c",
           "text": "Insert, then delete duplicates nightly"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "Use a validation rule on Name"
+        },
+        {
+          "id": "c",
+          "text": "Longer timeouts"
+        },
+        {
+          "id": "d",
+          "text": "Send the system's own order number and upsert on an External ID field"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Upserting on an External ID makes the operation idempotent: a retry updates the existing record instead of creating another."
     },
@@ -1018,7 +1018,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Web server flow"
+          "text": "Device flow"
         },
         {
           "id": "b",
@@ -1030,7 +1030,7 @@
         },
         {
           "id": "d",
-          "text": "Device flow"
+          "text": "Web server flow"
         }
       ],
       "answer": [
@@ -1053,11 +1053,11 @@
         },
         {
           "id": "c",
-          "text": "Apex triggers"
+          "text": "Validation rules"
         },
         {
           "id": "d",
-          "text": "Validation rules"
+          "text": "Apex triggers"
         }
       ],
       "answer": [
@@ -1073,23 +1073,23 @@
       "options": [
         {
           "id": "a",
-          "text": "connectedCallback"
-        },
-        {
-          "id": "b",
-          "text": "errorCallback"
-        },
-        {
-          "id": "c",
           "text": "renderedCallback"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "disconnectedCallback"
+        },
+        {
+          "id": "c",
+          "text": "connectedCallback"
+        },
+        {
+          "id": "d",
+          "text": "errorCallback"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "errorCallback(error, stack) acts like an error boundary for the component's children."
     },
@@ -1100,23 +1100,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Compute the result once when the data changes and store it in a field"
+          "text": "Add more getters"
         },
         {
           "id": "b",
-          "text": "Move the loop to CSS"
-        },
-        {
-          "id": "c",
           "text": "Use @track"
         },
         {
+          "id": "c",
+          "text": "Compute the result once when the data changes and store it in a field"
+        },
+        {
           "id": "d",
-          "text": "Add more getters"
+          "text": "Move the loop to CSS"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Getters run on every render; caching derived data avoids repeated work."
     },
@@ -1127,11 +1127,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Mark large controller variables transient"
+          "text": "Increase heap"
         },
         {
           "id": "b",
-          "text": "Add more components"
+          "text": "Mark large controller variables transient"
         },
         {
           "id": "c",
@@ -1139,11 +1139,11 @@
         },
         {
           "id": "d",
-          "text": "Increase heap"
+          "text": "Add more components"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "transient variables aren't stored in view state."
     },
@@ -1154,11 +1154,11 @@
       "options": [
         {
           "id": "a",
-          "text": "innerHTML"
+          "text": "document.write"
         },
         {
           "id": "b",
-          "text": "lightning-formatted-rich-text"
+          "text": "innerHTML"
         },
         {
           "id": "c",
@@ -1166,11 +1166,11 @@
         },
         {
           "id": "d",
-          "text": "document.write"
+          "text": "lightning-formatted-rich-text"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "lightning-formatted-rich-text sanitises the HTML before rendering it."
     },
@@ -1185,11 +1185,11 @@
         },
         {
           "id": "b",
-          "text": "Use the test wire adapter's emit() with mock data"
+          "text": "Skip wired components"
         },
         {
           "id": "c",
-          "text": "Skip wired components"
+          "text": "Use the test wire adapter's emit() with mock data"
         },
         {
           "id": "d",
@@ -1197,7 +1197,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Wire adapters are mocked in Jest; emit() pushes data into the component."
     },
@@ -1216,11 +1216,11 @@
         },
         {
           "id": "c",
-          "text": "Insert them in one statement"
+          "text": "Use @future in the test"
         },
         {
           "id": "d",
-          "text": "Use @future in the test"
+          "text": "Insert them in one statement"
         }
       ],
       "answer": [
@@ -1262,7 +1262,7 @@
       "options": [
         {
           "id": "a",
-          "text": "The Apex Stub API (System.StubProvider)"
+          "text": "SeeAllData"
         },
         {
           "id": "b",
@@ -1270,15 +1270,15 @@
         },
         {
           "id": "c",
-          "text": "Test.loadData"
+          "text": "The Apex Stub API (System.StubProvider)"
         },
         {
           "id": "d",
-          "text": "SeeAllData"
+          "text": "Test.loadData"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "The Stub API creates mock implementations via Test.createStub."
     },
@@ -1316,7 +1316,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Call Database.executeBatch between Test.startTest and Test.stopTest"
+          "text": "Use System.schedule only"
         },
         {
           "id": "b",
@@ -1324,15 +1324,15 @@
         },
         {
           "id": "c",
-          "text": "Use System.schedule only"
+          "text": "It can't run in tests"
         },
         {
           "id": "d",
-          "text": "It can't run in tests"
+          "text": "Call Database.executeBatch between Test.startTest and Test.stopTest"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Async jobs started inside start/stopTest run synchronously at stopTest; only one execute call is tested per test."
     },
@@ -1343,7 +1343,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Immediately on publish"
+          "text": "After the test ends"
         },
         {
           "id": "b",
@@ -1351,11 +1351,11 @@
         },
         {
           "id": "c",
-          "text": "Never"
+          "text": "Immediately on publish"
         },
         {
           "id": "d",
-          "text": "After the test ends"
+          "text": "Never"
         }
       ],
       "answer": [
@@ -1370,7 +1370,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Limits.getQueries() after calling the method"
+          "text": "It can't be checked"
         },
         {
           "id": "b",
@@ -1378,15 +1378,15 @@
         },
         {
           "id": "c",
-          "text": "The debug log"
+          "text": "Limits.getQueries() after calling the method"
         },
         {
           "id": "d",
-          "text": "It can't be checked"
+          "text": "The debug log"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "The Limits class reports usage so far in the transaction."
     },
@@ -1397,15 +1397,15 @@
       "options": [
         {
           "id": "a",
-          "text": "Apex Replay Debugger"
-        },
-        {
-          "id": "b",
           "text": "Developer Console Query Editor"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "Setup Audit Trail"
+        },
+        {
+          "id": "c",
+          "text": "Apex Replay Debugger"
         },
         {
           "id": "d",
@@ -1413,7 +1413,7 @@
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Apex Replay Debugger replays a debug log in VS Code with breakpoints and variable inspection."
     },
@@ -1424,7 +1424,7 @@
       "options": [
         {
           "id": "a",
-          "text": "One HttpCalloutMock that checks req.getEndpoint() and responds accordingly"
+          "text": "It can't"
         },
         {
           "id": "b",
@@ -1432,15 +1432,15 @@
         },
         {
           "id": "c",
-          "text": "It can't"
+          "text": "Use SeeAllData"
         },
         {
           "id": "d",
-          "text": "Use SeeAllData"
+          "text": "One HttpCalloutMock that checks req.getEndpoint() and responds accordingly"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "A single mock can branch on the request's endpoint or method; MultiStaticResourceCalloutMock is another option."
     },
@@ -1451,23 +1451,23 @@
       "options": [
         {
           "id": "a",
-          "text": "WHERE Name LIKE '%corp'"
-        },
-        {
-          "id": "b",
-          "text": "WHERE External_Id__c = :key"
-        },
-        {
-          "id": "c",
           "text": "WHERE Status__c != 'Closed'"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "WHERE Description != null"
+        },
+        {
+          "id": "c",
+          "text": "WHERE External_Id__c = :key"
+        },
+        {
+          "id": "d",
+          "text": "WHERE Name LIKE '%corp'"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "External ID fields are indexed; equality filters on indexed fields are selective. Leading wildcards and negative filters aren't."
     },
@@ -1486,11 +1486,11 @@
         },
         {
           "id": "c",
-          "text": "Field history"
+          "text": "Platform events"
         },
         {
           "id": "d",
-          "text": "Platform events"
+          "text": "Field history"
         }
       ],
       "answer": [
@@ -1505,7 +1505,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Ownership data skew"
+          "text": "Field history"
         },
         {
           "id": "b",
@@ -1517,11 +1517,11 @@
         },
         {
           "id": "d",
-          "text": "Field history"
+          "text": "Ownership data skew"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Ownership skew (very many records owned by one user) makes sharing recalculation slow; spread ownership or use a user outside the role hierarchy."
     },
@@ -1532,7 +1532,7 @@
       "options": [
         {
           "id": "a",
-          "text": "A SOQL for loop or Batch Apex to process in chunks"
+          "text": "Using a Set instead of a List"
         },
         {
           "id": "b",
@@ -1540,15 +1540,15 @@
         },
         {
           "id": "c",
-          "text": "A larger LIMIT"
+          "text": "A SOQL for loop or Batch Apex to process in chunks"
         },
         {
           "id": "d",
-          "text": "Using a Set instead of a List"
+          "text": "A larger LIMIT"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Processing in chunks keeps only part of the data in memory at a time."
     },
@@ -1563,7 +1563,7 @@
         },
         {
           "id": "b",
-          "text": "Adding System.debug"
+          "text": "Converting to a validation rule"
         },
         {
           "id": "c",
@@ -1571,7 +1571,7 @@
         },
         {
           "id": "d",
-          "text": "Converting to a validation rule"
+          "text": "Adding System.debug"
         }
       ],
       "answer": [
@@ -1586,11 +1586,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Load the data only when the user opens the section (lazy loading)"
+          "text": "Load everything up front"
         },
         {
           "id": "b",
-          "text": "Load everything up front"
+          "text": "Load the data only when the user opens the section (lazy loading)"
         },
         {
           "id": "c",
@@ -1602,7 +1602,7 @@
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Deferring rarely used data keeps the first render fast."
     },
@@ -1613,11 +1613,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Query Plan tool in the Developer Console"
+          "text": "Schema Builder"
         },
         {
           "id": "b",
-          "text": "Setup Audit Trail"
+          "text": "Query Plan tool in the Developer Console"
         },
         {
           "id": "c",
@@ -1625,11 +1625,11 @@
         },
         {
           "id": "d",
-          "text": "Schema Builder"
+          "text": "Setup Audit Trail"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "The Query Plan tool shows the plans the optimiser considers, with cost and whether an index is used."
     },
@@ -1640,15 +1640,15 @@
       "options": [
         {
           "id": "a",
-          "text": "SOQL queries (200 vs 100)"
-        },
-        {
-          "id": "b",
           "text": "Heap size (12 MB vs 6 MB)"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "DML statements"
+        },
+        {
+          "id": "c",
+          "text": "SOQL queries (200 vs 100)"
         },
         {
           "id": "d",
@@ -1657,7 +1657,7 @@
       ],
       "answer": [
         "a",
-        "b"
+        "c"
       ],
       "explanation": "Async gets 200 queries and 12 MB heap (and 60 s CPU); DML statements (150) and callouts (100) are the same."
     }
