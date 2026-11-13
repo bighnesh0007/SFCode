@@ -15,7 +15,7 @@ const ICONS: Record<string, typeof Award> = { sparkles: Sparkles, database: Data
 /** Headline numbers. */
 export function StatsStrip({ p }: { p: Profile }) {
   const tiles = [
-    { label: "Streak", value: p.stats.streak ? `${p.stats.streak}d` : "0", hint: `Longest ${p.stats.longestStreak}d`, icon: Flame, tone: p.stats.streak > 0 ? "text-orange-500" : "text-muted-foreground", glow: p.stats.streak >= 3 },
+    { label: "Streak", value: p.stats.streak ? `${p.stats.streak}d` : "0", hint: p.stats.freezesLeft > 0 ? `Longest ${p.stats.longestStreak}d · ❄ ${p.stats.freezesLeft}` : `Longest ${p.stats.longestStreak}d`, icon: Flame, tone: p.stats.streak > 0 ? "text-orange-500" : "text-muted-foreground", glow: p.stats.streak >= 3 },
     { label: "Points", value: String(p.score), hint: `${p.solved} solved`, icon: Trophy, tone: "text-amber-500" },
     { label: "Rank", value: p.rank ? `#${p.rank}` : "—", hint: "All time", icon: Medal, tone: "text-sky-500" },
     { label: "Coins", value: p.stats.coins === null ? "—" : String(p.stats.coins), hint: "Spend in the store", icon: Coins, tone: "text-yellow-500" },

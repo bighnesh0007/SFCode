@@ -6,7 +6,6 @@ import { SOLVED_EVENT } from "@/lib/communityApi";
 import { usePoints } from "@/components/usePoints";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useTheme } from "next-themes";
 import { SignInButton, useAuthState } from "@/components/auth";
 // The namespace handed to onMount; imported for its type only (no bundle cost).
 type Monaco = typeof import("monaco-editor");
@@ -21,6 +20,8 @@ import { getSubmission, listSubmissions, submitSolution, type ChallengeView, typ
 import { STATUS_CLASS, STATUS_LABEL } from "@/lib/verdicts";
 import { cn } from "@/lib/utils";
 import { Results } from "./Results";
+import { useEditorTheme } from "@/components/useEditorTheme";
+import { defineSfcThemes } from "@/lib/editorThemes";
 
 const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -44,7 +45,7 @@ function readDraft(challenge: ChallengeView): Record<string, string> {
 }
 
 export function Workspace({ challenge, backHref }: { challenge: ChallengeView; backHref: string }) {
-  const { resolvedTheme } = useTheme();
+  const editorTheme = useEditorTheme();
   const { isSignedIn, getToken } = useAuthState();
   const { state: org } = useOrgConnection();
   // Lazy init: the editor is client-only, so this never reaches server-rendered markup.
@@ -281,7 +282,8 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
                     path={activeFile.fileName}
                     // Monaco has no SOQL mode; SQL highlighting is close enough.
                     language={activeFile.type === "soql" ? "sql" : "apex"}
-                    theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
+                    theme={editorTheme}
+                    beforeMount={defineSfcThemes}
                     value={sources[activeFile.name] ?? ""}
                     onChange={(v) => setSources((s) => ({ ...s, [activeFile.name]: v ?? "" }))}
                     onMount={(_editor, monaco) => {

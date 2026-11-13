@@ -5,10 +5,23 @@ import { aboutBody } from "../src/validation/community.schema.ts";
 describe("streaks", () => {
   it("counts the current run through today or yesterday, and the longest run", () => {
     const days = ["2026-01-01", "2026-01-02", "2026-01-03", "2026-01-10", "2026-01-11"];
-    expect(streaks(days, "2026-01-11")).toEqual({ current: 2, longest: 3 });
-    expect(streaks(days, "2026-01-12")).toEqual({ current: 2, longest: 3 }); // yesterday still counts
-    expect(streaks(days, "2026-01-13")).toEqual({ current: 0, longest: 3 }); // broken
-    expect(streaks([], "2026-01-13")).toEqual({ current: 0, longest: 0 });
+    expect(streaks(days, "2026-01-11")).toMatchObject({ current: 2, longest: 3 });
+    expect(streaks(days, "2026-01-12")).toMatchObject({ current: 2, longest: 3 }); // yesterday still counts
+    expect(streaks(days, "2026-01-13")).toMatchObject({ current: 0, longest: 3 }); // broken
+    expect(streaks([], "2026-01-13")).toMatchObject({ current: 0, longest: 0 });
+  });
+
+  it("a freeze bridges one missed day; two gaps need two freezes; unused freezes aren't spent", () => {
+    // Active 1st–3rd, missed 4th, active 5th–6th; today is the 6th.
+    const days = ["2026-01-01", "2026-01-02", "2026-01-03", "2026-01-05", "2026-01-06"];
+    expect(streaks(days, "2026-01-06")).toMatchObject({ current: 2, freezesUsed: 0 });
+    expect(streaks(days, "2026-01-06", 1)).toMatchObject({ current: 5, freezesUsed: 1 });
+    expect(streaks(days, "2026-01-06", 2)).toMatchObject({ current: 5, freezesUsed: 1 }); // nothing more to bridge
+    // A two-day gap can't be bridged by one freeze.
+    expect(streaks(["2026-01-01", "2026-01-04"], "2026-01-04", 1)).toMatchObject({ current: 1, freezesUsed: 0 });
+    // Missed yesterday and today so far: a freeze keeps the streak alive.
+    expect(streaks(["2026-01-01", "2026-01-02"], "2026-01-04")).toMatchObject({ current: 0 });
+    expect(streaks(["2026-01-01", "2026-01-02"], "2026-01-04", 1)).toMatchObject({ current: 2, freezesUsed: 1 });
   });
 
   it("handles month and year boundaries", () => {

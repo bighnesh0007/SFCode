@@ -3,8 +3,12 @@
  * there's nothing to backfill or keep in sync. Pure functions: easy to test.
  */
 
-/** Current and longest run of consecutive UTC days with any submission. A streak survives until the end of the day after the last active day. */
-export function streaks(days: string[], todayIso: string): { current: number; longest: number } {
+/**
+ * Current and longest run of consecutive UTC days with any submission. The
+ * current streak survives until the end of the day after the last active
+ * day; each available freeze bridges one more missed day inside it.
+ */
+export function streaks(days: string[], todayIso: string, freezes = 0): { current: number; longest: number; freezesUsed: number } {
   const set = new Set(days);
   const dayMs = 86_400_000;
   const toMs = (d: string) => Date.parse(`${d}T00:00:00Z`);
@@ -17,14 +21,25 @@ export function streaks(days: string[], todayIso: string): { current: number; lo
     while (set.has(iso(toMs(d) + len * dayMs))) len++;
     longest = Math.max(longest, len);
   }
+
   const today = toMs(todayIso);
-  let start = set.has(todayIso) ? today : set.has(iso(today - dayMs)) ? today - dayMs : null;
+  // Today may not have activity yet without breaking the streak.
+  let cursor = set.has(todayIso) ? today : today - dayMs;
   let current = 0;
-  while (start !== null && set.has(iso(start))) {
-    current++;
-    start -= dayMs;
+  let left = freezes;
+  for (;;) {
+    if (set.has(iso(cursor))) {
+      current++;
+      cursor -= dayMs;
+    } else if (left > 0 && set.has(iso(cursor - dayMs))) {
+      // A freeze covers this one missed day (it doesn't add to the count).
+      left--;
+      cursor -= dayMs;
+    } else {
+      break;
+    }
   }
-  return { current, longest };
+  return { current, longest: Math.max(longest, current), freezesUsed: freezes - left };
 }
 
 export interface AchievementInput {

@@ -42,7 +42,7 @@ export interface Wallet {
 
 export interface StoreItem {
   id: string;
-  slot: "frame" | "badge" | "accent";
+  slot: "frame" | "badge" | "accent" | "editor";
   name: string;
   description: string;
   price: number;
@@ -51,9 +51,20 @@ export interface StoreItem {
   equipped: boolean;
 }
 
+export interface FreezeOffer {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  max: number;
+  owned: number;
+  available: number;
+}
+
 export interface StoreView {
   wallet: Wallet | null;
   items: StoreItem[];
+  freeze: FreezeOffer;
 }
 
 const enc = encodeURIComponent;

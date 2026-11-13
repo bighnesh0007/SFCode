@@ -78,7 +78,7 @@ export interface ProfileView {
   tier: Tier;
   cosmetics: Cosmetics;
   about: About;
-  stats: { streak: number; longestStreak: number; coins: number | null; contests: number; bestPlacement: number | null; activeDays: number };
+  stats: { freezesLeft: number; streak: number; longestStreak: number; coins: number | null; contests: number; bestPlacement: number | null; activeDays: number };
   achievements: Achievement[];
   contests: ContestResult[];
   roadmap: { title: string; done: number; total: number } | null;
