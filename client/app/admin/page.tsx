@@ -396,7 +396,7 @@ function Points() {
           <tbody>
             {TRACK_ROWS.map(([id, label]) => (
               <tr key={id} className="border-t">
-                <td className="py-2 pl-4 font-medium">{label}{id === "lwc" && <span className="ml-2 text-xs font-normal text-muted-foreground">(scored once LWC is graded on the server)</span>}</td>
+                <td className="py-2 pl-4 font-medium">{label}</td>
                 {DIFFS.map((d) => (
                   <td key={d} className="py-2 text-center">
                     <input type="number" min={0} max={100} aria-label={`${label} ${d}`} value={settings.matrix[id][d]} onChange={(e) => set(id, d, Math.max(0, Math.min(100, Math.round(Number(e.target.value) || 0))))} className="h-8 w-16 rounded-md border bg-background text-center tabular-nums" />

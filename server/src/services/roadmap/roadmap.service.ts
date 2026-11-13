@@ -35,7 +35,7 @@ export interface RoadmapNodeView extends Omit<RoadmapNode, "problems" | "quiz"> 
   /** Attempted a problem here without solving it: suggest the prerequisites/lesson. */
   struggling: boolean;
   read: boolean;
-  /** Completion is by marking read: lesson-only nodes, and LWC (graded in the browser, not stored). */
+  /** Completion is by marking read: lesson-only nodes (every problem, LWC included, is now graded on the server). */
   completeByReading: boolean;
   /** Completion is by passing the step quiz. */
   completeByQuiz: boolean;
@@ -100,7 +100,7 @@ export class RoadmapService {
         const c = this.catalog.get(slug);
         return { slug, title: c?.title ?? slug, track: c?.track ?? "apex", difficulty: c?.difficulty ?? "Easy", status: progress.get(slug) === "solved" ? "solved" as const : progress.get(slug) === "attempted" ? "attempted" as const : "todo" as const };
       });
-      const graded = problems.filter((p) => p.track !== "lwc");
+      const graded = problems;
       const completeByQuiz = graded.length === 0 && n.quiz !== undefined;
       const completeByReading = graded.length === 0 && !completeByQuiz;
       const selfDone = graded.length === 0 ? read.has(n.id) : graded.every((p) => p.status === "solved");

@@ -20,6 +20,7 @@
  * Adapted from dwcode/scripts/up.mjs: same restart/backoff and lock behaviour.
  */
 import { spawn, spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { cpSync, createWriteStream, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -144,6 +145,26 @@ if (existsSync(join(ROOT, "client", "public"))) {
   cpSync(join(ROOT, "client", "public"), join(ROOT, "client", ".next", "standalone", "client", "public"), { recursive: true });
 }
 
+// ── LWC grading sandbox ───────────────────────────────────────────────────────
+// The image is tagged by a hash of its sources, so it rebuilds only when the
+// runner changes. If Docker can't build it, the site still starts; only LWC
+// submissions report "unavailable".
+function ensureLwcRunner() {
+  const dir = join(ROOT, "server", "sandbox", "lwc-runner");
+  if (!existsSync(join(dir, "Dockerfile"))) return null;
+  const hash = createHash("sha256");
+  for (const f of ["Dockerfile", "runner.mjs"]) hash.update(readFileSync(join(dir, f)));
+  const tag = `sfcode-lwc-runner:${hash.digest("hex").slice(0, 12)}`;
+  if (spawnSync("docker", ["image", "inspect", tag], { stdio: "ignore" }).status === 0) return tag;
+  say("up", `$ docker build -t ${tag} server/sandbox/lwc-runner`);
+  if (spawnSync("docker", ["build", "-q", "-t", tag, dir], { stdio: "inherit" }).status !== 0) {
+    say("up", "\x1b[33m! LWC sandbox image failed to build; LWC submissions will be unavailable\x1b[0m");
+    return null;
+  }
+  return tag;
+}
+const lwcRunnerImage = ensureLwcRunner();
+
 // ── processes ─────────────────────────────────────────────────────────────────
 async function httpOk(url) {
   try {
@@ -158,7 +179,7 @@ const services = [
   {
     name: "server",
     argv: [serverEntry],
-    env: { ...serverEnv, NODE_ENV: "production", HOST: "127.0.0.1", API_PORT: "4100", LOG_PRETTY: "false" },
+    env: { ...serverEnv, NODE_ENV: "production", HOST: "127.0.0.1", API_PORT: "4100", LOG_PRETTY: "false", ...(lwcRunnerImage ? { LWC_RUNNER_IMAGE: lwcRunnerImage } : {}) },
     health: () => httpOk("http://127.0.0.1:4100/health"),
   },
   {

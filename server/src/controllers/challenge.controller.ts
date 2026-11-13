@@ -30,5 +30,11 @@ export function challengeController(service: ChallengeService) {
     ok(res, await service.view(req.auth?.userId ?? "", validatedParams<SubmissionParams>(req).id));
   };
 
-  return { list, get, submit, history, submission };
+  const submitLwc: RequestHandler = async (req, res) => {
+    const { slug } = validatedParams<SlugParams>(req);
+    const { files } = validatedBody<SubmitBody>(req);
+    ok(res, await service.submitLwc(req.auth?.userId ?? "", slug, files));
+  };
+
+  return { list, get, submit, submitLwc, history, submission };
 }

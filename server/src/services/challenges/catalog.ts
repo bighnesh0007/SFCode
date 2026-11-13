@@ -99,6 +99,11 @@ function loadLwcChallenge(dir: string, slug: string, meta: z.infer<typeof proble
   if (!existsSync(testsPath)) throw new Error(`${where}: missing tests/${component}.test.js`);
   const tests = readFileSync(testsPath, "utf8");
   if (!/\bconst tests\s*=/.test(tests)) throw new Error(`${where}: the test file must define \`const tests = [...]\``);
+  // Hidden tests grade submissions on the server (in the sandbox); they never reach the browser.
+  const hiddenPath = join(dir, "tests", `${component}.hidden.test.js`);
+  if (!existsSync(hiddenPath)) throw new Error(`${where}: missing tests/${component}.hidden.test.js (the tests that grade submissions)`);
+  const hiddenTests = readFileSync(hiddenPath, "utf8");
+  if (!/\bconst tests\s*=/.test(hiddenTests)) throw new Error(`${where}: the hidden test file must define \`const tests = [...]\``);
   const starter = readLwcSources(join(dir, "starter"), component, `${where}/starter`);
   const reference = readLwcSources(join(dir, "reference"), component, `${where}/reference`);
   return {
@@ -115,7 +120,7 @@ function loadLwcChallenge(dir: string, slug: string, meta: z.infer<typeof proble
     reference,
     // Unused for LWC (no Apex deploy); kept so Challenge has one shape.
     testClass: { name: `${component}.test.js`, source: tests },
-    lwc: { component, tests },
+    lwc: { component, tests, hiddenTests },
   };
 }
 

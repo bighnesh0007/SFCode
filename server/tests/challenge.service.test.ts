@@ -74,6 +74,13 @@ describe("ChallengeService — what clients can see", () => {
       for (const ref of Object.values(c.reference).filter((r) => r.trim() !== "")) {
         expect(json, `${c.slug} leaks its reference solution`).not.toContain(JSON.stringify(ref).slice(1, -1));
       }
+      if (c.lwc) {
+        // Hidden-only test names (the hidden set also contains the visible ones).
+        const names = (src: string) => [...src.matchAll(/name: "([^"]+)"/g)].map((m) => m[1] ?? "");
+        const hiddenOnly = names(c.lwc.hiddenTests).filter((n) => !names(c.lwc?.tests ?? "").includes(n));
+        expect(hiddenOnly.length, `${c.slug} has no hidden-only tests`).toBeGreaterThan(0);
+        for (const n of hiddenOnly) expect(json, `${c.slug} leaks hidden test "${n}"`).not.toContain(n);
+      }
     }
   });
 
@@ -174,7 +181,7 @@ describe("ChallengeService — submitting and grading", () => {
   it("refuses to submit an LWC problem to the org grader", async () => {
     const s = setup();
     await s.connect("u1");
-    await expect(s.service.submit("u1", "lwc-click-counter", {})).rejects.toThrow(/checked in your browser/);
+    await expect(s.service.submit("u1", "lwc-click-counter", {})).rejects.toThrow(/graded in our sandbox/);
     expect(s.fetch.calls).toHaveLength(0);
   });
 

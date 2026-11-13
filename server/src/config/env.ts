@@ -37,6 +37,8 @@ const envSchema = z.object({
   // The site owner's Clerk user id: always admin, and the only one who can
   // grant or revoke the admin role. Config, so it can't be revoked in-app.
   SUPER_ADMIN_USER_ID: z.string().min(1).optional(),
+  /** Docker image that grades LWC submissions (built by scripts/up.mjs). Unset = LWC submit unavailable. */
+  LWC_RUNNER_IMAGE: z.string().regex(/^[a-z0-9][a-z0-9._/-]*:[A-Za-z0-9._-]+$/, "an image name with a tag").optional(),
 
   // ── Salesforce External Client App ─────────────────────────────────────────
   SF_CLIENT_ID: z.string().min(1).optional(),

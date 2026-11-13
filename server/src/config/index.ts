@@ -20,6 +20,7 @@ export const config = Object.freeze({
   }),
 
   superAdminUserId: env.SUPER_ADMIN_USER_ID,
+  lwcRunnerImage: env.LWC_RUNNER_IMAGE,
 
   salesforce: Object.freeze({
     clientId: env.SF_CLIENT_ID,

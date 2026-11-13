@@ -21,6 +21,8 @@ import { AdminService } from "./services/admin/admin.service.ts";
 import { PgAdminRepository } from "./repositories/admin.repository.ts";
 import { PgBlogRepository } from "./repositories/blog.repository.ts";
 import { BlogService } from "./services/blog/blog.service.ts";
+import { compileLwc } from "./services/lwc/compiler.ts";
+import { LwcSandbox } from "./services/lwc/lwcSandbox.ts";
 import { PgProblemDraftRepository } from "./repositories/problemDraft.repository.ts";
 import { makeOrgChecker } from "./services/problems/orgChecker.ts";
 import { ProblemDraftService } from "./services/problems/problemDraft.service.ts";
@@ -124,6 +126,10 @@ export function buildContainer(): Container {
     container.contests = new ContestService(contestRepo ?? new PgContestRepository(container.db), catalog, new PgProfileRepository(container.db), container.community, container.admin, systemClock);
     container.daily = new DailyService(new PgDailyRepository(container.db), catalog, systemClock);
     container.store = new StoreService(new PgStoreRepository(container.db), new PgChallengeSubmissionRepository(container.db), catalog, container.contests, container.daily, container.points);
+    if (config.lwcRunnerImage) {
+      const sandbox = new LwcSandbox(config.lwcRunnerImage);
+      container.challenges.setLwcGrader({ run: (code, tests) => sandbox.run(code, tests), compile: compileLwc });
+    }
     const profilesForCredit = new PgProfileRepository(container.db);
     container.challenges.setAuthorLookup(async (userId) => {
       const p = await profilesForCredit.findByUser(userId);

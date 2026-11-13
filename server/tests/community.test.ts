@@ -86,18 +86,17 @@ describe("profiles", () => {
 });
 
 describe("scoring and leaderboard", () => {
-  it("scores each problem once, by difficulty, on server-graded tracks only", async () => {
+  it("scores each problem once, by track and difficulty", async () => {
     const { service, solve } = setup();
     await service.ensureProfile("ada");
     await solve("ada", "text-utils"); // Apex Easy 3
     await solve("ada", "text-utils"); // repeat: no extra points
     await solve("ada", "won-revenue-rollup"); // Apex Medium 6
     await solve("ada", "soql-accounts-with-won-deals"); // SOQL Hard 3
-    await solve("ada", "lwc-click-counter"); // LWC: not scored until it's graded on the server
+    await solve("ada", "lwc-click-counter"); // LWC Easy 4: graded in the server sandbox, so it scores
     const me = await service.me("ada");
-    expect(me).toMatchObject({ score: 12, solved: 3, rank: 1 });
-    expect(me.byTrack.map((t) => t.track)).not.toContain("lwc");
-    expect(me.recent.map((r) => r.slug)).not.toContain("lwc-click-counter");
+    expect(me).toMatchObject({ score: 16, solved: 4, rank: 1 });
+    expect(me.byTrack.find((t) => t.track === "lwc")).toMatchObject({ solved: 1 });
   });
 
   it("ranks by score, then by who got there first", async () => {
