@@ -7,6 +7,8 @@ export interface CertAttemptRepository {
   record(input: { userId: string; exam: string; questionId: string; correct: boolean }): Promise<void>;
   /** Latest outcome per question for one user and exam. */
   latest(userId: string, exam: string): Promise<Map<string, boolean>>;
+  /** Every attempt by one user, oldest first (for the review schedule). */
+  history(userId: string): Promise<{ questionId: string; correct: boolean; at: Date }[]>;
 }
 
 export class PgCertAttemptRepository implements CertAttemptRepository {
@@ -14,6 +16,14 @@ export class PgCertAttemptRepository implements CertAttemptRepository {
 
   async record(input: { userId: string; exam: string; questionId: string; correct: boolean }): Promise<void> {
     await this.db.insert(certAttempts).values({ userId: input.userId, exam: input.exam, questionId: input.questionId, correct: input.correct });
+  }
+
+  async history(userId: string): Promise<{ questionId: string; correct: boolean; at: Date }[]> {
+    return this.db
+      .select({ questionId: certAttempts.questionId, correct: certAttempts.correct, at: certAttempts.answeredAt })
+      .from(certAttempts)
+      .where(eq(certAttempts.userId, userId))
+      .orderBy(certAttempts.answeredAt);
   }
 
   async latest(userId: string, exam: string): Promise<Map<string, boolean>> {

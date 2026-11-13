@@ -104,6 +104,9 @@ export function mountRoutes(app: Application, container: Container): void {
     const c = certificationController(container.certification);
     const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
     cert.get("/", identify, c.list);
+    // Registered before /:exam/... so "review" is never read as an exam id.
+    const certService = container.certification;
+    cert.get("/review", verifier ? requireAuth(verifier) : disabled("Sign-in"), (async (req, res) => ok(res, await certService.review(req.auth?.userId ?? ""))) as RequestHandler);
     cert.get("/:exam/questions", validate({ params: examParams, query: practiceQuery }), c.practice);
     cert.post("/answers", identify, limiter(60), validate({ body: answerBody }), c.answer);
   } else {

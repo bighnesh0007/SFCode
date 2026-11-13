@@ -10,7 +10,8 @@ import { ApiError } from "@/lib/apiClient";
 import { getPractice, submitAnswer, type AnswerResult, type PracticeQuestion } from "@/lib/certificationApi";
 import { cn } from "@/lib/utils";
 
-export function PracticeSession({ exam, section }: { exam: string; section: string | null }) {
+/** `load` overrides where questions come from (spaced review uses it); default is a shuffled set for the exam/section. */
+export function PracticeSession({ exam, section, load, title }: { exam: string; section: string | null; load?: () => Promise<PracticeQuestion[]>; title?: string }) {
   const { getToken } = useAuthState();
   const [questions, setQuestions] = useState<PracticeQuestion[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -23,12 +24,14 @@ export function PracticeSession({ exam, section }: { exam: string; section: stri
 
   useEffect(() => {
     let cancelled = false;
-    getPractice(exam, section)
+    (load ? load() : getPractice(exam, section))
       .then((q) => !cancelled && setQuestions(q))
       .catch((err: unknown) => !cancelled && setError(err instanceof ApiError ? err.message : "Could not load questions."));
     return () => {
       cancelled = true;
     };
+    // `load` is stable per page; refetching on each render would reset the session.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exam, section, round]);
 
   function restart() {
@@ -89,6 +92,7 @@ export function PracticeSession({ exam, section }: { exam: string; section: stri
         <Link href="/certification" className="flex items-center gap-1 text-muted-foreground hover:text-foreground">
           <ChevronLeft className="h-4 w-4" /> All exams
         </Link>
+        {title && <span className="font-medium">{title}</span>}
         <span className="tabular-nums text-muted-foreground">
           {done ? `${questions.length}/${questions.length}` : `Question ${index + 1} of ${questions.length}`} · {score} correct
         </span>
@@ -100,11 +104,15 @@ export function PracticeSession({ exam, section }: { exam: string; section: stri
             {score}/{questions.length} correct
           </h1>
           <p className="mt-2 text-muted-foreground">
-            {score === questions.length ? "A clean sweep." : "Review the explanations, then go again — questions are shuffled each round."}
+            {load
+              ? "Each question comes back later: sooner if you missed it, later each time you get it right."
+              : score === questions.length
+                ? "A clean sweep."
+                : "Review the explanations, then go again — questions are shuffled each round."}
           </p>
           <div className="mt-6 flex justify-center gap-2">
             <Button onClick={restart}>
-              <RotateCcw className="mr-1 h-4 w-4" /> Practice again
+              <RotateCcw className="mr-1 h-4 w-4" /> {load ? "Anything else due?" : "Practice again"}
             </Button>
             <Link href="/certification" className={buttonVariants({ variant: "outline" })}>All exams</Link>
           </div>
