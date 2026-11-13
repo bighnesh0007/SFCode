@@ -79,6 +79,10 @@ is fine): **Setup → External Client App Manager → New External Client App**.
   `SF_CLIENT_SECRET`. Generate `TOKEN_ENCRYPTION_KEY` and `OAUTH_STATE_SECRET`
   with `openssl rand -hex 32`.
 
+Learners whose org blocks the shared app can use their own: **Settings → Salesforce
+org → Use my own Connected App** takes their Consumer Key and Secret (stored
+encrypted, used only for their connection).
+
 ## License
 
 [MIT](LICENSE)

@@ -140,6 +140,12 @@ function num(v: unknown): number | null {
   return Number.isFinite(n) && n >= 0 ? n : null;
 }
 
+/** A learner's own Connected App, used instead of SFCode's shared one. */
+export interface AppCredentials {
+  clientId: string;
+  clientSecret: string;
+}
+
 export class SalesforceClient {
   private readonly fetchImpl: FetchLike;
 
@@ -147,10 +153,10 @@ export class SalesforceClient {
     this.fetchImpl = opts.fetch ?? globalThis.fetch.bind(globalThis);
   }
 
-  authorizeUrl(loginUrl: string, state: string, codeChallenge: string): string {
+  authorizeUrl(loginUrl: string, state: string, codeChallenge: string, app?: AppCredentials): string {
     const params = new URLSearchParams({
       response_type: "code",
-      client_id: this.opts.clientId,
+      client_id: app?.clientId ?? this.opts.clientId,
       redirect_uri: this.opts.redirectUri,
       state,
       code_challenge: codeChallenge,
@@ -161,13 +167,17 @@ export class SalesforceClient {
     return `${loginUrl}/services/oauth2/authorize?${params.toString()}`;
   }
 
-  async exchangeCode(loginUrl: string, code: string, codeVerifier: string): Promise<TokenResponse & { refreshToken: string }> {
-    const tokens = await this.tokenRequest(loginUrl, {
-      grant_type: "authorization_code",
-      code,
-      code_verifier: codeVerifier,
-      redirect_uri: this.opts.redirectUri,
-    });
+  async exchangeCode(loginUrl: string, code: string, codeVerifier: string, app?: AppCredentials): Promise<TokenResponse & { refreshToken: string }> {
+    const tokens = await this.tokenRequest(
+      loginUrl,
+      {
+        grant_type: "authorization_code",
+        code,
+        code_verifier: codeVerifier,
+        redirect_uri: this.opts.redirectUri,
+      },
+      app,
+    );
     if (!tokens.refreshToken) {
       // Without one we could not keep the connection alive past the session timeout.
       throw new UpstreamError("Salesforce did not issue a refresh token. Enable the refresh_token scope on the app.");
@@ -175,8 +185,8 @@ export class SalesforceClient {
     return { ...tokens, refreshToken: tokens.refreshToken };
   }
 
-  async refresh(loginUrl: string, refreshToken: string): Promise<TokenResponse> {
-    return this.tokenRequest(loginUrl, { grant_type: "refresh_token", refresh_token: refreshToken });
+  async refresh(loginUrl: string, refreshToken: string, app?: AppCredentials): Promise<TokenResponse> {
+    return this.tokenRequest(loginUrl, { grant_type: "refresh_token", refresh_token: refreshToken }, app);
   }
 
   async identity(instanceUrl: string, accessToken: string): Promise<OrgIdentity> {
@@ -298,11 +308,11 @@ export class SalesforceClient {
     return { body, header: doc.Envelope?.Header };
   }
 
-  private async tokenRequest(loginUrl: string, params: Record<string, string>): Promise<TokenResponse> {
+  private async tokenRequest(loginUrl: string, params: Record<string, string>, app?: AppCredentials): Promise<TokenResponse> {
     const res = await this.send(`${loginUrl}/services/oauth2/token`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
-      body: new URLSearchParams({ ...params, client_id: this.opts.clientId, client_secret: this.opts.clientSecret }).toString(),
+      body: new URLSearchParams({ ...params, client_id: app?.clientId ?? this.opts.clientId, client_secret: app?.clientSecret ?? this.opts.clientSecret }).toString(),
     });
     const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
     if (!res.ok) {
