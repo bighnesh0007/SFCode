@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useTheme } from "next-themes";
 import { CheckCircle2, ChevronLeft, Eye, FlaskConical, Info, Loader2, RotateCcw, Send, XCircle } from "lucide-react";
 import { useAuthState } from "@/components/auth";
 import { Celebration } from "@/components/Celebration";
@@ -18,6 +17,8 @@ import { submitLwc, type ChallengeView, type Submission } from "@/lib/challenges
 import { compileLwcComponent } from "@/lib/lwcApi";
 import { cn } from "@/lib/utils";
 import { sandboxDocument, type SandboxMessage } from "./lwcSandbox";
+import { useEditorTheme } from "@/components/useEditorTheme";
+import { defineSfcThemes } from "@/lib/editorThemes";
 
 const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 const LANGUAGE: Record<string, string> = { html: "html", js: "javascript", css: "css" };
@@ -44,7 +45,7 @@ function readDraft(challenge: ChallengeView): Record<string, string> {
 }
 
 export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView; backHref: string }) {
-  const { resolvedTheme } = useTheme();
+  const editorTheme = useEditorTheme();
   const lwc = challenge.lwc;
   const [sources, setSources] = useState<Record<string, string>>(() => readDraft(challenge));
   const [active, setActive] = useState("html");
@@ -198,7 +199,8 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
                   <Editor
                     path={`lwc/${challenge.slug}/${activeFile.fileName}`}
                     language={LANGUAGE[activeFile.name] ?? "plaintext"}
-                    theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
+                    theme={editorTheme}
+                    beforeMount={defineSfcThemes}
                     value={sources[activeFile.name] ?? ""}
                     onChange={(v) => setSources((s) => ({ ...s, [activeFile.name]: v ?? "" }))}
                     options={{ minimap: { enabled: false }, fontSize: 14, scrollBeyondLastLine: false, automaticLayout: true, tabSize: 4 }}

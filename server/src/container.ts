@@ -158,6 +158,8 @@ export function buildContainer(): Container {
     container.buddies = new BuddyService(new PgBuddyRepository(container.db), container.admin, container.community, new PgProfileRepository(container.db));
     container.buddies.setNotifier((userId, kind, data) => social.notify(userId, kind, data));
     container.community.setCosmeticsSource(container.store);
+    const communityForFreezes = container.community;
+    container.store.setFreezeUsage((userId) => communityForFreezes.freezesUsed(userId));
     const store = container.store;
     const contests = container.contests;
     const roadmapSvc = container.roadmaps;
@@ -165,6 +167,7 @@ export function buildContainer(): Container {
       coins: async (userId) => (await store.wallet(userId)).balance,
       contestHistory: (userId) => contests.history(userId),
       ratingHistory: (userId) => contests.ratingHistory(userId),
+      streakFreezes: (userId) => store.freezesOwned(userId),
       contributions: (userId) => (container.drafts ? container.drafts.countPublishedBy(userId) : Promise.resolve(0)),
       roadmapProgress: async (userId) => {
         const ob = roadmapSvc ? await roadmapSvc.onboarding(userId) : null;

@@ -7,7 +7,7 @@
  */
 import { ConflictError, NotFoundError, ValidationError } from "../../errors/AppError.ts";
 import { SCORED_TRACKS } from "../../domain/challenge.ts";
-import { itemById, STORE_ITEMS, type StoreItem } from "../../domain/store.ts";
+import { isFreezeId, itemById, MAX_FREEZES, STORE_ITEMS, STREAK_FREEZE, type StoreItem } from "../../domain/store.ts";
 import { PointsService } from "../points/points.service.ts";
 import type { ChallengeSubmissionRepository } from "../../repositories/challengeSubmission.repository.ts";
 import type { StoreRepository } from "../../repositories/store.repository.ts";
@@ -25,7 +25,19 @@ export interface Wallet {
   balance: number;
 }
 
+export interface FreezeOffer {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  max: number;
+  /** Bought so far / not yet used by the current streak. */
+  owned: number;
+  available: number;
+}
+
 export interface StoreView {
+  freeze: FreezeOffer;
   wallet: Wallet | null;
   items: (StoreItem & { owned: boolean; equipped: boolean })[];
 }
@@ -53,20 +65,51 @@ export class StoreService {
     return { earnedFromSolves, earnedFromContests, earnedFromDaily, spent, balance: earnedFromSolves + earnedFromContests + earnedFromDaily - spent };
   }
 
+  private freezeUsage: ((userId: string) => Promise<number>) | undefined;
+  /** How many freezes the user's current streak is using (from the community service; wired after construction). */
+  setFreezeUsage(fn: (userId: string) => Promise<number>): void {
+    this.freezeUsage = fn;
+  }
+
+  /** Streak Freezes bought so far (each purchase is its own row). */
+  async freezesOwned(userId: string): Promise<number> {
+    return (await this.repo.owned(userId)).filter(isFreezeId).length;
+  }
+
   async view(userId: string | null): Promise<StoreView> {
-    if (!userId) return { wallet: null, items: STORE_ITEMS.map((i) => ({ ...i, owned: false, equipped: false })) };
+    const freezeOffer = { ...STREAK_FREEZE, max: MAX_FREEZES };
+    if (!userId) return { wallet: null, items: STORE_ITEMS.map((i) => ({ ...i, owned: false, equipped: false })), freeze: { ...freezeOffer, owned: 0, available: 0 } };
     const [wallet, owned, equipped] = await Promise.all([this.wallet(userId), this.repo.owned(userId), this.repo.equipped([userId])]);
     const mine = equipped.get(userId) ?? {};
-    return { wallet, items: STORE_ITEMS.map((i) => ({ ...i, owned: owned.includes(i.id), equipped: mine[i.slot] === i.id })) };
+    const freezes = owned.filter(isFreezeId).length;
+    const used = this.freezeUsage ? await this.freezeUsage(userId) : 0;
+    return {
+      wallet,
+      items: STORE_ITEMS.map((i) => ({ ...i, owned: owned.includes(i.id), equipped: mine[i.slot] === i.id })),
+      freeze: { ...freezeOffer, owned: freezes, available: Math.max(0, freezes - used) },
+    };
   }
 
   async buy(userId: string, itemId: string): Promise<StoreView> {
+    if (itemId === STREAK_FREEZE.id) return this.buyFreeze(userId);
     const item = itemById(itemId);
     if (!item) throw new NotFoundError("No such item.");
     const w = await this.wallet(userId);
     const outcome = await this.repo.purchase(userId, item.id, item.price, w.earnedFromSolves + w.earnedFromContests + w.earnedFromDaily);
     if (outcome === "owned") throw new ConflictError("You already own this.");
     if (outcome === "insufficient") throw new ValidationError(`You need ${item.price} coins; you have ${w.balance}.`);
+    return this.view(userId);
+  }
+
+  private async buyFreeze(userId: string): Promise<StoreView> {
+    const owned = await this.freezesOwned(userId);
+    const used = this.freezeUsage ? await this.freezeUsage(userId) : 0;
+    if (owned - used >= MAX_FREEZES) throw new ConflictError(`You can hold at most ${MAX_FREEZES} unused Streak Freezes.`);
+    const w = await this.wallet(userId);
+    // Next numbered id; a concurrent buy picking the same number gets "owned" (a clean 409), never a double charge.
+    const outcome = await this.repo.purchase(userId, `${STREAK_FREEZE.id}-${owned + 1}`, STREAK_FREEZE.price, w.earnedFromSolves + w.earnedFromContests + w.earnedFromDaily);
+    if (outcome === "owned") throw new ConflictError("That purchase is already being processed. Try again.");
+    if (outcome === "insufficient") throw new ValidationError(`You need ${STREAK_FREEZE.price} coins; you have ${w.balance}.`);
     return this.view(userId);
   }
 

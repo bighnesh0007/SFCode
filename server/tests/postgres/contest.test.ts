@@ -166,4 +166,22 @@ describe.skipIf(!safe)("Contests and store on Postgres", () => {
     await submit("alice", p2, "accepted", start + 40 * MIN, id);
     expect((await contests.history("alice"))[0]?.score).toBe(100);
   });
+
+  it("streak freezes: bought one at a time, capped at two unused, charged each time", async () => {
+    // Ten first solves: about 120 coins at the default points table.
+    const slugs = ["text-utils", "won-revenue-rollup", "close-stale-opportunities", "sync-contact-city", "soql-hot-tech-accounts", "debug-soql-in-loop", "protect-closed-won", "account-rating-default", "contacts-by-account", "flow-key-account-task"];
+    for (const slug of slugs) await submit("dan", slug, "accepted", clock.nowMs(), null);
+    const before = await store.wallet("dan");
+    expect(before.balance).toBeGreaterThanOrEqual(120);
+    let v = await store.buy("dan", "streak-freeze");
+    expect(v.freeze).toMatchObject({ owned: 1, available: 1, max: 2 });
+    v = await store.buy("dan", "streak-freeze");
+    expect(v.freeze).toMatchObject({ owned: 2, available: 2 });
+    await expect(store.buy("dan", "streak-freeze")).rejects.toMatchObject({ status: 409 });
+    expect((await store.wallet("dan")).balance).toBe(before.balance - 120);
+    // Once the streak uses one, the cap lifts: the next attempt is refused for coins (400), not the cap (409).
+    store.setFreezeUsage(() => Promise.resolve(1));
+    expect((await store.view("dan")).freeze).toMatchObject({ owned: 2, available: 1 });
+    await expect(store.buy("dan", "streak-freeze")).rejects.toMatchObject({ status: 400 });
+  });
 });

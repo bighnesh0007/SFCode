@@ -40,6 +40,8 @@ export interface ProfileExtras {
   contributions(userId: string): Promise<number>;
   /** Contest rating history, oldest first. */
   ratingHistory(userId: string): Promise<RatingPoint[]>;
+  /** Streak Freezes bought so far. */
+  streakFreezes(userId: string): Promise<number>;
 }
 
 export interface ContestResult {
@@ -60,6 +62,8 @@ export interface SiteStats {
 }
 
 export interface ProfileStats {
+  /** Streak Freezes owned and not yet used by the current streak. */
+  freezesLeft: number;
   streak: number;
   longestStreak: number;
   coins: number | null;
@@ -201,6 +205,14 @@ export class CommunityService {
     return value;
   }
 
+  /** How many Streak Freezes the current streak is using (for the store's "available" count). */
+  async freezesUsed(userId: string): Promise<number> {
+    const since = new Date(this.clock.nowMs() - ACTIVITY_DAYS * 86_400_000);
+    const days = (await this.submissions.dailyActivity(userId, since)).filter((d) => d.count > 0).map((d) => d.day);
+    const owned = this.extras ? await this.extras.streakFreezes(userId) : 0;
+    return streaks(days, this.clock.now().toISOString().slice(0, 10), owned).freezesUsed;
+  }
+
   /** Cheap "how am I doing" for the level-up toast: points and rank only. */
   async myTier(userId: string): Promise<RankView> {
     const table = await this.points.table();
@@ -250,7 +262,8 @@ export class CommunityService {
     const board = await this.leaderboard("all", Number.MAX_SAFE_INTEGER);
     const since = new Date(this.clock.nowMs() - ACTIVITY_DAYS * 86_400_000);
     const activity = await this.submissions.dailyActivity(p.userId, since);
-    const streak = streaks(activity.filter((d) => d.count > 0).map((d) => d.day), this.clock.now().toISOString().slice(0, 10));
+    const freezes = this.extras ? await this.extras.streakFreezes(p.userId) : 0;
+    const streak = streaks(activity.filter((d) => d.count > 0).map((d) => d.day), this.clock.now().toISOString().slice(0, 10), freezes);
     const [coins, contests, roadmap, about, contributions, ratingHistory] = await Promise.all([
       this.extras ? this.extras.coins(p.userId) : Promise.resolve(null),
       this.extras ? this.extras.contestHistory(p.userId) : Promise.resolve([]),
@@ -268,7 +281,7 @@ export class CommunityService {
       rating: lastRating ? { current: lastRating.rating, peak: Math.max(...ratingHistory.map((r) => r.rating)), history: ratingHistory } : null,
       tier: rankFor(score),
       about: about ?? EMPTY_ABOUT,
-      stats: { streak: streak.current, longestStreak: streak.longest, coins, contests: contests.length, bestPlacement, activeDays: activity.filter((d) => d.count > 0).length, contributions },
+      stats: { freezesLeft: freezes - streak.freezesUsed, streak: streak.current, longestStreak: streak.longest, coins, contests: contests.length, bestPlacement, activeDays: activity.filter((d) => d.count > 0).length, contributions },
       achievements: achievements({
         solved: solvedScored.map((c) => ({ slug: c.slug, track: c.track, difficulty: c.difficulty, category: c.category })),
         score,

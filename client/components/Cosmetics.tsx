@@ -8,6 +8,8 @@ const FRAMES: Record<string, string> = {
   sky: "ring-2 ring-sky-500 ring-offset-2 ring-offset-background",
   gold: "ring-2 ring-amber-400 ring-offset-2 ring-offset-background",
   aurora: "ring-2 ring-fuchsia-500 ring-offset-2 ring-offset-background shadow-[0_0_12px_rgba(168,85,247,0.6)]",
+  pulse: "sfc-frame-pulse",
+  prism: "sfc-frame-prism",
 };
 const ACCENTS: Record<string, string> = {
   emerald: "text-emerald-600 dark:text-emerald-400",
