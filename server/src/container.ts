@@ -21,6 +21,10 @@ import { AdminService } from "./services/admin/admin.service.ts";
 import { PgAdminRepository } from "./repositories/admin.repository.ts";
 import { PgBlogRepository } from "./repositories/blog.repository.ts";
 import { BlogService } from "./services/blog/blog.service.ts";
+import { PgBuddyRepository } from "./repositories/buddy.repository.ts";
+import { PgSettingsRepository } from "./repositories/settings.repository.ts";
+import { BuddyService } from "./services/buddy/buddy.service.ts";
+import { PointsService } from "./services/points/points.service.ts";
 import { PgDailyRepository } from "./repositories/daily.repository.ts";
 import { DailyService } from "./services/daily/daily.service.ts";
 import { PgAboutRepository } from "./repositories/about.repository.ts";
@@ -47,6 +51,8 @@ export interface Container {
   store?: StoreService;
   roadmaps?: RoadmapService;
   daily?: DailyService;
+  points?: PointsService;
+  buddies?: BuddyService;
 }
 
 /** server/certification (question banks), resolved like PROBLEMS_DIR. */
@@ -92,6 +98,10 @@ export function buildContainer(): Container {
     systemClock,
     contestRepo,
   );
+  // Built before the services that score or check roles.
+  if (container.db) container.admin = new AdminService(new PgAdminRepository(container.db), config.superAdminUserId, systemClock);
+  container.points = new PointsService(container.db ? new PgSettingsRepository(container.db) : undefined, container.admin);
+
   // Profiles need the database; the Clerk lookup only seeds names/avatars.
   if (container.db) {
     container.community = new CommunityService(
@@ -101,15 +111,16 @@ export function buildContainer(): Container {
       config.clerk.secretKey ? new ClerkIdentityLookup(config.clerk.secretKey) : undefined,
       systemClock,
       new PgAboutRepository(container.db),
+      container.points,
     );
   }
 
-  if (container.db) container.admin = new AdminService(new PgAdminRepository(container.db), config.superAdminUserId, systemClock);
   if (container.db && container.community && container.admin) {
     container.blog = new BlogService(new PgBlogRepository(container.db), new PgProfileRepository(container.db), container.community, container.admin);
     container.contests = new ContestService(contestRepo ?? new PgContestRepository(container.db), catalog, new PgProfileRepository(container.db), container.community, container.admin, systemClock);
     container.daily = new DailyService(new PgDailyRepository(container.db), catalog, systemClock);
-    container.store = new StoreService(new PgStoreRepository(container.db), new PgChallengeSubmissionRepository(container.db), catalog, container.contests, container.daily);
+    container.store = new StoreService(new PgStoreRepository(container.db), new PgChallengeSubmissionRepository(container.db), catalog, container.contests, container.daily, container.points);
+    container.buddies = new BuddyService(new PgBuddyRepository(container.db), container.admin, container.community, new PgProfileRepository(container.db));
     container.community.setCosmeticsSource(container.store);
     const store = container.store;
     const contests = container.contests;

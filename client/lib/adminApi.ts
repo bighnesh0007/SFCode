@@ -2,8 +2,13 @@
 import { apiRequest } from "./apiClient";
 
 type Token = string | null;
-export type Standing = "owner" | "admin" | "moderator";
-export type StaffRole = "admin" | "moderator";
+export type Standing = "owner" | "admin" | "reviewer" | "buddy";
+export type StaffRole = "admin" | "reviewer" | "buddy";
+/** Server-side cap, mirrored for display. */
+export const MAX_ADMINS = 2;
+/** Who may grant or revoke each role (mirrors the server). */
+export const CAN_GRANT: Record<StaffRole, Standing[]> = { admin: ["owner"], reviewer: ["owner", "admin"], buddy: ["owner", "admin", "reviewer"] };
+export const isStaff = (s: Standing | null | undefined) => s === "owner" || s === "admin" || s === "reviewer";
 
 export interface AdminOverview {
   learners: number;
@@ -38,3 +43,23 @@ export async function setRole(token: Token, userId: string, role: StaffRole, gra
     throw new Error(body?.error?.message ?? `Request failed (HTTP ${res.status}).`);
   }
 }
+
+export interface BuddyApplicationRow {
+  id: string;
+  motivation: string;
+  link: string | null;
+  createdAt: string;
+  handle: string | null;
+  displayName: string;
+}
+export const getApplications = (token: Token) => apiRequest<BuddyApplicationRow[]>("/api/v1/admin/applications", { token });
+export const decideApplication = (token: Token, id: string, approve: boolean, note: string) =>
+  apiRequest<{ ok: true }>(`/api/v1/admin/applications/${encodeURIComponent(id)}/decide`, { method: "POST", token, body: { approve, note } });
+
+export type PointsMatrix = Record<"lwc" | "apex" | "debug" | "flow" | "soql", Record<"Easy" | "Medium" | "Hard", number>>;
+export interface PointsSettings {
+  matrix: PointsMatrix;
+  coinsPerPoint: number;
+}
+export const getPoints = () => apiRequest<PointsSettings>("/api/v1/points");
+export const savePoints = (token: Token, p: PointsSettings) => apiRequest<PointsSettings>("/api/v1/admin/points", { method: "PUT", token, body: p });

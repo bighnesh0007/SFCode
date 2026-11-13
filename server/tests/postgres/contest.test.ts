@@ -120,7 +120,7 @@ describe.skipIf(!safe)("Contests and store on Postgres", () => {
     clock.advance(100 * MIN);
     const wallet = await store.wallet("alice");
     expect(wallet.earnedFromContests).toBe(100);
-    expect(wallet.balance).toBeGreaterThanOrEqual(110);
+    expect(wallet.balance).toBeGreaterThan(100); // prize + the solve's coins
 
     // The duplicate frame-sky must lose: exactly 30 + 60 spent.
     const results = await Promise.allSettled([store.buy("alice", "frame-sky"), store.buy("alice", "frame-sky"), store.buy("alice", "accent-emerald")]);

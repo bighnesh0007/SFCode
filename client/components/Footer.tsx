@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const LINKS = [
   { href: "https://github.com/bighnesh0007/SFCode", label: "GitHub" },
-  { href: "https://github.com/bighnesh0007/SFCode/blob/main/CONTRIBUTING.md", label: "Contribute" },
+  { href: "/contribute", label: "Contribute" },
   { href: "https://github.com/bighnesh0007/SFCode/issues/new/choose", label: "Report an issue" },
 ];
 

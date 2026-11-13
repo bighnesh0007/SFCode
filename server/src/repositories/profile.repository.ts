@@ -2,6 +2,7 @@
 import { eq, inArray, sql } from "drizzle-orm";
 import type { PgDatabase } from "../data/postgres/client.ts";
 import { userProfiles } from "../data/postgres/schema.ts";
+import { isUniqueViolation } from "./pgErrors.ts";
 
 export interface ProfileRecord {
   userId: string;
@@ -20,16 +21,6 @@ export interface ProfileRepository {
   /** Returns false if the new handle is taken. */
   update(userId: string, changes: { handle?: string; displayName?: string }): Promise<boolean>;
 }
-
-/**
- * Postgres unique violation. Drizzle wraps driver errors, so the code is on
- * `cause`; checking only the top level never matched (a real clash surfaced
- * as a 500 instead of a retry — caught by the Postgres suite).
- */
-const isUniqueViolation = (err: unknown): boolean => {
-  const e = err as { code?: unknown; cause?: { code?: unknown } } | null;
-  return e?.code === "23505" || e?.cause?.code === "23505";
-};
 
 export class PgProfileRepository implements ProfileRepository {
   constructor(private readonly db: PgDatabase) {}

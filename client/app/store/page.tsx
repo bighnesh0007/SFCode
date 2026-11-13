@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Coins } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
+import { usePoints } from "@/components/usePoints";
 import { useAuthState } from "@/components/auth";
 import { Flair, accentClass, frameClass } from "@/components/Cosmetics";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ function Preview({ item }: { item: StoreItem }) {
 }
 
 export default function StorePage() {
+  const points = usePoints();
   const { isSignedIn, getToken } = useAuthState();
   const [view, setView] = useState<StoreView | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +56,7 @@ export default function StorePage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Store</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Earn coins by solving problems (Easy 10, Medium 20, Hard 40, once each) and placing top three in contests, plus a bonus for each Daily Challenge solved on the day. Spend them on cosmetics; nothing here affects grading.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Earn coins by solving problems (each problem&apos;s points × {points?.coinsPerPoint ?? "…"}, once each) and placing top three in contests, plus a bonus for each Daily Challenge solved on the day. Spend them on cosmetics; nothing here affects grading.</p>
         </div>
         {wallet && (
           <div className="flex items-center gap-2 rounded-lg border px-3 py-2" title={`${wallet.earnedFromSolves} from solves + ${wallet.earnedFromContests} from contests + ${wallet.earnedFromDaily} from Daily Challenges − ${wallet.spent} spent`}>

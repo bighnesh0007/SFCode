@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Celebration } from "@/components/Celebration";
+import { usePoints } from "@/components/usePoints";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
@@ -41,9 +42,6 @@ function readDraft(challenge: ChallengeView): Record<string, string> {
   }
 }
 
-/** Mirrors the server's pointsFor; display only. */
-const POINTS: Record<string, number> = { Easy: 10, Medium: 20, Hard: 40 };
-
 export function Workspace({ challenge, backHref }: { challenge: ChallengeView; backHref: string }) {
   const { resolvedTheme } = useTheme();
   const { isSignedIn, getToken } = useAuthState();
@@ -55,6 +53,8 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [history, setHistory] = useState<SubmissionSummary[]>([]);
   const [celebrate, setCelebrate] = useState<{ first: boolean } | null>(null);
+  const points = usePoints();
+  const worth = points?.matrix[challenge.track]?.[challenge.difficulty as "Easy" | "Medium" | "Hard"] ?? null;
   const endCelebration = useCallback(() => setCelebrate(null), []);
   // Read inside the poller without restarting it: was this already solved before this submission?
   const solvedBefore = useRef(false);
@@ -178,7 +178,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
       {celebrate && (
         <Celebration
           title="Accepted!"
-          detail={celebrate.first ? `+${POINTS[challenge.difficulty] ?? 0} points and coins. Nice work.` : "Solved again. Your best stands."}
+          detail={celebrate.first ? `${worth !== null ? `+${worth} points. ` : ""}Nice work.` : "Solved again. Your best stands."}
           onDone={endCelebration}
         />
       )}

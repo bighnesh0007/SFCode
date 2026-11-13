@@ -198,12 +198,16 @@ describe.skipIf(!safe)("PgAdminRepository", () => {
 
   it("grants idempotently, revokes, and lists roles with users", async () => {
     await profiles.create({ userId: "u1", handle: "ada", displayName: "Ada", imageUrl: null });
-    await admin.grant("u1", "moderator", "owner");
-    await admin.grant("u1", "moderator", "owner");
-    expect(await admin.rolesOf("u1")).toEqual(["moderator"]);
-    expect((await admin.users("ada", 10))[0]?.roles).toEqual(["moderator"]);
-    expect(await admin.revoke("u1", "moderator")).toBe(true);
-    expect(await admin.revoke("u1", "moderator")).toBe(false);
+    await admin.grant("u1", "reviewer", "owner");
+    await admin.grant("u1", "reviewer", "owner");
+    expect(await admin.rolesOf("u1")).toEqual(["reviewer"]);
+    expect((await admin.users("ada", 10))[0]?.roles).toEqual(["reviewer"]);
+    expect(await admin.countRole("reviewer")).toBe(1);
+    expect(await admin.revoke("u1", "reviewer")).toBe(true);
+    expect(await admin.revoke("u1", "reviewer")).toBe(false);
+    // Rows written before the rename still say "moderator"; listed as reviewer.
+    await db.execute(sql`INSERT INTO user_roles (user_id, role, granted_by) VALUES ('u1', 'moderator', 'owner')`);
+    expect((await admin.users("ada", 10))[0]?.roles).toEqual(["reviewer"]);
   });
 
   it("search treats % and _ literally", async () => {
