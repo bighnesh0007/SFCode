@@ -95,6 +95,8 @@ export default function RoadmapPage() {
 
   const byId = useMemo(() => new Map((view?.nodes ?? []).map((n) => [n.id, n])), [view]);
   const rows = Math.max(0, ...(view?.nodes ?? []).map((n) => n.depth)) + 1;
+  // As many columns as the roadmap uses (3 or 4).
+  const cols = Math.max(3, ...view.nodes.map((n) => n.col + 1));
   const pos = (n: RoadmapNode) => ({ x: n.col * COL_W + (COL_W - BOX_W) / 2, y: n.depth * ROW_H + 8 });
   const selected = open ? byId.get(open) : undefined;
 
@@ -105,7 +107,7 @@ export default function RoadmapPage() {
     const el = graphRef.current;
     const n = focusId ? byId.get(focusId) : undefined;
     if (!el || !n || el.scrollWidth <= el.clientWidth) return;
-    const inner = (el.scrollWidth - COL_W * 3) / 2;
+    const inner = (el.scrollWidth - COL_W * cols) / 2;
     el.scrollLeft = inner + n.col * COL_W + COL_W / 2 - el.clientWidth / 2;
   }, [focusId, byId]);
   const nextNode = view?.next ? byId.get(view.next) : undefined;
@@ -150,8 +152,8 @@ export default function RoadmapPage() {
       </div>
 
       <div ref={graphRef} className="mt-4 overflow-x-auto rounded-xl border bg-[radial-gradient(circle_at_1px_1px,var(--color-border)_1px,transparent_0)] [background-size:20px_20px] p-4">
-        <div className="relative mx-auto" style={{ width: COL_W * 3, height: rows * ROW_H }}>
-          <svg className="absolute inset-0" width={COL_W * 3} height={rows * ROW_H} aria-hidden>
+        <div className="relative mx-auto" style={{ width: COL_W * cols, height: rows * ROW_H }}>
+          <svg className="absolute inset-0" width={COL_W * cols} height={rows * ROW_H} aria-hidden>
             {view.nodes.flatMap((n) =>
               n.requires.map((rid) => {
                 const p = byId.get(rid);

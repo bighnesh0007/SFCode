@@ -1,8 +1,132 @@
 {
   "id": "developer",
   "title": "Salesforce Developer",
-  "description": "From the data model to PD II: SOQL, Flows, Apex, triggers, limits, async and LWC, practised on real problems graded in your org.",
+  "description": "From the data model to PD II: SOQL, Flow, Apex, testing, security, LWC, integration, async and deployment, practised on real problems graded in your org.",
   "nodes": [
+    {
+      "id": "platform-basics",
+      "title": "How the platform works",
+      "level": 1,
+      "col": 0,
+      "requires": [],
+      "summary": "Orgs, metadata versus data, and where developers work.",
+      "lesson": "Salesforce is a **multi-tenant** platform: thousands of companies share the same servers, each in its own **org**. That's why the platform enforces **governor limits**: no one org's code may starve the others.\n\nTwo kinds of things live in an org:\n\n- **Metadata**: the shape of the org. Objects, fields, page layouts, Flows, Apex classes. It's moved between orgs by deploying.\n- **Data**: the records: the actual Accounts, Contacts and Opportunities.\n\nYou'll work in several kinds of org: a free **Developer Edition** for learning, **sandboxes** (copies of production for building and testing), **scratch orgs** (short-lived orgs created from source), and **production**, where real users work. Code is written in a sandbox or scratch org and deployed to production, never written there directly.",
+      "concepts": [
+        "Multi-tenancy, and why it leads to governor limits",
+        "Metadata (configuration and code) versus data (records)",
+        "Developer Edition, sandbox, scratch org and production: what each is for"
+      ],
+      "pitfalls": [
+        "Building or testing directly in production: Apex can't even be written there, and Flow changes affect real users at once.",
+        "Expecting a sandbox to stay in sync with production: it's a copy from the moment it was refreshed."
+      ],
+      "resources": [
+        {
+          "title": "Platform Development Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/starting_force_com",
+          "kind": "trailhead"
+        }
+      ],
+      "optional": true,
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Which of these is metadata rather than data?",
+          "options": [
+            "An Account named Acme",
+            "A custom field on Account",
+            "A Contact record",
+            "A closed Case"
+          ],
+          "answer": 1,
+          "why": "Fields, objects, layouts, Flows and code describe the org's shape: that's metadata. Records are data."
+        },
+        {
+          "q": "Why does Salesforce enforce governor limits?",
+          "options": [
+            "To sell more licences",
+            "Orgs share servers, so no one org may use more than its share",
+            "To stop Apex being used",
+            "Only for security"
+          ],
+          "answer": 1,
+          "why": "Multi-tenancy: limits keep one org's code from slowing everyone else."
+        },
+        {
+          "q": "Where should new Apex be written and tested?",
+          "options": [
+            "Directly in production",
+            "In a sandbox or scratch org, then deployed",
+            "In the Developer Console in production",
+            "Anywhere: it's the same"
+          ],
+          "answer": 1,
+          "why": "Production can't even compile new Apex directly; it's built elsewhere and deployed with tests."
+        }
+      ]
+    },
+    {
+      "id": "dev-tools",
+      "title": "Developer tools",
+      "level": 1,
+      "col": 2,
+      "requires": [],
+      "summary": "VS Code, the Salesforce CLI and source-driven development.",
+      "lesson": "Modern Salesforce development happens in **VS Code** with the **Salesforce Extension Pack** and the **Salesforce CLI** (`sf`).\n\n- `sf org login web` connects an org; `sf project retrieve start` pulls metadata into files; `sf project deploy start` pushes them back.\n- Your project is **source format**: one file per class, trigger, object field, Flow. It belongs in **Git**.\n- **Scratch orgs** are created from a definition file, used for a feature, then thrown away. They make every change reproducible.\n\nThe Developer Console still works for a quick look at a debug log or a test run, but it isn't where projects live.",
+      "concepts": [
+        "Retrieving and deploying metadata with `sf project retrieve/deploy start`",
+        "Source format and why it belongs in Git",
+        "Scratch orgs as disposable, reproducible environments"
+      ],
+      "pitfalls": [
+        "Editing the same class in the org and locally: the next retrieve overwrites one of the versions.",
+        "Committing an org's credentials or auth URL to Git."
+      ],
+      "resources": [
+        {
+          "title": "App Development with Salesforce DX (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/sfdx_app_dev",
+          "kind": "trailhead"
+        }
+      ],
+      "optional": true,
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Which command sends your local metadata to an org?",
+          "options": [
+            "sf project retrieve start",
+            "sf project deploy start",
+            "sf org list",
+            "sf data query"
+          ],
+          "answer": 1,
+          "why": "deploy sends local source to the org; retrieve brings the org's metadata down to files."
+        },
+        {
+          "q": "What is a scratch org best for?",
+          "options": [
+            "Storing production data",
+            "A short-lived, reproducible org for one feature",
+            "Running reports for executives",
+            "Replacing sandboxes for UAT with real data"
+          ],
+          "answer": 1,
+          "why": "Scratch orgs are created from a definition file and source, used briefly, then deleted."
+        },
+        {
+          "q": "Where should your Salesforce project's source live?",
+          "options": [
+            "Only in the org",
+            "In Git, as source-format files",
+            "In a spreadsheet",
+            "In the Developer Console"
+          ],
+          "answer": 1,
+          "why": "Source format in Git gives history, review and reproducible deploys."
+        }
+      ]
+    },
     {
       "id": "data-model",
       "title": "Data model",
@@ -11,11 +135,80 @@
       "requires": [],
       "summary": "Objects, fields, relationships and how records connect.",
       "lesson": "Everything in Salesforce is a **record** of an **object** (Account, Contact, Opportunity, or your own `Thing__c`). Objects have **fields**; custom ones end in `__c`.\n\nRelationships link objects:\n\n- **Lookup**: a loose link (a Contact *looks up* to an Account). Deleting the parent doesn't delete the child.\n- **Master-detail**: a tight link. The child inherits sharing and is deleted with the parent; the parent can have **roll-up summary** fields.\n\nYou'll query these relationships in SOQL next: child-to-parent with dots (`Account.Name`), parent-to-child with subqueries (`(SELECT Id FROM Contacts)`).",
+      "concepts": [
+        "Standard versus custom objects and fields (`__c`)",
+        "Lookup versus master-detail: deletion, sharing and roll-up summaries",
+        "Junction objects for many-to-many relationships",
+        "Relationship names: `Account.Name` up, `Contacts` down"
+      ],
+      "pitfalls": [
+        "Choosing master-detail when the child must exist without a parent: master-detail children can't.",
+        "Querying a child relationship by the object name (`Contact`) instead of the relationship name (`Contacts`, or `Things__r` for custom)."
+      ],
+      "resources": [
+        {
+          "title": "Data Modeling (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/data_modeling",
+          "kind": "trailhead"
+        }
+      ],
+      "diagram": "relationships",
+      "diagramCaption": "Lookup (Contact to Account), master-detail (Expense to Project) and a junction object (Enrollment) linking Students and Courses many-to-many.",
       "problems": [],
       "cert": {
         "exam": "pd1",
         "section": "fundamentals"
-      }
+      },
+      "quiz": [
+        {
+          "q": "In the diagram, what happens to Expense__c records when their Project__c is deleted?",
+          "options": [
+            "Nothing",
+            "They're deleted too",
+            "They're reassigned to another project",
+            "The delete is blocked"
+          ],
+          "answer": 1,
+          "why": "Master-detail children can't exist without their master, so they're deleted with it.",
+          "image": "relationships",
+          "imageAlt": "Relationships diagram: Expense__c is the detail side of a master-detail relationship to Project__c."
+        },
+        {
+          "q": "Using the diagram: how do Students relate to Courses?",
+          "options": [
+            "A lookup from Student to Course",
+            "Through Enrollment__c, a junction object with two master-details",
+            "A multi-select picklist",
+            "They don't relate"
+          ],
+          "answer": 1,
+          "why": "Many-to-many goes through a junction object with a master-detail to each side.",
+          "image": "relationships",
+          "imageAlt": "Relationships diagram: Enrollment__c sits between Student and Course with a link to each."
+        },
+        {
+          "q": "Which relationship lets a parent have roll-up summary fields?",
+          "options": [
+            "Lookup",
+            "Master-detail",
+            "Hierarchical",
+            "External lookup"
+          ],
+          "answer": 1,
+          "why": "Roll-up summaries need master-detail (a few standard lookups, like Account to Opportunity, are special cases)."
+        },
+        {
+          "q": "Contact has a lookup to Account. Which SOQL gets each contact's account name?",
+          "options": [
+            "SELECT Name, Account FROM Contact",
+            "SELECT LastName, Account.Name FROM Contact",
+            "SELECT LastName, (SELECT Name FROM Account) FROM Contact",
+            "SELECT LastName FROM Contact JOIN Account"
+          ],
+          "answer": 1,
+          "why": "Child to parent uses dot notation through the relationship name."
+        }
+      ]
     },
     {
       "id": "soql-basics",
@@ -25,21 +218,150 @@
       "requires": [
         "data-model"
       ],
-      "summary": "SELECT, WHERE, ORDER BY and parent fields.",
+      "summary": "SELECT, WHERE, ORDER BY and LIMIT; parent fields with dots.",
+      "lesson": "**SOQL** reads records. Every query names one object and the fields you want:\n\n```sql\nSELECT Id, Name, Industry FROM Account WHERE Industry = 'Technology' ORDER BY Name LIMIT 10\n```\n\n- `WHERE` filters with `=`, `!=`, `<`, `LIKE 'Ac%'`, `IN ('a','b')`, combined with `AND`, `OR`, `NOT`.\n- Parent fields use **dots**: `SELECT LastName, Account.Name FROM Contact`.\n- `ORDER BY` sorts; add `NULLS LAST` to push blanks down; `LIMIT` caps rows.\n- There's no `SELECT *`: name every field you need. Asking for a field you didn't select raises an error in Apex.",
+      "concepts": [
+        "The shape of a query: SELECT fields FROM object WHERE … ORDER BY … LIMIT …",
+        "Comparison operators, LIKE, IN, and combining with AND/OR",
+        "Child-to-parent fields with dot notation",
+        "Sorting with NULLS FIRST/LAST"
+      ],
+      "pitfalls": [
+        "Using double quotes for strings: SOQL needs single quotes.",
+        "Reading a field in Apex that the query didn't select: `SObjectException`.",
+        "Expecting `ORDER BY ... DESC` to put blanks last: it puts them first unless you add `NULLS LAST`."
+      ],
+      "resources": [
+        {
+          "title": "SOQL for Admins (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/soql-for-admins",
+          "kind": "trailhead"
+        },
+        {
+          "title": "Apex Basics and Database (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/apex_database",
+          "kind": "trailhead"
+        }
+      ],
       "problems": [
         "soql-hot-tech-accounts",
-        "soql-contacts-in-city"
+        "soql-contacts-in-city",
+        "soql-open-high-cases"
+      ]
+    },
+    {
+      "id": "security-basics",
+      "title": "Security model",
+      "level": 1,
+      "col": 1,
+      "requires": [
+        "data-model"
+      ],
+      "summary": "Profiles, permission sets, sharing: what users can do and see.",
+      "lesson": "Salesforce asks two questions before showing a record:\n\n1. **Can this user work with this object and field at all?** That's **object and field permissions**, from the user's **profile** and **permission sets**. Field-level security (FLS) can hide a field everywhere, including the API.\n2. **Can they see this particular record?** That's **sharing**: organization-wide defaults set the baseline, then the role hierarchy, sharing rules, manual shares and Apex sharing open access up.\n\nAs a developer this matters because **Apex runs in system mode** by default: it ignores object permissions and FLS unless you ask it not to, and `with sharing` decides whether record sharing applies. You'll write secure Apex in the Advanced stage; here, learn the model it protects.",
+      "concepts": [
+        "Object permissions and field-level security, from profiles and permission sets",
+        "Organization-wide defaults as the most restrictive baseline",
+        "Role hierarchy, sharing rules and manual sharing only open access up",
+        "Apex runs in system mode unless told otherwise"
+      ],
+      "pitfalls": [
+        "Hiding a field only on the page layout: it's still visible in reports, list views and the API. Use field-level security.",
+        "Trying to restrict access with a sharing rule: sharing only ever grants more."
+      ],
+      "resources": [
+        {
+          "title": "Data Security (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/data_security",
+          "kind": "trailhead"
+        }
+      ],
+      "diagram": "sharing-layers",
+      "diagramCaption": "Record access in layers: organization-wide defaults, then role hierarchy, sharing rules, manual sharing and teams, and Apex managed sharing, each only adding access.",
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Look at the diagram. Organization-wide default is Private. Can a sharing rule make a record invisible to someone the role hierarchy already lets see it?",
+          "options": [
+            "Yes",
+            "No: every layer after the defaults only adds access",
+            "Only for admins",
+            "Only with Apex"
+          ],
+          "answer": 1,
+          "why": "Sharing is additive: the layers above the defaults grant access; none of them take it away.",
+          "image": "sharing-layers",
+          "imageAlt": "Diagram of access layers: organization-wide defaults first, then four layers that each add access."
+        },
+        {
+          "q": "Using the diagram, which layer sets the most restrictive baseline?",
+          "options": [
+            "Role hierarchy",
+            "Organization-wide defaults",
+            "Sharing rules",
+            "Apex managed sharing"
+          ],
+          "answer": 1,
+          "why": "Organization-wide defaults are layer 1, the baseline everything else builds on.",
+          "image": "sharing-layers",
+          "imageAlt": "Diagram of access layers with organization-wide defaults at the top as layer 1."
+        },
+        {
+          "q": "A Salary field must be hidden from support users in reports and the API too. What do you use?",
+          "options": [
+            "Remove it from the page layout",
+            "Field-level security",
+            "A sharing rule",
+            "A validation rule"
+          ],
+          "answer": 1,
+          "why": "Field-level security applies everywhere; layouts only affect that page."
+        },
+        {
+          "q": "By default, which mode does Apex run in?",
+          "options": [
+            "User mode: it respects the user's permissions",
+            "System mode: it ignores object and field permissions",
+            "Read-only mode",
+            "Guest mode"
+          ],
+          "answer": 1,
+          "why": "Apex runs in system mode unless you use user-mode queries or other enforcement."
+        }
       ]
     },
     {
       "id": "flow-basics",
-      "title": "Before-save Flows",
+      "title": "Flow basics",
       "level": 1,
       "col": 2,
       "requires": [
         "data-model"
       ],
-      "summary": "Automate field updates without code.",
+      "summary": "Record-triggered flows: before-save field updates.",
+      "lesson": "**Flow** is Salesforce's declarative automation, and the first tool to reach for before code.\n\nA **record-triggered flow** runs when a record is created, updated or deleted:\n\n- **Fast Field Updates (before-save)** change fields on the triggering record before it's saved: no extra DML, very fast.\n- **Actions and Related Records (after-save)** create or update other records, send emails, call actions.\n\nEntry conditions decide which records start the flow. \"**Only when a record is updated to meet the condition requirements**\" fires once, when the condition becomes true, instead of on every save.",
+      "concepts": [
+        "Before-save versus after-save record-triggered flows",
+        "Entry conditions and when to run the flow",
+        "$Record and $Record__Prior",
+        "When to prefer Flow over Apex"
+      ],
+      "pitfalls": [
+        "Using an after-save flow to update the triggering record: it costs an extra save and can re-trigger automation.",
+        "Choosing 'every time the condition is met' when you meant 'only when updated to meet': the action repeats on every edit."
+      ],
+      "resources": [
+        {
+          "title": "Flow Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/flow-basics",
+          "kind": "trailhead"
+        },
+        {
+          "title": "Record-Triggered Flows (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/record-triggered-flows",
+          "kind": "trailhead"
+        }
+      ],
       "problems": [
         "flow-account-default-rating",
         "flow-won-next-step"
@@ -53,12 +375,36 @@
       "requires": [
         "soql-basics"
       ],
-      "summary": "Classes, methods, collections and null safety.",
+      "summary": "Variables, types, classes, methods and control flow.",
+      "lesson": "**Apex** is Salesforce's strongly typed, Java-like language. It runs on the platform, next to your data.\n\n- Primitive types: `Integer`, `Decimal` (use it for money), `String`, `Boolean`, `Date`, `Datetime`, `Id`.\n- Every record type is an **sObject** type: `Account a = new Account(Name = 'Acme');`.\n- **Classes** hold methods; `static` methods are called on the class (`MyUtils.format(x)`), instance methods on an object.\n- Control flow: `if/else`, `for` (including `for (Account a : accounts)`), `while`, `switch on`.\n- SOQL is part of the language: `List<Account> accs = [SELECT Id FROM Account];`, and Apex variables are **bound** with a colon: `WHERE Name = :name`.\n- `null` is not zero: calling a method on null throws `NullPointerException`.",
+      "concepts": [
+        "Primitive types, sObjects and when to use Decimal",
+        "Static versus instance methods",
+        "Inline SOQL and bind variables (`:name`)",
+        "Null safety: checking before calling methods"
+      ],
+      "pitfalls": [
+        "Using `Double` for money: rounding errors. Use `Decimal` with `setScale`.",
+        "`String ==` comparison is case-insensitive in Apex; use `.equals()` when case matters.",
+        "Calling a method on a value that might be null."
+      ],
+      "resources": [
+        {
+          "title": "Apex Basics and Database (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/apex_database",
+          "kind": "trailhead"
+        },
+        {
+          "title": "Apex Basics for .NET Developers (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/apex_basics_dotnet",
+          "kind": "trailhead"
+        }
+      ],
       "problems": [
         "text-utils",
-        "contacts-by-account",
         "debug-null-discount",
-        "debug-off-by-one-buckets"
+        "debug-off-by-one-buckets",
+        "debug-missing-map-key"
       ],
       "cert": {
         "exam": "pd1",
@@ -67,29 +413,68 @@
     },
     {
       "id": "soql-advanced",
-      "title": "Aggregates & subqueries",
+      "title": "Advanced SOQL",
       "level": 2,
       "col": 1,
       "requires": [
         "soql-basics"
       ],
-      "summary": "GROUP BY, semi-joins and anti-joins.",
+      "summary": "Aggregates, subqueries, semi-joins and date literals.",
+      "lesson": "- **Aggregates**: `COUNT()`, `SUM()`, `AVG()`, `MIN()`, `MAX()` with `GROUP BY`, filtered after grouping with `HAVING`. In Apex they return `AggregateResult`; read values by alias: `(Decimal) ar.get('total')`.\n- **Parent-to-child subqueries**: `SELECT Name, (SELECT LastName FROM Contacts) FROM Account`.\n- **Semi-joins and anti-joins**: `WHERE Id IN (SELECT AccountId FROM Opportunity)` and `NOT IN`, to filter by whether related records exist.\n- **Date literals**: `TODAY`, `LAST_N_DAYS:30`, `THIS_QUARTER`, evaluated when the query runs.\n- **Polymorphic** fields (`WhoId`, `WhatId`) can point to several objects; `TYPEOF` selects fields per type.",
+      "concepts": [
+        "GROUP BY with HAVING, and reading AggregateResult",
+        "Child subqueries using the plural relationship name",
+        "Semi-joins and anti-joins",
+        "Relative date literals"
+      ],
+      "pitfalls": [
+        "Putting an aggregate in WHERE: use HAVING.",
+        "Expecting a child subquery's filter to drop parents with no matching children: it doesn't; use a semi-join.",
+        "Hard-coding date ranges that drift; prefer date literals."
+      ],
+      "resources": [
+        {
+          "title": "Apex Basics and Database (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/apex_database",
+          "kind": "trailhead"
+        }
+      ],
       "problems": [
         "soql-pipeline-by-stage",
         "soql-busy-accounts",
         "soql-accounts-without-contacts",
-        "soql-accounts-with-won-deals"
+        "soql-accounts-with-won-deals",
+        "soql-contacts-with-open-cases",
+        "soql-closing-this-quarter"
       ]
     },
     {
       "id": "flow-advanced",
-      "title": "Decisions, loops & after-save",
+      "title": "Advanced Flow",
       "level": 2,
       "col": 2,
       "requires": [
         "flow-basics"
       ],
-      "summary": "Branching, collections and autolaunched flows.",
+      "summary": "Decisions, loops, autolaunched flows, and calling Flow from Apex.",
+      "lesson": "- A **Decision** element takes the first outcome whose conditions match, so order outcomes from most to least specific; the default outcome catches the rest.\n- **Loops** walk a collection one item at a time; inside, use Assignment to collect results, then do **one** Create/Update after the loop, not one per item.\n- **Autolaunched flows** have no trigger: Apex, other flows or REST call them with input variables and read output variables.\n- From Apex: `Flow.Interview f = Flow.Interview.createInterview('My_Flow', inputs); f.start(); f.getVariableValue('result');`.\n- Flows share governor limits with the transaction that runs them.",
+      "concepts": [
+        "Decision outcome order and the default outcome",
+        "Loops with collections, and DML outside the loop",
+        "Input and output variables on autolaunched flows",
+        "Calling a flow from Apex"
+      ],
+      "pitfalls": [
+        "A Create or Update element inside a loop: one DML per item, quickly over the limit.",
+        "Forgetting to mark variables available for input or output: callers can't see them."
+      ],
+      "resources": [
+        {
+          "title": "Flow Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/flow-basics",
+          "kind": "trailhead"
+        }
+      ],
       "problems": [
         "flow-key-account-task",
         "flow-shipping-cost",
@@ -98,23 +483,291 @@
       ]
     },
     {
+      "id": "sosl",
+      "title": "SOSL search",
+      "level": 2,
+      "col": 3,
+      "requires": [
+        "soql-basics"
+      ],
+      "summary": "Text search across many objects at once.",
+      "lesson": "**SOSL** searches text across several objects in one call, the way the global search box does:\n\n```apex\nList<List<SObject>> found = [FIND 'Acme*' IN NAME FIELDS RETURNING Account(Name), Contact(FirstName, LastName)];\n```\n\n- Use **SOQL** when you know the object and want exact filters; use **SOSL** when you're searching words across objects or in long text.\n- Results come back as a list per object, in the order of `RETURNING`.\n- SOSL uses the search index, so very recent records may not appear for a moment.",
+      "concepts": [
+        "When SOSL beats SOQL",
+        "FIND, IN … FIELDS and RETURNING",
+        "Results as a list of lists"
+      ],
+      "pitfalls": [
+        "Using SOSL for exact filtering on known fields: SOQL is clearer and immediate.",
+        "Expecting just-inserted records in SOSL results within the same transaction."
+      ],
+      "optional": true,
+      "problems": [],
+      "quiz": [
+        {
+          "q": "You need every Account and Contact whose name contains 'acme'. Which fits best?",
+          "options": [
+            "Two SOQL queries with LIKE",
+            "One SOSL search returning Account and Contact",
+            "A report",
+            "A Flow"
+          ],
+          "answer": 1,
+          "why": "Searching text across several objects at once is what SOSL is for."
+        },
+        {
+          "q": "What does a SOSL query return in Apex?",
+          "options": [
+            "List<SObject>",
+            "List<List<SObject>>",
+            "Map<Id, SObject>",
+            "AggregateResult[]"
+          ],
+          "answer": 1,
+          "why": "One list per object named in RETURNING."
+        },
+        {
+          "q": "Which is true of SOSL compared with SOQL?",
+          "options": [
+            "SOSL can filter on any field exactly",
+            "SOSL uses the search index, so very new records may not appear yet",
+            "SOSL can't search Contacts",
+            "SOSL has no limits"
+          ],
+          "answer": 1,
+          "why": "SOSL reads the search index, which updates shortly after records change."
+        }
+      ]
+    },
+    {
+      "id": "collections-dml",
+      "title": "Collections and DML",
+      "level": 2,
+      "col": 0,
+      "requires": [
+        "apex-basics"
+      ],
+      "summary": "Lists, sets, maps, and saving records in bulk.",
+      "lesson": "Bulk-safe Apex is built on three collections:\n\n- **List**: ordered, duplicates allowed. Queries return lists.\n- **Set**: unique values, fast `contains`. Collect Ids into a `Set<Id>` before querying.\n- **Map**: key to value. `new Map<Id, Account>([SELECT ...])` indexes records by Id in one line.\n\n**DML** saves records: `insert`, `update`, `upsert` (by Id or an external Id), `delete`, `undelete`. Each statement can handle up to 10,000 records, so collect changes into a list and run **one** statement.\n\n`Database.insert(records, false)` allows **partial success**: valid rows save, and each `SaveResult` says which failed and why. `Database.setSavepoint()` and `Database.rollback(sp)` undo work inside a transaction.",
+      "concepts": [
+        "Choosing List, Set or Map",
+        "Building a Map<Id, SObject> straight from a query",
+        "One DML statement for a whole collection",
+        "Partial success with Database methods, and savepoints"
+      ],
+      "pitfalls": [
+        "DML inside a loop: 151 records and you've hit the 150-statement limit.",
+        "Using a List where uniqueness matters: duplicates sneak into your query filters.",
+        "Ignoring `SaveResult` errors after `Database.insert(list, false)`."
+      ],
+      "resources": [
+        {
+          "title": "Apex Basics and Database (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/apex_database",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [
+        "contacts-by-account"
+      ]
+    },
+    {
+      "id": "exceptions",
+      "title": "Errors and exceptions",
+      "level": 2,
+      "col": 1,
+      "requires": [
+        "apex-basics"
+      ],
+      "summary": "try/catch, custom exceptions, and showing errors to users.",
+      "lesson": "When something goes wrong, Apex **throws an exception**; unhandled, it rolls back the whole transaction.\n\n- `try { … } catch (DmlException e) { … } finally { … }`: catch the specific types you can handle; `Exception` catches the rest.\n- Custom exceptions: `public class BudgetException extends Exception {}`; the name must end in `Exception`.\n- **`LimitException` can't be caught**: going over a governor limit always fails the transaction.\n- In triggers, `record.addError('message')` stops that record's save and shows the message to the user, without failing the others in a partial-success save.\n- Don't swallow errors: an empty `catch` hides the bug and leaves data half-changed.",
+      "concepts": [
+        "try/catch/finally and catching specific exception types",
+        "Writing custom exceptions",
+        "Why LimitException can't be caught",
+        "addError for user-facing validation in triggers"
+      ],
+      "pitfalls": [
+        "An empty catch block that hides failures.",
+        "Catching Exception to 'handle' a limit problem: it can't be caught; fix the code.",
+        "Throwing in a trigger when `addError` would give the user a clean message."
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Which exception can never be caught?",
+          "options": [
+            "DmlException",
+            "QueryException",
+            "LimitException",
+            "NullPointerException"
+          ],
+          "answer": 2,
+          "why": "Exceeding a governor limit ends the transaction; catch blocks don't run."
+        },
+        {
+          "q": "Which is a valid custom exception?",
+          "options": [
+            "public class BudgetError extends Exception {}",
+            "public class BudgetException extends Exception {}",
+            "public exception Budget {}",
+            "public class BudgetException implements Exception {}"
+          ],
+          "answer": 1,
+          "why": "Custom exceptions extend Exception and their name must end in Exception."
+        },
+        {
+          "q": "In a before trigger, how do you stop one bad record from saving with a friendly message?",
+          "options": [
+            "throw new Exception()",
+            "record.addError('message')",
+            "System.abort()",
+            "delete the record"
+          ],
+          "answer": 1,
+          "why": "addError blocks that record and shows the message; other records in a partial save still succeed."
+        },
+        {
+          "q": "What happens to the transaction when an exception isn't caught?",
+          "options": [
+            "Only the last statement is undone",
+            "Everything in the transaction rolls back",
+            "Nothing: it continues",
+            "The data is saved but flagged"
+          ],
+          "answer": 1,
+          "why": "An unhandled exception rolls back all DML in the transaction."
+        }
+      ]
+    },
+    {
+      "id": "testing",
+      "title": "Testing",
+      "level": 3,
+      "col": 2,
+      "requires": [
+        "apex-basics"
+      ],
+      "summary": "Test classes, test data and assertions; 75% coverage to deploy.",
+      "lesson": "Every SFCode problem is graded by a hidden **test class**, the same way Salesforce gates production deploys.\n\n- Mark classes `@IsTest`; methods `@IsTest static void ...`.\n- Create your own data in the test. Never rely on org data (`SeeAllData=true`).\n- Wrap the action in `Test.startTest()` / `Test.stopTest()`: you get fresh governor limits, and async work runs at `stopTest`.\n- Assert outcomes with `Assert.areEqual(expected, actual, message)`.\n- Production deploys need **75%** coverage overall and every trigger covered.\n\nTest **bulk**: insert 200 records, not 1.\n\nAlso worth knowing:\n\n- `@TestSetup` creates data once for every test method in the class.\n- A **test data factory** class keeps record creation in one place.\n- `System.runAs(user)` tests sharing and permissions as another user.\n- `Test.setMock(HttpCalloutMock.class, mock)` fakes callouts; tests can't call real APIs.",
+      "concepts": [
+        "@IsTest classes and methods; creating your own test data",
+        "Test.startTest/stopTest: fresh limits and running async work",
+        "Assertions that check behaviour, not just coverage",
+        "@TestSetup, data factories and System.runAs"
+      ],
+      "pitfalls": [
+        "Writing tests that only raise coverage and assert nothing.",
+        "Testing with one record: bulk bugs only show at 200.",
+        "Using SeeAllData=true: tests then break when org data changes."
+      ],
+      "resources": [
+        {
+          "title": "Apex Testing (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/apex_testing",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [],
+      "cert": {
+        "exam": "pd1",
+        "section": "testing"
+      },
+      "quiz": [
+        {
+          "q": "What does Test.stopTest() do for asynchronous Apex queued in the test?",
+          "options": [
+            "Cancels it",
+            "Runs it before the next line",
+            "Schedules it for later",
+            "Nothing"
+          ],
+          "answer": 1,
+          "why": "Async work queued between startTest and stopTest runs synchronously at stopTest."
+        },
+        {
+          "q": "What coverage does a production deploy require?",
+          "options": [
+            "50% org-wide",
+            "75% org-wide, and every trigger covered",
+            "100% of each class",
+            "None"
+          ],
+          "answer": 1,
+          "why": "75% overall across the Apex being deployed, and every trigger must have some coverage."
+        },
+        {
+          "q": "Why avoid SeeAllData=true?",
+          "options": [
+            "It's slower to type",
+            "Tests then depend on org data and break when it changes",
+            "It's not allowed in sandboxes",
+            "It disables assertions"
+          ],
+          "answer": 1,
+          "why": "Tests should create their own data so they pass the same everywhere."
+        },
+        {
+          "q": "Which tests sharing as a specific user?",
+          "options": [
+            "Test.setMock",
+            "System.runAs(user)",
+            "@TestSetup",
+            "Test.isRunningTest()"
+          ],
+          "answer": 1,
+          "why": "runAs executes the block as that user, applying their sharing."
+        }
+      ]
+    },
+    {
+      "id": "lwc",
+      "title": "Lightning Web Components",
+      "level": 3,
+      "col": 3,
+      "requires": [
+        "apex-basics"
+      ],
+      "summary": "Components, templates, reactivity and events.",
+      "lesson": "A **Lightning web component** is an HTML template, a JavaScript class and optional CSS.\n\n- Fields on the class are **reactive**: reassign one and the template re-renders.\n- `@api` makes a property public, so a parent can set it.\n- Templates bind with `{property}` and can't hold expressions, so compute in **getters**: `get isEmpty() { return this.items.length === 0; }`.\n- Lists use `for:each` with a unique `key`; conditions use `lwc:if` / `lwc:else`.\n- Handlers are passed, not called: `onclick={handleClick}`.",
+      "concepts": [
+        "Template, class and CSS; how they're wired",
+        "Reactivity, @api and getters",
+        "for:each with keys, lwc:if/lwc:else",
+        "Event handlers"
+      ],
+      "pitfalls": [
+        "Mutating an @api property inside the child: the parent owns it.",
+        "Writing an expression in a template (`{a + b}`): use a getter.",
+        "A for:each without a unique key."
+      ],
+      "resources": [
+        {
+          "title": "Lightning Web Components Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/lightning-web-components-basics",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [
+        "lwc-click-counter",
+        "lwc-character-counter"
+      ],
+      "cert": {
+        "exam": "pd1",
+        "section": "ui"
+      }
+    },
+    {
       "id": "triggers",
       "title": "Triggers",
       "level": 3,
       "col": 0,
       "requires": [
-        "apex-basics"
+        "apex-basics",
+        "collections-dml"
       ],
       "summary": "Before/after context, bulk-safe patterns, recursion.",
-      "problems": [
-        "account-rating-default",
-        "protect-closed-won",
-        "won-revenue-rollup",
-        "debug-recursive-trigger"
-      ],
       "lesson": "A **trigger** is Apex that runs when records are inserted, updated, deleted or undeleted. It receives the records in **context variables**: `Trigger.new` (the new versions), `Trigger.old` (the previous ones, on update and delete), and the `Trigger.newMap` / `Trigger.oldMap` versions keyed by Id.\n\n**Before** triggers run before the record is saved: change fields on `Trigger.new` directly and Salesforce saves them, with no DML. **After** triggers run once the record has an Id: use them to create or update *other* records.\n\nTriggers fire for up to **200 records at a time**, so every trigger must be **bulk-safe**: no queries or DML inside loops. Collect what you need into sets and maps, query once, then loop.\n\nWhere triggers sit among everything else that happens on save is called the **order of execution**:",
-      "diagram": "order-of-execution",
-      "diagramCaption": "Order of execution, simplified: before-save flows, before triggers, validation and duplicate rules, the save, after triggers, assignment rules, after-save flows, roll-ups, then commit and post-commit work.",
       "concepts": [
         "The difference between `Trigger.new`, `Trigger.old`, `Trigger.newMap` and `Trigger.oldMap`, and when each is null",
         "Same-record field changes go in **before** triggers; changes to other records go in **after** triggers",
@@ -149,6 +802,16 @@
           "url": "https://trailhead.salesforce.com/content/learn/modules/apex_triggers",
           "kind": "trailhead"
         }
+      ],
+      "diagram": "order-of-execution",
+      "diagramCaption": "Order of execution, simplified: before-save flows, before triggers, validation and duplicate rules, the save, after triggers, assignment rules, after-save flows, roll-ups, then commit and post-commit work.",
+      "problems": [
+        "account-rating-default",
+        "protect-closed-won",
+        "won-revenue-rollup",
+        "debug-recursive-trigger",
+        "case-urgent-priority",
+        "block-duplicate-contacts"
       ],
       "quiz": [
         {
@@ -202,50 +865,249 @@
       ]
     },
     {
-      "id": "testing",
-      "title": "Apex testing",
+      "id": "apex-security",
+      "title": "Secure Apex",
       "level": 3,
       "col": 1,
       "requires": [
-        "apex-basics"
+        "collections-dml",
+        "security-basics"
       ],
-      "summary": "Test classes, test data, asserts and 75% coverage.",
-      "lesson": "Every SFCode problem is graded by a hidden **test class**, the same way Salesforce gates production deploys.\n\n- Mark classes `@IsTest`; methods `@IsTest static void ...`.\n- Create your own data in the test. Never rely on org data (`SeeAllData=true`).\n- Wrap the action in `Test.startTest()` / `Test.stopTest()`: you get fresh governor limits, and async work runs at `stopTest`.\n- Assert outcomes with `Assert.areEqual(expected, actual, message)`.\n- Production deploys need **75%** coverage overall and every trigger covered.\n\nTest **bulk**: insert 200 records, not 1.",
-      "problems": [],
-      "cert": {
-        "exam": "pd1",
-        "section": "testing"
-      }
+      "summary": "Sharing, CRUD and FLS in code, and SOQL injection.",
+      "lesson": "Apex runs in **system mode**, so security is something your code opts into:\n\n- **Record sharing**: declare `with sharing` on classes that serve users; `without sharing` only where you deliberately need to see everything; `inherited sharing` to follow the caller.\n- **Object and field permissions**: query `WITH USER_MODE` (enforces CRUD, FLS and sharing), or run DML as the user with `insert as user records;`. `Security.stripInaccessible()` removes fields the user can't see from records.\n- **SOQL injection**: never build queries by joining user input into a string. Use **bind variables** (`WHERE Name = :input`), which work in dynamic SOQL too, or `String.escapeSingleQuotes` as a last resort.\n- Expose only what's needed from `@AuraEnabled` methods: they're callable by any user who can load the component.",
+      "concepts": [
+        "with sharing, without sharing and inherited sharing",
+        "WITH USER_MODE and DML as user",
+        "Security.stripInaccessible",
+        "Bind variables against SOQL injection"
+      ],
+      "pitfalls": [
+        "Leaving a class without a sharing keyword: it runs without sharing when called from some contexts.",
+        "Building dynamic SOQL with string concatenation of user input.",
+        "Trusting the UI to hide data: an @AuraEnabled method returns whatever it queries."
+      ],
+      "problems": [
+        "debug-soql-injection"
+      ],
+      "quiz": [
+        {
+          "q": "Which clause enforces object permissions, field-level security and sharing in a query?",
+          "options": [
+            "WITH SECURITY_ENFORCED",
+            "WITH USER_MODE",
+            "WITH SYSTEM_MODE",
+            "FOR VIEW"
+          ],
+          "answer": 1,
+          "why": "USER_MODE applies the running user's CRUD, FLS and sharing."
+        },
+        {
+          "q": "What stops SOQL injection?",
+          "options": [
+            "Upper-casing input",
+            "Bind variables (:value) instead of joining strings",
+            "Using LIMIT",
+            "Running in system mode"
+          ],
+          "answer": 1,
+          "why": "Binds send input as a value, so it can't change the query's structure."
+        },
+        {
+          "q": "A class has no sharing keyword. Is sharing enforced?",
+          "options": [
+            "Always",
+            "Never",
+            "It depends on the calling context; declare it explicitly",
+            "Only in triggers"
+          ],
+          "answer": 2,
+          "why": "Without a keyword the class takes its sharing from context, which is easy to get wrong. Be explicit."
+        }
+      ]
     },
     {
-      "id": "lwc",
-      "title": "Lightning Web Components",
-      "level": 3,
+      "id": "debugging",
+      "title": "Debugging",
+      "level": 2,
       "col": 2,
       "requires": [
-        "apex-basics"
+        "exceptions"
       ],
-      "summary": "Reactivity, events and rendering lists.",
+      "summary": "Debug logs, checkpoints and reading a stack trace.",
+      "lesson": "- **Debug logs** record what a transaction did. Set a **trace flag** for a user, reproduce the problem, then read the log: `USER_DEBUG` lines show your `System.debug` output; `SOQL_EXECUTE` and `DML_BEGIN` show queries and saves; `LIMIT_USAGE` shows how close you came to each limit.\n- Log levels per category (Apex code, database, workflow…) control how much detail you get; too much detail truncates long logs.\n- A **stack trace** names the class, method and line: start at the top line that's your code.\n- The SFCode **Apex Playground** shows debug output and limit usage for anonymous Apex in your connected org.",
+      "concepts": [
+        "Trace flags and log levels",
+        "Reading USER_DEBUG, SOQL_EXECUTE and limit usage",
+        "Finding your code in a stack trace"
+      ],
+      "pitfalls": [
+        "Leaving very verbose log levels on: logs truncate and hide the part you need.",
+        "Leaving `System.debug` of sensitive data in production code."
+      ],
+      "optional": true,
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Which debug log event shows your System.debug output?",
+          "options": [
+            "SOQL_EXECUTE_BEGIN",
+            "USER_DEBUG",
+            "DML_BEGIN",
+            "CODE_UNIT_STARTED"
+          ],
+          "answer": 1,
+          "why": "System.debug writes USER_DEBUG lines."
+        },
+        {
+          "q": "What must exist before a user's actions produce debug logs?",
+          "options": [
+            "A sandbox refresh",
+            "A trace flag for that user",
+            "A permission set",
+            "A custom setting"
+          ],
+          "answer": 1,
+          "why": "Trace flags turn logging on for a user, class or trigger for a period of time."
+        },
+        {
+          "q": "Why turn log levels down rather than up when a log is huge?",
+          "options": [
+            "Lower levels are faster to download",
+            "Logs have a size cap; too much detail truncates the part you need",
+            "Higher levels hide errors",
+            "It doesn't matter"
+          ],
+          "answer": 1,
+          "why": "Logs over the size limit are truncated, often losing the end where the error is."
+        }
+      ]
+    },
+    {
+      "id": "lwc-data",
+      "title": "LWC and data",
+      "level": 3,
+      "col": 3,
+      "requires": [
+        "lwc"
+      ],
+      "summary": "Wire service, Lightning Data Service and calling Apex.",
+      "lesson": "- **Lightning Data Service** (`getRecord`, `updateRecord`, `lightning-record-form`) reads and writes single records with sharing and FLS applied, and keeps a shared cache, so every component showing a record updates together.\n- **`@wire`** connects a property or function to a data source and re-runs when its reactive parameters (`$recordId`) change.\n- **Apex**: annotate methods `@AuraEnabled(cacheable=true)` to use them with `@wire`; call non-cacheable ones imperatively for DML. After changing data, `refreshApex(wiredResult)` refreshes a wired Apex result.\n- State that drives lists should be replaced, not mutated: `this.items = [...this.items, item]`.",
+      "concepts": [
+        "Lightning Data Service and its shared cache",
+        "@wire with reactive `$` parameters",
+        "cacheable=true versus imperative Apex calls",
+        "refreshApex after a change"
+      ],
+      "pitfalls": [
+        "DML in a `cacheable=true` method: it fails.",
+        "Forgetting refreshApex, so the list stays stale after an update.",
+        "Querying a single record with Apex when Lightning Data Service would do it with security built in."
+      ],
+      "resources": [
+        {
+          "title": "Lightning Web Components and Salesforce Data (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/lightning-web-components-and-salesforce-data",
+          "kind": "trailhead"
+        }
+      ],
       "problems": [
-        "lwc-click-counter",
-        "lwc-star-rating",
-        "lwc-contact-filter"
+        "lwc-contact-filter",
+        "lwc-todo-list",
+        "lwc-tabs"
+      ]
+    },
+    {
+      "id": "trigger-frameworks",
+      "title": "Trigger architecture",
+      "level": 3,
+      "col": 0,
+      "requires": [
+        "triggers"
       ],
-      "cert": {
-        "exam": "pd1",
-        "section": "ui"
-      }
+      "summary": "One trigger per object, handler classes, recursion control.",
+      "lesson": "As an org grows, triggers need structure:\n\n- **One trigger per object**, with no logic in it: it hands every event to a **handler class**. Several triggers on one object run in an undefined order.\n- The handler routes by event (`beforeInsert`, `afterUpdate`…) to methods or **service** classes that hold the business logic, with **selector** classes holding the queries.\n- **Recursion**: an after trigger that updates related records can fire triggers again. A static `Set<Id>` of already-processed records stops repeat work within one transaction.\n- Keep switches to turn handlers off (custom metadata), for data loads and emergencies.",
+      "concepts": [
+        "One trigger per object, logic in a handler",
+        "Service and selector classes",
+        "Static recursion guards",
+        "Bypass switches with custom metadata"
+      ],
+      "pitfalls": [
+        "A static Boolean 'run once' flag: it skips the second chunk of 200 in a bulk load. Track Ids instead.",
+        "Logic split across several triggers on the same object."
+      ],
+      "resources": [
+        {
+          "title": "Apex Enterprise Patterns: Service Layer (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/apex_patterns_sl",
+          "kind": "trailhead"
+        }
+      ],
+      "diagram": "trigger-handler",
+      "diagramCaption": "Trigger handler pattern: a one-line trigger calls a handler, which routes to service and selector classes and uses a static recursion guard.",
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Look at the diagram. Where does the business logic live?",
+          "options": [
+            "In AccountTrigger",
+            "In the handler and the service and selector classes it calls",
+            "In the recursion guard",
+            "In a Flow"
+          ],
+          "answer": 1,
+          "why": "The trigger is one line; the handler routes to classes that hold the logic and queries.",
+          "image": "trigger-handler",
+          "imageAlt": "Diagram: AccountTrigger calls AccountTriggerHandler, which calls AccountService and AccountSelector, with a recursion guard."
+        },
+        {
+          "q": "Using the diagram, what does the recursion guard store?",
+          "options": [
+            "A Boolean flag",
+            "A static Set<Id> of records already processed",
+            "The last error",
+            "A list of triggers"
+          ],
+          "answer": 1,
+          "why": "Tracking Ids handles bulk loads correctly, where a single flag would skip later chunks.",
+          "image": "trigger-handler",
+          "imageAlt": "Diagram: the recursion guard box reads 'static Set<Id> already processed'."
+        },
+        {
+          "q": "Why only one trigger per object?",
+          "options": [
+            "Salesforce allows only one",
+            "Multiple triggers on one object run in no guaranteed order",
+            "It uses fewer licences",
+            "Triggers can't call classes"
+          ],
+          "answer": 1,
+          "why": "With several triggers, execution order isn't defined, so behaviour can change between deploys."
+        }
+      ]
     },
     {
       "id": "governor-limits",
       "title": "Governor limits",
       "level": 4,
-      "col": 0,
+      "col": 1,
       "requires": [
         "triggers",
         "soql-advanced"
       ],
-      "summary": "No SOQL or DML in loops; work in sets and maps.",
+      "summary": "The limits every transaction lives within, and how to stay under them.",
+      "lesson": "Every transaction has hard limits. The ones you'll meet most (synchronous / asynchronous):\n\n| Limit | Sync | Async |\n|---|---|---|\n| SOQL queries | 100 | 200 |\n| Records returned by SOQL | 50,000 | 50,000 |\n| DML statements | 150 | 150 |\n| Records processed by DML | 10,000 | 10,000 |\n| CPU time | 10 s | 60 s |\n| Heap | 6 MB | 12 MB |\n| Callouts | 100 | 100 |\n\nStaying under them is a design habit: query once outside loops, DML once on collections, filter in SOQL rather than in Apex, and move large volumes to Batch Apex. `Limits.getQueries()` and friends tell you where you are.",
+      "concepts": [
+        "The main limits and their sync/async values",
+        "Bulk patterns that keep you under them",
+        "Measuring with the Limits class",
+        "When to move work to async or Batch"
+      ],
+      "pitfalls": [
+        "Trying to catch a LimitException: you can't.",
+        "Filtering records in Apex loops when SOQL could have filtered them.",
+        "Loading huge lists into memory and hitting the heap limit."
+      ],
       "problems": [
         "debug-soql-in-loop",
         "debug-dml-in-loop"
@@ -256,39 +1118,609 @@
       }
     },
     {
-      "id": "pd1-ready",
-      "title": "PD I checkpoint",
-      "level": 4,
-      "col": 1,
+      "id": "integration-callouts",
+      "title": "Callouts and integration",
+      "level": 3,
+      "col": 2,
       "requires": [
-        "triggers",
-        "testing",
-        "flow-advanced",
-        "lwc"
+        "apex-security",
+        "testing"
       ],
-      "summary": "You've covered the PD I syllabus. Drill the exam questions.",
-      "lesson": "Time to test yourself. Do a full **PD I practice exam** in Certification Prep, then review every miss: the explanation tells you which roadmap node to revisit.",
-      "problems": [],
-      "cert": {
-        "exam": "pd1"
-      }
+      "summary": "HTTP callouts, JSON, Named Credentials and mocks.",
+      "lesson": "Apex calls other systems with `HttpRequest` and `Http.send()`:\n\n- Store the endpoint and authentication in a **Named Credential** and call `callout:My_API/path`: no secrets in code, and no Remote Site Setting needed.\n- Parse JSON with typed classes (`JSON.deserialize(body, MyResponse.class)`) or `JSON.deserializeUntyped`.\n- Check the status code before trusting the body; set timeouts.\n- **Callouts can't run after uncommitted DML** in the same transaction, and triggers can't call out directly: use Queueable (with `Database.AllowsCallouts`) or `@future(callout=true)`.\n- In tests, `Test.setMock(HttpCalloutMock.class, mock)` returns a fake response.",
+      "concepts": [
+        "HttpRequest, Http.send and status codes",
+        "Named Credentials instead of hard-coded URLs and secrets",
+        "JSON serialisation and parsing",
+        "Callouts from triggers via async Apex",
+        "HttpCalloutMock in tests"
+      ],
+      "pitfalls": [
+        "Hard-coding API keys in Apex or custom settings.",
+        "Calling out after DML in the same transaction: 'You have uncommitted work pending'.",
+        "Parsing the body without checking the status code."
+      ],
+      "resources": [
+        {
+          "title": "Apex Integration Services (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/apex_integration_services",
+          "kind": "trailhead"
+        }
+      ],
+      "diagram": "callout-flow",
+      "diagramCaption": "Callouts: Apex sends an HttpRequest to a Named Credential, which holds the URL and authentication and calls the external API; tests use HttpCalloutMock.",
+      "problems": [
+        "weather-callout"
+      ],
+      "quiz": [
+        {
+          "q": "Look at the diagram. Where should the API's URL and credentials live?",
+          "options": [
+            "In the Apex class",
+            "In the Named Credential",
+            "In a custom label",
+            "In the test class"
+          ],
+          "answer": 1,
+          "why": "Named Credentials hold the endpoint and auth so code never contains secrets.",
+          "image": "callout-flow",
+          "imageAlt": "Diagram: Apex calls a Named Credential, which holds URL and auth and calls the external API."
+        },
+        {
+          "q": "Using the diagram's notes: what answers callouts during a test?",
+          "options": [
+            "The real API",
+            "An HttpCalloutMock set with Test.setMock",
+            "Nothing; tests skip callouts",
+            "A Named Credential"
+          ],
+          "answer": 1,
+          "why": "Tests can't make real callouts; a mock returns the response.",
+          "image": "callout-flow",
+          "imageAlt": "Diagram notes: in tests, Test.setMock with an HttpCalloutMock answers instead of the API."
+        },
+        {
+          "q": "A trigger must call an external API. What do you do?",
+          "options": [
+            "Call Http.send in the trigger",
+            "Enqueue a Queueable (or @future(callout=true)) that makes the callout",
+            "Use a validation rule",
+            "It's impossible"
+          ],
+          "answer": 1,
+          "why": "Triggers can't make callouts synchronously; async Apex can."
+        }
+      ]
+    },
+    {
+      "id": "lwc-communication",
+      "title": "LWC communication",
+      "level": 3,
+      "col": 3,
+      "requires": [
+        "lwc-data"
+      ],
+      "summary": "Events up, properties down, and Lightning Message Service.",
+      "lesson": "- **Parent to child**: set the child's `@api` properties, or call its `@api` methods.\n- **Child to parent**: `this.dispatchEvent(new CustomEvent('select', { detail: id }))`; the parent listens with `onselect={handleSelect}`. Event names are lower-case.\n- `bubbles` and `composed` let events travel further up or out of shadow DOM; use them sparingly.\n- **Unrelated components** (different parts of a page, or LWC talking to Aura and Visualforce) use **Lightning Message Service**: publish to and subscribe on a **message channel**.",
+      "concepts": [
+        "@api properties and methods",
+        "CustomEvent with detail; lower-case event names",
+        "bubbles and composed",
+        "Lightning Message Service channels"
+      ],
+      "pitfalls": [
+        "Using camelCase event names: listeners won't match.",
+        "Reaching into a child's DOM to change it instead of using @api.",
+        "Reaching for LMS between a parent and its child, where events and properties are simpler."
+      ],
+      "diagram": "lwc-communication",
+      "diagramCaption": "LWC communication: a parent passes data down with @api properties, a child sends CustomEvents up, and unrelated components publish and subscribe through a Lightning Message Service channel.",
+      "problems": [
+        "lwc-star-rating"
+      ],
+      "quiz": [
+        {
+          "q": "Look at the diagram. A child must tell its parent a star was clicked. How?",
+          "options": [
+            "Set a property on the parent",
+            "Dispatch a CustomEvent the parent listens for",
+            "Publish to a message channel",
+            "Use @wire"
+          ],
+          "answer": 1,
+          "why": "Children send changes up as events; properties only flow down.",
+          "image": "lwc-communication",
+          "imageAlt": "Diagram: arrows show @api props down from c-parent to c-child and CustomEvent up from child to parent."
+        },
+        {
+          "q": "Using the diagram, how do c-child and c-unrelated communicate?",
+          "options": [
+            "Through @api",
+            "Through a Lightning Message Service channel: one publishes, the other subscribes",
+            "They can't",
+            "Through the parent's template"
+          ],
+          "answer": 1,
+          "why": "Components with no parent-child link use a message channel.",
+          "image": "lwc-communication",
+          "imageAlt": "Diagram: c-child publishes to a Message channel; c-unrelated subscribes to it."
+        },
+        {
+          "q": "Which event name will a parent's `onitemselect` handler receive?",
+          "options": [
+            "itemSelect",
+            "item-select",
+            "itemselect",
+            "ItemSelect"
+          ],
+          "answer": 2,
+          "why": "Event names are lower-case, and `on` plus the name forms the handler attribute."
+        }
+      ]
     },
     {
       "id": "async",
-      "title": "Async Apex",
+      "title": "Asynchronous Apex",
       "level": 4,
       "col": 2,
       "requires": [
         "governor-limits"
       ],
-      "summary": "Queueable, future and Batch Apex.",
+      "summary": "Future, Queueable and choosing the right async tool.",
+      "lesson": "Async Apex runs later, in its own transaction, with **higher limits** (200 queries, 12 MB heap, 60 s CPU):\n\n- **@future**: a static method with primitive arguments. Simple, but can't be chained or monitored easily.\n- **Queueable**: a class with `execute(QueueableContext)`; takes objects as arguments, returns a job Id from `System.enqueueJob`, and can **chain** another job. The default choice today.\n- **Batch Apex** and **Schedulable** handle volume and timing; see the next step.\n- **Platform Events** decouple work: publish an event, and subscribers handle it.\n\nAsync work doesn't start until the transaction that queued it **commits**.",
+      "concepts": [
+        "@future versus Queueable",
+        "Higher async limits",
+        "Chaining Queueable jobs",
+        "Async starts only after commit"
+      ],
+      "pitfalls": [
+        "Calling @future from @future or from Batch: not allowed.",
+        "Enqueuing a Queueable per record inside a loop.",
+        "Expecting async results within the same transaction."
+      ],
+      "resources": [
+        {
+          "title": "Asynchronous Apex (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/asynchronous_apex",
+          "kind": "trailhead"
+        }
+      ],
+      "diagram": "async-choice",
+      "diagramCaption": "Choosing asynchronous Apex: future for simple deferred work, Queueable for objects and chaining, Batch for millions of records, Schedulable for timed runs, Platform Events to notify other systems.",
       "problems": [
-        "sync-contact-city",
-        "close-stale-opportunities"
+        "sync-contact-city"
       ],
       "cert": {
         "exam": "pd2",
         "section": "advanced"
+      },
+      "quiz": [
+        {
+          "q": "Look at the diagram. You need to pass a List<Account> to code that runs later and then start a second job. Which tool?",
+          "options": [
+            "@future",
+            "Queueable",
+            "Schedulable",
+            "A trigger"
+          ],
+          "answer": 1,
+          "why": "Queueable takes objects as arguments and can chain jobs.",
+          "image": "async-choice",
+          "imageAlt": "Diagram: Queueable is labelled 'Run later, objects as args, chain jobs'."
+        },
+        {
+          "q": "Using the diagram, which tool processes millions of records in chunks?",
+          "options": [
+            "@future",
+            "Queueable",
+            "Batch Apex",
+            "Platform Events"
+          ],
+          "answer": 2,
+          "why": "Batch Apex splits a large dataset into chunks, each with its own limits.",
+          "image": "async-choice",
+          "imageAlt": "Diagram: Batch Apex is labelled 'Millions of records in chunks'."
+        },
+        {
+          "q": "How many SOQL queries may an asynchronous transaction run?",
+          "options": [
+            "100",
+            "150",
+            "200",
+            "Unlimited"
+          ],
+          "answer": 2,
+          "why": "Async limits are higher: 200 queries instead of 100."
+        }
+      ]
+    },
+    {
+      "id": "batch-scheduled",
+      "title": "Batch and scheduled Apex",
+      "level": 4,
+      "col": 2,
+      "requires": [
+        "async"
+      ],
+      "summary": "Processing large volumes in chunks, on a schedule.",
+      "lesson": "**Batch Apex** processes up to 50 million records:\n\n- `start` returns a `Database.QueryLocator` (or an iterable) describing the records.\n- `execute` receives a **chunk** (200 by default, set in `Database.executeBatch(job, size)`), each with fresh limits.\n- `finish` runs once at the end: send a summary, chain another job.\n- `Database.Stateful` keeps instance variables between chunks; without it they reset.\n\n**Schedulable** classes run at set times: `System.schedule('Nightly', '0 0 2 * * ?', new MyJob())`. A common pattern is a scheduled class that starts a batch.",
+      "concepts": [
+        "start, execute and finish",
+        "Chunk size and per-chunk limits",
+        "Database.Stateful",
+        "Cron expressions with System.schedule"
+      ],
+      "pitfalls": [
+        "Querying the same records again inside execute: the scope already has them.",
+        "Expecting counters to survive between chunks without Database.Stateful.",
+        "Too many scheduled jobs: orgs have a cap on scheduled Apex."
+      ],
+      "resources": [
+        {
+          "title": "Asynchronous Apex (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/asynchronous_apex",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [
+        "close-stale-opportunities",
+        "overdue-task-scheduler",
+        "debug-batch-wrong-scope"
+      ]
+    },
+    {
+      "id": "platform-events",
+      "title": "Platform events",
+      "level": 4,
+      "col": 3,
+      "requires": [
+        "async"
+      ],
+      "summary": "Publish-subscribe messaging inside and outside Salesforce.",
+      "lesson": "A **platform event** is a message type you define (`Order_Shipped__e`) with fields. Code, Flows and external systems **publish** events; triggers, Flows, LWC and external subscribers **receive** them.\n\n- Publish from Apex with `EventBus.publish(events)`; check the `SaveResult`s.\n- By default events are delivered **after the transaction commits** (Publish After Commit), so subscribers never see work that was rolled back.\n- Event triggers run as the Automated Process user in their own transaction, and can process events in batches.\n- They decouple systems: the publisher doesn't need to know who's listening.",
+      "concepts": [
+        "Defining an event and its fields",
+        "Publishing with EventBus.publish",
+        "Publish After Commit versus Publish Immediately",
+        "Subscribers: triggers, flows, LWC, external"
+      ],
+      "pitfalls": [
+        "Using platform events for data that must be queryable later: they're messages, not records.",
+        "Expecting the subscriber to run as the user who published."
+      ],
+      "resources": [
+        {
+          "title": "Platform Events Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/platform_events_basics",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "How do you publish a platform event from Apex?",
+          "options": [
+            "insert event;",
+            "EventBus.publish(event)",
+            "System.enqueueJob(event)",
+            "Database.publish(event)"
+          ],
+          "answer": 1,
+          "why": "EventBus.publish sends the event and returns SaveResults."
+        },
+        {
+          "q": "With 'Publish After Commit', what happens if the publishing transaction rolls back?",
+          "options": [
+            "The event is still delivered",
+            "The event isn't delivered",
+            "It's delivered twice",
+            "It's delivered to admins only"
+          ],
+          "answer": 1,
+          "why": "After-commit events are only sent when the transaction succeeds."
+        },
+        {
+          "q": "Which can subscribe to a platform event?",
+          "options": [
+            "Only Apex triggers",
+            "Triggers, Flows, LWC and external systems",
+            "Only external systems",
+            "Only Flows"
+          ],
+          "answer": 1,
+          "why": "Platform events support many subscriber types, which is what makes them good for decoupling."
+        }
+      ]
+    },
+    {
+      "id": "performance",
+      "title": "Performance at scale",
+      "level": 4,
+      "col": 1,
+      "requires": [
+        "governor-limits"
+      ],
+      "summary": "Selective queries, indexes and large data volumes.",
+      "lesson": "With millions of records, the question becomes whether your query is **selective**: does it filter on an **indexed** field (Id, Name, lookups, external Ids, and fields you ask Salesforce to index) narrowly enough to avoid scanning the whole table?\n\n- Non-selective queries in triggers fail outright on large objects.\n- Avoid leading wildcards (`LIKE '%acme'`), `!=` and `NOT IN` on big tables: they can't use indexes well.\n- **Data skew**: one parent with tens of thousands of children (or one owner of huge numbers of records) causes lock contention and slow sharing recalculation.\n- Use **Batch Apex** and the **Bulk API** for big loads; turn off non-essential automation during data migrations.",
+      "concepts": [
+        "Selective queries and standard indexes",
+        "Why leading wildcards and negative filters are slow",
+        "Ownership and parent-child data skew",
+        "Batch and Bulk API for large volumes"
+      ],
+      "pitfalls": [
+        "A trigger query filtering on an unindexed field: fine in a sandbox, fails in production at volume.",
+        "Assigning millions of records to a single integration user."
+      ],
+      "resources": [
+        {
+          "title": "Large Data Volumes (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/large-data-volumes",
+          "kind": "trailhead"
+        }
+      ],
+      "optional": true,
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Which filter is most likely to be selective?",
+          "options": [
+            "WHERE Name LIKE '%acme'",
+            "WHERE ExternalId__c = :key (an External ID field)",
+            "WHERE Status__c != 'Closed'",
+            "WHERE Description != null"
+          ],
+          "answer": 1,
+          "why": "External ID fields are indexed; an equality filter on one is selective."
+        },
+        {
+          "q": "What is data skew?",
+          "options": [
+            "Records with bad data",
+            "One parent or owner with a huge number of child or owned records",
+            "Unbalanced test data",
+            "A sandbox out of date"
+          ],
+          "answer": 1,
+          "why": "Skew causes locking and slow sharing calculations."
+        },
+        {
+          "q": "You must load 5 million records. What's appropriate?",
+          "options": [
+            "Data Import Wizard",
+            "Bulk API or Data Loader in bulk mode, with heavy automation paused",
+            "Anonymous Apex",
+            "One insert in a trigger"
+          ],
+          "answer": 1,
+          "why": "Bulk API is built for large volumes; pausing non-essential automation avoids limits and locks."
+        }
+      ]
+    },
+    {
+      "id": "deployment",
+      "title": "Deployment and DevOps",
+      "level": 4,
+      "col": 0,
+      "requires": [
+        "testing",
+        "pd1-ready"
+      ],
+      "summary": "Getting changes safely from development to production.",
+      "lesson": "Changes move through environments: build in a scratch org or sandbox, commit to **Git**, test automatically in **CI**, check in a UAT sandbox, then deploy to production.\n\n- **Salesforce CLI** deploys source: `sf project deploy start --test-level RunLocalTests`.\n- Production deploys **run tests**: overall coverage of at least 75%, every trigger covered, all tests passing.\n- Alternatives: **change sets** (clicks, between connected orgs), **unlocked packages** (versioned modules), **DevOps Center**.\n- Validate first (`--dry-run`) and quick-deploy the validated build in your release window.\n- Data isn't deployed with metadata: plan data loads separately.",
+      "concepts": [
+        "Environments: scratch org, sandbox, UAT, production",
+        "Deploying with the Salesforce CLI and test levels",
+        "Coverage rules for production",
+        "Change sets, packages and DevOps Center"
+      ],
+      "pitfalls": [
+        "Deploying on release night without a prior validation.",
+        "Assuming records come with a metadata deploy.",
+        "Different metadata in sandboxes than in Git: everything should come from source."
+      ],
+      "resources": [
+        {
+          "title": "App Development with Salesforce DX (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/sfdx_app_dev",
+          "kind": "trailhead"
+        }
+      ],
+      "diagram": "deploy-pipeline",
+      "diagramCaption": "Deployment pipeline: build in a scratch org or sandbox, commit to Git, run tests in CI, check in a UAT sandbox, then deploy to production.",
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Look at the diagram. Where should automated tests run before anything reaches production?",
+          "options": [
+            "In production",
+            "In CI, after the change is committed to Git",
+            "Only in the scratch org",
+            "They don't need to"
+          ],
+          "answer": 1,
+          "why": "CI runs the tests on every change, before UAT and production.",
+          "image": "deploy-pipeline",
+          "imageAlt": "Diagram: Scratch org, Git, CI (tests, scans), UAT sandbox, Production."
+        },
+        {
+          "q": "Using the diagram's note: what must be true for a production deploy?",
+          "options": [
+            "50% coverage",
+            "75% overall coverage, every trigger covered, all tests pass",
+            "No tests needed with change sets",
+            "100% coverage"
+          ],
+          "answer": 1,
+          "why": "Production deploys enforce those test rules.",
+          "image": "deploy-pipeline",
+          "imageAlt": "Diagram note: production deploys need 75% org-wide coverage, every trigger covered, all tests passing."
+        },
+        {
+          "q": "Which is versioned and installable as a module?",
+          "options": [
+            "A change set",
+            "An unlocked package",
+            "A sandbox",
+            "A report"
+          ],
+          "answer": 1,
+          "why": "Packages are versioned units of metadata."
+        }
+      ]
+    },
+    {
+      "id": "design-patterns",
+      "title": "Design patterns",
+      "level": 4,
+      "col": 1,
+      "requires": [
+        "pd1-ready"
+      ],
+      "summary": "Service, domain and selector layers for larger codebases.",
+      "lesson": "**Apex Enterprise Patterns** organise big codebases into layers:\n\n- **Selector**: all the queries for an object, in one place, with consistent fields and security.\n- **Domain**: behaviour and validation for an object's records (what a trigger handler calls).\n- **Service**: business operations that span objects (`OpportunityService.applyDiscount(ids, pct)`), callable from LWC, REST, batch or triggers alike.\n- **Unit of Work**: collect DML and commit it once, in the right order.\n\nNot every org needs all four: the goal is code where each class has one reason to change.",
+      "concepts": [
+        "Selector, domain, service and unit of work layers",
+        "Separation of concerns",
+        "When patterns help and when they're overkill"
+      ],
+      "pitfalls": [
+        "Adopting a full framework for three triggers.",
+        "Putting queries everywhere instead of in selectors: fields and security drift."
+      ],
+      "resources": [
+        {
+          "title": "Apex Enterprise Patterns: Service Layer (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/apex_patterns_sl",
+          "kind": "trailhead"
+        },
+        {
+          "title": "Apex Enterprise Patterns: Domain and Selector Layers (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/apex_patterns_dsl",
+          "kind": "trailhead"
+        }
+      ],
+      "optional": true,
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Which layer holds an object's queries?",
+          "options": [
+            "Service",
+            "Domain",
+            "Selector",
+            "Unit of Work"
+          ],
+          "answer": 2,
+          "why": "Selectors centralise SOQL for an object."
+        },
+        {
+          "q": "Which layer exposes business operations to LWC, REST and batch alike?",
+          "options": [
+            "Selector",
+            "Service",
+            "Domain",
+            "Trigger"
+          ],
+          "answer": 1,
+          "why": "Service methods are the single entry point for an operation, whoever calls it."
+        },
+        {
+          "q": "What does a Unit of Work do?",
+          "options": [
+            "Schedules jobs",
+            "Collects DML and commits it once, in order",
+            "Runs tests",
+            "Formats JSON"
+          ],
+          "answer": 1,
+          "why": "It batches DML across objects into one ordered commit."
+        }
+      ]
+    },
+    {
+      "id": "apex-rest",
+      "title": "Apex REST services",
+      "level": 4,
+      "col": 3,
+      "requires": [
+        "integration-callouts"
+      ],
+      "summary": "Exposing your own REST endpoints from Salesforce.",
+      "lesson": "Integration goes both ways: external systems can call **your** Apex.\n\n```apex\n@RestResource(urlMapping='/orders/*')\nglobal with sharing class OrderApi {\n    @HttpGet global static Order__c getOrder() { … }\n    @HttpPost global static Id create(String name) { … }\n}\n```\n\n- The endpoint lives at `/services/apexrest/orders/…` and requires an authenticated caller (usually an integration user via a Connected App).\n- `RestContext.request` and `RestContext.response` give the URL, headers and body; return values are serialised to JSON.\n- Prefer the standard REST API when it already does what you need; write Apex REST for custom operations.",
+      "concepts": [
+        "@RestResource and the HTTP method annotations",
+        "RestContext request and response",
+        "Authentication via Connected Apps and integration users",
+        "When to use the standard REST API instead"
+      ],
+      "pitfalls": [
+        "Declaring the class without sharing: it exposes everything to the integration user.",
+        "Building custom endpoints for plain CRUD the standard API already provides."
+      ],
+      "resources": [
+        {
+          "title": "Apex Integration Services (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/apex_integration_services",
+          "kind": "trailhead"
+        }
+      ],
+      "optional": true,
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Which annotation exposes an Apex class as a REST endpoint?",
+          "options": [
+            "@AuraEnabled",
+            "@RestResource",
+            "@InvocableMethod",
+            "@HttpCallout"
+          ],
+          "answer": 1,
+          "why": "@RestResource with a urlMapping publishes the class under /services/apexrest/."
+        },
+        {
+          "q": "Where does an Apex REST class live in the URL?",
+          "options": [
+            "/services/data/",
+            "/services/apexrest/",
+            "/apex/",
+            "/rest/"
+          ],
+          "answer": 1,
+          "why": "Custom Apex REST endpoints are under /services/apexrest/."
+        },
+        {
+          "q": "When should you use the standard REST API instead of Apex REST?",
+          "options": [
+            "Never",
+            "When it already covers the operation, such as plain record CRUD",
+            "Only for reads",
+            "Only in sandboxes"
+          ],
+          "answer": 1,
+          "why": "Custom endpoints are code to maintain; use them for custom logic only."
+        }
+      ]
+    },
+    {
+      "id": "pd1-ready",
+      "title": "PD I checkpoint",
+      "level": 4,
+      "col": 0,
+      "requires": [
+        "trigger-frameworks",
+        "apex-security",
+        "flow-advanced",
+        "lwc-communication",
+        "testing"
+      ],
+      "summary": "Take a full Platform Developer I practice exam.",
+      "lesson": "Time to test yourself. Do a full **PD I practice exam** in Certification Prep, then review every miss: the explanation tells you which roadmap node to revisit.",
+      "problems": [],
+      "cert": {
+        "exam": "pd1"
       }
     },
     {
@@ -297,10 +1729,13 @@
       "level": 4,
       "col": 1,
       "requires": [
-        "async",
-        "pd1-ready"
+        "batch-scheduled",
+        "platform-events",
+        "deployment",
+        "pd1-ready",
+        "integration-callouts"
       ],
-      "summary": "Advanced Apex, integration and performance.",
+      "summary": "Take a full Platform Developer II practice exam.",
       "lesson": "PD II leans on design judgement: which async tool, how to stay under limits at scale, and how to integrate. Do a **PD II practice exam** and revisit the nodes behind each miss.",
       "problems": [],
       "cert": {
