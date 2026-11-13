@@ -53,7 +53,18 @@ export interface ContestResult {
   score: number;
 }
 
+export type TierId = "novice" | "trailblazer" | "ranger" | "expert" | "legend";
+export interface Tier {
+  id: TierId;
+  title: string;
+  level: number;
+  points: number;
+  next: { title: string; min: number } | null;
+  progress: number;
+}
+
 export interface ProfileView {
+  tier: Tier;
   cosmetics: Cosmetics;
   about: About;
   stats: { streak: number; longestStreak: number; coins: number | null; contests: number; bestPlacement: number | null; activeDays: number };
@@ -74,6 +85,7 @@ export interface ProfileView {
 }
 
 export interface LeaderboardRow {
+  tier: { id: TierId; title: string };
   cosmetics: Cosmetics;
   rank: number;
   handle: string;
@@ -91,3 +103,8 @@ export const getLeaderboard = (window: "all" | "30d") => apiRequest<LeaderboardR
 
 export const updateMyAbout = (token: Token, about: { bio: string; company: string; location: string; trailheadUrl: string; linkedinUrl: string; githubUrl: string; certifications: string[]; openToWork: boolean }) =>
   apiRequest<ProfileView>("/api/v1/profile/me/about", { method: "PUT", token, body: about });
+
+export const getMyTier = (token: Token) => apiRequest<Tier>("/api/v1/profile/me/tier", { token });
+
+/** Fired after an accepted submission so the rank watcher can check for a level-up. */
+export const SOLVED_EVENT = "sfc:solved";

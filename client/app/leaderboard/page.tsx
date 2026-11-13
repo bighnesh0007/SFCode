@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Avatar } from "@/components/Avatar";
+import { RankBadge } from "@/components/RankBadge";
 import { pointsSummary, usePoints } from "@/components/usePoints";
 import { Flair, accentClass, frameClass } from "@/components/Cosmetics";
 import { ApiError } from "@/lib/apiClient";
@@ -71,6 +72,7 @@ export default function LeaderboardPage() {
                         <Avatar src={r.imageUrl} name={r.displayName} size={24} className={frameClass(r.cosmetics.frame)} />
                         <span className={cn("truncate font-medium", accentClass(r.cosmetics.accent))}>{r.displayName}</span>
                         <Flair badge={r.cosmetics.badge} />
+                        <RankBadge id={r.tier.id} title={r.tier.title} size="sm" className="hidden sm:inline-flex" />
                         <span className="truncate text-xs text-muted-foreground">@{r.handle}</span>
                       </Link>
                     </td>

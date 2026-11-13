@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
+import { RankBadge } from "@/components/RankBadge";
 import { AboutCard, AchievementsWall, ContestHistory, RoadmapProgress, ShareButtons, SkillRadar, StatsStrip } from "@/components/profile/Sections";
 import { Flair, accentClass, frameClass } from "@/components/Cosmetics";
 import { useAuthState } from "@/components/auth";
@@ -102,6 +103,15 @@ export function ProfileView({ profile: initial, editable }: { profile: Profile; 
                   </button>
                 )}
               </h1>
+              <div className="mt-1 flex flex-wrap items-center gap-2">
+                <RankBadge id={profile.tier.id} title={profile.tier.title} />
+                {profile.tier.next && (
+                  <span className="flex items-center gap-2 text-xs text-muted-foreground" title={`${profile.tier.points} of ${profile.tier.next.min} points`}>
+                    <span className="h-1.5 w-24 overflow-hidden rounded-full bg-muted"><span className="block h-full rounded-full bg-gradient-to-r from-sky-400 to-indigo-500" style={{ width: `${profile.tier.progress}%` }} /></span>
+                    {profile.tier.next.min - profile.tier.points} pts to {profile.tier.next.title}
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-muted-foreground">@{profile.handle} · joined {new Date(profile.joined).toLocaleDateString(undefined, { month: "short", year: "numeric" })}</p>
             </>
           )}

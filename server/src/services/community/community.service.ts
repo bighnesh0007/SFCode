@@ -10,6 +10,7 @@ import { DIFFICULTIES, type Difficulty } from "../../domain/difficulty.ts";
 import { achievements, streaks, type Achievement } from "../../domain/achievements.ts";
 import { EMPTY_ABOUT, type AboutRecord, type AboutRepository } from "../../repositories/about.repository.ts";
 import { PointsService } from "../points/points.service.ts";
+import { rankFor, type RankView } from "../../domain/ranks.ts";
 import type { ChallengeSubmissionRepository } from "../../repositories/challengeSubmission.repository.ts";
 import type { ProfileRecord, ProfileRepository } from "../../repositories/profile.repository.ts";
 import type { Clock } from "../../types/ports.ts";
@@ -67,6 +68,8 @@ export interface ProfileStats {
 }
 
 export interface ProfileView {
+  /** Rank-from-points with progress to the next one. */
+  tier: RankView;
   cosmetics: Cosmetics;
   about: AboutRecord;
   stats: ProfileStats;
@@ -87,6 +90,8 @@ export interface ProfileView {
 }
 
 export interface LeaderboardRow {
+  /** Rank-from-points (Novice … Legend); `rank` is the board position. */
+  tier: { id: RankView["id"]; title: string };
   cosmetics: Cosmetics;
   rank: number;
   handle: string;
@@ -191,6 +196,16 @@ export class CommunityService {
     return value;
   }
 
+  /** Cheap "how am I doing" for the level-up toast: points and rank only. */
+  async myTier(userId: string): Promise<RankView> {
+    const table = await this.points.table();
+    const points = (await this.submissions.firstSolves(undefined, userId)).reduce((sum, s) => {
+      const c = this.catalog.get(s.slug);
+      return c && SCORED_TRACKS.includes(c.track) ? sum + table.points(c.track, c.difficulty) : sum;
+    }, 0);
+    return rankFor(points);
+  }
+
   async leaderboard(window: LeaderboardWindow, limit = 100): Promise<LeaderboardRow[]> {
     const now = this.clock.nowMs();
     const hit = this.cached.get(window);
@@ -217,7 +232,7 @@ export class CommunityService {
       })
       .sort((a, b) => b.t.score - a.t.score || a.t.last - b.t.last);
     const looks = await this.cosmeticsOf(ordered.map(({ p }) => p.userId));
-    const rows = ordered.map(({ p, t }, i) => ({ rank: i + 1, handle: p.handle, displayName: p.displayName, imageUrl: p.imageUrl, score: t.score, solved: t.solved, cosmetics: looks.get(p.userId) ?? {} }));
+    const rows = ordered.map(({ p, t }, i) => ({ rank: i + 1, handle: p.handle, displayName: p.displayName, imageUrl: p.imageUrl, score: t.score, solved: t.solved, cosmetics: looks.get(p.userId) ?? {}, tier: { id: rankFor(t.score).id, title: rankFor(t.score).title } }));
     this.cached.set(window, { at: now, rows });
     return rows.slice(0, limit);
   }
@@ -243,6 +258,7 @@ export class CommunityService {
     const score = solvedScored.reduce((sum, c) => sum + table.points(c.track, c.difficulty), 0);
 
     return {
+      tier: rankFor(score),
       about: about ?? EMPTY_ABOUT,
       stats: { streak: streak.current, longestStreak: streak.longest, coins, contests: contests.length, bestPlacement, activeDays: activity.filter((d) => d.count > 0).length, contributions },
       achievements: achievements({

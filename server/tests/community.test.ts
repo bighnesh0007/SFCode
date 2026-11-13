@@ -100,6 +100,10 @@ describe("scoring and leaderboard", () => {
     const me = await service.me("ada");
     expect(me).toMatchObject({ score: 16, solved: 4, rank: 1 });
     expect(me.byTrack.find((t) => t.track === "lwc")).toMatchObject({ solved: 1 });
+    // 16 points: Trailblazer; the cheap tier endpoint agrees with the full profile.
+    expect(me.tier).toMatchObject({ id: "trailblazer", points: 16 });
+    expect(await service.myTier("ada")).toEqual(me.tier);
+    expect((await service.leaderboard("all"))[0]?.tier).toEqual({ id: "trailblazer", title: "Trailblazer" });
   });
 
   it("ranks by score, then by who got there first", async () => {

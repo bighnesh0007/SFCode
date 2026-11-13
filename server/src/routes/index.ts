@@ -118,6 +118,8 @@ export function mountRoutes(app: Application, container: Container): void {
     const c = communityController(container.community);
     const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
     v1.get("/profile/me", signedIn, c.me);
+    const communityForTier = container.community;
+    v1.get("/profile/me/tier", signedIn, (async (req, res) => ok(res, await communityForTier.myTier(req.auth?.userId ?? ""))) as RequestHandler);
     v1.patch("/profile/me", signedIn, limiter(20), validate({ body: profileUpdateBody }), c.updateMe);
     v1.put("/profile/me/about", signedIn, limiter(20), validate({ body: aboutBody }), c.updateAbout);
     v1.get("/profile/:handle", validate({ params: handleParams }), c.byHandle);
