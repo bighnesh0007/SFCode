@@ -14,7 +14,18 @@ export interface MyContributorStatus {
   application: { status: BuddyApplication["status"]; createdAt: string; note: string | null } | null;
 }
 
+export type Notifier = (userId: string, kind: "review" | "buddy", data: Record<string, string>) => Promise<void>;
+
 export class BuddyService {
+  private notifier: Notifier | undefined;
+  /** Wired after construction (the social service depends on profiles). Failures never block the action. */
+  setNotifier(fn: Notifier): void {
+    this.notifier = fn;
+  }
+  private tell(userId: string, kind: "review" | "buddy", data: Record<string, string>): void {
+    void this.notifier?.(userId, kind, data).catch(() => undefined);
+  }
+
   constructor(
     private readonly repo: BuddyRepository,
     private readonly admin: AdminService,
@@ -60,5 +71,6 @@ export class BuddyService {
     if (approve) await this.admin.grant(actor, app.userId, "buddy");
     if (!(await this.repo.decide(id, approve ? "approved" : "rejected", actor, note.trim() || null))) throw new ConflictError("That application was already decided.");
     logEvent("buddy.decided", { id, approve, by: actor });
+    this.tell(app.userId, "buddy", { approved: approve ? "yes" : "no", ...(note.trim() ? { note: note.trim().slice(0, 200) } : {}) });
   }
 }

@@ -23,7 +23,7 @@ import { contestSlugParams, createContestBody, equipBody, onboardingBody, roadma
 import { blogListQuery, blogSlugParams, commentBody, commentParams, hideBody, postBody, postPatchBody, voteBody } from "../validation/blog.schema.ts";
 import { adminUsersQuery, roleBody } from "../validation/admin.schema.ts";
 import { aboutBody, applicationParams, buddyApplyBody, decideBody, handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
-import { validatedBody, validatedParams } from "../middleware/validate.ts";
+import { validatedBody, validatedParams, validatedQuery } from "../middleware/validate.ts";
 import { z } from "zod";
 import { pointsMatrixSchema } from "../services/points/points.service.ts";
 import { problemContentSchema } from "../services/problems/problemDraft.service.ts";
@@ -268,6 +268,30 @@ export function mountRoutes(app: Application, container: Container): void {
     }
   } else {
     v1.use("/contribute", disabled("Contributing"));
+  }
+
+  // Social: follows, the activity feed, and notifications.
+  if (container.social) {
+    const social = container.social;
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
+    const handleP = z.strictObject({ handle: z.string().min(1).max(40) });
+    const followBody = z.strictObject({ on: z.boolean() });
+    const feedQ = z.object({ scope: z.enum(["following", "everyone"]).default("everyone") });
+    const handleOf = (req: Parameters<RequestHandler>[0]) => validatedParams<z.infer<typeof handleP>>(req).handle;
+    v1.get("/social/:handle", identify, validate({ params: handleP }), (async (req, res) => ok(res, await social.socialFor(handleOf(req), req.auth?.userId ?? null))) as RequestHandler);
+    v1.post("/social/:handle/follow", signedIn, limiter(30), validate({ params: handleP, body: followBody }), (async (req, res) => {
+      ok(res, await social.follow(req.auth?.userId ?? "", handleOf(req), validatedBody<z.infer<typeof followBody>>(req).on));
+    }) as RequestHandler);
+    v1.get("/feed", identify, validate({ query: feedQ }), (async (req, res) => ok(res, await social.feed(req.auth?.userId ?? null, validatedQuery<z.infer<typeof feedQ>>(req).scope))) as RequestHandler);
+    v1.get("/notifications", signedIn, (async (req, res) => ok(res, await social.notifications(req.auth?.userId ?? ""))) as RequestHandler);
+    v1.get("/notifications/unread", signedIn, (async (req, res) => ok(res, { unread: await social.unread(req.auth?.userId ?? "") })) as RequestHandler);
+    v1.post("/notifications/read", signedIn, limiter(60), (async (req, res) => {
+      await social.markAllRead(req.auth?.userId ?? "");
+      ok(res, { ok: true });
+    }) as RequestHandler);
+  } else {
+    v1.use(["/social", "/feed", "/notifications"], disabled("Social features"));
   }
 
   // Daily Challenge: public; signed-in viewers also get their own status.

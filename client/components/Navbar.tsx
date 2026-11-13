@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
 import { LogoMark } from "@/components/Logo";
 import { OrgBadge } from "@/components/OrgBadge";
+import { NotificationBell } from "@/components/NotificationBell";
 import { SearchPalette } from "@/components/SearchPalette";
 import { cn } from "@/lib/utils";
 
@@ -74,6 +75,7 @@ export default function Navbar() {
           <SearchPalette shortcut />
           <LocalModeBadge />
           {isSignedIn && <OrgBadge />}
+          <NotificationBell />
           <ModeToggle />
           {isSignedIn ? (
             <>
@@ -94,6 +96,7 @@ export default function Navbar() {
         </div>
 
         <div className="ml-auto flex items-center gap-1 lg:hidden">
+          <NotificationBell />
           <SearchPalette />
           <ModeToggle />
           <Button type="button" variant="ghost" size="icon" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"}>

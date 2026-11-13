@@ -340,3 +340,30 @@ export const problems = pgTable("problems", {
   active: boolean("active").notNull().default(true),
   publishedAt: timestamp("published_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/** Who follows whom. */
+export const follows = pgTable(
+  "follows",
+  {
+    followerId: text("follower_id").notNull(),
+    followeeId: text("followee_id").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.followerId, t.followeeId] }), index("follows_followee_idx").on(t.followeeId)],
+);
+
+export type NotificationKind = "follow" | "review" | "buddy";
+
+/** In-app notifications (the bell). `data` holds what the UI needs to render and link. */
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    kind: text("kind").$type<NotificationKind>().notNull(),
+    data: jsonb("data").$type<Record<string, string>>().notNull(),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("notifications_user_created_idx").on(t.userId, t.createdAt)],
+);

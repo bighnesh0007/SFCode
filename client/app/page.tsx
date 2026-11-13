@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { DailyCard } from "@/components/DailyCard";
+import { ActivityFeed } from "@/components/ActivityFeed";
 import { Globe } from "@/components/Globe";
 import { LiveStats } from "@/components/LiveStats";
 import { buttonVariants } from "@/components/ui/button";
@@ -49,8 +50,11 @@ export default function Home() {
         <Globe className="mx-auto w-full max-w-[340px] sm:max-w-[460px] lg:max-w-[560px]" />
       </section>
 
-      <section className="mb-8">
-        <DailyCard />
+      <section className="mb-8 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <div className="space-y-6">
+          <DailyCard />
+        </div>
+        <ActivityFeed />
       </section>
 
       <section className="grid gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2 lg:grid-cols-3">
