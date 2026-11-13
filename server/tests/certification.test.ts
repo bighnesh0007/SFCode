@@ -253,3 +253,24 @@ describe("mock exams", () => {
     expect((await request(app).post("/api/v1/certification/pd2/mock/grade").send({ answers: {} })).status).toBe(400);
   });
 });
+
+describe("readiness for profiles", () => {
+  it("lists only practised exams, best first, with distinct questions answered", async () => {
+    const attempts = new MemoryAttempts();
+    const s = new CertificationService(bank, attempts);
+    expect(await s.readiness("u")).toEqual([]);
+    const pd1 = bank.exam("pd1")?.questions ?? [];
+    const admin = bank.exam("admin")?.questions ?? [];
+    // All of PD I right; two Admin answers, one wrong.
+    for (const q of pd1) attempts.rows.push({ userId: "u", exam: "pd1", questionId: q.id, correct: true });
+    attempts.rows.push({ userId: "u", exam: "admin", questionId: admin[0]?.id ?? "", correct: true });
+    attempts.rows.push({ userId: "u", exam: "admin", questionId: admin[1]?.id ?? "", correct: false });
+    const r = await s.readiness("u");
+    expect(r.map((x) => [x.exam, x.readiness, x.answered, x.total])).toEqual([
+      ["pd1", 100, pd1.length, pd1.length],
+      ["admin", expect.any(Number), 2, admin.length],
+    ]);
+    expect(r[1]?.readiness).toBeLessThan(10);
+    expect(await s.readiness("someone-else")).toEqual([]);
+  });
+});

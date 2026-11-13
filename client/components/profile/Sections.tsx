@@ -149,6 +149,35 @@ export function RoadmapProgress({ p, editable }: { p: Profile; editable: boolean
   );
 }
 
+/** Certification readiness for the exams this learner has practised. */
+export function CertReadiness({ p, editable }: { p: Profile; editable: boolean }) {
+  const certs = p.certifications ?? [];
+  if (certs.length === 0) return null;
+  return (
+    <section className="rounded-xl border p-5">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-semibold">Certification readiness</h2>
+        {editable && <Link href="/certification" className="text-xs text-sky-700 hover:underline dark:text-sky-400">Practise →</Link>}
+      </div>
+      <ul className="mt-3 space-y-3">
+        {certs.map((c) => (
+          <li key={c.exam}>
+            <div className="flex items-baseline justify-between gap-2 text-sm">
+              <Link href={`/certification/${c.exam}`} className="hover:text-primary hover:underline">{c.title}</Link>
+              <span className={cn("font-semibold tabular-nums", c.readiness >= 70 ? "text-emerald-700 dark:text-emerald-400" : c.readiness >= 40 ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground")}>{c.readiness}%</span>
+            </div>
+            <div className="mt-1 h-2 overflow-hidden rounded-full bg-muted" role="progressbar" aria-valuenow={c.readiness} aria-valuemin={0} aria-valuemax={100} aria-label={`${c.title}: ${c.readiness}% ready`}>
+              <div className={cn("h-full rounded-full", c.readiness >= 70 ? "bg-emerald-500" : c.readiness >= 40 ? "bg-amber-500" : "bg-sky-500")} style={{ width: `${c.readiness}%` }} />
+            </div>
+            <p className="mt-0.5 text-xs text-muted-foreground">{c.answered} of {c.total} questions practised</p>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-3 text-xs text-muted-foreground">Readiness is the share of each section&apos;s questions answered correctly (latest attempt), averaged across sections.</p>
+    </section>
+  );
+}
+
 export function ShareButtons({ p }: { p: Profile }) {
   const [copied, setCopied] = useState(false);
   const url = typeof window === "undefined" ? `https://sf.bighnesh.space/u/${p.handle}` : `${window.location.origin}/u/${p.handle}`;

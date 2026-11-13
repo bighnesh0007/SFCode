@@ -226,6 +226,8 @@ export function buildContainer(): Container {
       contestHistory: (userId) => contests.history(userId),
       ratingHistory: (userId) => contests.ratingHistory(userId),
       streakFreezes: (userId) => store.freezesOwned(userId),
+      // Built further down; looked up at call time.
+      certReadiness: (userId) => (container.certification ? container.certification.readiness(userId) : Promise.resolve([])),
       contributions: (userId) => (container.drafts ? container.drafts.countPublishedBy(userId) : Promise.resolve(0)),
       roadmapProgress: async (userId) => {
         const ob = roadmapSvc ? await roadmapSvc.onboarding(userId) : null;

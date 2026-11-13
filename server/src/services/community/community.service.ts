@@ -42,6 +42,18 @@ export interface ProfileExtras {
   ratingHistory(userId: string): Promise<RatingPoint[]>;
   /** Streak Freezes bought so far. */
   streakFreezes(userId: string): Promise<number>;
+  /** Certification readiness for exams the user has practised. */
+  certReadiness?(userId: string): Promise<CertReadiness[]>;
+}
+
+export interface CertReadiness {
+  exam: string;
+  title: string;
+  /** 0-100, the same number the learner sees on Certification Prep. */
+  readiness: number;
+  /** Distinct questions answered, out of the bank. */
+  answered: number;
+  total: number;
 }
 
 export interface ContestResult {
@@ -85,6 +97,7 @@ export interface ProfileView {
   achievements: Achievement[];
   contests: ContestResult[];
   roadmap: { title: string; done: number; total: number } | null;
+  certifications: CertReadiness[];
   handle: string;
   displayName: string;
   imageUrl: string | null;
@@ -268,13 +281,14 @@ export class CommunityService {
     const activity = await this.submissions.dailyActivity(p.userId, since);
     const freezes = this.extras ? await this.extras.streakFreezes(p.userId) : 0;
     const streak = streaks(activity.filter((d) => d.count > 0).map((d) => d.day), this.clock.now().toISOString().slice(0, 10), freezes);
-    const [coins, contests, roadmap, about, contributions, ratingHistory] = await Promise.all([
+    const [coins, contests, roadmap, about, contributions, ratingHistory, certifications] = await Promise.all([
       this.extras ? this.extras.coins(p.userId) : Promise.resolve(null),
       this.extras ? this.extras.contestHistory(p.userId) : Promise.resolve([]),
       this.extras ? this.extras.roadmapProgress(p.userId) : Promise.resolve(null),
       this.about ? this.about.get(p.userId) : Promise.resolve(null),
       this.extras ? this.extras.contributions(p.userId) : Promise.resolve(0),
       this.extras ? this.extras.ratingHistory(p.userId) : Promise.resolve([]),
+      this.extras?.certReadiness ? this.extras.certReadiness(p.userId) : Promise.resolve([]),
     ]);
     const bestPlacement = contests.length ? Math.min(...contests.map((c) => c.rank)) : null;
     const table = await this.points.table();
@@ -297,6 +311,7 @@ export class CommunityService {
       }),
       contests: contests.slice(0, 10),
       roadmap,
+      certifications,
       cosmetics: (await this.cosmeticsOf([p.userId])).get(p.userId) ?? {},
       handle: p.handle,
       displayName: p.displayName,
