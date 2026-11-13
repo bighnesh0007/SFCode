@@ -32,7 +32,7 @@ class MemoryOnboarding implements OnboardingRepository {
 
 function roadmapDir(nodes: unknown[]): string {
   const dir = mkdtempSync(join(tmpdir(), "rm-"));
-  writeFileSync(join(dir, "x.json"), JSON.stringify({ id: "x", title: "X", description: "d", nodes }));
+  writeFileSync(join(dir, "x.json"), JSON.stringify({ id: "x", order: 9, title: "X", description: "d", nodes }));
   return dir;
 }
 const node = (id: string, requires: string[] = [], problems: string[] = []) => ({ id, title: id, summary: "s", level: 1, col: 0, requires, problems, lesson: "l" });
@@ -45,7 +45,7 @@ describe("roadmap content", () => {
 
   it("node ids must be unique across roadmap files; quiz answers must be in range", () => {
     const dir = roadmapDir([node("shared")]);
-    writeFileSync(join(dir, "y.json"), JSON.stringify({ id: "y", title: "Y", description: "d", nodes: [node("shared")] }));
+    writeFileSync(join(dir, "y.json"), JSON.stringify({ id: "y", order: 10, title: "Y", description: "d", nodes: [node("shared")] }));
     expect(() => loadRoadmaps(dir, exists)).toThrow(/unique across roadmaps/);
     const quiz = [0, 1, 2].map(() => ({ q: "q", options: ["a", "b"], answer: 0, why: "w" }));
     expect(() => loadRoadmaps(roadmapDir([{ ...node("a"), quiz: [...quiz, { q: "q", options: ["a", "b"], answer: 2, why: "w" }] }]), exists)).toThrow(/out of range/);
@@ -189,6 +189,11 @@ describe("roadmap diagrams, resources and optional steps", () => {
     ["a plain-http link", { resources: [{ title: "Docs page", url: "http://developer.salesforce.com/x", kind: "docs" }] }, /./],
   ])("rejects %s", (_name, extra, error) => {
     expect(() => loadRoadmaps(withDiagram([{ ...node("a"), ...extra }]), exists)).toThrow(error);
+  });
+
+  it("lists roadmaps in tab order: Developer, Admin, LWC, Integration", () => {
+    const svc = new RoadmapService(loadRoadmaps(ROADMAPS_DIR, exists), catalog, new MemoryOnboarding(), new MemorySubmissionRepository(fixedClock()));
+    expect(svc.list().map((r) => r.id)).toEqual(["developer", "admin", "lwc", "integration"]);
   });
 
   it("refuses two steps in the same spot on the map", () => {

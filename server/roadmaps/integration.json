@@ -1,5 +1,6 @@
 {
   "id": "integration",
+  "order": 4,
   "title": "Integration",
   "description": "Connecting Salesforce with other systems: APIs, OAuth, callouts, custom endpoints, bulk data, events and the patterns that tie them together.",
   "nodes": [

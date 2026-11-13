@@ -1,5 +1,6 @@
 {
   "id": "developer",
+  "order": 1,
   "title": "Salesforce Developer",
   "description": "From the data model to PD II: SOQL, Flow, Apex, testing, security, LWC, integration, async and deployment, practised on real problems graded in your org.",
   "nodes": [

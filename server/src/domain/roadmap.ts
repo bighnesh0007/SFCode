@@ -64,6 +64,8 @@ const nodeSchema = z.strictObject({
 });
 const roadmapSchema = z.strictObject({
   id: z.string().regex(/^[a-z0-9-]+$/),
+  /** Position in the roadmap tabs, lowest first. */
+  order: z.number().int().positive(),
   title: z.string(),
   description: z.string(),
   nodes: z.array(nodeSchema).min(1),
