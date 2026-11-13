@@ -790,6 +790,870 @@
         "b"
       ],
       "explanation": "Test classes don't count toward the 6 MB Apex code limit. They can't be called from non-test code, and since API 24.0 they don't see org data by default."
+    },
+    {
+      "id": "pd1-mvc",
+      "section": "fundamentals",
+      "prompt": "In Salesforce's model-view-controller view of an app, which is the model?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Visualforce pages and Lightning components"
+        },
+        {
+          "id": "b",
+          "text": "Objects, fields and relationships"
+        },
+        {
+          "id": "c",
+          "text": "Apex controllers"
+        },
+        {
+          "id": "d",
+          "text": "Page layouts"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The model is the data: objects, fields and relationships. Pages and components are the view; controllers are the controller."
+    },
+    {
+      "id": "pd1-schema-describe",
+      "section": "fundamentals",
+      "prompt": "Which code checks whether the running user can read the Account Industry field?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Schema.sObjectType.Account.fields.Industry.isAccessible()"
+        },
+        {
+          "id": "b",
+          "text": "Account.Industry.canRead()"
+        },
+        {
+          "id": "c",
+          "text": "UserInfo.canRead('Account.Industry')"
+        },
+        {
+          "id": "d",
+          "text": "Security.read(Account.Industry)"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Describe results expose isAccessible, isCreateable and isUpdateable for objects and fields."
+    },
+    {
+      "id": "pd1-custom-metadata-vs-settings",
+      "section": "fundamentals",
+      "prompt": "Configuration values must deploy with your code between orgs. What should hold them?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Custom settings"
+        },
+        {
+          "id": "b",
+          "text": "Custom metadata types"
+        },
+        {
+          "id": "c",
+          "text": "Static resources"
+        },
+        {
+          "id": "d",
+          "text": "Custom labels"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Custom metadata type records are metadata, so they deploy with change sets and packages; custom setting data does not."
+    },
+    {
+      "id": "pd1-polymorphic",
+      "section": "fundamentals",
+      "prompt": "Which field can point to records of several different objects?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Account.ParentId"
+        },
+        {
+          "id": "b",
+          "text": "Task.WhatId"
+        },
+        {
+          "id": "c",
+          "text": "Contact.AccountId"
+        },
+        {
+          "id": "d",
+          "text": "Opportunity.AccountId"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "WhatId (and WhoId) on activities are polymorphic: WhatId can reference an Account, Opportunity, Case and other objects."
+    },
+    {
+      "id": "pd1-declarative-first",
+      "section": "fundamentals",
+      "prompt": "When a new account is created, its Rating should default to Hot if Industry is Technology. What's the recommended first choice?",
+      "options": [
+        {
+          "id": "a",
+          "text": "An Apex trigger"
+        },
+        {
+          "id": "b",
+          "text": "A before-save record-triggered flow"
+        },
+        {
+          "id": "c",
+          "text": "A batch job"
+        },
+        {
+          "id": "d",
+          "text": "A Visualforce page"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Use declarative tools when they can do the job; a before-save flow sets same-record fields efficiently with no code."
+    },
+    {
+      "id": "pd1-sobject-generic",
+      "section": "fundamentals",
+      "prompt": "Which statement creates an Account record dynamically from its API name?",
+      "options": [
+        {
+          "id": "a",
+          "text": "SObject s = Schema.getGlobalDescribe().get('Account').newSObject();"
+        },
+        {
+          "id": "b",
+          "text": "SObject s = new SObject('Account');"
+        },
+        {
+          "id": "c",
+          "text": "Account s = Type.forName('Account');"
+        },
+        {
+          "id": "d",
+          "text": "SObject s = Account.class.new();"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The global describe map gives each object's token, and newSObject() creates a record of that type."
+    },
+    {
+      "id": "pd1-map-from-query",
+      "section": "logic",
+      "prompt": "Which line builds a map of Accounts keyed by Id in one statement?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Map<Id, Account> m = new Map<Id, Account>([SELECT Id, Name FROM Account]);"
+        },
+        {
+          "id": "b",
+          "text": "Map<Id, Account> m = [SELECT Id, Name FROM Account];"
+        },
+        {
+          "id": "c",
+          "text": "Map<Id, Account> m = Map.of(Account);"
+        },
+        {
+          "id": "d",
+          "text": "Map<Id, Account> m = new Map<Id, Account>(Account.class);"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The Map constructor accepts a list of sObjects and keys them by Id."
+    },
+    {
+      "id": "pd1-upsert-external",
+      "section": "logic",
+      "prompt": "Which DML statement inserts or updates Contacts matched on an External ID field Legacy_Id__c?",
+      "options": [
+        {
+          "id": "a",
+          "text": "upsert contacts Contact.Legacy_Id__c;"
+        },
+        {
+          "id": "b",
+          "text": "merge contacts Legacy_Id__c;"
+        },
+        {
+          "id": "c",
+          "text": "insert contacts Legacy_Id__c;"
+        },
+        {
+          "id": "d",
+          "text": "update contacts by Legacy_Id__c;"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "upsert takes an optional field token naming the External ID to match on."
+    },
+    {
+      "id": "pd1-for-soql-loop",
+      "section": "logic",
+      "prompt": "Why use a SOQL for loop (for (Account a : [SELECT ...])) on a large result?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It avoids the SOQL query limit"
+        },
+        {
+          "id": "b",
+          "text": "It retrieves records in batches of 200, reducing heap use"
+        },
+        {
+          "id": "c",
+          "text": "It's the only way to query in a loop"
+        },
+        {
+          "id": "d",
+          "text": "It runs asynchronously"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "SOQL for loops fetch records in chunks, so large results don't have to fit in the heap at once."
+    },
+    {
+      "id": "pd1-switch",
+      "section": "logic",
+      "prompt": "Which is valid Apex for branching on an enum value?",
+      "options": [
+        {
+          "id": "a",
+          "text": "switch on season { when SUMMER { ... } when else { ... } }"
+        },
+        {
+          "id": "b",
+          "text": "switch (season) { case SUMMER: ... }"
+        },
+        {
+          "id": "c",
+          "text": "select season { SUMMER => ... }"
+        },
+        {
+          "id": "d",
+          "text": "case season of SUMMER: ..."
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Apex uses switch on ... with when branches and when else for the default."
+    },
+    {
+      "id": "pd1-safe-navigation",
+      "section": "logic",
+      "prompt": "What does `String city = acc?.BillingCity;` do when acc is null?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Throws NullPointerException"
+        },
+        {
+          "id": "b",
+          "text": "Sets city to null"
+        },
+        {
+          "id": "c",
+          "text": "Sets city to an empty string"
+        },
+        {
+          "id": "d",
+          "text": "Doesn't compile"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The safe navigation operator ?. returns null instead of dereferencing a null value."
+    },
+    {
+      "id": "pd1-trigger-isexecuting",
+      "section": "logic",
+      "prompt": "Which context variable is true only in an update trigger?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Trigger.isInsert"
+        },
+        {
+          "id": "b",
+          "text": "Trigger.isUpdate"
+        },
+        {
+          "id": "c",
+          "text": "Trigger.isBefore"
+        },
+        {
+          "id": "d",
+          "text": "Trigger.isExecuting"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Trigger.isUpdate is true for update operations; isBefore and isExecuting are true in other contexts too."
+    },
+    {
+      "id": "pd1-invocable",
+      "section": "logic",
+      "prompt": "A flow needs to call your Apex method. What annotation exposes it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "@AuraEnabled"
+        },
+        {
+          "id": "b",
+          "text": "@InvocableMethod"
+        },
+        {
+          "id": "c",
+          "text": "@future"
+        },
+        {
+          "id": "d",
+          "text": "@RemoteAction"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "@InvocableMethod makes a static method available as an action in Flow."
+    },
+    {
+      "id": "pd1-aggregate-result",
+      "section": "logic",
+      "prompt": "How do you read the value of `SUM(Amount) total` from an AggregateResult ar?",
+      "options": [
+        {
+          "id": "a",
+          "text": "ar.total"
+        },
+        {
+          "id": "b",
+          "text": "(Decimal) ar.get('total')"
+        },
+        {
+          "id": "c",
+          "text": "ar.getDecimal(1)"
+        },
+        {
+          "id": "d",
+          "text": "ar.Amount"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "AggregateResult values are read with get() using the alias, then cast."
+    },
+    {
+      "id": "pd1-lwc-getter",
+      "section": "ui",
+      "prompt": "A template needs to show 'No items' when a list is empty. Where does the check go?",
+      "options": [
+        {
+          "id": "a",
+          "text": "In the template: {items.length === 0}"
+        },
+        {
+          "id": "b",
+          "text": "In a getter on the class, used with lwc:if"
+        },
+        {
+          "id": "c",
+          "text": "In the CSS"
+        },
+        {
+          "id": "d",
+          "text": "In the js-meta.xml"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Templates can't evaluate expressions; compute it in a getter and bind lwc:if to it."
+    },
+    {
+      "id": "pd1-lwc-wire-recordid",
+      "section": "ui",
+      "prompt": "On a record page, how does a component receive the current record's Id?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Query it with SOQL"
+        },
+        {
+          "id": "b",
+          "text": "Declare @api recordId"
+        },
+        {
+          "id": "c",
+          "text": "Read window.location"
+        },
+        {
+          "id": "d",
+          "text": "Use @track recordId"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Lightning record pages set a public recordId property on components that declare @api recordId."
+    },
+    {
+      "id": "pd1-lwc-imperative",
+      "section": "ui",
+      "prompt": "An Apex method updates records. How must the component call it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "With @wire"
+        },
+        {
+          "id": "b",
+          "text": "Imperatively, and the method must not be cacheable"
+        },
+        {
+          "id": "c",
+          "text": "Through a Visualforce page"
+        },
+        {
+          "id": "d",
+          "text": "With refreshApex"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Methods that perform DML can't be cacheable, so they're called imperatively."
+    },
+    {
+      "id": "pd1-lwc-meta-targets",
+      "section": "ui",
+      "prompt": "Which file makes a component available in Lightning App Builder on record pages?",
+      "options": [
+        {
+          "id": "a",
+          "text": "component.html"
+        },
+        {
+          "id": "b",
+          "text": "component.js-meta.xml with isExposed and a lightning__RecordPage target"
+        },
+        {
+          "id": "c",
+          "text": "component.css"
+        },
+        {
+          "id": "d",
+          "text": "sfdx-project.json"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The js-meta.xml file declares isExposed and the targets where the component can be placed."
+    },
+    {
+      "id": "pd1-lwc-record-form",
+      "section": "ui",
+      "prompt": "What's the quickest way to show an edit form for an Account's fields with field-level security applied?",
+      "options": [
+        {
+          "id": "a",
+          "text": "lightning-record-form"
+        },
+        {
+          "id": "b",
+          "text": "A custom Apex controller and inputs"
+        },
+        {
+          "id": "c",
+          "text": "lightning-datatable"
+        },
+        {
+          "id": "d",
+          "text": "A Visualforce page"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "lightning-record-form uses Lightning Data Service, which applies sharing and field-level security."
+    },
+    {
+      "id": "pd1-vf-standard-controller",
+      "section": "ui",
+      "prompt": "A Visualforce page should show and edit a single Account without Apex. Which attribute?",
+      "options": [
+        {
+          "id": "a",
+          "text": "standardController=\"Account\""
+        },
+        {
+          "id": "b",
+          "text": "controller=\"Account\""
+        },
+        {
+          "id": "c",
+          "text": "recordSetVar=\"accounts\""
+        },
+        {
+          "id": "d",
+          "text": "extensions=\"Account\""
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The standard controller provides record data and save actions with no custom code."
+    },
+    {
+      "id": "pd1-vf-extension",
+      "section": "ui",
+      "prompt": "You need the standard Account controller plus one custom action. What do you write?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A controller extension"
+        },
+        {
+          "id": "b",
+          "text": "A custom controller replacing the standard one"
+        },
+        {
+          "id": "c",
+          "text": "A trigger"
+        },
+        {
+          "id": "d",
+          "text": "A static resource"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Extensions add behaviour to a standard or custom controller."
+    },
+    {
+      "id": "pd1-lwc-toast",
+      "section": "ui",
+      "prompt": "Which shows a success message after saving in a Lightning web component?",
+      "options": [
+        {
+          "id": "a",
+          "text": "alert()"
+        },
+        {
+          "id": "b",
+          "text": "Dispatching a ShowToastEvent"
+        },
+        {
+          "id": "c",
+          "text": "console.log"
+        },
+        {
+          "id": "d",
+          "text": "A validation rule"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "ShowToastEvent from lightning/platformShowToastEvent displays a toast in Lightning Experience."
+    },
+    {
+      "id": "pd1-lwc-navigation",
+      "section": "ui",
+      "prompt": "How should a component open a record page without hard-coding a URL?",
+      "options": [
+        {
+          "id": "a",
+          "text": "window.open with the Id"
+        },
+        {
+          "id": "b",
+          "text": "NavigationMixin with a standard__recordPage reference"
+        },
+        {
+          "id": "c",
+          "text": "A toast"
+        },
+        {
+          "id": "d",
+          "text": "An iframe"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "NavigationMixin builds the correct URL for the current context (desktop, mobile, Experience site)."
+    },
+    {
+      "id": "pd1-xss",
+      "section": "ui",
+      "prompt": "Which practice prevents cross-site scripting in Visualforce?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Using escape=\"false\" on outputText"
+        },
+        {
+          "id": "b",
+          "text": "Leaving output escaping on (the default) and encoding user data"
+        },
+        {
+          "id": "c",
+          "text": "Storing data in custom settings"
+        },
+        {
+          "id": "d",
+          "text": "Using with sharing"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Visualforce escapes merge fields by default; turning escaping off on user data creates XSS risks."
+    },
+    {
+      "id": "pd1-test-assert-class",
+      "section": "testing",
+      "prompt": "Which assertion compares an expected and actual value with a message?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Assert.areEqual(expected, actual, 'message')"
+        },
+        {
+          "id": "b",
+          "text": "System.check(expected, actual)"
+        },
+        {
+          "id": "c",
+          "text": "Test.assert(actual)"
+        },
+        {
+          "id": "d",
+          "text": "Assert.equals(actual)"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Assert.areEqual (or System.assertEquals) fails the test with the message if the values differ."
+    },
+    {
+      "id": "pd1-test-isolation",
+      "section": "testing",
+      "prompt": "Records created in one test method are visible to:",
+      "options": [
+        {
+          "id": "a",
+          "text": "All test methods in the class"
+        },
+        {
+          "id": "b",
+          "text": "Only that test method"
+        },
+        {
+          "id": "c",
+          "text": "The whole org afterwards"
+        },
+        {
+          "id": "d",
+          "text": "Other test classes"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Each test method runs in its own transaction, rolled back at the end. @TestSetup data is recreated for each method."
+    },
+    {
+      "id": "pd1-test-exception",
+      "section": "testing",
+      "prompt": "How do you test that a method throws a custom exception?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Call it in try/catch, fail if no exception, and assert in the catch"
+        },
+        {
+          "id": "b",
+          "text": "Use @ExpectedException"
+        },
+        {
+          "id": "c",
+          "text": "Use Test.throws()"
+        },
+        {
+          "id": "d",
+          "text": "Exceptions can't be tested"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Apex has no expected-exception annotation; the try/catch with a failing assertion after the call is the standard pattern."
+    },
+    {
+      "id": "pd1-test-bulk",
+      "section": "testing",
+      "prompt": "Why should trigger tests insert 200 records at once?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Coverage needs 200 records"
+        },
+        {
+          "id": "b",
+          "text": "To prove the code stays within governor limits in bulk"
+        },
+        {
+          "id": "c",
+          "text": "Tests are faster"
+        },
+        {
+          "id": "d",
+          "text": "It's required for deployment"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Triggers receive up to 200 records per call; testing with one record hides limit problems."
+    },
+    {
+      "id": "pd1-test-visible",
+      "section": "testing",
+      "prompt": "A private method needs to be called from a test class. What annotation allows that?",
+      "options": [
+        {
+          "id": "a",
+          "text": "@TestVisible"
+        },
+        {
+          "id": "b",
+          "text": "@isTest"
+        },
+        {
+          "id": "c",
+          "text": "@AuraEnabled"
+        },
+        {
+          "id": "d",
+          "text": "@public"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "@TestVisible lets test code access private members without making them public."
+    },
+    {
+      "id": "pd1-debug-log",
+      "section": "testing",
+      "prompt": "Where do you see the values written by System.debug when running code?",
+      "options": [
+        {
+          "id": "a",
+          "text": "In the debug log"
+        },
+        {
+          "id": "b",
+          "text": "In the Setup Audit Trail"
+        },
+        {
+          "id": "c",
+          "text": "In a report"
+        },
+        {
+          "id": "d",
+          "text": "In field history"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "System.debug output appears as USER_DEBUG lines in debug logs."
+    },
+    {
+      "id": "pd1-test-runas-limits",
+      "section": "testing",
+      "prompt": "Which statement about Test.startTest() is true?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It can be called many times per test"
+        },
+        {
+          "id": "b",
+          "text": "It gives the code after it a fresh set of governor limits"
+        },
+        {
+          "id": "c",
+          "text": "It deletes test data"
+        },
+        {
+          "id": "d",
+          "text": "It runs only in sandboxes"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "startTest resets limits for the code under test, once per test method, until stopTest."
+    },
+    {
+      "id": "pd1-deploy-test-levels",
+      "section": "testing",
+      "prompt": "Which test level runs all tests in your org except those from managed packages?",
+      "options": [
+        {
+          "id": "a",
+          "text": "RunSpecifiedTests"
+        },
+        {
+          "id": "b",
+          "text": "RunLocalTests"
+        },
+        {
+          "id": "c",
+          "text": "RunAllTestsInOrg"
+        },
+        {
+          "id": "d",
+          "text": "NoTestRun"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "RunLocalTests runs every local test; RunAllTestsInOrg also includes managed package tests."
     }
   ]
 }

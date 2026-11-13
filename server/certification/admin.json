@@ -1162,6 +1162,520 @@
         "c"
       ],
       "explanation": "Workflow Rules and Process Builder are retired for new automation. Flow is the recommended declarative tool, and Apex is for when declarative tools can't do the job."
+    },
+    {
+      "id": "adm-mfa",
+      "section": "setup",
+      "prompt": "What does Salesforce require for every user who logs in to the user interface directly?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Single sign-on"
+        },
+        {
+          "id": "b",
+          "text": "Multi-factor authentication (MFA)"
+        },
+        {
+          "id": "c",
+          "text": "A hardware security key"
+        },
+        {
+          "id": "d",
+          "text": "Login IP ranges"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Salesforce requires MFA for direct UI logins. SSO logins can satisfy it through the identity provider's own MFA. Login IP ranges are optional extra protection."
+    },
+    {
+      "id": "adm-permset-group",
+      "section": "setup",
+      "prompt": "Sales reps need the same five permission sets. What makes assigning and maintaining them easiest?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Clone their profile five times"
+        },
+        {
+          "id": "b",
+          "text": "A permission set group containing the five permission sets"
+        },
+        {
+          "id": "c",
+          "text": "A public group"
+        },
+        {
+          "id": "d",
+          "text": "A role"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Permission set groups bundle permission sets so users get them in one assignment, and a muting permission set can remove anything that shouldn't be included."
+    },
+    {
+      "id": "adm-dependent-picklist",
+      "section": "objects",
+      "prompt": "The Sub-Category options should change depending on the chosen Category. What do you configure?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A record type per category"
+        },
+        {
+          "id": "b",
+          "text": "A dependent picklist with Category as the controlling field"
+        },
+        {
+          "id": "c",
+          "text": "A validation rule"
+        },
+        {
+          "id": "d",
+          "text": "A lookup filter"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Dependent picklists show only the values allowed for the controlling field's current value."
+    },
+    {
+      "id": "adm-formula-history",
+      "section": "objects",
+      "prompt": "Managers want to report on what a discount percentage was at the time of each sale, even if the formula inputs change later. What's the problem with a formula field?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Formulas can't hold percentages"
+        },
+        {
+          "id": "b",
+          "text": "Formulas are calculated when read, so they always show today's value"
+        },
+        {
+          "id": "c",
+          "text": "Formulas can't be reported on"
+        },
+        {
+          "id": "d",
+          "text": "Formulas are deleted after a year"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A formula has no stored history. To keep the value at a point in time, store it in a regular field (for example with a flow at the moment of sale)."
+    },
+    {
+      "id": "adm-lookup-filter",
+      "section": "objects",
+      "prompt": "Users should only be able to pick active Accounts in the Partner lookup on Opportunity. What do you use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A validation rule on Account"
+        },
+        {
+          "id": "b",
+          "text": "A lookup filter on the Partner field"
+        },
+        {
+          "id": "c",
+          "text": "A sharing rule"
+        },
+        {
+          "id": "d",
+          "text": "A record type"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Lookup filters restrict which records can be selected in a lookup, and can show an error or simply hide non-matching records."
+    },
+    {
+      "id": "adm-external-id",
+      "section": "objects",
+      "prompt": "An ERP sends customer records with its own customer number. What should the matching field on Account be marked as, so imports can update the right record? Choose 2.",
+      "options": [
+        {
+          "id": "a",
+          "text": "External ID"
+        },
+        {
+          "id": "b",
+          "text": "Unique"
+        },
+        {
+          "id": "c",
+          "text": "Required on the page layout"
+        },
+        {
+          "id": "d",
+          "text": "Encrypted"
+        }
+      ],
+      "answer": [
+        "a",
+        "b"
+      ],
+      "explanation": "An External ID field lets imports and integrations upsert by that value; making it unique stops two Accounts sharing a customer number."
+    },
+    {
+      "id": "adm-opportunity-team",
+      "section": "sales",
+      "prompt": "Several people work on large deals and need edit access to those Opportunities only. What should be used?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Opportunity teams"
+        },
+        {
+          "id": "b",
+          "text": "A new role"
+        },
+        {
+          "id": "c",
+          "text": "Organization-wide default Public Read/Write"
+        },
+        {
+          "id": "d",
+          "text": "A queue"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Opportunity teams give specific people access to a specific opportunity, with a role and access level per member."
+    },
+    {
+      "id": "adm-knowledge",
+      "section": "service",
+      "prompt": "Agents keep answering the same questions. What lets them search and attach approved answers to cases?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Chatter groups"
+        },
+        {
+          "id": "b",
+          "text": "Salesforce Knowledge articles"
+        },
+        {
+          "id": "c",
+          "text": "Email templates only"
+        },
+        {
+          "id": "d",
+          "text": "Case teams"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Knowledge stores reviewed articles that agents can search from the case and share with customers."
+    },
+    {
+      "id": "adm-web-to-case-limit",
+      "section": "service",
+      "prompt": "Customers submit support requests from a form on your website. What feature creates cases from it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Email-to-Case"
+        },
+        {
+          "id": "b",
+          "text": "Web-to-Case"
+        },
+        {
+          "id": "c",
+          "text": "Web-to-Lead"
+        },
+        {
+          "id": "d",
+          "text": "Omni-Channel"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Web-to-Case generates an HTML form that creates cases. Web-to-Lead does the same for leads."
+    },
+    {
+      "id": "adm-list-view-sharing",
+      "section": "productivity",
+      "prompt": "A list view should be visible only to the support team. How?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Share the list view with a public group or role"
+        },
+        {
+          "id": "b",
+          "text": "Create a new app"
+        },
+        {
+          "id": "c",
+          "text": "Use a report"
+        },
+        {
+          "id": "d",
+          "text": "Make it private"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "List views can be shared with all users, or limited to selected public groups and roles."
+    },
+    {
+      "id": "adm-activity-reminders",
+      "section": "productivity",
+      "prompt": "Which type of activity has a due date but no start and end time?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Event"
+        },
+        {
+          "id": "b",
+          "text": "Task"
+        },
+        {
+          "id": "c",
+          "text": "Chatter post"
+        },
+        {
+          "id": "d",
+          "text": "Email"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Tasks are to-dos with a due date; events are calendar entries with start and end times."
+    },
+    {
+      "id": "adm-upsert",
+      "section": "data",
+      "prompt": "You import a file where some rows are new contacts and some update existing ones, matched on an External ID. Which operation?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Insert"
+        },
+        {
+          "id": "b",
+          "text": "Update"
+        },
+        {
+          "id": "c",
+          "text": "Upsert"
+        },
+        {
+          "id": "d",
+          "text": "Delete"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Upsert inserts rows with no match and updates rows whose External ID (or Salesforce Id) matches."
+    },
+    {
+      "id": "adm-recycle-bin",
+      "section": "data",
+      "prompt": "How long are deleted records kept in the Recycle Bin before being permanently removed?",
+      "options": [
+        {
+          "id": "a",
+          "text": "24 hours"
+        },
+        {
+          "id": "b",
+          "text": "15 days"
+        },
+        {
+          "id": "c",
+          "text": "90 days"
+        },
+        {
+          "id": "d",
+          "text": "Forever"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Deleted records stay in the Recycle Bin for 15 days, subject to storage-based limits, before they're permanently deleted."
+    },
+    {
+      "id": "adm-data-export",
+      "section": "data",
+      "prompt": "Which feature produces a scheduled weekly backup of your org's data as CSV files?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Data Import Wizard"
+        },
+        {
+          "id": "b",
+          "text": "Data Export Service"
+        },
+        {
+          "id": "c",
+          "text": "Report subscriptions"
+        },
+        {
+          "id": "d",
+          "text": "Sandbox refresh"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The Data Export Service (Setup > Data Export) can export all data weekly or monthly as CSV files."
+    },
+    {
+      "id": "adm-prior-value",
+      "section": "automation",
+      "prompt": "A record-triggered flow should act only when Stage changes to Closed Won, not on every edit of a Closed Won record. Which setting?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Run every time a record is updated and meets the conditions"
+        },
+        {
+          "id": "b",
+          "text": "Only when a record is updated to meet the condition requirements"
+        },
+        {
+          "id": "c",
+          "text": "Run asynchronously"
+        },
+        {
+          "id": "d",
+          "text": "A scheduled path"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "'Only when a record is updated to meet the condition requirements' compares with the prior values, so it fires once on the change."
+    },
+    {
+      "id": "adm-flow-fault",
+      "section": "automation",
+      "prompt": "A flow's Update Records element fails for some users. How do you show them a helpful message instead of an unhandled error?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Add a fault path from the element"
+        },
+        {
+          "id": "b",
+          "text": "Add a decision before it"
+        },
+        {
+          "id": "c",
+          "text": "Run the flow in system context"
+        },
+        {
+          "id": "d",
+          "text": "Use a loop"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Fault paths run when an element fails, so you can show a message, log the error or notify an admin."
+    },
+    {
+      "id": "adm-subflow",
+      "section": "automation",
+      "prompt": "Three flows contain the same steps to create a follow-up task. How do you avoid maintaining three copies?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Put the steps in one flow and call it as a subflow"
+        },
+        {
+          "id": "b",
+          "text": "Copy and paste"
+        },
+        {
+          "id": "c",
+          "text": "Use an approval process"
+        },
+        {
+          "id": "d",
+          "text": "Use a validation rule"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Subflows let one flow call another, so shared logic lives in one place."
+    },
+    {
+      "id": "adm-flow-email-alert",
+      "section": "automation",
+      "prompt": "A flow should email the opportunity owner using an existing template with merge fields. Which element or action?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Send Email Alert action (using an email alert)"
+        },
+        {
+          "id": "b",
+          "text": "Create Records"
+        },
+        {
+          "id": "c",
+          "text": "Assignment"
+        },
+        {
+          "id": "d",
+          "text": "Decision"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Email alerts use email templates and recipients you configure; flows can call them as actions."
+    },
+    {
+      "id": "adm-flow-trigger-order",
+      "section": "automation",
+      "prompt": "Two record-triggered flows run on the same object and event. How do you control which runs first?",
+      "options": [
+        {
+          "id": "a",
+          "text": "You can't"
+        },
+        {
+          "id": "b",
+          "text": "Set the Trigger Order value on each flow"
+        },
+        {
+          "id": "c",
+          "text": "Rename them alphabetically"
+        },
+        {
+          "id": "d",
+          "text": "Make one a subflow"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Record-triggered flows have a Trigger Order setting that decides their relative order for the same object and timing."
     }
   ]
 }
