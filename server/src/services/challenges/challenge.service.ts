@@ -34,6 +34,8 @@ export interface ChallengeSummary {
   category: string;
   tags: string[];
   progress: "solved" | "attempted" | null;
+  /** Written by a community Buddy (not one of the built-in problems). */
+  community: boolean;
 }
 
 /** Everything a client may see about a problem. Hidden tests and reference are absent by construction. */
@@ -50,6 +52,8 @@ export interface ChallengeView {
   lwc?: { component: string; tests: string };
   /** Flow problems: the flow to build in the learner's own org. */
   flow?: { apiName: string; kind: "record-triggered" | "autolaunched" };
+  /** Community problems: credit to the Buddy who wrote it. */
+  author?: { handle: string; displayName: string };
 }
 
 export interface SubmissionView {
@@ -135,7 +139,20 @@ export class ChallengeService {
       category: c.category,
       tags: c.tags,
       progress: progress.get(c.slug) ?? null,
+      community: c.authorId !== undefined,
     }));
+  }
+
+  private authorLookup: ((userId: string) => Promise<{ handle: string; displayName: string } | null>) | undefined;
+  /** Wired after construction: profiles live in the community service. */
+  setAuthorLookup(fn: (userId: string) => Promise<{ handle: string; displayName: string } | null>): void {
+    this.authorLookup = fn;
+  }
+
+  /** Credit for a community problem, or null for a built-in one. */
+  async author(slug: string): Promise<{ handle: string; displayName: string } | null> {
+    const id = this.require(slug).authorId;
+    return id && this.authorLookup ? this.authorLookup(id) : null;
   }
 
   get(slug: string): ChallengeView {

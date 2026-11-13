@@ -20,6 +20,7 @@ export interface ChallengeSummary {
   category: string;
   tags: string[];
   progress: "solved" | "attempted" | null;
+  community?: boolean;
 }
 
 export interface ChallengeFile {
@@ -30,6 +31,8 @@ export interface ChallengeFile {
 }
 
 export interface ChallengeView {
+  /** Community problems: who wrote it. */
+  author?: { handle: string; displayName: string };
   slug: string;
   track: Track;
   title: string;

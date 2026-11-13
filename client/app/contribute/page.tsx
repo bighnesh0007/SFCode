@@ -7,6 +7,7 @@ import { SignInButton, useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { pointsSummary, usePoints } from "@/components/usePoints";
 import { ApiError } from "@/lib/apiClient";
+import { myDrafts, STATUS_TEXT, type DraftRow } from "@/lib/draftsApi";
 import { applyForBuddy, getMyContributorStatus, type MyContributorStatus } from "@/lib/contributeApi";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +16,35 @@ const ROLES = [
   { icon: ShieldCheck, title: "Reviewers", body: "Review submitted problems (approve, request changes, reject) and keep the community friendly.", tone: "text-sky-500" },
   { icon: HeartHandshake, title: "Buddies", body: "Write problems for everyone to practise, help people out, and flag spam. Anyone can apply.", tone: "text-emerald-500" },
 ];
+
+function MyDrafts() {
+  const { getToken } = useAuthState();
+  const [rows, setRows] = useState<DraftRow[] | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    getToken()
+      .then((t) => myDrafts(t))
+      .then((r) => !cancelled && setRows(r))
+      .catch(() => !cancelled && setRows([]));
+    return () => {
+      cancelled = true;
+    };
+  }, [getToken]);
+  if (!rows || rows.length === 0) return null;
+  return (
+    <ul className="mt-4 divide-y rounded-lg border text-sm">
+      {rows.map((r) => (
+        <li key={r.id}>
+          <Link href={`/contribute/drafts/${r.id}`} className="flex items-center gap-3 px-3 py-2 hover:bg-accent/60">
+            <span className="min-w-0 flex-1 truncate font-medium">{r.title}</span>
+            <span className="text-xs text-muted-foreground">{r.track} · {r.difficulty}</span>
+            <span className={cn("rounded-full border px-2 py-0.5 text-xs", r.status === "approved" && "border-emerald-500/50 text-emerald-600", r.status === "changes_requested" && "border-amber-500/50 text-amber-600")}>{STATUS_TEXT[r.status]}</span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export default function ContributePage() {
   const { isSignedIn, getToken } = useAuthState();
@@ -93,12 +123,12 @@ export default function ContributePage() {
             <BadgeCheck className="h-6 w-6 text-emerald-500" />
             <div>
               <p className="font-semibold">You&apos;re a{role === "admin" || role === "owner" ? "n" : ""} {role === "owner" ? "owner" : role}.</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {role === "buddy"
-                  ? "The problem builder is on its way: you'll be able to write, test in your org and submit problems right here."
-                  : "Review tools live in the Admin area."}
-              </p>
-              {role !== "buddy" && <Link href="/admin" className="mt-2 inline-block text-sm text-sky-600 hover:underline dark:text-sky-400">Open Admin →</Link>}
+              <p className="mt-1 text-sm text-muted-foreground">Write a problem, test it in your org, and submit it for review.{role !== "buddy" && " Review tools are in the Admin area."}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link href="/contribute/new"><Button size="sm">New problem</Button></Link>
+                {role !== "buddy" && <Link href="/admin"><Button size="sm" variant="outline">Open Admin</Button></Link>}
+              </div>
+              <MyDrafts />
             </div>
           </div>
         ) : app?.status === "pending" ? (

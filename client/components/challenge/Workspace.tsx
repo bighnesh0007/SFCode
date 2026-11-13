@@ -207,6 +207,11 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
                       <Badge key={t} variant="outline" className="text-[10px]">{t}</Badge>
                     ))}
                   </div>
+                  {challenge.author && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Community problem by <Link href={`/u/${challenge.author.handle}`} className="font-medium text-sky-600 hover:underline dark:text-sky-400">{challenge.author.displayName}</Link>
+                    </p>
+                  )}
                   <Markdown source={challenge.statement} className="markdown mt-5" />
                   <div className="mt-6 flex gap-2 rounded-lg border bg-muted/30 p-3 text-xs text-muted-foreground">
                     <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />

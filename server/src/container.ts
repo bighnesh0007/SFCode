@@ -21,6 +21,9 @@ import { AdminService } from "./services/admin/admin.service.ts";
 import { PgAdminRepository } from "./repositories/admin.repository.ts";
 import { PgBlogRepository } from "./repositories/blog.repository.ts";
 import { BlogService } from "./services/blog/blog.service.ts";
+import { PgProblemDraftRepository } from "./repositories/problemDraft.repository.ts";
+import { makeOrgChecker } from "./services/problems/orgChecker.ts";
+import { ProblemDraftService } from "./services/problems/problemDraft.service.ts";
 import { PgBuddyRepository } from "./repositories/buddy.repository.ts";
 import { PgSettingsRepository } from "./repositories/settings.repository.ts";
 import { BuddyService } from "./services/buddy/buddy.service.ts";
@@ -53,6 +56,7 @@ export interface Container {
   daily?: DailyService;
   points?: PointsService;
   buddies?: BuddyService;
+  drafts?: ProblemDraftService;
 }
 
 /** server/certification (question banks), resolved like PROBLEMS_DIR. */
@@ -120,6 +124,19 @@ export function buildContainer(): Container {
     container.contests = new ContestService(contestRepo ?? new PgContestRepository(container.db), catalog, new PgProfileRepository(container.db), container.community, container.admin, systemClock);
     container.daily = new DailyService(new PgDailyRepository(container.db), catalog, systemClock);
     container.store = new StoreService(new PgStoreRepository(container.db), new PgChallengeSubmissionRepository(container.db), catalog, container.contests, container.daily, container.points);
+    const profilesForCredit = new PgProfileRepository(container.db);
+    container.challenges.setAuthorLookup(async (userId) => {
+      const p = await profilesForCredit.findByUser(userId);
+      return p ? { handle: p.handle, displayName: p.displayName } : null;
+    });
+    container.drafts = new ProblemDraftService(
+      new PgProblemDraftRepository(container.db),
+      catalog,
+      container.admin,
+      new PgProfileRepository(container.db),
+      grading ? makeOrgChecker(grading, catalog.soqlCompare) : undefined,
+      systemClock,
+    );
     container.buddies = new BuddyService(new PgBuddyRepository(container.db), container.admin, container.community, new PgProfileRepository(container.db));
     container.community.setCosmeticsSource(container.store);
     const store = container.store;
@@ -128,6 +145,7 @@ export function buildContainer(): Container {
     container.community.setExtras({
       coins: async (userId) => (await store.wallet(userId)).balance,
       contestHistory: (userId) => contests.history(userId),
+      contributions: (userId) => (container.drafts ? container.drafts.countPublishedBy(userId) : Promise.resolve(0)),
       roadmapProgress: async (userId) => {
         const ob = roadmapSvc ? await roadmapSvc.onboarding(userId) : null;
         if (!roadmapSvc || !ob) return null;

@@ -13,6 +13,14 @@ for (const { capability, vars } of capabilities.missing) {
 }
 
 const container = buildContainer();
+// Community problems live in the database; add them to the catalog before serving.
+if (container.drafts) {
+  const n = await container.drafts.loadPublished().catch((err: unknown) => {
+    logger.error({ err }, "loading community problems failed; serving built-in problems only");
+    return 0;
+  });
+  logger.info({ count: n }, "community problems loaded");
+}
 const app = buildApp(container);
 
 const server = app.listen(config.port, config.host, () => {

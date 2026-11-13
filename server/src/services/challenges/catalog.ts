@@ -131,10 +131,51 @@ export function loadChallenge(root: string, slug: string): Challenge {
   if (meta.lwc) return loadLwcChallenge(dir, slug, meta, meta.lwc.component);
   if (!meta.testClass) throw new Error(`${where}: testClass is required`);
   const testClass = meta.testClass;
+  const testPath = join(dir, "tests", `${testClass}.cls`);
+  if (meta.track === "flow" ? !meta.flow || meta.files.length > 0 : meta.flow !== undefined || meta.files.length === 0) {
+    throw new Error(`${where}: a flow-track problem has a "flow" block and no files; other problems have files and no "flow"`);
+  }
+  return buildChallenge(
+    {
+      slug,
+      meta: { ...meta, testClass },
+      statement: readFileSync(join(dir, "statement.md"), "utf8"),
+      starter: readSources(join(dir, "starter"), meta.files, `${where}/starter`),
+      reference: meta.flow ? readFlowReference(join(dir, "reference"), meta.flow.apiName, where) : readSources(join(dir, "reference"), meta.files, `${where}/reference`),
+      testSource: existsSync(testPath) ? readFileSync(testPath, "utf8") : null,
+    },
+    where,
+  );
+}
+
+/** A problem's parts in memory: from files (built-in) or from the database (community). */
+export interface ChallengeSource {
+  slug: string;
+  meta: Omit<z.infer<typeof problemJson>, "lwc" | "testClass"> & { testClass: string };
+  statement: string;
+  starter: Record<string, string>;
+  reference: Record<string, string>;
+  /** null = the test class file is missing. */
+  testSource: string | null;
+}
+
+/** problem.json's shape, for callers building a ChallengeSource themselves. */
+export const problemMetaSchema = problemJson;
+
+/**
+ * Validates a non-LWC problem and returns it. Every rule here applies to
+ * built-in and community problems alike. `where` prefixes error messages.
+ */
+export function buildChallenge(src: ChallengeSource, where: string): Challenge {
+  const { slug, meta } = src;
+  if (!SLUG.test(slug)) throw new Error(`${where}: "${slug}" is not a kebab-case slug`);
+  const testClass = meta.testClass;
+  if (!apexName.safeParse(testClass).success) throw new Error(`${where}: test class ${testClass} must be an Apex name starting with Sfc`);
 
   if (meta.track === "flow" ? !meta.flow || meta.files.length > 0 : meta.flow !== undefined || meta.files.length === 0) {
     throw new Error(`${where}: a flow-track problem has a "flow" block and no files; other problems have files and no "flow"`);
   }
+  if (meta.track === "lwc") throw new Error(`${where}: LWC problems are built from their own folder layout`);
 
   const names = [...meta.files.map((f) => f.name), testClass];
   if (new Set(names).size !== names.length) throw new Error(`${where}: file and test class names must be unique`);
@@ -145,17 +186,15 @@ export function loadChallenge(root: string, slug: string): Challenge {
     throw new Error(`${where}: a soql-track problem has exactly one soql file, and only soql-track problems have one`);
   }
 
-  const testPath = join(dir, "tests", `${testClass}.cls`);
-  if (!existsSync(testPath)) throw new Error(`${where}: missing tests/${testClass}.cls`);
-  const testSource = readFileSync(testPath, "utf8");
+  if (src.testSource === null) throw new Error(`${where}: missing tests/${testClass}.cls`);
+  const testSource = src.testSource;
   if (!/@isTest/i.test(testSource)) throw new Error(`${where}: hidden test class has no @isTest`);
   if (/SeeAllData\s*=\s*true/i.test(testSource)) throw new Error(`${where}: hidden tests must not use SeeAllData=true`);
   // Long text areas cannot be filtered in SOQL; such a test fails for every
   // submission, correct or not. Description is the one problems reach for.
   if (/\bWHERE\b[^\]]*\bDescription\b/i.test(testSource)) throw new Error(`${where}: hidden tests filter on Description (a long text area — not filterable)`);
 
-  const starter = readSources(join(dir, "starter"), meta.files, `${where}/starter`);
-  const reference = meta.flow ? readFlowReference(join(dir, "reference"), meta.flow.apiName, where) : readSources(join(dir, "reference"), meta.files, `${where}/reference`);
+  const { starter, reference } = src;
   // Each file must declare the type and name problem.json promises, or the deploy fails confusingly.
   for (const f of meta.files) {
     const decl =
@@ -188,7 +227,7 @@ export function loadChallenge(root: string, slug: string): Challenge {
     category: meta.category,
     order: meta.order,
     tags: meta.tags,
-    statement: readFileSync(join(dir, "statement.md"), "utf8"),
+    statement: src.statement,
     files: meta.files,
     starter,
     reference,
@@ -198,7 +237,9 @@ export function loadChallenge(root: string, slug: string): Challenge {
 }
 
 export class ChallengeCatalog {
-  private readonly bySlug: Map<string, Challenge>;
+  private readonly bySlug = new Map<string, Challenge>();
+  private readonly orders = new Map<number, string>();
+  private readonly orgNames = new Map<string, string>();
 
   /** `soqlCompare`: the shared comparison helper pasted into SOQL tests ("" when no SOQL problems). */
   constructor(
@@ -214,21 +255,48 @@ export class ChallengeCatalog {
         if (!soqlCompare.includes(fn)) throw new Error(`problems/_shared/soqlCompare.apex must define/use ${fn}`);
       }
     }
-    const orders = new Set<number>();
-    const apexNames = new Map<string, string>();
-    for (const c of challenges) {
-      if (orders.has(c.order)) throw new Error(`problems/${c.slug}: duplicate order ${c.order}`);
-      orders.add(c.order);
-      // Apex names are org-global; two problems sharing one would grade against each other's code.
-      // Apex names are org-global; LWC problems never deploy, so they have none.
-      const orgNames = c.lwc ? [] : [...c.files.filter((f) => f.type !== "soql").map((f) => f.name), c.testClass.name, ...(c.flow ? [c.flow.apiName] : [])];
-      for (const n of orgNames) {
-        const other = apexNames.get(n.toLowerCase());
-        if (other) throw new Error(`problems/${c.slug}: Apex name ${n} is also used by ${other}`);
-        apexNames.set(n.toLowerCase(), c.slug);
-      }
+    for (const c of [...challenges].sort((a, b) => a.order - b.order)) this.add(c);
+  }
+
+  /** Org-global names a problem deploys (Apex classes, triggers, the flow). LWC deploys nothing. */
+  private static namesOf(c: Challenge): string[] {
+    return c.lwc ? [] : [...c.files.filter((f) => f.type !== "soql").map((f) => f.name), c.testClass.name, ...(c.flow ? [c.flow.apiName] : [])];
+  }
+
+  /** Why `c` can't join the catalog, or null. Slugs, orders and Apex names must be unique. */
+  conflict(c: Challenge): string | null {
+    if (this.bySlug.has(c.slug)) return `the slug ${c.slug} is taken`;
+    const byOrder = this.orders.get(c.order);
+    if (byOrder) return `duplicate order ${c.order} (also ${byOrder})`;
+    // Apex names are org-global; two problems sharing one would grade against each other's code.
+    for (const n of ChallengeCatalog.namesOf(c)) {
+      const other = this.orgNames.get(n.toLowerCase());
+      if (other) return `Apex name ${n} is also used by ${other}`;
     }
-    this.bySlug = new Map([...challenges].sort((a, b) => a.order - b.order).map((c) => [c.slug, c]));
+    return null;
+  }
+
+  /** Adds a problem (built-in at startup, community on approval). Throws on a conflict. */
+  add(c: Challenge): void {
+    const why = this.conflict(c);
+    if (why) throw new Error(`problems/${c.slug}: ${why}`);
+    this.bySlug.set(c.slug, c);
+    this.orders.set(c.order, c.slug);
+    for (const n of ChallengeCatalog.namesOf(c)) this.orgNames.set(n.toLowerCase(), c.slug);
+  }
+
+  /** Removes a community problem (unpublish). */
+  remove(slug: string): void {
+    const c = this.bySlug.get(slug);
+    if (!c) return;
+    this.bySlug.delete(slug);
+    this.orders.delete(c.order);
+    for (const n of ChallengeCatalog.namesOf(c)) this.orgNames.delete(n.toLowerCase());
+  }
+
+  /** The next free order number for community problems (they sort after the built-ins). */
+  nextCommunityOrder(): number {
+    return Math.max(999, ...this.orders.keys()) + 1;
   }
 
   static load(root: string): ChallengeCatalog {
@@ -242,7 +310,7 @@ export class ChallengeCatalog {
   }
 
   all(): Challenge[] {
-    return [...this.bySlug.values()];
+    return [...this.bySlug.values()].sort((a, b) => a.order - b.order);
   }
 
   get(slug: string): Challenge | undefined {
