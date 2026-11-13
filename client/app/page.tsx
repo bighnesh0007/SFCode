@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { DailyCard } from "@/components/DailyCard";
+import { Globe } from "@/components/Globe";
+import { LiveStats } from "@/components/LiveStats";
 import { buttonVariants } from "@/components/ui/button";
 import { TRACK_INFO } from "@/lib/tracks";
 
@@ -20,21 +22,31 @@ const SECTIONS = [
 export default function Home() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4">
-      <section className="py-16 sm:py-24">
-        <p className="text-sm font-medium text-primary">Open-source practice for Salesforce developers</p>
-        <h1 className="mt-3 max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">Write real Apex. Get graded in a real org.</h1>
-        <p className="mt-4 max-w-xl text-lg text-muted-foreground">
-          Solve Apex, SOQL, Flow, debugging and LWC problems against hidden tests that run in your own connected org,
-          follow a roadmap from first steps to certification, and compete in weekly contests.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/problems" className={buttonVariants({ size: "lg" })}>
-            Browse problems <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
-          <Link href="/roadmap" className={buttonVariants({ size: "lg", variant: "outline" })}>
-            See the roadmap
-          </Link>
+      <section className="relative grid items-center gap-8 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:py-20">
+        <div aria-hidden className="pointer-events-none absolute -left-32 -top-24 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+        <div className="relative">
+          <p className="inline-flex items-center gap-2 rounded-full border bg-background/60 px-3 py-1 text-xs font-medium text-sky-600 backdrop-blur dark:text-sky-400">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> Open-source practice for the Salesforce community
+          </p>
+          <h1 className="mt-4 max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
+            Write real Apex.{" "}
+            <span className="bg-gradient-to-r from-sky-500 via-indigo-500 to-violet-500 bg-clip-text text-transparent">Get graded in a real org.</span>
+          </h1>
+          <p className="mt-5 max-w-xl text-lg text-muted-foreground">
+            Apex, SOQL, Flow, debugging and LWC problems checked by hidden tests, a roadmap from first steps to certification, and weekly
+            contests with Trailblazers everywhere.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/problems" className={buttonVariants({ size: "lg" })}>
+              Start solving <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+            <Link href="/roadmap" className={buttonVariants({ size: "lg", variant: "outline" })}>
+              See the roadmap
+            </Link>
+          </div>
+          <LiveStats />
         </div>
+        <Globe className="mx-auto w-full max-w-[340px] sm:max-w-[460px] lg:max-w-[560px]" />
       </section>
 
       <section className="mb-8">

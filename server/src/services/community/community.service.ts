@@ -47,6 +47,14 @@ export interface ContestResult {
   score: number;
 }
 
+export interface SiteStats {
+  problems: number;
+  communityProblems: number;
+  learners: number;
+  /** First solves (learner × problem) in the last 7 days. */
+  solvesThisWeek: number;
+}
+
 export interface ProfileStats {
   streak: number;
   longestStreak: number;
@@ -164,6 +172,23 @@ export class CommunityService {
     const p = await this.profiles.findByHandle(handle);
     if (!p) throw new NotFoundError("No learner with that handle.");
     return this.view(p);
+  }
+
+  private statsCache: { at: number; value: SiteStats } | null = null;
+
+  /** Public headline numbers for the landing page; cached for a minute. */
+  async stats(): Promise<SiteStats> {
+    const now = this.clock.nowMs();
+    if (this.statsCache && now - this.statsCache.at < 60_000) return this.statsCache.value;
+    const all = this.catalog.all();
+    const value: SiteStats = {
+      problems: all.length,
+      communityProblems: all.filter((c) => c.authorId !== undefined).length,
+      learners: await this.profiles.count(),
+      solvesThisWeek: (await this.submissions.firstSolves(new Date(now - 7 * 86_400_000))).length,
+    };
+    this.statsCache = { at: now, value };
+    return value;
   }
 
   async leaderboard(window: LeaderboardWindow, limit = 100): Promise<LeaderboardRow[]> {
