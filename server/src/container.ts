@@ -23,6 +23,8 @@ import { PgBlogRepository } from "./repositories/blog.repository.ts";
 import { BlogService } from "./services/blog/blog.service.ts";
 import { compileLwc } from "./services/lwc/compiler.ts";
 import { LwcSandbox } from "./services/lwc/lwcSandbox.ts";
+import { PgHubRepository } from "./repositories/hub.repository.ts";
+import { HubService } from "./services/hub/hub.service.ts";
 import { PgEmailRepository } from "./repositories/email.repository.ts";
 import { DigestService } from "./services/email/digest.service.ts";
 import { emailJsSender } from "./services/email/emailjs.ts";
@@ -66,6 +68,7 @@ export interface Container {
   drafts?: ProblemDraftService;
   social?: SocialService;
   digest?: DigestService;
+  hub?: HubService;
 }
 
 /** server/certification (question banks), resolved like PROBLEMS_DIR. */
@@ -192,6 +195,7 @@ export function buildContainer(): Container {
       { total: monthlyCap, perUser: perUserMonthly },
       site,
     );
+    container.hub = new HubService(new PgHubRepository(container.db), new PgProfileRepository(container.db), container.community, container.admin, container.social, systemClock);
     container.buddies.setNotifier((userId, kind, data) => social.notify(userId, kind, data));
     container.community.setCosmeticsSource(container.store);
     const communityForFreezes = container.community;

@@ -21,7 +21,7 @@ export type FeedItem =
   | { kind: "post"; at: string; actor: FeedActor; post: { slug: string; title: string } };
 export interface NotificationItem {
   id: string;
-  kind: "follow" | "review" | "buddy";
+  kind: "follow" | "review" | "buddy" | "mentor" | "team";
   data: Record<string, string>;
   read: boolean;
   at: string;
