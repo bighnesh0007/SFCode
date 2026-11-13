@@ -17,6 +17,7 @@ import { useIsNarrow } from "@/lib/useIsNarrow";
 import { Markdown } from "@/components/Markdown";
 import { LearningPanel } from "@/components/challenge/LearningPanel";
 import { SolutionSize } from "@/components/challenge/SolutionSize";
+import { RelatedLessons, type Lesson } from "@/components/challenge/RelatedLessons";
 import { ApiError } from "@/lib/apiClient";
 import { submitLwc, type ChallengeView, type Submission } from "@/lib/challengesApi";
 import { compileLwcComponent } from "@/lib/lwcApi";
@@ -49,7 +50,7 @@ function readDraft(challenge: ChallengeView): Record<string, string> {
   }
 }
 
-export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView; backHref: string }) {
+export function LwcWorkspace({ challenge, backHref, lessons }: { challenge: ChallengeView; backHref: string; lessons?: Lesson[] }) {
   const editorTheme = useEditorTheme();
   const lwc = challenge.lwc;
   const [sources, setSources] = useState<Record<string, string>>(() => readDraft(challenge));
@@ -178,6 +179,7 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
               <Markdown source={challenge.statement} className="markdown mt-5" />
               <LearningPanel slug={challenge.slug} hintCount={challenge.hintCount ?? 0} hasEditorial={challenge.hasEditorial ?? false} />
               <SolutionSize slug={challenge.slug} />
+              <RelatedLessons lessons={lessons} />
               <div className="mt-6 flex gap-2 rounded-lg border bg-muted/30 p-3 text-xs text-muted-foreground">
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 <p>

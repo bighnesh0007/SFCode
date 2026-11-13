@@ -6,13 +6,14 @@ import { ApiError } from "@/lib/apiClient";
 import { getChallenge, type ChallengeView } from "@/lib/challengesApi";
 import { LwcWorkspace } from "./LwcWorkspace";
 import { Workspace } from "./Workspace";
+import type { Lesson } from "./RelatedLessons";
 import { WorkspaceSkeleton } from "@/components/ui/skeleton";
 
 /**
  * Loads one problem and renders the workspace. `backHref` is the list it belongs to.
  * `initial` is the problem as rendered on the server; without it, it's fetched here.
  */
-export function ChallengePage({ slug, backHref, initial }: { slug: string; backHref: string; initial?: ChallengeView }) {
+export function ChallengePage({ slug, backHref, initial, lessons }: { slug: string; backHref: string; initial?: ChallengeView; lessons?: Lesson[] }) {
   const [challenge, setChallenge] = useState<ChallengeView | null>(initial ?? null);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,5 +39,5 @@ export function ChallengePage({ slug, backHref, initial }: { slug: string; backH
     return (
       <WorkspaceSkeleton />
     );
-  return challenge.lwc ? <LwcWorkspace challenge={challenge} backHref={backHref} /> : <Workspace challenge={challenge} backHref={backHref} />;
+  return challenge.lwc ? <LwcWorkspace challenge={challenge} backHref={backHref} lessons={lessons} /> : <Workspace challenge={challenge} backHref={backHref} lessons={lessons} />;
 }
