@@ -92,7 +92,9 @@ describe("CertificationService", () => {
   it("never sends answers or explanations with questions", () => {
     const service = new CertificationService(bank, undefined);
     for (const e of bank.all()) {
-      const json = JSON.stringify(service.practice(e.exam, undefined, 30));
+      // Section by section, so every question is checked rather than a random 30.
+      const json = JSON.stringify(e.sections.flatMap((s) => service.practice(e.exam, s.id, 100)));
+      expect(JSON.parse(json)).toHaveLength(e.questions.length);
       expect(json).not.toMatch(/"answer"|"explanation"/);
       for (const q of e.questions) expect(json).not.toContain(q.explanation.slice(0, 40));
     }
