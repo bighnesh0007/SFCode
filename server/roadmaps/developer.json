@@ -36,7 +36,7 @@
           "options": [
             "A custom field on Account",
             "A Contact record",
-            "A closed Case",
+            "A closed Case with its comments",
             "An Account named Acme"
           ],
           "answer": 0,
@@ -46,7 +46,7 @@
           "q": "Why does Salesforce enforce governor limits?",
           "options": [
             "Orgs share servers, so no one org may use more than its share",
-            "Only for security",
+            "Only for security, so no one can read too much data",
             "To stop Apex being used",
             "To sell more licences"
           ],
@@ -56,7 +56,7 @@
         {
           "q": "Where should new Apex be written and tested?",
           "options": [
-            "In the Developer Console in production",
+            "In the Developer Console in production, then copied to a sandbox",
             "In a sandbox or scratch org, then deployed",
             "Anywhere: it's the same",
             "Directly in production"
@@ -108,7 +108,7 @@
           "q": "What is a scratch org best for?",
           "options": [
             "A short-lived, reproducible org for one feature",
-            "Replacing sandboxes for UAT with real data",
+            "Replacing sandboxes for UAT with a full copy of real data",
             "Running reports for executives",
             "Storing production data"
           ],
@@ -118,7 +118,7 @@
         {
           "q": "Where should your Salesforce project's source live?",
           "options": [
-            "In the Developer Console",
+            "In the Developer Console of the production org",
             "In Git, as source-format files",
             "In a spreadsheet",
             "Only in the org"
@@ -179,7 +179,7 @@
           "options": [
             "They don't relate",
             "Through Enrollment__c, a junction object with two master-details",
-            "A lookup from Student to Course",
+            "A lookup from Student__c to Course__c, one per student",
             "A multi-select picklist"
           ],
           "answer": 1,
@@ -285,7 +285,7 @@
           "q": "Look at the diagram. Organization-wide default is Private. Can a sharing rule make a record invisible to someone the role hierarchy already lets see it?",
           "options": [
             "No: every layer after the defaults only adds access",
-            "Yes",
+            "Yes, a rule can set the record to Private for some users",
             "Only with Apex",
             "Only for admins"
           ],
@@ -300,7 +300,7 @@
             "Apex managed sharing",
             "Organization-wide defaults",
             "Role hierarchy",
-            "Sharing rules"
+            "Sharing rules on each object"
           ],
           "answer": 1,
           "why": "Organization-wide defaults are layer 1, the baseline everything else builds on.",
@@ -508,7 +508,7 @@
         {
           "q": "You need every Account and Contact whose name contains 'acme'. Which fits best?",
           "options": [
-            "Two SOQL queries with LIKE",
+            "Two SOQL queries using LIKE '%acme%' on each object",
             "A Flow",
             "One SOSL search returning Account and Contact",
             "A report"
@@ -522,7 +522,7 @@
             "List<List<SObject>>",
             "List<SObject>",
             "AggregateResult[]",
-            "Map<Id, SObject>"
+            "Map<Id, SObject> of matching records"
           ],
           "answer": 0,
           "why": "One list per object named in RETURNING."
@@ -532,7 +532,7 @@
           "options": [
             "SOSL can't search Contacts",
             "SOSL has no limits",
-            "SOSL can filter on any field exactly",
+            "SOSL can filter on any field with exact matches, like SOQL",
             "SOSL uses the search index, so very new records may not appear yet"
           ],
           "answer": 3,
@@ -621,7 +621,7 @@
           "q": "In a before trigger, how do you stop one bad record from saving with a friendly message?",
           "options": [
             "delete the record",
-            "throw new Exception()",
+            "throw new Exception('message') from the trigger",
             "System.abort()",
             "record.addError('message')"
           ],
@@ -634,7 +634,7 @@
             "Nothing: it continues",
             "Everything in the transaction rolls back",
             "The data is saved but flagged",
-            "Only the last statement is undone"
+            "Only the last DML statement in the transaction is undone"
           ],
           "answer": 1,
           "why": "An unhandled exception rolls back all DML in the transaction."
@@ -679,7 +679,7 @@
           "q": "What does Test.stopTest() do for asynchronous Apex queued in the test?",
           "options": [
             "Cancels it",
-            "Schedules it for later",
+            "Schedules it to run after the test method finishes",
             "Nothing",
             "Runs it before the next line"
           ],
@@ -689,7 +689,7 @@
         {
           "q": "What coverage does a production deploy require?",
           "options": [
-            "100% of each class",
+            "100% of each class and trigger in the deployment",
             "50% org-wide",
             "None",
             "75% org-wide, and every trigger covered"
@@ -701,7 +701,7 @@
           "q": "Why avoid SeeAllData=true?",
           "options": [
             "It's not allowed in sandboxes",
-            "It disables assertions",
+            "It disables System.assert calls in the test",
             "Tests then depend on org data and break when it changes",
             "It's slower to type"
           ],
@@ -836,7 +836,7 @@
             "Only in bulk inserts",
             "Only if the trigger is active",
             "No: validation fails before the save, and after triggers come after it",
-            "Yes, after triggers always run"
+            "Yes, after triggers always run, even when validation fails"
           ],
           "answer": 2,
           "why": "Validation runs before the record is saved (step 3). A failure stops the save, so steps 5 onwards, including after triggers, never run."
@@ -907,7 +907,7 @@
           "options": [
             "Bind variables (:value) instead of joining strings",
             "Upper-casing input",
-            "Running in system mode",
+            "Running the query in system mode",
             "Using LIMIT"
           ],
           "answer": 0,
@@ -916,7 +916,7 @@
         {
           "q": "A class has no sharing keyword. Is sharing enforced?",
           "options": [
-            "Always",
+            "Always, because sharing is on by default",
             "It depends on the calling context; declare it explicitly",
             "Only in triggers",
             "Never"
@@ -963,7 +963,7 @@
           "q": "What must exist before a user's actions produce debug logs?",
           "options": [
             "A sandbox refresh",
-            "A permission set",
+            "A permission set with View All Data for that user",
             "A custom setting",
             "A trace flag for that user"
           ],
@@ -974,7 +974,7 @@
           "q": "Why turn log levels down rather than up when a log is huge?",
           "options": [
             "Higher levels hide errors",
-            "Lower levels are faster to download",
+            "Lower levels download faster, but show the same detail",
             "Logs have a size cap; too much detail truncates the part you need",
             "It doesn't matter"
           ],
@@ -1052,7 +1052,7 @@
           "q": "Look at the diagram. Where does the business logic live?",
           "options": [
             "In the recursion guard",
-            "In AccountTrigger",
+            "In AccountTrigger itself, in each context block",
             "In the handler and the service and selector classes it calls",
             "In a Flow"
           ],
@@ -1065,7 +1065,7 @@
           "q": "Using the diagram, what does the recursion guard store?",
           "options": [
             "The last error",
-            "A Boolean flag",
+            "A Boolean flag set once the trigger has run",
             "A list of triggers",
             "A static Set<Id> of records already processed"
           ],
@@ -1077,7 +1077,7 @@
         {
           "q": "Why only one trigger per object?",
           "options": [
-            "Salesforce allows only one",
+            "Salesforce allows only one trigger per object, so a second won't save",
             "Multiple triggers on one object run in no guaranteed order",
             "It uses fewer licences",
             "Triggers can't call classes"
@@ -1158,7 +1158,7 @@
           "q": "Look at the diagram. Where should the API's URL and credentials live?",
           "options": [
             "In the Named Credential",
-            "In a custom label",
+            "In a custom label per environment",
             "In the Apex class",
             "In the test class"
           ],
@@ -1173,7 +1173,7 @@
             "A Named Credential",
             "An HttpCalloutMock set with Test.setMock",
             "Nothing; tests skip callouts",
-            "The real API"
+            "The real API, called from the test with a test key"
           ],
           "answer": 1,
           "why": "Tests can't make real callouts; a mock returns the response.",
@@ -1185,7 +1185,7 @@
           "options": [
             "Use a validation rule",
             "Enqueue a Queueable (or @future(callout=true)) that makes the callout",
-            "Call Http.send in the trigger",
+            "Call Http.send directly in the trigger after the save",
             "It's impossible"
           ],
           "answer": 1,
@@ -1226,7 +1226,7 @@
             "Dispatch a CustomEvent the parent listens for",
             "Set a property on the parent",
             "Use @wire",
-            "Publish to a message channel"
+            "Publish to a Lightning message channel"
           ],
           "answer": 0,
           "why": "Children send changes up as events; properties only flow down.",
@@ -1236,7 +1236,7 @@
         {
           "q": "Using the diagram, how do c-child and c-unrelated communicate?",
           "options": [
-            "Through the parent's template",
+            "Through the parent's template, passing values down with @api",
             "Through a Lightning Message Service channel: one publishes, the other subscribes",
             "Through @api",
             "They can't"
@@ -1424,7 +1424,7 @@
         {
           "q": "Which can subscribe to a platform event?",
           "options": [
-            "Only Apex triggers",
+            "Only Apex triggers on the event object",
             "Triggers, Flows, LWC and external systems",
             "Only Flows",
             "Only external systems"
@@ -1470,7 +1470,7 @@
             "WHERE Name LIKE '%acme'",
             "WHERE ExternalId__c = :key (an External ID field)",
             "WHERE Status__c != 'Closed'",
-            "WHERE Description != null"
+            "WHERE Description != null AND Name != null"
           ],
           "answer": 1,
           "why": "External ID fields are indexed; an equality filter on one is selective."
@@ -1480,7 +1480,7 @@
           "options": [
             "Unbalanced test data",
             "A sandbox out of date",
-            "Records with bad data",
+            "Records with bad or missing data in key fields",
             "One parent or owner with a huge number of child or owned records"
           ],
           "answer": 3,
@@ -1489,7 +1489,7 @@
         {
           "q": "You must load 5 million records. What's appropriate?",
           "options": [
-            "Data Import Wizard",
+            "Data Import Wizard in batches of 50,000 records",
             "One insert in a trigger",
             "Bulk API or Data Loader in bulk mode, with heavy automation paused",
             "Anonymous Apex"
@@ -1537,7 +1537,7 @@
           "options": [
             "They don't need to",
             "In production",
-            "Only in the scratch org",
+            "Only in the scratch org of the developer who made the change",
             "In CI, after the change is committed to Git"
           ],
           "answer": 3,
@@ -1550,7 +1550,7 @@
           "options": [
             "75% overall coverage, every trigger covered, all tests pass",
             "100% coverage",
-            "No tests needed with change sets",
+            "No tests are needed when deploying with change sets",
             "50% coverage"
           ],
           "answer": 0,
@@ -1564,7 +1564,7 @@
             "An unlocked package",
             "A sandbox",
             "A report",
-            "A change set"
+            "A change set, which can be reinstalled"
           ],
           "answer": 0,
           "why": "Packages are versioned units of metadata."
@@ -1630,7 +1630,7 @@
         {
           "q": "What does a Unit of Work do?",
           "options": [
-            "Schedules jobs",
+            "Schedules jobs in the order they were queued",
             "Formats JSON",
             "Runs tests",
             "Collects DML and commits it once, in order"
@@ -1686,7 +1686,7 @@
           "options": [
             "/services/apexrest/",
             "/apex/",
-            "/services/data/",
+            "/services/data/vXX.X/apexrest/",
             "/rest/"
           ],
           "answer": 0,
@@ -1698,7 +1698,7 @@
             "Only in sandboxes",
             "When it already covers the operation, such as plain record CRUD",
             "Never",
-            "Only for reads"
+            "Only for reads, since Apex REST can't return records"
           ],
           "answer": 1,
           "why": "Custom endpoints are code to maintain; use them for custom logic only."

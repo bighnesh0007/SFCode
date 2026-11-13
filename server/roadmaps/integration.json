@@ -35,7 +35,7 @@
           "options": [
             "GET",
             "POST",
-            "PUT",
+            "PUT with only the changed fields",
             "PATCH"
           ],
           "answer": 3,
@@ -45,7 +45,7 @@
           "q": "What does a 429 status mean?",
           "options": [
             "Too many requests: slow down",
-            "Not found",
+            "Not found: the resource doesn't exist",
             "Server error",
             "Created"
           ],
@@ -107,7 +107,7 @@
             "Nothing else",
             "Its client secret and the PKCE verifier",
             "The access token",
-            "The user's password"
+            "The user's password and username, to confirm"
           ],
           "answer": 1,
           "why": "The secret and verifier prove the app is the one that started the flow.",
@@ -156,7 +156,7 @@
           "q": "How do you create-or-update by another system's key?",
           "options": [
             "DELETE then POST",
-            "POST then PATCH",
+            "POST to create, then PATCH with the Salesforce Id if the POST fails",
             "A SOQL query",
             "PATCH to /sobjects/Object/ExternalIdField/value (upsert)"
           ],
@@ -243,7 +243,7 @@
           "options": [
             "Use a validation rule",
             "Enqueue a Queueable that implements Database.AllowsCallouts",
-            "Call it from the trigger",
+            "Call it directly from the trigger with Http.send()",
             "Use SOQL"
           ],
           "answer": 1,
@@ -291,7 +291,7 @@
             "/apex/",
             "/api/",
             "/services/apexrest/",
-            "/services/data/"
+            "/services/data/vXX.X/apexrest/"
           ],
           "answer": 2,
           "why": "Apex REST lives under /services/apexrest/."
@@ -312,7 +312,7 @@
           "options": [
             "Set a 4xx status code with a clear message",
             "Throw an uncaught exception",
-            "200 with an error in the body",
+            "Return 200 with an error message in the response body",
             "Return null"
           ],
           "answer": 0,
@@ -363,7 +363,7 @@
         {
           "q": "After a Bulk job finishes, how do you find rows that failed?",
           "options": [
-            "They're emailed to the user",
+            "They're emailed to the job's owner as a CSV",
             "They're retried forever",
             "Download the job's failed results",
             "Run a report"
@@ -434,7 +434,7 @@
           "options": [
             "A sandbox refresh",
             "Nothing",
-            "Data Loader",
+            "Data Loader, exporting the event object",
             "Replay from a stored replay Id"
           ],
           "answer": 3,
@@ -446,7 +446,7 @@
             "To save storage",
             "It's not needed",
             "Delivery is at least once, so the same event may arrive again",
-            "They're never sent twice"
+            "Events are never sent twice, so duplicates mean a bug"
           ],
           "answer": 2,
           "why": "At-least-once delivery means idempotent handling."
@@ -545,7 +545,7 @@
             "400 Bad Request",
             "503 Service Unavailable",
             "404 Not Found",
-            "403 Forbidden"
+            "403 Forbidden, after refreshing permissions"
           ],
           "answer": 1,
           "why": "503 is temporary; 4xx errors won't fix themselves."
@@ -555,7 +555,7 @@
           "options": [
             "Idempotent operations",
             "Without sharing",
-            "More API calls",
+            "More API calls, sent in parallel",
             "Shorter timeouts"
           ],
           "answer": 0,
@@ -612,7 +612,7 @@
           "options": [
             "In the external system, fetched when viewed",
             "In a static resource",
-            "Copied into Salesforce nightly",
+            "Copied into Salesforce by a nightly sync job",
             "In platform events"
           ],
           "answer": 0,
@@ -621,7 +621,7 @@
         {
           "q": "Which is a poor fit for external objects?",
           "options": [
-            "Viewing a huge archive occasionally",
+            "Viewing records from a very large archive only occasionally",
             "Cross-org lookups",
             "Data that needs heavy reporting and automation in Salesforce",
             "Read-only reference data"

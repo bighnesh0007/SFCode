@@ -46,7 +46,7 @@
         {
           "q": "What does `await` do inside an async function?",
           "options": [
-            "Runs code in parallel",
+            "Runs the rest of the function in parallel on another thread",
             "Retries on failure",
             "Creates a new thread",
             "Waits for a Promise to settle and gives its value"
@@ -59,7 +59,7 @@
           "options": [
             "They return arrays",
             "They keep `this` from the surrounding code",
-            "They're faster",
+            "They run faster than regular methods in LWC templates",
             "They're required by LWC"
           ],
           "answer": 1,
@@ -112,7 +112,7 @@
           "q": "Which command deploys your components to an org?",
           "options": [
             "sf project deploy start",
-            "npm run lwc",
+            "npm run lwc -- --target-org",
             "sf org open",
             "sf data query"
           ],
@@ -203,7 +203,7 @@
           "q": "Why doesn't a CSS rule in a parent change the inside of a child component?",
           "options": [
             "Only inline styles work",
-            "The child must import it",
+            "The child must import the parent's stylesheet first",
             "CSS is disabled in LWC",
             "Shadow DOM scopes each component's styles"
           ],
@@ -225,7 +225,7 @@
           "q": "What does SLDS provide?",
           "options": [
             "A database",
-            "A JavaScript framework",
+            "A JavaScript framework for building Salesforce UI components",
             "A testing tool",
             "Salesforce's design system: CSS classes and patterns"
           ],
@@ -291,7 +291,7 @@
         {
           "q": "Look at the diagram. Where do you subscribe to a message channel?",
           "options": [
-            "renderedCallback()",
+            "renderedCallback(), after the template renders",
             "constructor()",
             "connectedCallback()",
             "errorCallback()"
@@ -364,7 +364,7 @@
           "options": [
             "Nothing until reload",
             "It errors",
-            "It must call refreshApex",
+            "It must call refreshApex to see the change",
             "It refreshes from the shared LDS cache"
           ],
           "answer": 3,
@@ -376,7 +376,7 @@
             "lightning-datatable",
             "lightning-record-edit-form",
             "lightning-card",
-            "lightning-input"
+            "lightning-input with a field-name attribute"
           ],
           "answer": 1,
           "why": "Record forms use LDS, which respects FLS and sharing."
@@ -424,7 +424,7 @@
           "options": [
             "@AuraEnabled(cacheable=true) methods",
             "@future methods",
-            "Any public method",
+            "Any public or global method in the class",
             "Methods with DML"
           ],
           "answer": 0,
@@ -434,7 +434,7 @@
           "q": "What does `$recordId` in a wire's parameters mean?",
           "options": [
             "A literal string",
-            "An Apex variable",
+            "An Apex variable named recordId in the controller",
             "A reactive reference: the wire re-runs when recordId changes",
             "A global variable"
           ],
@@ -487,7 +487,7 @@
         {
           "q": "Look at the diagram. Two components with no parent-child link need to share a selected record. How?",
           "options": [
-            "CustomEvent with bubbles",
+            "A CustomEvent with bubbles and composed set to true",
             "A Lightning Message Service channel",
             "A shared variable",
             "@api properties"
@@ -550,7 +550,7 @@
           "options": [
             "An href to the Id",
             "NavigationMixin.Navigate with a standard__recordPage reference",
-            "window.location = '/lightning/r/...'",
+            "window.location = '/lightning/r/Account/' + recordId + '/view'",
             "A toast"
           ],
           "answer": 1,
@@ -616,7 +616,7 @@
             "el.shadowRoot.querySelector",
             "window.find",
             "document.querySelector",
-            "el.querySelector"
+            "el.querySelector on the created element"
           ],
           "answer": 0,
           "why": "The component's DOM is in its shadow root."
@@ -627,7 +627,7 @@
             "Re-rendering is asynchronous: await a microtask first",
             "The test needs an org",
             "Jest is slow",
-            "Properties can't be set in tests"
+            "Properties can't be set on a component in tests"
           ],
           "answer": 0,
           "why": "Wait for the re-render, e.g. `await Promise.resolve()`."
@@ -672,7 +672,7 @@
           "options": [
             "No roles",
             "role=tablist, role=tab and role=tabpanel",
-            "role=button on each",
+            "role=button on each tab and role=region on the panel",
             "role=menu"
           ],
           "answer": 1,
@@ -729,7 +729,7 @@
           "options": [
             "document.write",
             "Bind it in the template ({text}), which escapes it",
-            "innerHTML",
+            "Set innerHTML on a div in renderedCallback",
             "eval"
           ],
           "answer": 1,
@@ -749,7 +749,7 @@
         {
           "q": "What stops a component from reading another namespace's DOM?",
           "options": [
-            "The js-meta.xml",
+            "The isExposed setting in js-meta.xml",
             "Lightning Web Security (or Locker)",
             "CSS",
             "SLDS"
