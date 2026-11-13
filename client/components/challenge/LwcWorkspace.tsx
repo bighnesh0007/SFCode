@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { CheckCircle2, ChevronLeft, Eye, FlaskConical, Info, Loader2, RotateCcw, Send, XCircle } from "lucide-react";
 import { useAuthState } from "@/components/auth";
 import { Celebration } from "@/components/Celebration";
+import { SOLVED_EVENT } from "@/lib/communityApi";
 import { Results } from "./Results";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -65,7 +66,10 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
     try {
       const s = await submitLwc(await getToken(), challenge.slug, sources);
       setSubmission(s);
-      if (s.status === "accepted") setCelebrate(true);
+      if (s.status === "accepted") {
+        setCelebrate(true);
+        window.dispatchEvent(new Event(SOLVED_EVENT));
+      }
     } catch (err) {
       setSubmitError(err instanceof ApiError ? err.message : "Could not submit.");
     } finally {

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Celebration } from "@/components/Celebration";
+import { SOLVED_EVENT } from "@/lib/communityApi";
 import { usePoints } from "@/components/usePoints";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -118,7 +119,10 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
         try {
           const next = await getSubmission(await getToken(), running);
           setSubmission(next);
-          if (next.status === "accepted") setCelebrate({ first: !solvedBefore.current });
+          if (next.status === "accepted") {
+            setCelebrate({ first: !solvedBefore.current });
+            window.dispatchEvent(new Event(SOLVED_EVENT));
+          }
           if (next.status !== "running") void refreshHistory();
         } catch {
           /* transient; keep polling */
