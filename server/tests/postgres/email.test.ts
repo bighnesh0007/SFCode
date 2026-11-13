@@ -75,6 +75,9 @@ describe.skipIf(!safe)("weekly digest on Postgres", () => {
     const f = setup(monday9, { total: 190, perUser: 4 }, true);
     expect(await f.svc.runWeekly()).toEqual({ failed: 3 });
     expect(await repo.sentThisMonth(monthStart(new Date(monday9)))).toBe(3);
+    // A test send reports the provider's actual reason, so the admin page can show it.
+    await db.execute(sql`TRUNCATE email_log`);
+    expect(await f.svc.sendTest("u1")).toBe("failed: boom");
   });
 
   it("parallel runs can't overshoot the total cap", async () => {

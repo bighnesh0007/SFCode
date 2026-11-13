@@ -426,6 +426,7 @@ function EmailTab() {
   const { getToken } = useAuthState();
   const [usage, setUsage] = useState<{ sentThisMonth: number; cap: number; perUser: number; enabled: boolean } | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
   const load = useCallback(() => {
     getToken()
       .then((t) => getEmailUsage(t))
@@ -435,12 +436,15 @@ function EmailTab() {
   useEffect(load, [load]);
   async function test() {
     setMessage(null);
+    setSending(true);
     try {
       const r = await sendTestDigest(await getToken());
-      setMessage(r.result === "sent" ? "Sent: check your inbox." : `Not sent: ${r.result.replace("_", " ")}.`);
-      load();
+      setMessage(r.result === "sent" ? `Sent at ${new Date().toLocaleTimeString()}: check your inbox.` : `Not sent: ${r.result.replace(/_/g, " ")}`);
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Could not send.");
+    } finally {
+      setSending(false);
+      load();
     }
   }
   if (!usage) return <div className="mt-5 h-24 animate-pulse rounded-lg bg-muted/50" />;
@@ -455,7 +459,7 @@ function EmailTab() {
         <div className="flex justify-between text-sm"><span>This month</span><span className="tabular-nums">{usage.sentThisMonth} / {usage.cap}</span></div>
         <div className="mt-1 h-2 overflow-hidden rounded-full bg-muted"><div className={cn("h-full rounded-full", pct > 85 ? "bg-rose-500" : "bg-sky-500")} style={{ width: `${pct}%` }} /></div>
       </div>
-      <Button size="sm" disabled={!usage.enabled} onClick={() => void test()}>Send me a test digest</Button>
+      <Button size="sm" disabled={!usage.enabled || sending} onClick={() => void test()}>{sending ? "Sending…" : "Send me a test digest"}</Button>
       {message && <p className="text-sm text-muted-foreground">{message}</p>}
     </section>
   );

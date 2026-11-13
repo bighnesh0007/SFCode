@@ -77,7 +77,7 @@ export class DigestService {
     return this.prefs(userId);
   }
 
-  /** Sends one user's digest for `period` if allowed. Returns what happened. */
+  /** Sends one user's digest for `period` if allowed. Returns what happened (with the provider's reason on failure). */
   private async sendOne(userId: string, kind: string, period: string): Promise<string> {
     const sender = this.sender;
     if (!sender) return "disabled";
@@ -91,8 +91,9 @@ export class DigestService {
       return "sent";
     } catch (err) {
       await this.repo.markFailed(userId, kind, period);
-      logger.warn({ err: err instanceof Error ? err.message : String(err), userId }, "digest send failed");
-      return "failed";
+      const reason = err instanceof Error ? err.message : String(err);
+      logger.warn({ err: reason, userId }, "digest send failed");
+      return `failed: ${reason}`;
     }
   }
 
@@ -104,15 +105,22 @@ export class DigestService {
     const period = isoWeek(now);
     for (const userId of await this.repo.digestSubscribers()) {
       const r = await this.sendOne(userId, "digest", period);
-      counts[r] = (counts[r] ?? 0) + 1;
+      const key = r.startsWith("failed") ? "failed" : r; // reasons stay in the log, not the counts
+      counts[key] = (counts[key] ?? 0) + 1;
       if (r === "global_cap") break; // nothing else can go out this month
     }
     if (Object.keys(counts).length) logger.info({ period, ...counts }, "weekly digest run");
     return counts;
   }
 
-  /** Sends the caller their own digest now (staff, for checking the template). Counts toward the caps. */
+  /** Sends the caller their own digest now (staff, for checking the template). Counts toward the caps. Logged either way. */
   async sendTest(userId: string): Promise<string> {
+    const result = await this.sendTestInner(userId);
+    logger.info({ userId, result: result.slice(0, 200) }, "test digest");
+    return result;
+  }
+
+  private async sendTestInner(userId: string): Promise<string> {
     if (!this.sender) throw new BadRequestError("Email isn't configured on this server.");
     return this.sendOne(userId, "test", this.clock.now().toISOString().slice(0, 16));
   }
