@@ -38,6 +38,12 @@ describe("answer positions", () => {
     expect(longest.length / single.length).toBeLessThanOrEqual(0.4);
   });
 
+  it.each(read("roadmaps"))("$name: the right quiz answer isn't usually the longest option", ({ data }) => {
+    const quiz = (data as Map_).nodes.flatMap((n) => n.quiz ?? []);
+    const longest = quiz.filter((q) => q.options.every((o, i) => i === q.answer || o.length < (q.options[q.answer] ?? "").length));
+    expect(longest.length / quiz.length).toBeLessThanOrEqual(0.4);
+  });
+
   it("every roadmap quiz explains its answer", () => {
     const thin = read("roadmaps").flatMap(({ data }) => (data as Map_).nodes.flatMap((n) => n.quiz ?? [])).filter((q) => q.why.trim().length < 30);
     expect(thin.map((q) => q.why)).toEqual([]);

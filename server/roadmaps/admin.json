@@ -20,7 +20,7 @@
             "A type of user license",
             "A named set of tabs and items users open from the App Launcher",
             "A managed package you must install",
-            "A separate database with its own records"
+            "A separate database with its own records and its own users"
           ],
           "answer": 1,
           "why": "Apps are navigation: groups of tabs over the same shared data."
@@ -147,7 +147,7 @@
         {
           "q": "An employee leaves. What do you do with their user?",
           "options": [
-            "Change their profile to read-only and leave it active",
+            "Change their profile to read-only and leave the user active for reference",
             "Delete their records, then the user",
             "Deactivate it (freeze first if you need to block login right away)",
             "Delete the user"
@@ -222,7 +222,7 @@
           "q": "Where can you create a roll-up summary field?",
           "options": [
             "On the master object of a master-detail relationship",
-            "On either side of a lookup",
+            "On either object of a lookup relationship, parent or child",
             "On the detail object",
             "On any object"
           ],
@@ -234,7 +234,7 @@
           "options": [
             "A formula field",
             "A junction object with two master-detail relationships",
-            "Two lookups on Student",
+            "Two lookup fields on Student, each pointing to a Course record",
             "A multi-select picklist"
           ],
           "answer": 1,
@@ -368,7 +368,7 @@
           "q": "Field-level security controls…",
           "options": [
             "Whether a user can see or edit a field",
-            "Which records a user sees",
+            "Which records a user can see in list views",
             "Which picklist values appear",
             "The order of fields on a page"
           ],
@@ -378,7 +378,7 @@
         {
           "q": "What do object permissions NOT control?",
           "options": [
-            "Whether you can delete records",
+            "Whether a user can delete records of that object",
             "Whether you can create records",
             "Whether you can read the object",
             "Which specific records you can see"
@@ -431,7 +431,7 @@
           "q": "A field is required on the page layout only. Is it required for Data Loader imports?",
           "options": [
             "Only for admins",
-            "Yes, always",
+            "Yes, always, for every import tool and API",
             "Only for new records",
             "No, layout-required is UI-only"
           ],
@@ -443,7 +443,7 @@
           "options": [
             "Process Builder",
             "Data Loader",
-            "Schema Builder",
+            "Schema Builder, from the object's page",
             "Lightning App Builder"
           ],
           "answer": 3,
@@ -540,7 +540,7 @@
           "options": [
             "Only for custom objects",
             "No, sharing rules only grant extra access",
-            "Yes",
+            "Yes, a rule can remove access for a group",
             "Only with a permission set"
           ],
           "answer": 1,
@@ -562,7 +562,7 @@
           "options": [
             "The report type",
             "The page layout",
-            "Apex managed sharing",
+            "Apex managed sharing, then the role hierarchy and each sharing rule in turn",
             "Organization-wide defaults, then whether a higher layer grants access"
           ],
           "answer": 3,
@@ -739,7 +739,7 @@
           "q": "Built-in way to schedule regular CSV backups of your data?",
           "options": [
             "Change sets",
-            "Sandbox refresh",
+            "A scheduled sandbox refresh",
             "Dashboards",
             "Data Export Service"
           ],
@@ -797,7 +797,7 @@
             "Home page",
             "Global search",
             "Object Manager",
-            "App Launcher"
+            "App Launcher > Objects"
           ],
           "answer": 2,
           "why": "Object Manager is the home of object configuration."
@@ -862,7 +862,7 @@
         {
           "q": "Escalations should only count working time. What must be set up?",
           "options": [
-            "Login hours",
+            "Login hours for the support profile",
             "Business hours and holidays",
             "Multiple currencies",
             "Fiscal year"
@@ -876,7 +876,7 @@
             "It can't be turned off once enabled",
             "It needs a sandbox refresh",
             "It only affects reports",
-            "It can be turned off any time"
+            "It can be turned off at any time in Setup"
           ],
           "answer": 0,
           "why": "Multi-currency is permanent, so plan before enabling it."
@@ -920,7 +920,7 @@
           "q": "What decides which page layout a user sees?",
           "options": [
             "The record owner",
-            "The app",
+            "The app the user has open when viewing the record",
             "The user's profile and the record's record type",
             "The role"
           ],
@@ -930,7 +930,7 @@
         {
           "q": "You added a picklist value but users can't choose it on some records. Why?",
           "options": [
-            "The field is read-only",
+            "The field is read-only on the page layout for those users",
             "It isn't enabled for those records' record type",
             "The value is too long",
             "It needs a sandbox refresh"
@@ -1084,7 +1084,7 @@
           "options": [
             "Entitlements with milestones",
             "Macros",
-            "Case teams",
+            "Case teams with a response-time role",
             "Queues"
           ],
           "answer": 0,
@@ -1142,7 +1142,7 @@
             "Screen flow",
             "Apex",
             "Approval process",
-            "After-save flow"
+            "After-save flow with a lock step"
           ],
           "answer": 2,
           "why": "Approval processes route for sign-off and lock the record.",
@@ -1164,7 +1164,7 @@
           "q": "What shows users a friendly message when a flow element fails?",
           "options": [
             "A loop",
-            "A subflow",
+            "A subflow that catches errors",
             "A fault path",
             "A decision"
           ],
@@ -1209,7 +1209,7 @@
             "It's locked against editing",
             "It's deleted",
             "Nothing",
-            "It's shared with everyone"
+            "It's shared with everyone in the role"
           ],
           "answer": 0,
           "why": "Pending records are locked; admins and approvers can still edit."
@@ -1284,7 +1284,7 @@
             "A dashboard filter",
             "A joined report",
             "A reporting snapshot",
-            "Field history"
+            "Field history on Amount"
           ],
           "answer": 2,
           "why": "Reporting snapshots store report results on a schedule for trending."
@@ -1336,7 +1336,7 @@
           "options": [
             "A list view",
             "A report",
-            "A new app",
+            "A new Lightning app for field reps with an Account tab",
             "An object-specific quick action on the Account layout"
           ],
           "answer": 3,
@@ -1357,7 +1357,7 @@
           "q": "Which fields does the mobile app highlight at the top of a record?",
           "options": [
             "Formula fields",
-            "Page layout fields",
+            "The first fields on the page layout",
             "Compact layout fields",
             "All required fields"
           ],
@@ -1408,7 +1408,7 @@
           "options": [
             "Every day",
             "Never",
-            "Every 5 days",
+            "Every 5 days, like a Partial Copy",
             "Every 29 days"
           ],
           "answer": 3,
@@ -1456,7 +1456,7 @@
           "q": "Who changed the Opportunity sharing setting last week?",
           "options": [
             "Setup Audit Trail",
-            "Field history",
+            "Field history on the sharing settings",
             "Debug logs",
             "Login History"
           ],
@@ -1466,7 +1466,7 @@
         {
           "q": "You need old and new values of an Account's Rating over time. What do you enable?",
           "options": [
-            "Setup Audit Trail",
+            "Setup Audit Trail for the Account object",
             "Field history tracking on Rating",
             "A validation rule",
             "Feed tracking"
@@ -1543,7 +1543,7 @@
           "options": [
             "Two reports",
             "A junction object with two master-detail relationships, plus a roll-up summary on Course",
-            "A lookup on Course and a formula",
+            "A lookup from Student to Course, plus a formula on Course that counts students",
             "A multi-select picklist"
           ],
           "answer": 1,
