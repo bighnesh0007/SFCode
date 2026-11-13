@@ -114,7 +114,13 @@ describe.skipIf(!safe)("problem drafts on Postgres", () => {
     await expect(svc.decide("rev", d.id, "approve", "")).rejects.toThrow(/Run the check in your own org/);
     await svc.check("rev", d.id);
     await settle(d.id);
+    const told: { userId: string; data: Record<string, string> }[] = [];
+    svc.setNotifier((userId, _kind, data) => {
+      told.push({ userId, data });
+      return Promise.resolve();
+    });
     const approved = await svc.decide("rev", d.id, "approve", "Nice one");
+    expect(told).toEqual([{ userId: "bud", data: expect.objectContaining({ action: "approved", slug: "double-it" }) }]);
     expect(approved).toMatchObject({ status: "approved", publishedSlug: "double-it" });
     const live = catalog.get("double-it");
     expect(live).toMatchObject({ authorId: "bud", title: "Double It" });

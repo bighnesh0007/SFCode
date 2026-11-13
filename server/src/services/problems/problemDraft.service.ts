@@ -54,7 +54,18 @@ function slugify(title: string): string {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "problem";
 }
 
+export type Notifier = (userId: string, kind: "review" | "buddy", data: Record<string, string>) => Promise<void>;
+
 export class ProblemDraftService {
+  private notifier: Notifier | undefined;
+  /** Wired after construction (the social service depends on profiles). Failures never block the action. */
+  setNotifier(fn: Notifier): void {
+    this.notifier = fn;
+  }
+  private tell(userId: string, kind: "review" | "buddy", data: Record<string, string>): void {
+    void this.notifier?.(userId, kind, data).catch(() => undefined);
+  }
+
   constructor(
     private readonly repo: ProblemDraftRepository,
     private readonly catalog: ChallengeCatalog,
@@ -238,6 +249,7 @@ export class ProblemDraftService {
       if (action === "changes" && !cleanNote) throw new BadRequestError("Tell the author what to change.");
       if (!(await this.repo.transition(id, ["submitted"], action === "changes" ? "changes_requested" : "rejected", { reviewedBy: actor, reviewNote: cleanNote }))) throw new ConflictError("Someone else just reviewed this draft.");
       logEvent("problem.reviewed", { id, action, by: actor });
+      this.tell(d.authorId, "review", { draftId: id, title: d.content.title, action: action === "changes" ? "changes" : "rejected" });
       return this.get(actor, id);
     }
 
@@ -255,6 +267,7 @@ export class ProblemDraftService {
     if (!(await this.repo.publish(id, { slug, ord, authorId: d.authorId, approvedBy: actor, content: d.content }, cleanNote))) throw new ConflictError("Someone else just reviewed this draft.");
     this.catalog.add(challenge);
     logEvent("problem.published", { id, slug, by: actor });
+    this.tell(d.authorId, "review", { draftId: id, title: d.content.title, action: "approved", slug, track: d.content.track });
     return this.get(actor, id);
   }
 

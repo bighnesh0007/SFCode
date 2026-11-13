@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { RankBadge } from "@/components/RankBadge";
+import { FollowButton } from "@/components/FollowButton";
 import { AboutCard, AchievementsWall, ContestHistory, RoadmapProgress, ShareButtons, SkillRadar, StatsStrip } from "@/components/profile/Sections";
 import { Flair, accentClass, frameClass } from "@/components/Cosmetics";
 import { useAuthState } from "@/components/auth";
@@ -117,7 +118,10 @@ export function ProfileView({ profile: initial, editable }: { profile: Profile; 
           )}
           {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
         </div>
-        <ShareButtons p={profile} />
+        <div className="flex flex-col items-start gap-2 sm:items-end">
+          <FollowButton handle={profile.handle} />
+          <ShareButtons p={profile} />
+        </div>
       </div>
 
       <StatsStrip p={profile} />

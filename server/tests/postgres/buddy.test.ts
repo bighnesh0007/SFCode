@@ -51,7 +51,13 @@ describe.skipIf(!safe)("Buddy applications on Postgres", () => {
     await buddies.apply("ann", why, "");
     const [app] = await buddies.pending("rev");
     expect(app).toMatchObject({ handle: "ann", motivation: why });
+    const told: { userId: string; data: Record<string, string> }[] = [];
+    buddies.setNotifier((userId, _kind, data) => {
+      told.push({ userId, data });
+      return Promise.resolve();
+    });
     await buddies.decide("rev", app?.id ?? "", true, "Welcome!");
+    expect(told).toEqual([{ userId: "ann", data: { approved: "yes", note: "Welcome!" } }]);
     expect(await admin.standing("ann")).toBe("buddy");
     expect((await buddies.me("ann")).application).toMatchObject({ status: "approved", note: "Welcome!" });
     await expect(buddies.decide("rev", app?.id ?? "", false, "")).rejects.toMatchObject({ status: 409 });

@@ -23,6 +23,8 @@ import { PgBlogRepository } from "./repositories/blog.repository.ts";
 import { BlogService } from "./services/blog/blog.service.ts";
 import { compileLwc } from "./services/lwc/compiler.ts";
 import { LwcSandbox } from "./services/lwc/lwcSandbox.ts";
+import { PgSocialRepository } from "./repositories/social.repository.ts";
+import { SocialService } from "./services/social/social.service.ts";
 import { PgProblemDraftRepository } from "./repositories/problemDraft.repository.ts";
 import { makeOrgChecker } from "./services/problems/orgChecker.ts";
 import { ProblemDraftService } from "./services/problems/problemDraft.service.ts";
@@ -59,6 +61,7 @@ export interface Container {
   points?: PointsService;
   buddies?: BuddyService;
   drafts?: ProblemDraftService;
+  social?: SocialService;
 }
 
 /** server/certification (question banks), resolved like PROBLEMS_DIR. */
@@ -143,7 +146,17 @@ export function buildContainer(): Container {
       grading ? makeOrgChecker(grading, catalog.soqlCompare) : undefined,
       systemClock,
     );
+    container.social = new SocialService(new PgSocialRepository(container.db), new PgProfileRepository(container.db), container.community, new PgChallengeSubmissionRepository(container.db), catalog, container.points ?? new PointsService(undefined, undefined), systemClock);
+    const draftRepoForFeed = new PgProblemDraftRepository(container.db);
+    const blog = container.blog;
+    container.social.setSources({
+      communityProblems: async () => (await draftRepoForFeed.published(true)).map((p) => ({ slug: p.slug, title: p.content.title, track: p.content.track, difficulty: p.content.difficulty, authorId: p.authorId, publishedAt: p.publishedAt })),
+      posts: async () => (blog ? (await blog.list("new")).map((p) => ({ slug: p.slug, title: p.title, authorHandle: p.author.handle, createdAt: p.createdAt })) : []),
+    });
+    const social = container.social;
+    container.drafts.setNotifier((userId, kind, data) => social.notify(userId, kind, data));
     container.buddies = new BuddyService(new PgBuddyRepository(container.db), container.admin, container.community, new PgProfileRepository(container.db));
+    container.buddies.setNotifier((userId, kind, data) => social.notify(userId, kind, data));
     container.community.setCosmeticsSource(container.store);
     const store = container.store;
     const contests = container.contests;
