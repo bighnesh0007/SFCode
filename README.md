@@ -12,7 +12,7 @@ Write Apex, SOQL, Flows and Lightning Web Components, graded by hidden tests in
 *your own* connected org. Follow a roadmap from your first org to certification,
 and compete in weekly contests.
 
-Live at **https://sf.bighnesh.space**
+Live at **https://sf.bighnesh.space**: 51 problems (11 Apex, 9 SOQL, 8 debugging, 6 Flow, 17 LWC), 8 certification banks and 4 roadmaps.
 
 | | |
 |---|---|
@@ -21,12 +21,13 @@ Live at **https://sf.bighnesh.space**
 | **Debugging Arena** | Start from broken Apex: governor limits, recursion, nulls, off-by-ones |
 | **Apex Playground** | Run anonymous Apex in your org and read the debug log |
 | **Flows** | Build record-triggered and autolaunched flows in your org's Flow Builder; hidden Apex tests grade them |
-| **LWC** | Build components in the browser; compiled on the server, tested in a sandboxed iframe |
-| **Certification Prep** | Original questions with explanations for Administrator, Platform App Builder, PD I, PD II and JavaScript Developer I, timed mock exams weighted like the real ones, and a readiness meter |
-| **Roadmaps** | Developer and Admin paths: a one-time welcome quiz places you, steps link real problems, lessons and quizzes, and a weekly plan fits your time |
+| **LWC** | Build components in the browser, from a click counter to undo/redo; compiled on the server and tested in a sandboxed iframe, with no org needed |
+| **Certification Prep** | Original questions with explanations for Administrator, Platform App Builder, PD I, PD II, JavaScript Developer I, Agentforce Sales and Service Consultant and Agentforce Specialist; timed mock exams weighted like the real ones, spaced review, and a readiness meter |
+| **Roadmaps** | Developer, Admin, LWC and Integration paths: a one-time welcome quiz places you, steps link real problems, lessons, diagrams and quizzes, and a weekly plan fits your time |
+| **Interview mode** | A random timed set of problems with a scorecard, like a technical screen; "Explain my error" turns compile and test failures into plain English |
 | **Daily Challenge** | One problem a day for everyone, with bonus coins and a streak |
 | **Contests** | Timed rounds with live standings; the top three win coins |
-| **Community** | Profiles with streaks, achievements and a skill radar, a leaderboard, a blog, and a coin store for cosmetics |
+| **Community** | Profiles with streaks, achievements and a skill radar; leaderboards by points, contest rating, team and country; discussions on every problem; a blog; and a coin store for cosmetics |
 
 ## Contributing
 

@@ -150,3 +150,10 @@ The test file defines `const tests = [...]`. Each test is
 - Prove it in a browser: open the problem, put the reference in the editor, and
   check **Run tests** passes; with the starter it must fail. (`verify:problems`
   only checks that both compile.)
+- Or prove it in the grading container, which is what **Submit** uses: with Docker,
+  `SFC_TEST_LWC_IMAGE=<the sfcode-lwc-runner image> npx vitest run tests/lwcSandbox.docker.test.ts`
+  grades every LWC problem's reference (must pass every hidden test) and starter
+  (must fail one). Then break your reference on purpose and check a test catches it.
+- A whole test file must finish in **8 seconds**. For timers, add an `@api` property
+  for the interval (default the real value) and use a short one in most tests; see
+  `lwc-countdown`.

@@ -32,5 +32,11 @@ The bank is validated at startup.
 - **`section`** must be one of the exam's `sections`.
 - **Explain.** The explanation is where people learn. One or two sentences on why
   the answer is right and why the tempting wrong options are wrong.
+- **Don't let length or position give it away.** Write the wrong options as fully and
+  specifically as the right one: if the right answer is usually the longest, people
+  pass by guessing. Vary which letter is correct. `npm test` fails a bank where one
+  letter holds more than 40% of the answers or the right answer is the longest
+  option in more than 40% of questions. Keep the explanation's opening words out of
+  the prompt and options too: a test checks that answers can't leak.
 
 Run `npm test` to validate the bank.
