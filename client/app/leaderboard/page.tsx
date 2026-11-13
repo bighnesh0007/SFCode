@@ -169,7 +169,7 @@ function EmptyBoard({ board, window, track }: { board: Board; window: Leaderboar
   const where = [track !== "all" ? TRACKS.find((t) => t.id === track)?.label : null, window === "7d" ? "this week" : window === "30d" ? "in the last 30 days" : null].filter(Boolean).join(" ");
   return (
     <div className="mt-6 flex flex-col items-center rounded-lg border border-dashed px-6 py-14 text-center">
-      {board === "points" ? <Trophy className="h-10 w-10 text-amber-500" aria-hidden="true" /> : <Swords className="h-10 w-10 text-sky-500" aria-hidden="true" />}
+      {board === "points" ? <Trophy className="h-10 w-10 text-amber-700 dark:text-amber-400" aria-hidden="true" /> : <Swords className="h-10 w-10 text-sky-700 dark:text-sky-400" aria-hidden="true" />}
       <p className="mt-4 font-semibold">{board === "points" ? `No solves yet${where ? ` ${where}` : ""}.` : "No contest results yet."}</p>
       <p className="mt-1 max-w-sm text-sm text-muted-foreground">
         {board === "points" ? "Solve a problem and your name goes here. The top spot is open." : "Ratings appear after the first contest with at least two entrants finishes."}

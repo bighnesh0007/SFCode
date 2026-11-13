@@ -179,15 +179,15 @@ export function ProblemsHub() {
                   <tr key={c.slug} className={cn("border-t transition-colors hover:bg-accent/60", i % 2 === 1 && "bg-muted/25")}>
                     <td className="py-3 pl-4">
                       {c.progress === "solved" ? (
-                        <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-500" aria-label="Solved" />
+                        <CheckCircle2 className="h-4 w-4 text-green-700 dark:text-green-500" aria-label="Solved" />
                       ) : c.progress === "attempted" ? (
-                        <CircleDot className="h-4 w-4 text-amber-500" aria-label="Attempted" />
+                        <CircleDot className="h-4 w-4 text-amber-700 dark:text-amber-400" aria-label="Attempted" />
                       ) : null}
                     </td>
                     <td className="py-3 pr-3">
                       <Link href={`${info.base}/${c.slug}`} title={c.title} className="block truncate font-medium hover:text-primary">
                         {c.title}
-                        {c.community && <span className="ml-2 rounded-full bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-medium text-sky-600 dark:text-sky-400">Community</span>}
+                        {c.community && <span className="ml-2 rounded-full bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-medium text-sky-700 dark:text-sky-400">Community</span>}
                       </Link>
                     </td>
                     <td className="hidden truncate py-3 pr-3 text-muted-foreground sm:table-cell">{c.category}</td>

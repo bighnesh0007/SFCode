@@ -38,7 +38,7 @@ export default function NewDraftPage() {
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
         {TRACKS.map((t) => (
           <button key={t.id} type="button" disabled={busy} onClick={() => void start(t.id)} className="rounded-xl border p-4 text-left transition-all hover:-translate-y-0.5 hover:border-sky-500/60 hover:shadow-md disabled:opacity-50">
-            <t.icon className="h-5 w-5 text-sky-500" />
+            <t.icon className="h-5 w-5 text-sky-700 dark:text-sky-400" />
             <h2 className="mt-2 font-semibold">{t.title}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{t.body}</p>
           </button>

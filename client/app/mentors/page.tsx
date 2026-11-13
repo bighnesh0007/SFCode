@@ -43,7 +43,7 @@ export default function MentorsPage() {
   const shown = (mentors ?? []).filter((m) => !topic || m.topics.includes(topic));
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-10">
-      <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight"><HeartHandshake className="h-6 w-6 text-emerald-500" /> Mentors</h1>
+      <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight"><HeartHandshake className="h-6 w-6 text-emerald-700 dark:text-emerald-400" /> Mentors</h1>
       <p className="mt-1 text-sm text-muted-foreground">Learners at Ranger rank and above who offer to help. Ask a short question; it arrives in their notifications.</p>
 
       <div className="mt-5 flex flex-wrap gap-1.5">

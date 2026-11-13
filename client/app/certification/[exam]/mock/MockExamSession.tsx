@@ -208,7 +208,7 @@ export function MockExamSession({ exam }: { exam: string }) {
                     return n;
                   })
                 }
-                className={cn("flex items-center gap-1 rounded-md px-2 py-1 hover:bg-accent", flagged.has(q.id) && "text-amber-600 dark:text-amber-400")}
+                className={cn("flex items-center gap-1 rounded-md px-2 py-1 hover:bg-accent", flagged.has(q.id) && "text-amber-700 dark:text-amber-400")}
               >
                 <Flag className="h-3.5 w-3.5" /> {flagged.has(q.id) ? "Flagged" : "Flag for review"}
               </button>
@@ -295,7 +295,7 @@ function Results({ mock, answers, result, usedMs }: { mock: MockExam; answers: R
   return (
     <div className="container mx-auto max-w-3xl space-y-8 px-4 py-10">
       <div className={cn("rounded-xl border p-6 text-center sm:p-8", result.passed ? "border-emerald-500/40 bg-emerald-500/5" : "border-red-500/40 bg-red-500/5")}>
-        <p className={cn("text-sm font-semibold uppercase tracking-wide", result.passed ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400")}>
+        <p className={cn("text-sm font-semibold uppercase tracking-wide", result.passed ? "text-emerald-700 dark:text-emerald-400" : "text-red-600 dark:text-red-400")}>
           {result.passed ? "Pass" : "Not yet"}
         </p>
         <p className="mt-1 text-5xl font-bold tabular-nums">{result.score}%</p>
@@ -343,7 +343,7 @@ function Results({ mock, answers, result, usedMs }: { mock: MockExam; answers: R
             return (
               <li key={q.id} className="rounded-xl border p-4">
                 <div className="mb-2 flex items-center gap-2 text-sm font-medium">
-                  {r?.correct ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
+                  {r?.correct ? <CheckCircle2 className="h-4 w-4 text-green-700 dark:text-green-400" /> : <XCircle className="h-4 w-4 text-red-500" />}
                   Question {mock.questions.indexOf(q) + 1}
                   {picked.length === 0 && <span className="text-xs font-normal text-muted-foreground">(unanswered)</span>}
                 </div>

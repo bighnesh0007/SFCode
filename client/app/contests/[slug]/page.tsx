@@ -88,7 +88,7 @@ export default function ContestPage({ params }: { params: Promise<{ slug: string
           {!isSignedIn ? (
             <span className="text-muted-foreground">Sign in to join.</span>
           ) : contest.joined ? (
-            <span className="inline-flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400"><Check className="h-4 w-4" /> You&apos;re in. Submissions to these problems during the contest count automatically.</span>
+            <span className="inline-flex items-center gap-1.5 font-medium text-emerald-700 dark:text-emerald-400"><Check className="h-4 w-4" /> You&apos;re in. Submissions to these problems during the contest count automatically.</span>
           ) : (
             <div className="flex flex-wrap items-center gap-3">
               <Button size="sm" onClick={() => void join()}>Join contest</Button>
@@ -144,7 +144,7 @@ export default function ContestPage({ params }: { params: Promise<{ slug: string
                   return (
                     <td key={p.slug} className="py-2.5 text-center text-xs tabular-nums">
                       {cell?.solved ? (
-                        <span className="text-emerald-600 dark:text-emerald-400">+{cell.wrong || ""}<br />{cell.minutes}m</span>
+                        <span className="text-emerald-700 dark:text-emerald-400">+{cell.wrong || ""}<br />{cell.minutes}m</span>
                       ) : cell && cell.wrong > 0 ? (
                         <span className="text-destructive">−{cell.wrong}</span>
                       ) : (

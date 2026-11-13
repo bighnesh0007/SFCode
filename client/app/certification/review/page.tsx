@@ -38,7 +38,7 @@ export default function ReviewPage() {
   if (queue.due.length === 0)
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <BrainCircuit className="mx-auto h-10 w-10 text-sky-500" />
+        <BrainCircuit className="mx-auto h-10 w-10 text-sky-700 dark:text-sky-400" />
         <h1 className="mt-3 text-xl font-semibold">Nothing due right now</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {queue.upcoming > 0 && queue.nextDueAt

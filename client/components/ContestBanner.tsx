@@ -50,7 +50,7 @@ export function ContestBanner() {
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-500 opacity-75 motion-reduce:animate-none" />
           <span className="relative inline-flex h-2 w-2 rounded-full bg-orange-500" />
         </span>
-        <Trophy className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+        <Trophy className="h-4 w-4 text-amber-700 dark:text-amber-400" />
         <span className="min-w-0 flex-1 truncate">
           <b>{c.title}</b> {live ? `is live · ${fmt(Date.parse(c.endsAt) - now)} left` : `starts in ${fmt(Date.parse(c.startsAt) - now)}`} · {c.entrants} joined
         </span>

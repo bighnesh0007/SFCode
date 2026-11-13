@@ -344,7 +344,7 @@ function Applications() {
             <span className="ml-auto text-xs text-muted-foreground">{new Date(a.createdAt).toLocaleString()}</span>
           </div>
           <p className="mt-2 whitespace-pre-line text-sm">{a.motivation}</p>
-          {a.link && <a href={a.link} target="_blank" rel="noopener noreferrer nofollow" className="mt-1 inline-block text-xs text-sky-600 hover:underline dark:text-sky-400">{a.link}</a>}
+          {a.link && <a href={a.link} target="_blank" rel="noopener noreferrer nofollow" className="mt-1 inline-block text-xs text-sky-700 hover:underline dark:text-sky-400">{a.link}</a>}
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <input aria-label="Note to the applicant" placeholder="Optional note to the applicant" maxLength={500} value={notes[a.id] ?? ""} onChange={(e) => setNotes((n) => ({ ...n, [a.id]: e.target.value }))} className="h-8 min-w-[14rem] flex-1 rounded-md border bg-background px-2 text-sm" />
             <Button size="sm" onClick={() => void decide(a.id, true)}><Check className="mr-1 h-3.5 w-3.5" /> Approve</Button>

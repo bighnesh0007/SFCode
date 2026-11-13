@@ -11,19 +11,19 @@ import { trackInfo } from "@/lib/tracks";
 import { cn } from "@/lib/utils";
 
 const ICON = { solve: CheckCircle2, rank: Sparkles, problem: PenLine, post: Newspaper } as const;
-const TONE = { solve: "text-emerald-500", rank: "text-amber-500", problem: "text-sky-500", post: "text-violet-500" } as const;
+const TONE = { solve: "text-emerald-700 dark:text-emerald-400", rank: "text-amber-700 dark:text-amber-400", problem: "text-sky-700 dark:text-sky-400", post: "text-violet-500" } as const;
 
 function Line({ item }: { item: FeedItem }) {
   const who = <Link href={`/u/${item.actor.handle}`} className="font-medium hover:underline">{item.actor.displayName}</Link>;
   switch (item.kind) {
     case "solve":
-      return <>{who} solved <Link href={`${trackInfo(item.problem.track as Track).base}/${item.problem.slug}`} className="font-medium text-sky-600 hover:underline dark:text-sky-400">{item.problem.title}</Link> <span className="text-muted-foreground">· {trackInfo(item.problem.track as Track).label} {item.problem.difficulty}</span></>;
+      return <>{who} solved <Link href={`${trackInfo(item.problem.track as Track).base}/${item.problem.slug}`} className="font-medium text-sky-700 hover:underline dark:text-sky-400">{item.problem.title}</Link> <span className="text-muted-foreground">· {trackInfo(item.problem.track as Track).label} {item.problem.difficulty}</span></>;
     case "rank":
       return <>{who} reached <b>{item.rank.title}</b> 🎉</>;
     case "problem":
-      return <>{who} published a community problem: <Link href={`${trackInfo(item.problem.track as Track).base}/${item.problem.slug}`} className="font-medium text-sky-600 hover:underline dark:text-sky-400">{item.problem.title}</Link></>;
+      return <>{who} published a community problem: <Link href={`${trackInfo(item.problem.track as Track).base}/${item.problem.slug}`} className="font-medium text-sky-700 hover:underline dark:text-sky-400">{item.problem.title}</Link></>;
     case "post":
-      return <>{who} wrote <Link href={`/blog/${item.post.slug}`} className="font-medium text-sky-600 hover:underline dark:text-sky-400">{item.post.title}</Link></>;
+      return <>{who} wrote <Link href={`/blog/${item.post.slug}`} className="font-medium text-sky-700 hover:underline dark:text-sky-400">{item.post.title}</Link></>;
   }
 }
 

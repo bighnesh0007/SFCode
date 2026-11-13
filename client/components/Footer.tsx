@@ -21,13 +21,13 @@ export function Footer() {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
         <div>
           <Link href="/" className="flex items-center gap-2 font-semibold">
-            <LogoMark size={28} /> <span>SF<span className="text-sky-500">Code</span></span>
+            <LogoMark size={28} /> <span>SF<span className="text-sky-700 dark:text-sky-400">Code</span></span>
           </Link>
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">Open-source, LeetCode-style practice for Salesforce developers and admins, graded in real orgs.</p>
         </div>
         {COLUMNS.map((c) => (
           <nav key={c.title} aria-label={c.title}>
-            <h3 className="text-sm font-semibold">{c.title}</h3>
+            <h2 className="text-sm font-semibold">{c.title}</h2>
             <ul className="mt-3 space-y-2 text-sm">
               {c.links.map((l) => (
                 <li key={l.href}>

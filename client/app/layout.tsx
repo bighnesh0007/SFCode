@@ -26,12 +26,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
         <body className="min-h-full flex flex-col bg-background text-foreground">
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <a href="#main" className="sr-only rounded-md bg-background px-3 py-2 text-sm font-medium shadow focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100]">
+              Skip to content
+            </a>
             <Navbar />
             <AnnouncementBanner />
             <ContestBanner />
             <OnboardingGate />
             <RankWatcher />
-            <main className="flex-1 flex flex-col">{children}</main>
+            <main id="main" tabIndex={-1} className="flex-1 flex flex-col outline-none">{children}</main>
             <Footer />
           </ThemeProvider>
         </body>

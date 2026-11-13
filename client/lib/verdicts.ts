@@ -12,18 +12,18 @@ export const STATUS_LABEL: Record<SubmissionStatus, string> = {
 
 export const STATUS_CLASS: Record<SubmissionStatus, string> = {
   running: "text-muted-foreground",
-  accepted: "text-green-600 dark:text-green-400",
+  accepted: "text-green-700 dark:text-green-400",
   wrong_answer: "text-red-600 dark:text-red-400",
-  compile_error: "text-amber-600 dark:text-amber-400",
-  coverage: "text-amber-600 dark:text-amber-400",
+  compile_error: "text-amber-700 dark:text-amber-400",
+  coverage: "text-amber-700 dark:text-amber-400",
   error: "text-red-600 dark:text-red-400",
 };
 
 // Difficulty ids and their tones come from the server's registry; only the
 // tone → colour mapping lives here.
 export const TONE_TEXT: Record<Tone, string> = {
-  green: "text-green-600 dark:text-green-400",
-  amber: "text-amber-600 dark:text-amber-400",
+  green: "text-green-700 dark:text-green-400",
+  amber: "text-amber-700 dark:text-amber-400",
   red: "text-red-600 dark:text-red-400",
 };
 export const TONE_ACCENT: Record<Tone, string> = {

@@ -29,10 +29,10 @@ const STATE_LABEL: Record<NodeState, string> = { done: "Done", assumed: "You kno
 
 function StateIcon({ state, className }: { state: NodeState; className?: string }) {
   const c = cn("h-4 w-4 shrink-0", className);
-  if (state === "done") return <Check className={cn(c, "text-emerald-500")} />;
+  if (state === "done") return <Check className={cn(c, "text-emerald-700 dark:text-emerald-400")} />;
   if (state === "assumed") return <SkipForward className={c} />;
   if (state === "locked") return <Lock className={c} />;
-  return <CircleDashed className={cn(c, state === "in_progress" ? "text-sky-500" : "")} />;
+  return <CircleDashed className={cn(c, state === "in_progress" ? "text-sky-700 dark:text-sky-400" : "")} />;
 }
 
 function ProgressRing({ done, total }: { done: number; total: number }) {
@@ -179,7 +179,7 @@ export default function RoadmapPage() {
                 <span className="flex items-center gap-1.5 text-sm font-semibold">
                   <StateIcon state={n.state} />
                   <span className="truncate">{n.title}</span>
-                  {n.struggling && <TriangleAlert className="ml-auto h-3.5 w-3.5 text-amber-500" aria-label="Needs a revisit" />}
+                  {n.struggling && <TriangleAlert className="ml-auto h-3.5 w-3.5 text-amber-700 dark:text-amber-400" aria-label="Needs a revisit" />}
                 </span>
                 <span className="mt-1 line-clamp-2 text-xs text-muted-foreground">{n.summary}</span>
                 {n.problems.length > 0 && (
@@ -252,7 +252,7 @@ function NodePanel({ node, view, onClose, onChange }: { node: RoadmapNode; view:
               {node.problems.map((p) => (
                 <li key={p.slug}>
                   <Link href={`${trackInfo(p.track as Track).base}/${p.slug}`} className="flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-accent/60">
-                    {p.status === "solved" ? <Check className="h-4 w-4 text-emerald-500" /> : p.status === "attempted" ? <TriangleAlert className="h-4 w-4 text-amber-500" /> : <CircleDashed className="h-4 w-4 text-muted-foreground" />}
+                    {p.status === "solved" ? <Check className="h-4 w-4 text-emerald-700 dark:text-emerald-400" /> : p.status === "attempted" ? <TriangleAlert className="h-4 w-4 text-amber-700 dark:text-amber-400" /> : <CircleDashed className="h-4 w-4 text-muted-foreground" />}
                     <span className="min-w-0 flex-1 truncate">{p.title}</span>
                     <span className="text-xs text-muted-foreground">{trackInfo(p.track as Track).label} · {p.difficulty}</span>
                   </Link>
@@ -264,7 +264,7 @@ function NodePanel({ node, view, onClose, onChange }: { node: RoadmapNode; view:
 
         {node.cert && (
           <Link href={`/certification/${node.cert.exam}${node.cert.section ? `?section=${node.cert.section}` : ""}`} className="mt-5 flex items-center gap-2 rounded-lg border p-3 text-sm hover:bg-accent/60">
-            <GraduationCap className="h-4 w-4 text-sky-500" /> Practise {node.cert.exam.toUpperCase()} questions{node.cert.section ? ` on ${node.cert.section}` : ""} <ArrowRight className="ml-auto h-4 w-4" />
+            <GraduationCap className="h-4 w-4 text-sky-700 dark:text-sky-400" /> Practise {node.cert.exam.toUpperCase()} questions{node.cert.section ? ` on ${node.cert.section}` : ""} <ArrowRight className="ml-auto h-4 w-4" />
           </Link>
         )}
 
@@ -305,7 +305,7 @@ function Quiz({ node, view, onChange }: { node: RoadmapNode; view: RoadmapView; 
 
   return (
     <section className="mt-6">
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Quiz {node.state === "done" && <span className="ml-1 normal-case text-emerald-600 dark:text-emerald-400">· passed</span>}</h3>
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Quiz {node.state === "done" && <span className="ml-1 normal-case text-emerald-700 dark:text-emerald-400">· passed</span>}</h3>
       <ol className="mt-2 space-y-4">
         {questions.map((q, i) => {
           const r = result?.results[i];
@@ -323,7 +323,7 @@ function Quiz({ node, view, onChange }: { node: RoadmapNode; view: RoadmapView; 
                   );
                 })}
               </div>
-              {r && <p className={cn("mt-1 text-xs", r.correct ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")}>{r.correct ? "Correct. " : "Not quite. "}{r.why}</p>}
+              {r && <p className={cn("mt-1 text-xs", r.correct ? "text-emerald-700 dark:text-emerald-400" : "text-muted-foreground")}>{r.correct ? "Correct. " : "Not quite. "}{r.why}</p>}
             </li>
           );
         })}

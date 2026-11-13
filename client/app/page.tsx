@@ -11,10 +11,10 @@ import { TerminalDemo } from "@/components/home/TerminalDemo";
 import { buttonVariants } from "@/components/ui/button";
 
 const TRACKS = [
-  { icon: Code2, label: "Apex", href: "/problems?track=apex", tone: "text-sky-500" },
-  { icon: Database, label: "SOQL", href: "/problems?track=soql", tone: "text-emerald-500" },
+  { icon: Code2, label: "Apex", href: "/problems?track=apex", tone: "text-sky-700 dark:text-sky-400" },
+  { icon: Database, label: "SOQL", href: "/problems?track=soql", tone: "text-emerald-700 dark:text-emerald-400" },
   { icon: Bug, label: "Debugging", href: "/problems?track=debug", tone: "text-rose-500" },
-  { icon: Workflow, label: "Flows", href: "/problems?track=flow", tone: "text-amber-500" },
+  { icon: Workflow, label: "Flows", href: "/problems?track=flow", tone: "text-amber-700 dark:text-amber-400" },
   { icon: Zap, label: "LWC", href: "/problems?track=lwc", tone: "text-violet-500" },
 ];
 
@@ -28,7 +28,7 @@ const STEPS = [
 function SectionTitle({ eyebrow, title, body }: { eyebrow: string; title: string; body: string }) {
   return (
     <div className="mx-auto max-w-2xl text-center">
-      <p className="text-xs font-semibold uppercase tracking-widest text-sky-600 dark:text-sky-400">{eyebrow}</p>
+      <p className="text-xs font-semibold uppercase tracking-widest text-sky-700 dark:text-sky-400">{eyebrow}</p>
       <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h2>
       <p className="mt-3 text-muted-foreground">{body}</p>
     </div>
@@ -44,7 +44,7 @@ export default function Home() {
         <div aria-hidden className="pointer-events-none absolute -left-40 top-0 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl" />
         <div className="relative mx-auto grid w-full max-w-6xl items-center gap-8 px-4 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:py-24">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full border bg-background/70 px-3 py-1 text-xs font-medium text-sky-600 backdrop-blur dark:text-sky-400">
+            <p className="inline-flex items-center gap-2 rounded-full border bg-background/70 px-3 py-1 text-xs font-medium text-sky-700 backdrop-blur dark:text-sky-400">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> Open-source practice for the Salesforce community
             </p>
             <h1 className="mt-4 max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
@@ -101,7 +101,7 @@ export default function Home() {
                   </span>
                 ))}
               </div>
-              <span className="mt-6 inline-flex items-center gap-1 text-sm font-medium text-sky-600 dark:text-sky-400">Browse problems <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
+              <span className="mt-6 inline-flex items-center gap-1 text-sm font-medium text-sky-700 dark:text-sky-400">Browse problems <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
             </SpotlightCard>
             <SpotlightCard href="/roadmap" className="md:col-span-2">
               <MapIcon className="h-6 w-6 text-indigo-500" />
@@ -114,17 +114,17 @@ export default function Home() {
               <p className="mt-1 text-sm text-muted-foreground">Timed rounds, live standings, coins for the podium.</p>
             </SpotlightCard>
             <SpotlightCard href="/certification" className="md:col-span-2">
-              <GraduationCap className="h-6 w-6 text-emerald-500" />
+              <GraduationCap className="h-6 w-6 text-emerald-700 dark:text-emerald-400" />
               <h3 className="mt-3 font-semibold">Certification prep</h3>
               <p className="mt-1 text-sm text-muted-foreground">PD I and PD II questions with explanations and a readiness meter.</p>
             </SpotlightCard>
             <SpotlightCard href="/playground/apex" className="md:col-span-2">
-              <Terminal className="h-6 w-6 text-sky-500" />
+              <Terminal className="h-6 w-6 text-sky-700 dark:text-sky-400" />
               <h3 className="mt-3 font-semibold">Apex playground</h3>
               <p className="mt-1 text-sm text-muted-foreground">Run anonymous Apex in your org and read the debug log.</p>
             </SpotlightCard>
             <SpotlightCard href="/leaderboard" className="md:col-span-2">
-              <Trophy className="h-6 w-6 text-amber-500" />
+              <Trophy className="h-6 w-6 text-amber-700 dark:text-amber-400" />
               <h3 className="mt-3 font-semibold">Ranks and leaderboard</h3>
               <p className="mt-1 text-sm text-muted-foreground">Novice to Legend, achievements, streaks and a profile worth sharing.</p>
             </SpotlightCard>
@@ -134,13 +134,13 @@ export default function Home() {
         {/* ── How grading works: timeline + terminal ─────────────────────── */}
         <section className="grid items-center gap-10 py-16 lg:grid-cols-2">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-sky-600 dark:text-sky-400">How it works</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-sky-700 dark:text-sky-400">How it works</p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight">Graded the way production is</h2>
             <ol className="relative mt-8 space-y-8 border-l border-border pl-8">
               <span aria-hidden className="absolute -left-px top-0 h-full w-px bg-gradient-to-b from-sky-500 via-indigo-500 to-transparent" />
               {STEPS.map((s, i) => (
                 <li key={s.title} className="relative">
-                  <span className="absolute -left-[45px] grid h-7 w-7 place-items-center rounded-full border bg-background text-xs font-semibold text-sky-600 shadow-sm dark:text-sky-400">{i + 1}</span>
+                  <span className="absolute -left-[45px] grid h-7 w-7 place-items-center rounded-full border bg-background text-xs font-semibold text-sky-700 shadow-sm dark:text-sky-400">{i + 1}</span>
                   <h3 className="font-semibold">{s.title}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{s.body}</p>
                 </li>

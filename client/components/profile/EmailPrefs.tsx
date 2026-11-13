@@ -32,7 +32,7 @@ export function EmailPrefs() {
           }}
         />
         <span>
-          <span className="flex items-center gap-1.5 text-sm font-semibold"><Mail className="h-4 w-4 text-sky-500" /> Weekly digest email</span>
+          <span className="flex items-center gap-1.5 text-sm font-semibold"><Mail className="h-4 w-4 text-sky-700 dark:text-sky-400" /> Weekly digest email</span>
           <span className="block text-xs text-muted-foreground">
             One email on Mondays: your rank, streak, the Daily Challenge and upcoming contests. Off unless you turn it on.
             {!prefs.available && " (Email isn't switched on for this site yet; your choice is saved.)"}

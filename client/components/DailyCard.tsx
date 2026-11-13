@@ -59,7 +59,7 @@ export function DailyCard({ compact = false }: { compact?: boolean }) {
         {done ? <Check className="h-6 w-6" /> : <CalendarCheck className="h-6 w-6" />}
       </span>
       <div className="min-w-[12rem] flex-1">
-        <div className="text-xs font-medium uppercase tracking-wide text-sky-600 dark:text-sky-400">Daily Challenge · {daily.day}</div>
+        <div className="text-xs font-medium uppercase tracking-wide text-sky-700 dark:text-sky-400">Daily Challenge · {daily.day}</div>
         <div className="truncate font-semibold">{daily.problem.title}</div>
         <div className="text-xs text-muted-foreground">
           {info.label} · {daily.problem.difficulty} · {done ? "Solved today. Come back tomorrow!" : `+${daily.bonus} bonus coins if you solve it today`}

@@ -12,9 +12,9 @@ import { applyForBuddy, getMyContributorStatus, type MyContributorStatus } from 
 import { cn } from "@/lib/utils";
 
 const ROLES = [
-  { icon: Crown, title: "Admins", body: "Run SFCode: roles, points, publishing. One or two people.", tone: "text-amber-500" },
-  { icon: ShieldCheck, title: "Reviewers", body: "Review submitted problems (approve, request changes, reject) and keep the community friendly.", tone: "text-sky-500" },
-  { icon: HeartHandshake, title: "Buddies", body: "Write problems for everyone to practise, help people out, and flag spam. Anyone can apply.", tone: "text-emerald-500" },
+  { icon: Crown, title: "Admins", body: "Run SFCode: roles, points, publishing. One or two people.", tone: "text-amber-700 dark:text-amber-400" },
+  { icon: ShieldCheck, title: "Reviewers", body: "Review submitted problems (approve, request changes, reject) and keep the community friendly.", tone: "text-sky-700 dark:text-sky-400" },
+  { icon: HeartHandshake, title: "Buddies", body: "Write problems for everyone to practise, help people out, and flag spam. Anyone can apply.", tone: "text-emerald-700 dark:text-emerald-400" },
 ];
 
 function MyDrafts() {
@@ -38,7 +38,7 @@ function MyDrafts() {
           <Link href={`/contribute/drafts/${r.id}`} className="flex items-center gap-3 px-3 py-2 hover:bg-accent/60">
             <span className="min-w-0 flex-1 truncate font-medium">{r.title}</span>
             <span className="text-xs text-muted-foreground">{r.track} · {r.difficulty}</span>
-            <span className={cn("rounded-full border px-2 py-0.5 text-xs", r.status === "approved" && "border-emerald-500/50 text-emerald-600", r.status === "changes_requested" && "border-amber-500/50 text-amber-600")}>{STATUS_TEXT[r.status]}</span>
+            <span className={cn("rounded-full border px-2 py-0.5 text-xs", r.status === "approved" && "border-emerald-500/50 text-emerald-700 dark:text-emerald-400", r.status === "changes_requested" && "border-amber-500/50 text-amber-700 dark:text-amber-400")}>{STATUS_TEXT[r.status]}</span>
           </Link>
         </li>
       ))}
@@ -84,7 +84,7 @@ export default function ContributePage() {
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-10">
-      <p className="text-sm font-medium text-sky-600 dark:text-sky-400">Contribute</p>
+      <p className="text-sm font-medium text-sky-700 dark:text-sky-400">Contribute</p>
       <h1 className="mt-1 text-3xl font-semibold tracking-tight">Help build SFCode</h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
         SFCode grows through its community. Buddies write the problems other Salesforce developers practise on; reviewers make sure every
@@ -120,7 +120,7 @@ export default function ContributePage() {
           </div>
         ) : role ? (
           <div className="flex items-start gap-3">
-            <BadgeCheck className="h-6 w-6 text-emerald-500" />
+            <BadgeCheck className="h-6 w-6 text-emerald-700 dark:text-emerald-400" />
             <div>
               <p className="font-semibold">You&apos;re a{role === "admin" || role === "owner" ? "n" : ""} {role === "owner" ? "owner" : role}.</p>
               <p className="mt-1 text-sm text-muted-foreground">Write a problem, test it in your org, and submit it for review.{role !== "buddy" && " Review tools are in the Admin area."}</p>

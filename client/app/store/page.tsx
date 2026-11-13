@@ -76,7 +76,7 @@ export default function StorePage() {
         </div>
         {wallet && (
           <div className="flex items-center gap-2 rounded-lg border px-3 py-2" title={`${wallet.earnedFromSolves} from solves + ${wallet.earnedFromContests} from contests + ${wallet.earnedFromDaily} from Daily Challenges − ${wallet.spent} spent`}>
-            <Coins className="h-4 w-4 text-amber-500" />
+            <Coins className="h-4 w-4 text-amber-700 dark:text-amber-400" />
             <span className="text-lg font-semibold tabular-nums">{wallet.balance}</span>
             <span className="text-xs text-muted-foreground">coins</span>
           </div>
@@ -96,7 +96,7 @@ export default function StorePage() {
                 <div className="mt-2 font-medium">{item.name}</div>
                 <p className="text-xs text-muted-foreground">{item.description}</p>
                 <div className="mt-auto flex items-center justify-between pt-3">
-                  <span className="inline-flex items-center gap-1 text-sm font-medium tabular-nums"><Coins className="h-3.5 w-3.5 text-amber-500" />{item.price}</span>
+                  <span className="inline-flex items-center gap-1 text-sm font-medium tabular-nums"><Coins className="h-3.5 w-3.5 text-amber-700 dark:text-amber-400" />{item.price}</span>
                   {!isSignedIn ? null : item.owned ? (
                     <Button size="sm" variant={item.equipped ? "secondary" : "outline"} disabled={busy === item.id} onClick={() => void act(item.id, (t) => equipItem(t, item.id, !item.equipped))}>
                       {item.equipped ? "Unequip" : "Equip"}
@@ -119,13 +119,13 @@ function FreezeCard({ view, busy, signedIn, onBuy }: { view: StoreView; busy: st
   const full = f.available >= f.max;
   return (
     <section className="mt-8 flex flex-wrap items-center gap-4 rounded-xl border border-sky-500/30 bg-gradient-to-r from-sky-500/10 via-cyan-500/5 to-transparent p-5">
-      <span className="grid h-12 w-12 place-items-center rounded-xl bg-sky-500/15 text-sky-600 dark:text-sky-300"><Snowflake className="h-6 w-6" /></span>
+      <span className="grid h-12 w-12 place-items-center rounded-xl bg-sky-500/15 text-sky-700 dark:text-sky-300"><Snowflake className="h-6 w-6" /></span>
       <div className="min-w-[14rem] flex-1">
         <h2 className="font-semibold">{f.name}</h2>
         <p className="text-sm text-muted-foreground">{f.description} Hold up to {f.max}.</p>
         {signedIn && <p className="mt-1 text-xs text-muted-foreground">You have <b>{f.available}</b> ready{f.owned > f.available ? ` (${f.owned - f.available} already saved your streak)` : ""}.</p>}
       </div>
-      <span className="inline-flex items-center gap-1 text-sm font-medium tabular-nums"><Coins className="h-3.5 w-3.5 text-amber-500" />{f.price}</span>
+      <span className="inline-flex items-center gap-1 text-sm font-medium tabular-nums"><Coins className="h-3.5 w-3.5 text-amber-700 dark:text-amber-400" />{f.price}</span>
       {signedIn && (
         <Button size="sm" disabled={busy !== null || full || (view.wallet ? view.wallet.balance < f.price : true)} onClick={onBuy}>
           {full ? "Fully stocked" : "Buy freeze"}

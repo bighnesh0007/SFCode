@@ -65,7 +65,7 @@ export default function TeamPage({ params }: { params: Promise<{ slug: string }>
             <span className={cn("w-6 tabular-nums", m.place <= 3 ? "font-semibold" : "text-muted-foreground")}>{m.place}</span>
             <Avatar src={m.imageUrl} name={m.displayName} size={28} />
             <Link href={`/u/${m.handle}`} className="min-w-0 flex-1 truncate font-medium hover:text-primary">{m.displayName}</Link>
-            {m.owner && <Crown className="h-3.5 w-3.5 text-amber-500" />}
+            {m.owner && <Crown className="h-3.5 w-3.5 text-amber-700 dark:text-amber-400" />}
             <RankBadge id={m.tier.id} title={m.tier.title} size="sm" className="hidden sm:inline-flex" />
             <span className="w-16 text-right font-semibold tabular-nums">{m.points} pts</span>
             {team.owner && !m.owner && <button type="button" className="text-xs text-muted-foreground hover:text-destructive" onClick={() => void act((t) => removeMember(t, slug, m.handle))}>Remove</button>}

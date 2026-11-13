@@ -270,14 +270,14 @@ function LwcOutput({ run }: { run: Run }) {
   return (
     <div className="space-y-3">
       <div className="flex items-baseline gap-3">
-        <h2 className={cn("text-lg font-semibold", all ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400")}>{all ? "All tests passed" : "Tests failed"}</h2>
+        <h2 className={cn("text-lg font-semibold", all ? "text-green-700 dark:text-green-400" : "text-red-600 dark:text-red-400")}>{all ? "All tests passed" : "Tests failed"}</h2>
         <span className="tabular-nums text-muted-foreground">{passed}/{run.tests.length} passed</span>
       </div>
       <ul className="space-y-1.5">
         {run.tests.map((t) => (
           <li key={t.name} className="rounded-md border px-3 py-2">
             <div className="flex items-center gap-2">
-              {t.passed ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
+              {t.passed ? <CheckCircle2 className="h-4 w-4 text-green-700 dark:text-green-400" /> : <XCircle className="h-4 w-4 text-red-500" />}
               <span className="text-xs">{t.name}</span>
             </div>
             {!t.passed && t.message && <pre className="mt-1.5 whitespace-pre-wrap font-mono text-xs text-red-600 dark:text-red-400">{t.message}</pre>}
