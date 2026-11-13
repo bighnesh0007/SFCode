@@ -14,6 +14,7 @@ import { useEditorTheme } from "@/components/useEditorTheme";
 import { ApiError } from "@/lib/apiClient";
 import { executeAnonymous, runSoql, type ApexExecutionResult, type SoqlQueryResult } from "@/lib/salesforceApi";
 import { cn } from "@/lib/utils";
+import { ExplainError } from "@/components/ExplainError";
 import { useIsNarrow } from "@/lib/useIsNarrow";
 import { extractLimits, extractUserDebug } from "@/app/playground/apex/debugLog";
 import { APEX_SAMPLES, SOQL_SAMPLES } from "@/app/playground/apex/samples";
@@ -375,6 +376,7 @@ function Output({ run, tab, onJump }: { run: Run; tab: Tab; onJump: (line: numbe
         <AlertTriangle className="h-4 w-4 shrink-0" />
         <div>
           <p className="whitespace-pre-wrap">{run.message}</p>
+          <ExplainError message={run.message} />
           {run.code === "ORG_NOT_CONNECTED" && (
             <Link href="/settings/org" className="mt-2 inline-block underline">
               Connect an org
@@ -393,6 +395,7 @@ function Output({ run, tab, onJump }: { run: Run; tab: Tab; onJump: (line: numbe
     return (
       <Status icon={<XCircle className="h-4 w-4" />} tone="text-destructive" title="Compile error">
         {r.compileProblem}
+        <ExplainError message={r.compileProblem} />
         {r.line !== null && (
           <button type="button" className="mt-2 block underline" onClick={() => onJump(r.line ?? 1, r.column ?? 1)}>
             Go to line {r.line}, column {r.column ?? "?"}
@@ -409,6 +412,7 @@ function Output({ run, tab, onJump }: { run: Run; tab: Tab; onJump: (line: numbe
       ) : (
         <Status icon={<XCircle className="h-4 w-4" />} tone="text-destructive" title="Uncaught exception">
           {r.exceptionMessage}
+          <ExplainError message={r.exceptionMessage} />
           {r.exceptionStackTrace && <StackTrace trace={r.exceptionStackTrace} onJump={onJump} />}
         </Status>
       )}

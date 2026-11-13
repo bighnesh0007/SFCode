@@ -3,7 +3,7 @@
  * grid and the placeholder pages, so a feature cannot be listed in one place
  * and missing from another.
  */
-import { Bot, Bug, Database, GraduationCap, LayoutTemplate, Sparkles, Swords, Terminal, Trophy, Workflow, type LucideIcon } from "lucide-react";
+import { Bug, Timer, Database, GraduationCap, LayoutTemplate, Sparkles, Swords, Terminal, Trophy, Workflow, type LucideIcon } from "lucide-react";
 
 export type FeatureStatus = "live" | "soon";
 
@@ -29,7 +29,7 @@ export const FEATURES: readonly Feature[] = [
   { id: "debugging", href: "/debugging", title: "Debugging Arena", nav: "Debugging", description: "Find and fix the bug in existing Apex — governor limits, recursion, null handling.", icon: Bug, status: "live", primary: false },
   { id: "contests", href: "/contests", title: "Timed Contests", nav: "Contests", description: "Competitive, timed Salesforce coding rounds with a leaderboard.", icon: Trophy, status: "live", primary: true },
   { id: "generator", href: "/generator", title: "AI Problem Generator", nav: "Generator", description: "Generate fresh Salesforce challenges on any topic and difficulty.", icon: Sparkles, status: "soon", primary: false },
-  { id: "interview", href: "/interview", title: "Mock Interviews", nav: "Interview", description: "AI-powered Salesforce technical interviews with feedback.", icon: Bot, status: "soon", primary: false },
+  { id: "interview", href: "/interview", title: "Interview Mode", nav: "Interview", description: "A random set of problems against the clock, with a scorecard at the end.", icon: Timer, status: "live", primary: false },
   { id: "certification", href: "/certification", title: "Certification Prep", nav: "Cert Prep", description: "Original practice questions and timed mock exams for Administrator, Platform App Builder, Platform Developer I and II, and JavaScript Developer I.", icon: GraduationCap, status: "live", primary: false },
 ];
 

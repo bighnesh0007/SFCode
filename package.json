@@ -15,7 +15,7 @@
     "build": "npm run build -w sfcode-server && npm run build -w sfcode-client",
     "lint": "npm run lint -w sfcode-client && npm run lint -w sfcode-server",
     "typecheck": "npm run typecheck -w sfcode-client && npm run typecheck -w sfcode-server",
-    "test": "npm run test -w sfcode-server",
+    "test": "npm run test -w sfcode-server && npm run test -w sfcode-client",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "up": "node scripts/up.mjs",

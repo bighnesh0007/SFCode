@@ -4,6 +4,7 @@ import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import type { Submission } from "@/lib/challengesApi";
 import { STATUS_CLASS, STATUS_LABEL } from "@/lib/verdicts";
 import { cn } from "@/lib/utils";
+import { ExplainError } from "@/components/ExplainError";
 
 const HINT: Partial<Record<Submission["status"], string>> = {
   compile_error: "Fix the errors below. Ones marked “hidden tests” mean your code doesn't provide what the tests call — check method names and signatures against the statement.",
@@ -65,7 +66,12 @@ export function Results({ submission, isFlow = false, onOpenFile }: { submission
       ) : (
         HINT[submission.status] && <p className="text-xs text-muted-foreground">{HINT[submission.status]}</p>
       )}
-      {r?.message && <pre className="whitespace-pre-wrap rounded-md bg-muted/50 p-2 font-mono text-xs">{r.message}</pre>}
+      {r?.message && (
+        <div>
+          <pre className="whitespace-pre-wrap rounded-md bg-muted/50 p-2 font-mono text-xs">{r.message}</pre>
+          <ExplainError message={r.message} />
+        </div>
+      )}
 
       {r && r.compileErrors.length > 0 && (
         <ul className="space-y-1.5">
@@ -85,6 +91,7 @@ export function Results({ submission, isFlow = false, onOpenFile }: { submission
           ))}
         </ul>
       )}
+      {r && r.compileErrors.length > 0 && <ExplainError message={r.compileErrors[0]?.message} />}
 
       {r && r.tests.length > 0 && (
         <ul className="space-y-1.5">
@@ -95,7 +102,12 @@ export function Results({ submission, isFlow = false, onOpenFile }: { submission
                 <span className="font-mono text-xs">{t.method}</span>
                 {t.timeMs !== null && <span className="ml-auto text-xs tabular-nums text-muted-foreground">{t.timeMs} ms</span>}
               </div>
-              {!t.passed && t.message && <FailureMessage message={t.message} />}
+              {!t.passed && t.message && (
+                <>
+                  <FailureMessage message={t.message} />
+                  <ExplainError message={t.message} />
+                </>
+              )}
             </li>
           ))}
         </ul>
