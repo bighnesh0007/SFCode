@@ -232,7 +232,7 @@ export class SalesforceClient {
       headers: { Authorization: `Bearer ${accessToken}`, Accept: "application/json" },
     });
     if (res.status === 401) throw new SessionExpiredError();
-    const body = (await res.json().catch(() => null)) as unknown;
+    const body: unknown = await res.json().catch(() => null);
     if (!res.ok) {
       // Errors come back as [{ message, errorCode }]: a malformed query is the user's to fix.
       const first = Array.isArray(body) ? (body[0] as { message?: unknown } | undefined) : undefined;
