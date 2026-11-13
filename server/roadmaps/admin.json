@@ -1,140 +1,1553 @@
 {
   "id": "admin",
   "title": "Salesforce Admin",
-  "description": "From your first org to the Admin certification: data model, data quality, security and sharing, page design, Flows, reports and data tools. Each step ends with a short quiz.",
+  "description": "From your first org to the Administrator certification: data model, data quality, security and sharing, Sales and Service Cloud, page design, Flow and approvals, reports and dashboards, data tools, sandboxes and auditing.",
   "nodes": [
     {
-      "id": "admin-org", "title": "Orgs, apps & Setup", "level": 1, "col": 1, "requires": [],
+      "id": "admin-org",
+      "title": "Orgs, apps & Setup",
+      "level": 1,
+      "col": 1,
+      "requires": [],
       "summary": "What an org is, how apps group your work, and where admins configure everything.",
       "lesson": "An **org** is your company's instance of Salesforce: its data, configuration and users. To practise, use a free **Developer Edition** org: it doesn't expire. Companies test changes in **sandboxes** before touching **production**.\n\nAn **app** is a named set of tabs and items (Sales, Service, your own) that users switch between in the **App Launcher**. It's a view, not a separate database: every app reads the same records.\n\nAdmins work in **Setup** (the gear icon). Use the Quick Find box: type `Object Manager`, `Users`, `Flows`… and you'll rarely need to browse menus.",
       "problems": [],
       "quiz": [
-        { "q": "What is a Salesforce \"app\"?", "options": ["A separate database with its own records", "A named set of tabs and items users open from the App Launcher", "A managed package you must install", "A type of user license"], "answer": 1, "why": "Apps are navigation: groups of tabs over the same shared data." },
-        { "q": "Which org is free, doesn't expire, and is meant for learning and building?", "options": ["Production", "Full sandbox", "Developer Edition", "Partial Copy sandbox"], "answer": 2, "why": "Developer Edition orgs are free and permanent. Sandboxes are copies of a paid production org." },
-        { "q": "Where do admins configure objects, users and automation?", "options": ["The App Launcher", "Setup", "The Reports tab", "Chatter"], "answer": 1, "why": "Setup (gear icon) is the admin's home; Quick Find gets you anywhere fast." }
+        {
+          "q": "What is a Salesforce \"app\"?",
+          "options": [
+            "A separate database with its own records",
+            "A named set of tabs and items users open from the App Launcher",
+            "A managed package you must install",
+            "A type of user license"
+          ],
+          "answer": 1,
+          "why": "Apps are navigation: groups of tabs over the same shared data."
+        },
+        {
+          "q": "Which org is free, doesn't expire, and is meant for learning and building?",
+          "options": [
+            "Production",
+            "Full sandbox",
+            "Developer Edition",
+            "Partial Copy sandbox"
+          ],
+          "answer": 2,
+          "why": "Developer Edition orgs are free and permanent. Sandboxes are copies of a paid production org."
+        },
+        {
+          "q": "Where do admins configure objects, users and automation?",
+          "options": [
+            "The App Launcher",
+            "Setup",
+            "The Reports tab",
+            "Chatter"
+          ],
+          "answer": 1,
+          "why": "Setup (gear icon) is the admin's home; Quick Find gets you anywhere fast."
+        }
+      ],
+      "concepts": [
+        "Production, sandboxes and Developer Edition orgs",
+        "Setup, Object Manager and the App Launcher",
+        "Licences, profiles and the difference between them"
+      ],
+      "pitfalls": [
+        "Changing configuration directly in production without testing it in a sandbox first."
+      ],
+      "resources": [
+        {
+          "title": "Lightning Experience Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/lex_implementation_basics",
+          "kind": "trailhead"
+        }
       ]
     },
     {
-      "id": "admin-objects", "title": "Objects & fields", "level": 1, "col": 0, "requires": ["admin-org"],
+      "id": "admin-objects",
+      "title": "Objects & fields",
+      "level": 1,
+      "col": 0,
+      "requires": [
+        "admin-org"
+      ],
       "summary": "Standard vs custom objects, field types, and formulas.",
       "lesson": "An **object** is a table: Account, Contact, Opportunity are **standard** objects that ship with Salesforce. You create **custom** objects for your business; their API names end in `__c` (e.g. `Project__c`), and so do custom fields.\n\nPick field types deliberately:\n\n- **Picklist** for a fixed list of values (clean reporting, unlike free text).\n- **Formula** for a read-only value calculated from other fields every time it's read, e.g. `Amount * Probability`.\n- **Lookup / Master-Detail** to relate records (next step).\n\nCreate objects and fields in **Setup → Object Manager**.",
       "problems": [],
       "quiz": [
-        { "q": "Custom object and custom field API names end in…", "options": ["__r", "__c", "_obj", "__x"], "answer": 1, "why": "__c marks custom objects and fields. __r is a relationship name, __x an external object." },
-        { "q": "Which field type calculates a read-only value from other fields?", "options": ["Picklist", "Formula", "Text Area", "Lookup"], "answer": 1, "why": "Formula fields are computed when read and can't be edited." },
-        { "q": "Which of these is a standard object?", "options": ["Invoice__c", "Account", "Project__c", "Shipment__c"], "answer": 1, "why": "Account ships with Salesforce; the others end in __c, so they're custom." }
+        {
+          "q": "Custom object and custom field API names end in…",
+          "options": [
+            "__r",
+            "__c",
+            "_obj",
+            "__x"
+          ],
+          "answer": 1,
+          "why": "__c marks custom objects and fields. __r is a relationship name, __x an external object."
+        },
+        {
+          "q": "Which field type calculates a read-only value from other fields?",
+          "options": [
+            "Picklist",
+            "Formula",
+            "Text Area",
+            "Lookup"
+          ],
+          "answer": 1,
+          "why": "Formula fields are computed when read and can't be edited."
+        },
+        {
+          "q": "Which of these is a standard object?",
+          "options": [
+            "Invoice__c",
+            "Account",
+            "Project__c",
+            "Shipment__c"
+          ],
+          "answer": 1,
+          "why": "Account ships with Salesforce; the others end in __c, so they're custom."
+        }
+      ],
+      "concepts": [
+        "Standard and custom objects; custom ones end in __c",
+        "Field types and when to use each (picklist, formula, lookup, checkbox…)",
+        "Formula fields calculate on read and are never stored"
+      ],
+      "pitfalls": [
+        "Using a text field where a picklist would keep data consistent.",
+        "Building a formula when the value must be reported historically: formulas always show today's value."
+      ],
+      "resources": [
+        {
+          "title": "Data Modeling (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/data_modeling",
+          "kind": "trailhead"
+        },
+        {
+          "title": "Formulas and Validations (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/point_click_business_logic",
+          "kind": "trailhead"
+        }
       ]
     },
     {
-      "id": "admin-users", "title": "Users & licenses", "level": 1, "col": 2, "requires": ["admin-org"],
+      "id": "admin-users",
+      "title": "Users & licenses",
+      "level": 1,
+      "col": 2,
+      "requires": [
+        "admin-org"
+      ],
       "summary": "Creating users, licenses, and deactivating instead of deleting.",
       "lesson": "Every person who logs in is a **user** with a **user license** (which features they can ever use) and exactly one **profile** (their baseline permissions).\n\nYou can't delete users: you **deactivate** them, which frees the license and keeps the records they own and their history intact. If a deactivation is blocked (they're a default owner, for example), **freeze** the user first to stop logins immediately.\n\nUsername must be unique across *all* Salesforce orgs and look like an email address; the email field is where notifications go.",
       "problems": [],
       "quiz": [
-        { "q": "An employee leaves. What do you do with their user?", "options": ["Delete the user", "Deactivate it (freeze first if you need to block login right away)", "Change their profile to read-only and leave it active", "Delete their records, then the user"], "answer": 1, "why": "Users can't be deleted; deactivation frees the license and keeps data and history." },
-        { "q": "How many profiles does each user have?", "options": ["Zero or more", "Exactly one", "One per app", "As many as their role allows"], "answer": 1, "why": "One profile per user; extra access is added with permission sets." },
-        { "q": "A Salesforce username must be…", "options": ["The user's real email address", "Unique across all Salesforce orgs, in email format", "Unique only within your org", "The same as their nickname"], "answer": 1, "why": "Usernames are globally unique and email-shaped, but don't have to be a real mailbox." }
+        {
+          "q": "An employee leaves. What do you do with their user?",
+          "options": [
+            "Delete the user",
+            "Deactivate it (freeze first if you need to block login right away)",
+            "Change their profile to read-only and leave it active",
+            "Delete their records, then the user"
+          ],
+          "answer": 1,
+          "why": "Users can't be deleted; deactivation frees the license and keeps data and history."
+        },
+        {
+          "q": "How many profiles does each user have?",
+          "options": [
+            "Zero or more",
+            "Exactly one",
+            "One per app",
+            "As many as their role allows"
+          ],
+          "answer": 1,
+          "why": "One profile per user; extra access is added with permission sets."
+        },
+        {
+          "q": "A Salesforce username must be…",
+          "options": [
+            "The user's real email address",
+            "Unique across all Salesforce orgs, in email format",
+            "Unique only within your org",
+            "The same as their nickname"
+          ],
+          "answer": 1,
+          "why": "Usernames are globally unique and email-shaped, but don't have to be a real mailbox."
+        }
+      ],
+      "concepts": [
+        "Creating, freezing and deactivating users",
+        "Profiles versus permission sets and permission set groups",
+        "Login hours, IP ranges and password policies"
+      ],
+      "pitfalls": [
+        "Deactivating a user who owns key automation or default lead routing: freeze them first.",
+        "Cloning profiles for every small difference: use permission sets."
+      ],
+      "resources": [
+        {
+          "title": "User Management (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/lex_implementation_user_setup_mgmt",
+          "kind": "trailhead"
+        }
       ]
     },
     {
-      "id": "admin-relationships", "title": "Relationships", "level": 2, "col": 0, "requires": ["admin-objects"],
+      "id": "admin-relationships",
+      "title": "Relationships",
+      "level": 2,
+      "col": 0,
+      "requires": [
+        "admin-objects"
+      ],
       "summary": "Lookup vs master-detail, roll-ups and junction objects.",
       "lesson": "- **Lookup**: a loose link. The child has its own owner and sharing; deleting the parent doesn't delete it.\n- **Master-detail**: a tight link. The detail inherits the master's owner and sharing, can't exist without a master, and **is deleted with it**. Only the master can have **roll-up summary** fields (COUNT, SUM, MIN, MAX of details).\n- **Many-to-many**: a **junction object** with two master-detail relationships, e.g. `Enrollment__c` between Student and Course.",
       "problems": [],
       "quiz": [
-        { "q": "In a master-detail relationship, what happens to detail records when the master is deleted?", "options": ["Nothing; they keep a blank parent", "They are deleted too", "They move to the default owner", "The delete is always blocked"], "answer": 1, "why": "Details can't exist without a master, so they're deleted with it." },
-        { "q": "Where can you create a roll-up summary field?", "options": ["On either side of a lookup", "On the master object of a master-detail relationship", "On the detail object", "On any object"], "answer": 1, "why": "Roll-ups summarise detail records onto their master." },
-        { "q": "How do you model many-to-many (students ↔ courses)?", "options": ["A multi-select picklist", "Two lookups on Student", "A junction object with two master-detail relationships", "A formula field"], "answer": 2, "why": "Each junction record links one student to one course." }
-      ]
+        {
+          "q": "In a master-detail relationship, what happens to detail records when the master is deleted?",
+          "options": [
+            "Nothing; they keep a blank parent",
+            "They are deleted too",
+            "They move to the default owner",
+            "The delete is always blocked"
+          ],
+          "answer": 1,
+          "why": "Details can't exist without a master, so they're deleted with it."
+        },
+        {
+          "q": "Where can you create a roll-up summary field?",
+          "options": [
+            "On either side of a lookup",
+            "On the master object of a master-detail relationship",
+            "On the detail object",
+            "On any object"
+          ],
+          "answer": 1,
+          "why": "Roll-ups summarise detail records onto their master."
+        },
+        {
+          "q": "How do you model many-to-many (students ↔ courses)?",
+          "options": [
+            "A multi-select picklist",
+            "Two lookups on Student",
+            "A junction object with two master-detail relationships",
+            "A formula field"
+          ],
+          "answer": 2,
+          "why": "Each junction record links one student to one course."
+        },
+        {
+          "q": "Look at the diagram. Which relationship would let Project__c show the total of its Expense__c amounts?",
+          "options": [
+            "The lookup from Contact",
+            "The master-detail from Expense__c to Project__c",
+            "The junction object",
+            "None of them"
+          ],
+          "answer": 1,
+          "why": "Roll-up summary fields need a master-detail relationship, which Expense__c has to Project__c.",
+          "image": "relationships",
+          "imageAlt": "Relationships diagram: Expense__c is the detail side of a master-detail to Project__c."
+        }
+      ],
+      "concepts": [
+        "Lookup versus master-detail, and what each means for deletion, sharing and roll-ups",
+        "Junction objects for many-to-many",
+        "Lookup filters to limit which records can be chosen"
+      ],
+      "pitfalls": [
+        "Converting lookup to master-detail when some records have no parent: the conversion fails."
+      ],
+      "resources": [
+        {
+          "title": "Data Modeling (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/data_modeling",
+          "kind": "trailhead"
+        }
+      ],
+      "diagram": "relationships",
+      "diagramCaption": "Lookup (Contact to Account), master-detail (Expense to Project) and a junction object (Enrollment) linking Students and Courses."
     },
     {
-      "id": "admin-data-quality", "title": "Validation rules", "level": 2, "col": 1, "requires": ["admin-objects"],
+      "id": "admin-data-quality",
+      "title": "Validation rules",
+      "level": 2,
+      "col": 1,
+      "requires": [
+        "admin-objects"
+      ],
       "summary": "Stop bad data at save time with formulas.",
       "lesson": "A **validation rule** is a formula that describes *bad* data. When it evaluates to **TRUE**, the save is blocked and your error message is shown, at the top of the page or next to a field.\n\n```\nAND(\n  ISPICKVAL(StageName, \"Closed Won\"),\n  ISBLANK(NextStep)\n)\n```\n\nUseful functions: `ISBLANK`, `ISPICKVAL`, `ISCHANGED`, `PRIORVALUE`, `REGEX`. Rules run on **every** save, from the UI, the API, imports and Apex, so they protect data everywhere, and can break integrations if you don't test them.",
       "problems": [],
       "quiz": [
-        { "q": "A validation rule blocks the save when its formula returns…", "options": ["FALSE", "TRUE", "An error code", "Null"], "answer": 1, "why": "Write the formula to describe invalid data; TRUE means \"block\"." },
-        { "q": "Which function checks whether a text field is empty?", "options": ["ISNULL only", "ISBLANK", "ISEMPTY", "LEN = null"], "answer": 1, "why": "ISBLANK is the recommended check for empty values." },
-        { "q": "Do validation rules apply to records saved through the API or Data Loader?", "options": ["No, UI only", "Yes, every save", "Only for admins", "Only if the field is on the page layout"], "answer": 1, "why": "They run on every save regardless of where it comes from." }
+        {
+          "q": "A validation rule blocks the save when its formula returns…",
+          "options": [
+            "FALSE",
+            "TRUE",
+            "An error code",
+            "Null"
+          ],
+          "answer": 1,
+          "why": "Write the formula to describe invalid data; TRUE means \"block\"."
+        },
+        {
+          "q": "Which function checks whether a text field is empty?",
+          "options": [
+            "ISNULL only",
+            "ISBLANK",
+            "ISEMPTY",
+            "LEN = null"
+          ],
+          "answer": 1,
+          "why": "ISBLANK is the recommended check for empty values."
+        },
+        {
+          "q": "Do validation rules apply to records saved through the API or Data Loader?",
+          "options": [
+            "No, UI only",
+            "Yes, every save",
+            "Only for admins",
+            "Only if the field is on the page layout"
+          ],
+          "answer": 1,
+          "why": "They run on every save regardless of where it comes from."
+        }
+      ],
+      "concepts": [
+        "Validation rules that block bad data with a clear message",
+        "Required fields: on the field versus on the layout",
+        "Duplicate and matching rules",
+        "Picklists and dependent picklists for consistent values"
+      ],
+      "pitfalls": [
+        "Making a field required on the field itself when only one process needs it: it blocks imports and integrations too.",
+        "Validation rules with unclear messages: users don't know what to fix."
+      ],
+      "resources": [
+        {
+          "title": "Data Quality (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/data_quality",
+          "kind": "trailhead"
+        },
+        {
+          "title": "Formulas and Validations (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/point_click_business_logic",
+          "kind": "trailhead"
+        }
       ]
     },
     {
-      "id": "admin-security", "title": "Profiles & permission sets", "level": 2, "col": 2, "requires": ["admin-users"],
+      "id": "admin-security",
+      "title": "Profiles & permission sets",
+      "level": 2,
+      "col": 2,
+      "requires": [
+        "admin-users"
+      ],
       "summary": "Object permissions, field-level security, least privilege.",
       "lesson": "Two questions decide what someone can do:\n\n1. **What** can they touch? **Object permissions** (Create, Read, Edit, Delete) and **field-level security** (visible / read-only). These come from the **profile** plus any **permission sets**.\n2. **Which records**? That's **sharing** (next step).\n\nBest practice: keep profiles minimal and grant extra access with **permission sets** (bundled into **permission set groups**). Adding is easy; taking away from a shared profile breaks other people.",
       "problems": [],
       "quiz": [
-        { "q": "A few users need to edit one extra field their profile can't. Best approach?", "options": ["Clone their profile", "Assign a permission set", "Make the field required", "Change the org-wide default"], "answer": 1, "why": "Permission sets add access to specific users without new profiles." },
-        { "q": "Field-level security controls…", "options": ["Which records a user sees", "Whether a user can see or edit a field", "The order of fields on a page", "Which picklist values appear"], "answer": 1, "why": "FLS is per field: hidden, read-only or editable." },
-        { "q": "What do object permissions NOT control?", "options": ["Whether you can create records", "Whether you can delete records", "Which specific records you can see", "Whether you can read the object"], "answer": 2, "why": "Which records is decided by sharing, not object permissions." }
+        {
+          "q": "A few users need to edit one extra field their profile can't. Best approach?",
+          "options": [
+            "Clone their profile",
+            "Assign a permission set",
+            "Make the field required",
+            "Change the org-wide default"
+          ],
+          "answer": 1,
+          "why": "Permission sets add access to specific users without new profiles."
+        },
+        {
+          "q": "Field-level security controls…",
+          "options": [
+            "Which records a user sees",
+            "Whether a user can see or edit a field",
+            "The order of fields on a page",
+            "Which picklist values appear"
+          ],
+          "answer": 1,
+          "why": "FLS is per field: hidden, read-only or editable."
+        },
+        {
+          "q": "What do object permissions NOT control?",
+          "options": [
+            "Whether you can create records",
+            "Whether you can delete records",
+            "Which specific records you can see",
+            "Whether you can read the object"
+          ],
+          "answer": 2,
+          "why": "Which records is decided by sharing, not object permissions."
+        }
+      ],
+      "concepts": [
+        "Object permissions and field-level security",
+        "Permission sets and permission set groups",
+        "Session security, MFA and login access policies"
+      ],
+      "pitfalls": [
+        "Hiding a field only on the page layout: it's still in reports and the API.",
+        "Granting 'Modify All Data' to fix one access problem."
+      ],
+      "resources": [
+        {
+          "title": "Data Security (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/data_security",
+          "kind": "trailhead"
+        }
       ]
     },
     {
-      "id": "admin-ui", "title": "Record types & page layouts", "level": 3, "col": 0, "requires": ["admin-relationships"],
+      "id": "admin-ui",
+      "title": "Record types & page layouts",
+      "level": 3,
+      "col": 0,
+      "requires": [
+        "admin-relationships"
+      ],
       "summary": "Different processes, picklists and layouts on one object.",
       "lesson": "**Page layouts** arrange fields, related lists and buttons on a record. **Lightning App Builder** designs the whole record page; **Dynamic Forms** show fields only when they're relevant.\n\n**Record types** let one object serve different processes: a *Partner* vs *Customer* Account can have different **picklist values** and **page layouts**, assigned by profile.\n\nCareful: a field marked required **on a page layout** is enforced only in that UI. Make the field required in its definition (or use a validation rule) to enforce it everywhere.",
       "problems": [],
       "quiz": [
-        { "q": "What do record types let you vary for different processes on one object?", "options": ["The object's API name", "Picklist values and page layouts", "The org-wide default", "The user license"], "answer": 1, "why": "Record types drive picklist values and which layout users see." },
-        { "q": "A field is required on the page layout only. Is it required for Data Loader imports?", "options": ["Yes, always", "No, layout-required is UI-only", "Only for new records", "Only for admins"], "answer": 1, "why": "Use field-level required or a validation rule to enforce everywhere." },
-        { "q": "Which tool designs Lightning record pages with components?", "options": ["Schema Builder", "Lightning App Builder", "Data Loader", "Process Builder"], "answer": 1, "why": "App Builder lays out components; Dynamic Forms add field visibility rules." }
+        {
+          "q": "What do record types let you vary for different processes on one object?",
+          "options": [
+            "The object's API name",
+            "Picklist values and page layouts",
+            "The org-wide default",
+            "The user license"
+          ],
+          "answer": 1,
+          "why": "Record types drive picklist values and which layout users see."
+        },
+        {
+          "q": "A field is required on the page layout only. Is it required for Data Loader imports?",
+          "options": [
+            "Yes, always",
+            "No, layout-required is UI-only",
+            "Only for new records",
+            "Only for admins"
+          ],
+          "answer": 1,
+          "why": "Use field-level required or a validation rule to enforce everywhere."
+        },
+        {
+          "q": "Which tool designs Lightning record pages with components?",
+          "options": [
+            "Schema Builder",
+            "Lightning App Builder",
+            "Data Loader",
+            "Process Builder"
+          ],
+          "answer": 1,
+          "why": "App Builder lays out components; Dynamic Forms add field visibility rules."
+        }
+      ],
+      "concepts": [
+        "Lightning App Builder record, home and app pages",
+        "Dynamic Forms and component visibility",
+        "Compact layouts, related lists and quick actions",
+        "Lightning apps and navigation"
+      ],
+      "pitfalls": [
+        "Editing the page layout when the record page uses Dynamic Forms: the layout no longer controls those fields."
+      ],
+      "resources": [
+        {
+          "title": "Lightning App Builder (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/lightning_app_builder",
+          "kind": "trailhead"
+        },
+        {
+          "title": "Lightning Experience Customization (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/lex_customization",
+          "kind": "trailhead"
+        }
       ]
     },
     {
-      "id": "admin-flows", "title": "Automate with Flow", "level": 3, "col": 1, "requires": ["admin-data-quality"],
+      "id": "admin-flows",
+      "title": "Automate with Flow",
+      "level": 3,
+      "col": 1,
+      "requires": [
+        "admin-data-quality"
+      ],
       "summary": "Build real flows in your org, graded by tests.",
       "lesson": "**Flow** is the declarative automation tool (Workflow Rules and Process Builder are retired). Record-triggered flows that only update the triggering record should run **before save**: fast, no extra DML. Do the three problems below in your own org's Flow Builder; SFCode grades them with hidden tests.",
-      "problems": ["flow-account-default-rating", "flow-won-next-step", "flow-revenue-tier"]
+      "problems": [
+        "flow-account-default-rating",
+        "flow-won-next-step",
+        "flow-revenue-tier"
+      ],
+      "concepts": [
+        "Before-save versus after-save record-triggered flows",
+        "Entry conditions and running only when a record changes to meet them",
+        "Where flows sit in the order of execution",
+        "Flow first, Apex when Flow can't"
+      ],
+      "pitfalls": [
+        "Updating the triggering record in an after-save flow: an extra save, and possible loops.",
+        "Using a Create or Update element inside a loop."
+      ],
+      "resources": [
+        {
+          "title": "Record-Triggered Flows (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/record-triggered-flows",
+          "kind": "trailhead"
+        },
+        {
+          "title": "Flow Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/flow-basics",
+          "kind": "trailhead"
+        }
+      ],
+      "diagram": "order-of-execution",
+      "diagramCaption": "Order of execution: before-save flows run before triggers and validation; after-save flows run after the record is saved."
     },
     {
-      "id": "admin-sharing", "title": "Sharing: OWD, roles, rules", "level": 3, "col": 2, "requires": ["admin-security"],
+      "id": "admin-sharing",
+      "title": "Sharing: OWD, roles, rules",
+      "level": 3,
+      "col": 2,
+      "requires": [
+        "admin-security"
+      ],
       "summary": "Lock down with OWD, then open up.",
       "lesson": "Record access is built in layers:\n\n1. **Organization-wide defaults (OWD)**: the most restrictive baseline per object (Private, Public Read Only, Public Read/Write).\n2. **Role hierarchy**: managers see what their team owns.\n3. **Sharing rules**: open access to groups or roles by owner or criteria.\n4. **Manual sharing** and **teams** for one-offs.\n\nEverything after OWD only **opens** access; you can't use sharing rules to take it away. So set OWD to the strictest anyone needs, then open up.",
       "problems": [],
       "quiz": [
-        { "q": "What sets the baseline (most restrictive) record access for an object?", "options": ["Profiles", "Organization-wide defaults", "Sharing rules", "Page layouts"], "answer": 1, "why": "OWD is the floor; everything else opens access from there." },
-        { "q": "Can a sharing rule restrict access below the org-wide default?", "options": ["Yes", "No, sharing rules only grant extra access", "Only for custom objects", "Only with a permission set"], "answer": 1, "why": "Sharing only ever adds access." },
-        { "q": "OWD for Opportunity is Private. How does a sales manager see their team's deals?", "options": ["Field-level security", "The role hierarchy", "A validation rule", "A record type"], "answer": 1, "why": "Users above in the role hierarchy get access to records owned below them." }
-      ]
+        {
+          "q": "What sets the baseline (most restrictive) record access for an object?",
+          "options": [
+            "Profiles",
+            "Organization-wide defaults",
+            "Sharing rules",
+            "Page layouts"
+          ],
+          "answer": 1,
+          "why": "OWD is the floor; everything else opens access from there."
+        },
+        {
+          "q": "Can a sharing rule restrict access below the org-wide default?",
+          "options": [
+            "Yes",
+            "No, sharing rules only grant extra access",
+            "Only for custom objects",
+            "Only with a permission set"
+          ],
+          "answer": 1,
+          "why": "Sharing only ever adds access."
+        },
+        {
+          "q": "OWD for Opportunity is Private. How does a sales manager see their team's deals?",
+          "options": [
+            "Field-level security",
+            "The role hierarchy",
+            "A validation rule",
+            "A record type"
+          ],
+          "answer": 1,
+          "why": "Users above in the role hierarchy get access to records owned below them."
+        },
+        {
+          "q": "Look at the diagram. A user can't see a record. Which layer would you check first?",
+          "options": [
+            "Apex managed sharing",
+            "Organization-wide defaults, then whether a higher layer grants access",
+            "The page layout",
+            "The report type"
+          ],
+          "answer": 1,
+          "why": "Start from the baseline and work up: the defaults, then role hierarchy, rules, manual shares.",
+          "image": "sharing-layers",
+          "imageAlt": "Diagram of access layers with organization-wide defaults at the top."
+        }
+      ],
+      "concepts": [
+        "Organization-wide defaults as the baseline",
+        "Role hierarchy, owner- and criteria-based sharing rules",
+        "Public groups, queues and manual sharing",
+        "Teams (account, opportunity, case)"
+      ],
+      "pitfalls": [
+        "Setting OWD to Public Read/Write 'to be safe' and losing the ability to restrict later without rework.",
+        "Expecting a sharing rule to take access away: sharing only adds."
+      ],
+      "resources": [
+        {
+          "title": "Data Security (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/data_security",
+          "kind": "trailhead"
+        }
+      ],
+      "diagram": "sharing-layers",
+      "diagramCaption": "Record access in layers: organization-wide defaults, role hierarchy, sharing rules, manual sharing and teams, and Apex managed sharing."
     },
     {
-      "id": "admin-reports", "title": "Reports & dashboards", "level": 4, "col": 0, "requires": ["admin-ui"],
+      "id": "admin-reports",
+      "title": "Reports & dashboards",
+      "level": 4,
+      "col": 0,
+      "requires": [
+        "admin-ui"
+      ],
       "summary": "Report types, formats and dashboard running users.",
       "lesson": "A **report type** decides which objects and fields a report can use (e.g. *Accounts with Contacts*). Formats:\n\n- **Tabular**: a plain list.\n- **Summary**: grouped by rows, with subtotals.\n- **Matrix**: grouped by rows **and** columns.\n- **Joined**: several report blocks side by side.\n\n**Dashboards** visualise source reports. A standard dashboard shows data as its **running user** sees it; a **dynamic dashboard** uses each viewer's own access.",
       "problems": [],
       "quiz": [
-        { "q": "You need totals grouped by Stage (rows) and Close Month (columns). Which format?", "options": ["Tabular", "Summary", "Matrix", "Joined"], "answer": 2, "why": "Matrix groups by rows and columns." },
-        { "q": "What decides which objects and fields a report can include?", "options": ["The dashboard", "The report type", "The page layout", "The user's role"], "answer": 1, "why": "Report types define the available objects, relationships and fields." },
-        { "q": "Whose access determines what a standard (non-dynamic) dashboard shows?", "options": ["Each viewer", "The running user", "The system administrator", "The report owner's manager"], "answer": 1, "why": "Dynamic dashboards are the ones that use each viewer's access." }
+        {
+          "q": "You need totals grouped by Stage (rows) and Close Month (columns). Which format?",
+          "options": [
+            "Tabular",
+            "Summary",
+            "Matrix",
+            "Joined"
+          ],
+          "answer": 2,
+          "why": "Matrix groups by rows and columns."
+        },
+        {
+          "q": "What decides which objects and fields a report can include?",
+          "options": [
+            "The dashboard",
+            "The report type",
+            "The page layout",
+            "The user's role"
+          ],
+          "answer": 1,
+          "why": "Report types define the available objects, relationships and fields."
+        },
+        {
+          "q": "Whose access determines what a standard (non-dynamic) dashboard shows?",
+          "options": [
+            "Each viewer",
+            "The running user",
+            "The system administrator",
+            "The report owner's manager"
+          ],
+          "answer": 1,
+          "why": "Dynamic dashboards are the ones that use each viewer's access."
+        },
+        {
+          "q": "Look at the diagram. Which format shows several different report blocks side by side?",
+          "options": [
+            "Tabular",
+            "Summary",
+            "Matrix",
+            "Joined"
+          ],
+          "answer": 3,
+          "why": "Joined reports combine blocks, each with its own report type and filters.",
+          "image": "report-formats",
+          "imageAlt": "Diagram of four report formats: Tabular, Summary, Matrix and Joined."
+        }
+      ],
+      "concepts": [
+        "Report types and what they include",
+        "Tabular, summary, matrix and joined formats",
+        "Filters, groupings, summary formulas and bucket fields",
+        "Report folders and sharing"
+      ],
+      "pitfalls": [
+        "Using the standard report type when you need records without related records: build a custom report type ('with or without').",
+        "Saving reports in private folders, then wondering why nobody sees the dashboard."
+      ],
+      "resources": [
+        {
+          "title": "Reports and Dashboards (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/lex_implementation_reports_dashboards",
+          "kind": "trailhead"
+        }
+      ],
+      "diagram": "report-formats",
+      "diagramCaption": "Report formats: Tabular is a plain list, Summary groups rows with subtotals, Matrix groups by rows and columns, Joined shows several blocks side by side."
+    },
+    {
+      "id": "admin-soql",
+      "title": "SOQL for admins",
+      "level": 4,
+      "col": 1,
+      "requires": [
+        "admin-relationships",
+        "admin-flows"
+      ],
+      "summary": "Query your data directly: filters and parent fields.",
+      "lesson": "SOQL lets you ask precise questions of your data: in the Developer Console, in Flow \"Get Records\" thinking, and in tools like Data Loader exports. Try these two; they're graded against real records in your org.",
+      "problems": [
+        "soql-hot-tech-accounts",
+        "soql-contacts-in-city"
+      ],
+      "concepts": [
+        "Reading a SOQL query: SELECT, FROM, WHERE",
+        "Running queries in the Developer Console or a SOQL tool",
+        "Why admins use SOQL for data checks"
+      ],
+      "pitfalls": [
+        "Expecting SOQL to change data: it only reads."
+      ],
+      "resources": [
+        {
+          "title": "SOQL for Admins (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/soql-for-admins",
+          "kind": "trailhead"
+        }
       ]
     },
     {
-      "id": "admin-soql", "title": "SOQL for admins", "level": 4, "col": 1, "requires": ["admin-relationships", "admin-flows"],
-      "summary": "Query your data directly: filters and parent fields.",
-      "lesson": "SOQL lets you ask precise questions of your data: in the Developer Console, in Flow \"Get Records\" thinking, and in tools like Data Loader exports. Try these two; they're graded against real records in your org.",
-      "problems": ["soql-hot-tech-accounts", "soql-contacts-in-city"]
-    },
-    {
-      "id": "admin-data", "title": "Data import & tools", "level": 4, "col": 2, "requires": ["admin-sharing"],
+      "id": "admin-data",
+      "title": "Data import & tools",
+      "level": 4,
+      "col": 2,
+      "requires": [
+        "admin-sharing"
+      ],
       "summary": "Import Wizard vs Data Loader, duplicates, backups.",
       "lesson": "- **Data Import Wizard** (in Setup): guided, up to **50,000** records, common standard objects and custom objects, with duplicate matching.\n- **Data Loader** (desktop app): up to **5 million** records, any object, insert / update / upsert / delete / export, and can be scripted.\n- **Duplicate rules** with **matching rules** warn about or block duplicates.\n- **Data Export Service** schedules weekly or monthly CSV exports of your data as a backup.",
       "problems": [],
       "quiz": [
-        { "q": "You must load 1 million records. Which tool?", "options": ["Data Import Wizard", "Data Loader", "Manual entry", "A report"], "answer": 1, "why": "The Import Wizard tops out at 50,000; Data Loader handles millions." },
-        { "q": "Which feature warns about or blocks duplicate records?", "options": ["Validation rules only", "Duplicate rules with matching rules", "Sharing rules", "Record types"], "answer": 1, "why": "Matching rules find duplicates; duplicate rules decide what to do." },
-        { "q": "Built-in way to schedule regular CSV backups of your data?", "options": ["Data Export Service", "Dashboards", "Change sets", "Sandbox refresh"], "answer": 0, "why": "Data Export runs weekly or monthly exports." }
+        {
+          "q": "You must load 1 million records. Which tool?",
+          "options": [
+            "Data Import Wizard",
+            "Data Loader",
+            "Manual entry",
+            "A report"
+          ],
+          "answer": 1,
+          "why": "The Import Wizard tops out at 50,000; Data Loader handles millions."
+        },
+        {
+          "q": "Which feature warns about or blocks duplicate records?",
+          "options": [
+            "Validation rules only",
+            "Duplicate rules with matching rules",
+            "Sharing rules",
+            "Record types"
+          ],
+          "answer": 1,
+          "why": "Matching rules find duplicates; duplicate rules decide what to do."
+        },
+        {
+          "q": "Built-in way to schedule regular CSV backups of your data?",
+          "options": [
+            "Data Export Service",
+            "Dashboards",
+            "Change sets",
+            "Sandbox refresh"
+          ],
+          "answer": 0,
+          "why": "Data Export runs weekly or monthly exports."
+        }
+      ],
+      "concepts": [
+        "Data Import Wizard versus Data Loader",
+        "Upsert with external Ids",
+        "Mass transfer, mass delete and the Recycle Bin",
+        "Data export and backups"
+      ],
+      "pitfalls": [
+        "Importing without an external Id, then creating duplicates on the second run.",
+        "Leaving automation on during a large import: flows and triggers fire for every row."
+      ],
+      "resources": [
+        {
+          "title": "Data Management (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/lex_implementation_data_management",
+          "kind": "trailhead"
+        }
       ]
     },
     {
-      "id": "admin-cert", "title": "Admin cert checkpoint", "level": 4, "col": 1, "requires": ["admin-reports", "admin-soql", "admin-data"],
+      "id": "admin-navigation",
+      "title": "Finding your way",
+      "level": 1,
+      "col": 0,
+      "requires": [],
+      "summary": "Apps, tabs, list views, search and Setup.",
+      "lesson": "Lightning Experience is organised into **apps** (Sales, Service, your own), each a set of **tabs** for objects and pages.\n\n- **List views** filter and sort records; pin the one you use most. Kanban views show records by stage.\n- **Global search** finds records across objects; **Setup** (the gear icon) holds every configuration screen, with Quick Find at the top.\n- **Object Manager** is where objects, fields, layouts and record types are configured.",
+      "concepts": [
+        "Apps, tabs and the App Launcher",
+        "List views and Kanban",
+        "Setup Quick Find and Object Manager"
+      ],
+      "pitfalls": [
+        "Creating dozens of public list views nobody uses: keep them curated."
+      ],
+      "resources": [
+        {
+          "title": "Lightning Experience Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/lex_implementation_basics",
+          "kind": "trailhead"
+        }
+      ],
+      "optional": true,
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Where do you configure an object's fields, layouts and record types?",
+          "options": [
+            "App Launcher",
+            "Object Manager",
+            "Global search",
+            "Home page"
+          ],
+          "answer": 1,
+          "why": "Object Manager is the home of object configuration."
+        },
+        {
+          "q": "What shows Opportunities as cards grouped by stage?",
+          "options": [
+            "A tabular report",
+            "A Kanban list view",
+            "A matrix report",
+            "A compact layout"
+          ],
+          "answer": 1,
+          "why": "Kanban views group records by a picklist such as Stage."
+        },
+        {
+          "q": "What groups tabs and pages for one kind of work?",
+          "options": [
+            "A profile",
+            "An app",
+            "A record type",
+            "A queue"
+          ],
+          "answer": 1,
+          "why": "Apps bundle the tabs and pages a role needs."
+        }
+      ]
+    },
+    {
+      "id": "admin-company-setup",
+      "title": "Company settings",
+      "level": 1,
+      "col": 1,
+      "requires": [
+        "admin-org"
+      ],
+      "summary": "Company information, fiscal year, currencies and business hours.",
+      "lesson": "Org-wide settings shape everything else:\n\n- **Company Information**: default locale, language, time zone and currency; licences in use.\n- **Fiscal year**: standard (12 months from a chosen start month) or custom periods. It decides how `THIS_FISCAL_QUARTER` and forecasts work.\n- **Currencies**: enable multiple currencies when you sell in several; each record then has its own currency, converted for reports.\n- **Business hours** and **holidays** drive escalation rules, entitlements and SLA timers.",
+      "concepts": [
+        "Company Information: locale, time zone, default currency",
+        "Standard versus custom fiscal years",
+        "Multiple currencies",
+        "Business hours and holidays"
+      ],
+      "pitfalls": [
+        "Enabling multiple currencies casually: it can't be turned off.",
+        "Forgetting business hours, so escalations count nights and weekends."
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Where do you set the org's default time zone and see licences in use?",
+          "options": [
+            "My Domain",
+            "Company Information",
+            "Session Settings",
+            "User Management Settings"
+          ],
+          "answer": 1,
+          "why": "Company Information holds org defaults and licence counts."
+        },
+        {
+          "q": "Escalations should only count working time. What must be set up?",
+          "options": [
+            "Fiscal year",
+            "Business hours and holidays",
+            "Multiple currencies",
+            "Login hours"
+          ],
+          "answer": 1,
+          "why": "Escalation rules and entitlements count time against business hours."
+        },
+        {
+          "q": "What is true about enabling multiple currencies?",
+          "options": [
+            "It can be turned off any time",
+            "It can't be turned off once enabled",
+            "It only affects reports",
+            "It needs a sandbox refresh"
+          ],
+          "answer": 1,
+          "why": "Multi-currency is permanent, so plan before enabling it."
+        }
+      ]
+    },
+    {
+      "id": "admin-record-types",
+      "title": "Record types and layouts",
+      "level": 2,
+      "col": 3,
+      "requires": [
+        "admin-objects"
+      ],
+      "summary": "Different processes on one object: record types, page layouts, picklists.",
+      "lesson": "**Record types** let one object serve different processes: *Hardware* and *Software* cases, *New Business* and *Renewal* opportunities.\n\n- Each record type limits the **picklist values** available.\n- **Page layout assignment** is by **profile and record type**: the same user sees a different layout per type.\n- **Sales processes**, **support processes** and **lead processes** choose which Stage, Status or Lead Status values each record type uses.\n- Users get record types through their profile or permission sets; one is their default.",
+      "concepts": [
+        "When to use a record type (different process, values or layout)",
+        "Picklist values per record type",
+        "Layout assignment by profile and record type",
+        "Sales, support and lead processes"
+      ],
+      "pitfalls": [
+        "Creating record types just to show a different layout to different teams: Dynamic Forms or layout assignment by profile may be enough.",
+        "Adding a picklist value but forgetting to enable it on each record type."
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Hardware and Software cases need different Status values. What do you configure?",
+          "options": [
+            "Two page layouts",
+            "Two support processes used by two Case record types",
+            "A validation rule",
+            "Two queues"
+          ],
+          "answer": 1,
+          "why": "Support processes define the Status values; each record type uses one."
+        },
+        {
+          "q": "What decides which page layout a user sees?",
+          "options": [
+            "The record owner",
+            "The user's profile and the record's record type",
+            "The app",
+            "The role"
+          ],
+          "answer": 1,
+          "why": "Layouts are assigned per profile and record type."
+        },
+        {
+          "q": "You added a picklist value but users can't choose it on some records. Why?",
+          "options": [
+            "It needs a sandbox refresh",
+            "It isn't enabled for those records' record type",
+            "The field is read-only",
+            "The value is too long"
+          ],
+          "answer": 1,
+          "why": "Each record type has its own selection of picklist values."
+        }
+      ]
+    },
+    {
+      "id": "admin-sales",
+      "title": "Sales Cloud essentials",
+      "level": 2,
+      "col": 3,
+      "requires": [
+        "admin-relationships",
+        "admin-record-types"
+      ],
+      "summary": "Leads, conversion, opportunities, products and forecasting.",
+      "lesson": "The core sales flow:\n\n1. **Leads** capture prospects, routed by **lead assignment rules** (including Web-to-Lead).\n2. **Conversion** turns a qualified lead into an **Account**, a **Contact** and optionally an **Opportunity**, mapping lead fields to the new records.\n3. **Opportunities** move through **stages**, each with a default probability and forecast category; **Path** guides reps through them.\n4. **Products** and **price books**: a product needs a standard price before it can go in a custom price book; opportunity line items and quotes use them.\n5. **Collaborative Forecasts** roll opportunity amounts up the role hierarchy.",
+      "concepts": [
+        "Lead assignment rules and Web-to-Lead",
+        "Lead conversion and field mapping",
+        "Stages, probability, forecast categories and Path",
+        "Products, standard and custom price books",
+        "Campaigns and campaign influence"
+      ],
+      "pitfalls": [
+        "Custom lead fields not mapped for conversion: the data is lost.",
+        "Adding a product to a custom price book before giving it a standard price."
+      ],
+      "resources": [
+        {
+          "title": "Leads and Opportunities (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/leads_opportunities_lightning_experience",
+          "kind": "trailhead"
+        },
+        {
+          "title": "Accounts and Contacts (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/accounts_contacts_lightning_experience",
+          "kind": "trailhead"
+        }
+      ],
+      "diagram": "lead-to-cash",
+      "diagramCaption": "Lead to cash: a Lead converts into an Account, a Contact and optionally an Opportunity, which gets a Quote with products and is closed.",
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Look at the diagram. Which record is optional when converting a lead?",
+          "options": [
+            "Account",
+            "Contact",
+            "Opportunity",
+            "None: all three are always created"
+          ],
+          "answer": 2,
+          "why": "Conversion always creates or merges an Account and a Contact; the Opportunity is optional.",
+          "image": "lead-to-cash",
+          "imageAlt": "Diagram: a Lead converts to Account, Contact and an Opportunity marked optional."
+        },
+        {
+          "q": "Using the diagram, where do the products on a Quote come from?",
+          "options": [
+            "The Lead",
+            "Price books",
+            "The Contact",
+            "Campaigns"
+          ],
+          "answer": 1,
+          "why": "Products are priced through price books, then added to opportunities and quotes.",
+          "image": "lead-to-cash",
+          "imageAlt": "Diagram note: products come from price books."
+        },
+        {
+          "q": "Where is an opportunity stage's default probability set?",
+          "options": [
+            "On the Stage picklist values",
+            "In a validation rule",
+            "On the forecast settings",
+            "On the page layout"
+          ],
+          "answer": 0,
+          "why": "Each Stage value carries a default probability and forecast category."
+        },
+        {
+          "q": "Why can't a new product be added to a custom price book?",
+          "options": [
+            "It has no standard price yet",
+            "Quotes are disabled",
+            "It isn't active in a campaign",
+            "It has no record type"
+          ],
+          "answer": 0,
+          "why": "A product needs a standard price before any custom price book entry."
+        }
+      ]
+    },
+    {
+      "id": "admin-service",
+      "title": "Service Cloud essentials",
+      "level": 2,
+      "col": 3,
+      "requires": [
+        "admin-sales"
+      ],
+      "summary": "Cases, queues, routing, escalation and Knowledge.",
+      "lesson": "- **Cases** come in through **Email-to-Case**, **Web-to-Case**, phone or chat.\n- **Case assignment rules** route new cases to a user or **queue**; **Omni-Channel** pushes work to available agents by capacity and skill.\n- **Escalation rules** act on cases still open after a time (counted in business hours): reassign, notify.\n- **Auto-response rules** reply to the customer; **entitlements and milestones** track promised response times.\n- **Knowledge** articles answer common questions; **macros** and **quick text** speed up agents.",
+      "concepts": [
+        "Email-to-Case and Web-to-Case",
+        "Assignment rules, queues and Omni-Channel",
+        "Escalation and auto-response rules",
+        "Entitlements and milestones",
+        "Knowledge, macros and quick text"
+      ],
+      "pitfalls": [
+        "Using assignment rules to escalate: they run on create and edit, not on time passing.",
+        "Escalation timings without business hours."
+      ],
+      "diagram": "case-lifecycle",
+      "diagramCaption": "Case lifecycle: Email-to-Case or Web-to-Case creates a case, an assignment rule routes it to a queue or agent, an escalation rule acts if it stays open too long, and it ends closed.",
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Look at the diagram. A case is still open after 8 hours. Which rule acts?",
+          "options": [
+            "Assignment rule",
+            "Escalation rule",
+            "Auto-response rule",
+            "Validation rule"
+          ],
+          "answer": 1,
+          "why": "Escalation rules act on cases that meet criteria for a period of time.",
+          "image": "case-lifecycle",
+          "imageAlt": "Diagram: an Escalation rule box labelled 'still open after X hours', reached by a 'too slow' arrow."
+        },
+        {
+          "q": "Using the diagram, what routes a new case to a queue?",
+          "options": [
+            "Escalation rule",
+            "Assignment rule",
+            "Omni-Channel presence",
+            "Knowledge"
+          ],
+          "answer": 1,
+          "why": "Case assignment rules route new cases to users or queues.",
+          "image": "case-lifecycle",
+          "imageAlt": "Diagram: Email-to-Case leads to an Assignment rule, then to a Queue / Omni-Channel."
+        },
+        {
+          "q": "What tracks whether first response happened within the contracted time?",
+          "options": [
+            "Entitlements with milestones",
+            "Queues",
+            "Macros",
+            "Case teams"
+          ],
+          "answer": 0,
+          "why": "Entitlement processes with milestones measure required steps against time."
+        }
+      ]
+    },
+    {
+      "id": "admin-flows-advanced",
+      "title": "More Flow",
+      "level": 3,
+      "col": 4,
+      "requires": [
+        "admin-flows"
+      ],
+      "summary": "Screen flows, scheduled paths, subflows and debugging.",
+      "lesson": "- **Screen flows** guide users step by step: on a record page, as a quick action, or in an app.\n- **Scheduled paths** on record-triggered flows run actions relative to a date (\"3 days before Close Date\"); **scheduled flows** run on a timetable for a set of records.\n- **Subflows** reuse logic across flows.\n- **Fault paths** handle errors so users see a helpful message, not a crash.\n- **Debug** runs a flow step by step with sample inputs; failed flow interviews email the admin.",
+      "concepts": [
+        "Screen flows and where to launch them",
+        "Scheduled paths versus scheduled flows",
+        "Subflows for reuse",
+        "Fault paths and debugging"
+      ],
+      "pitfalls": [
+        "No fault path: a single failure shows users an unhandled error.",
+        "A scheduled flow over a huge set of records without filters."
+      ],
+      "resources": [
+        {
+          "title": "Flow Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/flow-basics",
+          "kind": "trailhead"
+        }
+      ],
+      "diagram": "automation-choice",
+      "diagramCaption": "Choosing automation: before-save flows for same-record updates, after-save flows for other records, screen flows to guide users, scheduled flows for timing, approval processes for sign-off, Apex when Flow can't.",
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Look at the diagram. Agents need a guided wizard to log a warranty claim. Which tool?",
+          "options": [
+            "Before-save flow",
+            "Screen flow",
+            "Approval process",
+            "Scheduled flow"
+          ],
+          "answer": 1,
+          "why": "Screen flows show screens to users and collect input.",
+          "image": "automation-choice",
+          "imageAlt": "Diagram: 'Guide a user through steps' points to Screen flow."
+        },
+        {
+          "q": "Using the diagram, a manager must approve big discounts and the record must be locked meanwhile. Which tool?",
+          "options": [
+            "After-save flow",
+            "Approval process",
+            "Screen flow",
+            "Apex"
+          ],
+          "answer": 1,
+          "why": "Approval processes route for sign-off and lock the record.",
+          "image": "automation-choice",
+          "imageAlt": "Diagram: 'Someone must sign off, record locked' points to Approval process."
+        },
+        {
+          "q": "Send a reminder 3 days before an Opportunity's Close Date. What's best?",
+          "options": [
+            "A scheduled path on a record-triggered flow",
+            "A validation rule",
+            "A report subscription",
+            "A screen flow"
+          ],
+          "answer": 0,
+          "why": "Scheduled paths run actions relative to a date field on the record."
+        },
+        {
+          "q": "What shows users a friendly message when a flow element fails?",
+          "options": [
+            "A subflow",
+            "A fault path",
+            "A decision",
+            "A loop"
+          ],
+          "answer": 1,
+          "why": "Fault paths catch errors and let you handle them."
+        }
+      ]
+    },
+    {
+      "id": "admin-approvals",
+      "title": "Approval processes",
+      "level": 3,
+      "col": 4,
+      "requires": [
+        "admin-flows-advanced",
+        "admin-sharing"
+      ],
+      "summary": "Routing records for sign-off.",
+      "lesson": "An **approval process** routes a record to approvers when someone submits it:\n\n- **Entry criteria** decide which records can be submitted (e.g. Discount over 20%).\n- **Steps** name approvers: a specific user, the submitter's manager, a queue; steps can be sequential or require unanimous approval.\n- **Actions** run on submit, approve, reject and recall: field updates, email alerts, tasks.\n- Records are **locked** while pending; only admins and approvers can edit them.\n- Flow's **Orchestrator** and approval actions can handle more complex multi-step work.",
+      "concepts": [
+        "Entry criteria and initial submitters",
+        "Approval steps and approvers",
+        "Initial, final approval, rejection and recall actions",
+        "Record locking"
+      ],
+      "pitfalls": [
+        "No recall action, so a record stays locked if the submitter changes their mind.",
+        "Approvers who are inactive users: the request stalls."
+      ],
+      "resources": [
+        {
+          "title": "Approval Processes (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/business_process_automation",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "What happens to a record while it's pending approval?",
+          "options": [
+            "Nothing",
+            "It's locked against editing",
+            "It's deleted",
+            "It's shared with everyone"
+          ],
+          "answer": 1,
+          "why": "Pending records are locked; admins and approvers can still edit."
+        },
+        {
+          "q": "Which decides whether a record can be submitted at all?",
+          "options": [
+            "Approval steps",
+            "Entry criteria",
+            "Final approval actions",
+            "Page layout"
+          ],
+          "answer": 1,
+          "why": "Entry criteria filter which records qualify."
+        },
+        {
+          "q": "Where do you set a field to 'Approved' when the last approver approves?",
+          "options": [
+            "Initial submission actions",
+            "Final approval actions",
+            "Rejection actions",
+            "Entry criteria"
+          ],
+          "answer": 1,
+          "why": "Final approval actions run once the whole process is approved."
+        }
+      ]
+    },
+    {
+      "id": "admin-dashboards",
+      "title": "Dashboards",
+      "level": 3,
+      "col": 0,
+      "requires": [
+        "admin-reports"
+      ],
+      "summary": "Charts on reports, running users and snapshots.",
+      "lesson": "- Each **dashboard component** shows one source **report** (summary or matrix, or tabular with a row limit) as a chart, gauge, metric or table.\n- The **running user** decides whose data appears. A **dynamic dashboard** runs as the person viewing it.\n- **Dashboard filters** let viewers slice by a field; **subscriptions** email a snapshot on a schedule.\n- **Reporting snapshots** copy report results into a custom object on a schedule, to trend data over time.",
+      "concepts": [
+        "Components and their source reports",
+        "Running user and dynamic dashboards",
+        "Dashboard filters and subscriptions",
+        "Reporting snapshots for history"
+      ],
+      "pitfalls": [
+        "A dashboard running as an admin, showing everyone data they shouldn't see.",
+        "Source reports in private folders."
+      ],
+      "resources": [
+        {
+          "title": "Reports and Dashboards (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/lex_implementation_reports_dashboards",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Each rep should see only their own data on one dashboard. What do you set?",
+          "options": [
+            "A different dashboard per rep",
+            "The dashboard to run as the viewer (dynamic dashboard)",
+            "A report filter",
+            "A sharing rule"
+          ],
+          "answer": 1,
+          "why": "Dynamic dashboards run as whoever views them."
+        },
+        {
+          "q": "Leadership wants to see how the pipeline changed week by week. What captures history?",
+          "options": [
+            "A reporting snapshot",
+            "A dashboard filter",
+            "A joined report",
+            "Field history"
+          ],
+          "answer": 0,
+          "why": "Reporting snapshots store report results on a schedule for trending."
+        },
+        {
+          "q": "What is a dashboard component's data source?",
+          "options": [
+            "A list view",
+            "A report",
+            "A flow",
+            "A record page"
+          ],
+          "answer": 1,
+          "why": "Every component is backed by a report."
+        }
+      ]
+    },
+    {
+      "id": "admin-mobile-collab",
+      "title": "Mobile and Chatter",
+      "level": 3,
+      "col": 2,
+      "requires": [
+        "admin-ui",
+        "admin-reports"
+      ],
+      "summary": "The Salesforce mobile app, quick actions and Chatter.",
+      "lesson": "- The **Salesforce mobile app** uses the same metadata as desktop: Lightning record pages, compact layouts and **quick actions**.\n- **Quick actions** (log a call, create a related record, update fields) appear in the mobile action bar and on desktop.\n- **Chatter** feeds let people follow records and colleagues, @mention others and post in groups. **Feed tracking** posts field changes to a record's feed.",
+      "concepts": [
+        "Quick actions: object-specific and global",
+        "Compact layouts on mobile",
+        "Chatter feeds, groups and feed tracking"
+      ],
+      "pitfalls": [
+        "Designing pages only on desktop: test them in the mobile app too."
+      ],
+      "resources": [
+        {
+          "title": "Chatter Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/chatter_basics_for_users",
+          "kind": "trailhead"
+        }
+      ],
+      "optional": true,
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Field reps need a one-tap 'Log visit' on Accounts in the mobile app. What do you build?",
+          "options": [
+            "A report",
+            "An object-specific quick action on the Account layout",
+            "A new app",
+            "A list view"
+          ],
+          "answer": 1,
+          "why": "Quick actions show in the mobile action bar."
+        },
+        {
+          "q": "Followers of an Account should see a post when its Rating changes. What do you enable?",
+          "options": [
+            "Field history tracking",
+            "Feed tracking on Rating",
+            "A dashboard",
+            "An email alert"
+          ],
+          "answer": 1,
+          "why": "Feed tracking posts tracked field changes to the record feed."
+        },
+        {
+          "q": "Which fields does the mobile app highlight at the top of a record?",
+          "options": [
+            "Page layout fields",
+            "Compact layout fields",
+            "All required fields",
+            "Formula fields"
+          ],
+          "answer": 1,
+          "why": "Compact layouts decide the key fields shown in the highlights."
+        }
+      ]
+    },
+    {
+      "id": "admin-change-management",
+      "title": "Sandboxes and releases",
+      "level": 4,
+      "col": 3,
+      "requires": [
+        "admin-data"
+      ],
+      "summary": "Building safely: sandbox types, change sets and release habits.",
+      "lesson": "Never build directly in production. Build in a **sandbox**, test, then move changes:\n\n- **Change sets** send metadata between connected orgs: create an **outbound** change set in the sandbox, upload it, and deploy the **inbound** one in production. Deploying runs tests if Apex is included.\n- Validate a change set before the release window; schedule releases when users are offline.\n- Keep a release log; tell users what changed.\n- Records aren't moved by change sets: plan data separately.",
+      "concepts": [
+        "Sandbox types and refresh intervals",
+        "Outbound and inbound change sets",
+        "Validating before deploying",
+        "Release communication"
+      ],
+      "pitfalls": [
+        "Forgetting dependent components (fields used on a layout, a flow's custom field) in the change set.",
+        "Building in a sandbox that's months behind production."
+      ],
+      "diagram": "sandbox-types",
+      "diagramCaption": "Sandbox types: Developer and Developer Pro hold metadata only and refresh daily; Partial Copy adds sample data (5 GB, 5 days); Full copies all data (29 days).",
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Look at the diagram. You need to test with a realistic subset of production data, refreshed weekly. Which sandbox?",
+          "options": [
+            "Developer",
+            "Developer Pro",
+            "Partial Copy",
+            "Full"
+          ],
+          "answer": 2,
+          "why": "Partial Copy includes sample data chosen by a template and refreshes every 5 days.",
+          "image": "sandbox-types",
+          "imageAlt": "Diagram: Partial Copy has metadata plus sample data, 5 GB, refresh every 5 days."
+        },
+        {
+          "q": "Using the diagram, how often can a Full sandbox be refreshed?",
+          "options": [
+            "Every day",
+            "Every 5 days",
+            "Every 29 days",
+            "Never"
+          ],
+          "answer": 2,
+          "why": "Full sandboxes copy everything and can be refreshed every 29 days.",
+          "image": "sandbox-types",
+          "imageAlt": "Diagram: Full sandbox, refresh every 29 days."
+        },
+        {
+          "q": "What does a change set move?",
+          "options": [
+            "Records",
+            "Metadata between connected orgs",
+            "Users",
+            "Reports' data"
+          ],
+          "answer": 1,
+          "why": "Change sets carry configuration and code, never records."
+        }
+      ]
+    },
+    {
+      "id": "admin-auditing",
+      "title": "Auditing and org health",
+      "level": 4,
+      "col": 1,
+      "requires": [
+        "admin-sharing",
+        "admin-data"
+      ],
+      "summary": "Who changed what: audit trail, field history and Health Check.",
+      "lesson": "- **Setup Audit Trail** lists configuration changes from the last 180 days: who, what, when.\n- **Field history tracking** records old and new values for chosen fields (up to 20 per object); view it in the History related list or report on it.\n- **Login History** shows who logged in, from where and how.\n- **Health Check** scores your security settings against Salesforce's baseline and shows what to fix.\n- **Optimizer** and **Security Center** (if licensed) highlight unused or risky configuration.",
+      "concepts": [
+        "Setup Audit Trail",
+        "Field history tracking and its limits",
+        "Login History",
+        "Health Check"
+      ],
+      "pitfalls": [
+        "Expecting field history to show changes from before tracking was turned on.",
+        "Ignoring Health Check findings because the score 'looks fine'."
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Who changed the Opportunity sharing setting last week?",
+          "options": [
+            "Field history",
+            "Setup Audit Trail",
+            "Login History",
+            "Debug logs"
+          ],
+          "answer": 1,
+          "why": "Setup Audit Trail records configuration changes."
+        },
+        {
+          "q": "You need old and new values of an Account's Rating over time. What do you enable?",
+          "options": [
+            "Feed tracking",
+            "Field history tracking on Rating",
+            "Setup Audit Trail",
+            "A validation rule"
+          ],
+          "answer": 1,
+          "why": "Field history tracking stores before and after values."
+        },
+        {
+          "q": "Which tool scores your org's security settings against a baseline?",
+          "options": [
+            "Optimizer",
+            "Health Check",
+            "Login History",
+            "Schema Builder"
+          ],
+          "answer": 1,
+          "why": "Health Check compares settings with Salesforce's recommended baseline."
+        }
+      ]
+    },
+    {
+      "id": "admin-cert",
+      "title": "Admin cert checkpoint",
+      "level": 4,
+      "col": 1,
+      "requires": [
+        "admin-reports",
+        "admin-soql",
+        "admin-data",
+        "admin-dashboards",
+        "admin-approvals",
+        "admin-change-management",
+        "admin-service"
+      ],
       "summary": "Mixed scenario questions across the whole path.",
       "lesson": "The Admin exam is scenario-based: read what's asked, then pick the **least effort, most maintainable** declarative answer. Pass this checkpoint, then review any step you hesitated on.",
       "problems": [],
       "quiz": [
-        { "q": "Phone must be filled in only when Status is Closed. What do you build?", "options": ["Make Phone required on the field", "A validation rule", "A page layout", "A sharing rule"], "answer": 1, "why": "Conditional requirements are validation rules: AND(ISPICKVAL(Status, 'Closed'), ISBLANK(Phone))." },
-        { "q": "Support agents need Delete on Cases, but their profile is shared with others. Least-effort fix?", "options": ["New profile", "Permission set for the agents", "Change OWD to Public Read/Write", "Give them the System Administrator profile"], "answer": 1, "why": "Permission sets add access to specific users without side effects." },
-        { "q": "Accounts must be Private, but the whole Finance team needs to read accounts in the Enterprise segment. What do you use?", "options": ["Criteria-based sharing rule", "Field-level security", "Role hierarchy change", "Record type"], "answer": 0, "why": "Criteria-based sharing rules open access by field values to a group or role." },
-        { "q": "Each Course has many Students and each Student many Courses, and you need a count of students per course. What do you build?", "options": ["A lookup on Course and a formula", "A junction object with two master-detail relationships, plus a roll-up summary on Course", "A multi-select picklist", "Two reports"], "answer": 1, "why": "A junction object gives many-to-many; master-detail enables the roll-up count." }
+        {
+          "q": "Phone must be filled in only when Status is Closed. What do you build?",
+          "options": [
+            "Make Phone required on the field",
+            "A validation rule",
+            "A page layout",
+            "A sharing rule"
+          ],
+          "answer": 1,
+          "why": "Conditional requirements are validation rules: AND(ISPICKVAL(Status, 'Closed'), ISBLANK(Phone))."
+        },
+        {
+          "q": "Support agents need Delete on Cases, but their profile is shared with others. Least-effort fix?",
+          "options": [
+            "New profile",
+            "Permission set for the agents",
+            "Change OWD to Public Read/Write",
+            "Give them the System Administrator profile"
+          ],
+          "answer": 1,
+          "why": "Permission sets add access to specific users without side effects."
+        },
+        {
+          "q": "Accounts must be Private, but the whole Finance team needs to read accounts in the Enterprise segment. What do you use?",
+          "options": [
+            "Criteria-based sharing rule",
+            "Field-level security",
+            "Role hierarchy change",
+            "Record type"
+          ],
+          "answer": 0,
+          "why": "Criteria-based sharing rules open access by field values to a group or role."
+        },
+        {
+          "q": "Each Course has many Students and each Student many Courses, and you need a count of students per course. What do you build?",
+          "options": [
+            "A lookup on Course and a formula",
+            "A junction object with two master-detail relationships, plus a roll-up summary on Course",
+            "A multi-select picklist",
+            "Two reports"
+          ],
+          "answer": 1,
+          "why": "A junction object gives many-to-many; master-detail enables the roll-up count."
+        }
       ]
     }
   ]
