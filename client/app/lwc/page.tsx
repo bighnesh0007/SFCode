@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
+import { TrackLanding } from "@/components/TrackLanding";
 
-// LWC problems live in the Problems hub.
+// Server-rendered so search engines see the problem list; the interactive version is /problems?track=lwc.
 export default function Page() {
-  redirect("/problems?track=lwc");
+  return <TrackLanding track="lwc" />;
 }

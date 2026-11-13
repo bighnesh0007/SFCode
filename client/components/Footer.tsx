@@ -2,8 +2,8 @@ import Link from "next/link";
 import { LogoMark } from "@/components/Logo";
 
 const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
-  { title: "Practice", links: [{ href: "/problems", label: "Problems" }, { href: "/playground/apex", label: "Apex playground" }, { href: "/contests", label: "Contests" }, { href: "/interview", label: "Interview mode" }, { href: "/certification", label: "Certification prep" }] },
-  { title: "Learn", links: [{ href: "/roadmap", label: "Roadmaps" }, { href: "/welcome", label: "Find your path" }, { href: "/blog", label: "Blog" }] },
+  { title: "Practice", links: [{ href: "/problems", label: "All problems" }, { href: "/challenges", label: "Apex problems" }, { href: "/soql", label: "SOQL problems" }, { href: "/lwc", label: "LWC problems" }, { href: "/flows", label: "Flow exercises" }, { href: "/debugging", label: "Debugging exercises" }, { href: "/playground/apex", label: "Apex playground" }, { href: "/contests", label: "Contests" }, { href: "/interview", label: "Interview mode" }] },
+  { title: "Learn", links: [{ href: "/roadmap/developer", label: "Developer roadmap" }, { href: "/roadmap/admin", label: "Admin roadmap" }, { href: "/roadmap/lwc", label: "LWC roadmap" }, { href: "/roadmap/integration", label: "Integration roadmap" }, { href: "/certification", label: "Certification practice" }, { href: "/certification/pd1", label: "PD I questions" }, { href: "/certification/admin", label: "Admin questions" }, { href: "/blog", label: "Blog" }] },
   { title: "Community", links: [{ href: "/leaderboard", label: "Leaderboard" }, { href: "/teams", label: "Teams" }, { href: "/mentors", label: "Mentors" }, { href: "/jobs", label: "Job corner" }, { href: "/contribute", label: "Contribute" }, { href: "/store", label: "Store" }] },
   {
     title: "Project",

@@ -1,6 +1,7 @@
+import { pageMeta } from "@/lib/seo";
 import { LegalPage } from "@/components/LegalPage";
 
-export const metadata = { title: "Terms of use · SFCode" };
+export const metadata = pageMeta({ title: "Terms of use", description: "The terms for using SFCode, the open-source Salesforce practice site.", path: "/terms" });
 
 const SOURCE = `
 By using SFCode you agree to these terms. They're short on purpose.

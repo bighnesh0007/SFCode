@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import DOMPurify from "dompurify";
+import DOMPurify from "isomorphic-dompurify";
 import { marked } from "marked";
 
 /**
@@ -13,7 +13,8 @@ import { marked } from "marked";
 export function Markdown({ source, className }: { source: string; className?: string }) {
   const html = useMemo(() => {
     const raw = marked.parse(source, { async: false, gfm: true });
-    return typeof window === "undefined" ? "" : DOMPurify.sanitize(raw, { USE_PROFILES: { html: true } });
+    // Sanitised on the server too, so the text is in the HTML search engines read.
+    return DOMPurify.sanitize(raw, { USE_PROFILES: { html: true } });
   }, [source]);
   return <div className={className} dangerouslySetInnerHTML={{ __html: html }} />;
 }

@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { JsonLd } from "@/components/JsonLd";
+import { pageMeta } from "@/lib/seo";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl } from "@/lib/site";
 import { ArrowRight, Bug, Code2, Database, GraduationCap, Map as MapIcon, PenLine, Swords, Terminal, Trophy, Workflow, Zap } from "lucide-react";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { DailyCard } from "@/components/DailyCard";
@@ -9,6 +12,28 @@ import { ProblemMarquee } from "@/components/home/ProblemMarquee";
 import { SpotlightCard } from "@/components/home/SpotlightCard";
 import { TerminalDemo } from "@/components/home/TerminalDemo";
 import { buttonVariants } from "@/components/ui/button";
+
+export const metadata = pageMeta({ title: `Salesforce Practice Problems: Apex, SOQL, LWC & Flow | ${SITE_NAME}`, description: SITE_DESCRIPTION, path: "/", absoluteTitle: true });
+
+const SITE_LD = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_NAME,
+    alternateName: "SFCode Salesforce practice",
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+    inLanguage: "en",
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: absoluteUrl("/icon.svg"),
+    sameAs: ["https://github.com/bighnesh0007/SFCode"],
+  },
+];
 
 const TRACKS = [
   { icon: Code2, label: "Apex", href: "/problems?track=apex", tone: "text-sky-700 dark:text-sky-400" },
@@ -38,6 +63,7 @@ function SectionTitle({ eyebrow, title, body }: { eyebrow: string; title: string
 export default function Home() {
   return (
     <div className="relative">
+      <JsonLd data={SITE_LD} />
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden">
         <DotBackground />
@@ -45,7 +71,7 @@ export default function Home() {
         <div className="relative mx-auto grid w-full max-w-6xl items-center gap-8 px-4 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:py-24">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border bg-background/70 px-3 py-1 text-xs font-medium text-sky-700 backdrop-blur dark:text-sky-400">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> Open-source practice for the Salesforce community
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> Free, open-source Salesforce practice problems
             </p>
             <h1 className="mt-4 max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
               Write real Apex.{" "}

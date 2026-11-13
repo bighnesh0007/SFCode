@@ -1,6 +1,7 @@
+import { pageMeta } from "@/lib/seo";
 import { WifiOff } from "lucide-react";
 
-export const metadata = { title: "Offline · SFCode" };
+export const metadata = pageMeta({ title: "Offline", description: "You're offline.", path: "/offline", noindex: true });
 
 /** Shown by the service worker when a page can't be reached. Static: no data, no auth. */
 export default function OfflinePage() {

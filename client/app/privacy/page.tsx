@@ -1,6 +1,7 @@
+import { pageMeta } from "@/lib/seo";
 import { LegalPage } from "@/components/LegalPage";
 
-export const metadata = { title: "Privacy policy · SFCode" };
+export const metadata = pageMeta({ title: "Privacy policy", description: "What SFCode collects, why, and what you can do about it.", path: "/privacy" });
 
 // Keep in step with what the code stores: if a new feature keeps personal data, it belongs here.
 const SOURCE = `
