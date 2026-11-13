@@ -8,15 +8,32 @@
  * string drops the rest of that line for everyone alike, which is acceptable
  * for a rough comparison.
  */
+const COMMENTS: [open: string, close: string][] = [
+  ["<!--", "-->"],
+  ["/*", "*/"],
+  ["//", "\n"],
+];
+
+/** Counts non-whitespace characters outside comments. Counts only; the text is never rendered. */
+function countOutsideComments(src: string): number {
+  let n = 0;
+  let i = 0;
+  while (i < src.length) {
+    const c = COMMENTS.find(([open]) => src.startsWith(open, i));
+    if (c) {
+      const end = src.indexOf(c[1], i + c[0].length);
+      i = end === -1 ? src.length : end + c[1].length;
+      continue;
+    }
+    if (!/\s/.test(src.charAt(i))) n++;
+    i++;
+  }
+  return n;
+}
+
 export function codeSize(files: Record<string, string>): number {
   let n = 0;
-  for (const src of Object.values(files)) {
-    const stripped = src
-      .replace(/<!--[\s\S]*?-->/g, "")
-      .replace(/\/\*[\s\S]*?\*\//g, "")
-      .replace(/\/\/[^\n]*/g, "");
-    n += stripped.replace(/\s+/g, "").length;
-  }
+  for (const src of Object.values(files)) n += countOutsideComments(src);
   return n;
 }
 
