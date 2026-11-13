@@ -190,3 +190,14 @@
 .markdown table { border-collapse: collapse; font-size: 0.85rem; }
 .markdown th, .markdown td { border: 1px solid var(--border); padding: 0.3rem 0.6rem; text-align: left; }
 .markdown th { background: var(--muted); }
+
+/* Home page: infinite marquee (Aceternity-style moving cards). Paused on hover; still under reduced motion. */
+@keyframes sfc-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.sfc-marquee { animation: sfc-marquee var(--sfc-marquee-duration, 60s) linear infinite; }
+.sfc-marquee:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .sfc-marquee { animation: none; }
+}
