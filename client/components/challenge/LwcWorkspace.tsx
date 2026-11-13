@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup, useSavedLayout } from "@/components/ui/resizable";
 import { useSubmitShortcut } from "@/components/challenge/useSubmitShortcut";
+import { DiscussionPanel } from "@/components/challenge/DiscussionPanel";
 import { useIsNarrow } from "@/lib/useIsNarrow";
 import { Markdown } from "@/components/Markdown";
 import { LearningPanel } from "@/components/challenge/LearningPanel";
@@ -57,6 +58,7 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
   const { isSignedIn, getToken } = useAuthState();
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [leftTab, setLeftTab] = useState<"description" | "discussion">("description");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [celebrate, setCelebrate] = useState(false);
   const endCelebration = useCallback(() => setCelebrate(false), []);
@@ -153,9 +155,17 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
               <Link href={backHref} className="mr-1 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label="Back to the list">
                 <ChevronLeft className="h-4 w-4" />
               </Link>
-              <span className="text-xs font-medium">Description</span>
+              {(["description", "discussion"] as const).map((t) => (
+                <button key={t} type="button" onClick={() => setLeftTab(t)} className={cn("rounded-md px-2.5 py-1 text-xs font-medium capitalize", leftTab === t ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground")}>
+                  {t}
+                </button>
+              ))}
             </div>
             <div className="flex-1 overflow-auto p-5">
+              {leftTab === "discussion" ? (
+                <DiscussionPanel slug={challenge.slug} />
+              ) : (
+              <>
               <h1 className="text-xl font-semibold">{challenge.title}</h1>
               <div className="mt-2 flex flex-wrap items-center gap-1.5">
                 <Badge variant="outline">{challenge.difficulty}</Badge>
@@ -173,6 +183,8 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
                   Salesforce&apos;s built-in <code>lightning-*</code> components aren&apos;t available here; use plain HTML.
                 </p>
               </div>
+              </>
+              )}
             </div>
           </div>
         </ResizablePanel>

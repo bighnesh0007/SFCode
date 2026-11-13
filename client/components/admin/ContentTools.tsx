@@ -10,6 +10,7 @@ import { ContestForm, type ContestDraft } from "@/components/admin/ContestForm";
 import { useLoad } from "@/components/admin/AdminTools";
 import { getAdminStore, getModeration, getProblemStats, setCommentHidden, setStoreItem, type AdminStoreItem, type ProblemStatRow } from "@/lib/adminApi";
 import { hidePost } from "@/lib/blogApi";
+import { getRecentDiscussion, hideComment } from "@/lib/discussionApi";
 import { deleteContest, getContest, listContests } from "@/lib/contestApi";
 import { trackInfo } from "@/lib/tracks";
 import type { Track } from "@/lib/challengesApi";
@@ -267,6 +268,7 @@ export function ProblemsTab() {
 export function ModerationTab() {
   const { getToken } = useAuthState();
   const { data, error, reload } = useLoad(getModeration);
+  const discussion = useLoad(getRecentDiscussion);
   const [show, setShow] = useState<"all" | "hidden">("all");
   const [message, setMessage] = useState<string | null>(null);
 
@@ -275,6 +277,7 @@ export function ModerationTab() {
     try {
       await fn(await getToken());
       reload();
+      discussion.reload();
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Could not update.");
     }
@@ -282,10 +285,11 @@ export function ModerationTab() {
 
   const posts = (data?.posts ?? []).filter((p) => show === "all" || p.hidden);
   const comments = (data?.comments ?? []).filter((c) => show === "all" || c.hidden);
+  const threads = (discussion.data ?? []).filter((c) => show === "all" || c.hidden);
   return (
     <section className="mt-5 space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-muted-foreground">The newest blog posts and comments, hidden ones included. Hiding keeps the content but takes it out of view; restore any time.</p>
+        <p className="text-xs text-muted-foreground">The newest blog posts, blog comments and problem discussions, hidden ones included. Hiding keeps the content but takes it out of view; restore any time.</p>
         <select aria-label="Show" value={show} onChange={(e) => setShow(e.target.value as "all" | "hidden")} className="h-9 rounded-md border bg-background px-2 text-sm">
           <option value="all">Everything recent</option>
           <option value="hidden">Hidden only</option>
@@ -340,6 +344,34 @@ export function ModerationTab() {
             </li>
           ))}
           {comments.length === 0 && <li className="px-4 py-6 text-center text-sm text-muted-foreground">Nothing here.</li>}
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold">Problem discussions</h3>
+        {discussion.error && <p className="mt-2 text-sm text-destructive">{discussion.error}</p>}
+        <ul className="mt-2 divide-y rounded-lg border">
+          {threads.map((c) => (
+            <li key={c.id} className={cn("flex flex-wrap items-start gap-3 px-4 py-2.5 text-sm", c.hidden && "bg-muted/40")}>
+              <div className="min-w-0 flex-1">
+                <p className="whitespace-pre-wrap break-words">{c.body.length > 280 ? `${c.body.slice(0, 279)}…` : c.body}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  @{c.author.handle} on{" "}
+                  <Link href={`${trackInfo(c.problem.track as Track).base}/${c.problem.slug}`} className="hover:underline">
+                    {c.problem.title}
+                  </Link>{" "}
+                  · {when(c.createdAt)}
+                  {c.spoiler && " · spoiler"}
+                  {c.hidden && " · hidden"}
+                </p>
+              </div>
+              <Button size="sm" variant="ghost" onClick={() => void act((t) => hideComment(t, c.id, !c.hidden))}>
+                {c.hidden ? <Eye className="mr-1 h-3.5 w-3.5" /> : <EyeOff className="mr-1 h-3.5 w-3.5" />}
+                {c.hidden ? "Restore" : "Hide"}
+              </Button>
+            </li>
+          ))}
+          {threads.length === 0 && <li className="px-4 py-6 text-center text-sm text-muted-foreground">Nothing here.</li>}
         </ul>
       </div>
     </section>

@@ -489,3 +489,18 @@ export const pageViews = pgTable(
   },
   (t) => [primaryKey({ columns: [t.day, t.path] })],
 );
+
+/** Discussion under a problem. Comments marked as spoilers are blurred until the reader asks. */
+export const problemComments = pgTable(
+  "problem_comments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    problemSlug: text("problem_slug").notNull(),
+    authorId: text("author_id").notNull(),
+    body: text("body").notNull(),
+    spoiler: boolean("spoiler").notNull().default(false),
+    status: text("status").$type<"published" | "hidden">().notNull().default("published"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("problem_comments_problem_idx").on(t.problemSlug, t.createdAt), index("problem_comments_created_idx").on(t.createdAt)],
+);
