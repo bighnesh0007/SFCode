@@ -45,7 +45,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Apex, because it's more flexible"
+          "text": "Apex, because code is more flexible and easier to change later"
         },
         {
           "id": "b",
@@ -138,7 +138,7 @@
         },
         {
           "id": "d",
-          "text": "Page layout"
+          "text": "Page layout for the user's profile"
         }
       ],
       "answer": [
@@ -157,7 +157,7 @@
         },
         {
           "id": "b",
-          "text": "Sharing rules only"
+          "text": "Sharing rules from each user to their manager"
         },
         {
           "id": "c",
@@ -192,7 +192,7 @@
         },
         {
           "id": "d",
-          "text": "Limits are the same everywhere"
+          "text": "Limits are the same in every edition, so there's nothing to check"
         }
       ],
       "answer": [
@@ -207,7 +207,7 @@
       "options": [
         {
           "id": "a",
-          "text": "A new profile"
+          "text": "A new profile with only those tabs visible"
         },
         {
           "id": "b",
@@ -246,7 +246,7 @@
         },
         {
           "id": "d",
-          "text": "Lookup"
+          "text": "A lookup from Interview to Position with cascade delete"
         }
       ],
       "answer": [
@@ -261,7 +261,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Two lookups on Position"
+          "text": "Two lookup fields on Position pointing to Candidate records"
         },
         {
           "id": "b",
@@ -320,7 +320,7 @@
         },
         {
           "id": "b",
-          "text": "It changes the record Id"
+          "text": "Every record on the object gets a new record Id"
         },
         {
           "id": "c",
@@ -347,7 +347,7 @@
         },
         {
           "id": "b",
-          "text": "A picklist"
+          "text": "A picklist field holding every ERP number"
         },
         {
           "id": "c",
@@ -428,7 +428,7 @@
         },
         {
           "id": "b",
-          "text": "A before-save flow"
+          "text": "A before-save flow that clears the field if it isn't five digits"
         },
         {
           "id": "c",
@@ -537,7 +537,7 @@
         },
         {
           "id": "b",
-          "text": "After-save flow"
+          "text": "After-save record-triggered flow with an Update Records element"
         },
         {
           "id": "c",
@@ -560,7 +560,7 @@
       "options": [
         {
           "id": "a",
-          "text": "A screen flow"
+          "text": "A screen flow that asks the manager and locks the record"
         },
         {
           "id": "b",
@@ -595,7 +595,7 @@
         },
         {
           "id": "c",
-          "text": "A daily report"
+          "text": "A daily report of closed opportunities emailed to reps"
         },
         {
           "id": "d",
@@ -626,7 +626,7 @@
         },
         {
           "id": "d",
-          "text": "Use a subflow per contact"
+          "text": "Call a subflow per contact that updates that contact"
         }
       ],
       "answer": [
@@ -645,7 +645,7 @@
         },
         {
           "id": "b",
-          "text": "A new page layout"
+          "text": "A new page layout assigned to escalated cases"
         },
         {
           "id": "c",
@@ -680,7 +680,7 @@
         },
         {
           "id": "d",
-          "text": "A global action"
+          "text": "A global action that creates a Contact from anywhere"
         }
       ],
       "answer": [
@@ -699,7 +699,7 @@
         },
         {
           "id": "b",
-          "text": "Search layout"
+          "text": "Search layout for the object"
         },
         {
           "id": "c",
@@ -734,7 +734,7 @@
         },
         {
           "id": "d",
-          "text": "Create two Account objects"
+          "text": "Create a second Account object for the Support team"
         }
       ],
       "answer": [
@@ -815,7 +815,7 @@
         },
         {
           "id": "d",
-          "text": "Data Loader"
+          "text": "Data Loader, exporting the metadata from the sandbox and importing it"
         }
       ],
       "answer": [
@@ -830,7 +830,7 @@
       "options": [
         {
           "id": "a",
-          "text": "They can be upgraded automatically"
+          "text": "They can be upgraded automatically when the publisher releases a new version"
         },
         {
           "id": "b",
@@ -896,7 +896,7 @@
         },
         {
           "id": "d",
-          "text": "An owner-based sharing rule"
+          "text": "An owner-based sharing rule from recruiters to the group"
         }
       ],
       "answer": [
@@ -911,7 +911,7 @@
       "options": [
         {
           "id": "a",
-          "text": "A sharing rule"
+          "text": "A sharing rule for that colleague"
         },
         {
           "id": "b",
@@ -942,7 +942,7 @@
         },
         {
           "id": "b",
-          "text": "Yes, standard objects can't be customised"
+          "text": "Yes, because standard objects can't have custom fields or layouts added to them"
         },
         {
           "id": "c",
@@ -969,7 +969,7 @@
         },
         {
           "id": "b",
-          "text": "Schema Builder only"
+          "text": "Schema Builder, which lists the field count against the limit"
         },
         {
           "id": "c",
@@ -996,7 +996,7 @@
         },
         {
           "id": "b",
-          "text": "The OWD is Private"
+          "text": "The object's org-wide default is Private"
         },
         {
           "id": "c",
@@ -1113,7 +1113,7 @@
         },
         {
           "id": "d",
-          "text": "Yes, always"
+          "text": "Yes, any user with edit access can always change the master"
         }
       ],
       "answer": [
@@ -1136,7 +1136,7 @@
         },
         {
           "id": "c",
-          "text": "A unique email field"
+          "text": "Make Email a unique field on Contact so duplicates are flagged"
         },
         {
           "id": "d",
@@ -1155,7 +1155,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Setup Audit Trail"
+          "text": "Setup Audit Trail for the Position object"
         },
         {
           "id": "b",
@@ -1194,7 +1194,7 @@
         },
         {
           "id": "d",
-          "text": "Picklist"
+          "text": "Picklist (multi-select)"
         }
       ],
       "answer": [
@@ -1217,7 +1217,7 @@
         },
         {
           "id": "c",
-          "text": "VLOOKUP"
+          "text": "VLOOKUP(Priority__c, ...)"
         },
         {
           "id": "d",
@@ -1267,7 +1267,7 @@
         },
         {
           "id": "b",
-          "text": "COALESCE(Discount__c)"
+          "text": "COALESCE(Discount__c, 0)"
         },
         {
           "id": "c",
@@ -1344,7 +1344,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Before-save flow"
+          "text": "Before-save record-triggered flow with a Create Records element"
         },
         {
           "id": "b",
@@ -1375,7 +1375,7 @@
         },
         {
           "id": "b",
-          "text": "Two record types"
+          "text": "Two record types, each with its own approval routing"
         },
         {
           "id": "c",
@@ -1410,7 +1410,7 @@
         },
         {
           "id": "d",
-          "text": "Nothing; roll-ups can't filter"
+          "text": "Nothing, because roll-up summaries can't filter the records they count"
         }
       ],
       "answer": [
@@ -1456,7 +1456,7 @@
         },
         {
           "id": "b",
-          "text": "A formula field"
+          "text": "A formula field on Account listing the applications"
         },
         {
           "id": "c",
@@ -1487,7 +1487,7 @@
         },
         {
           "id": "c",
-          "text": "A compact layout"
+          "text": "A compact layout with the notes and recent items fields"
         },
         {
           "id": "d",
@@ -1514,7 +1514,7 @@
         },
         {
           "id": "c",
-          "text": "A validation rule"
+          "text": "A validation rule on Account checking the permission"
         },
         {
           "id": "d",
@@ -1537,7 +1537,7 @@
         },
         {
           "id": "b",
-          "text": "A queue"
+          "text": "A queue that opens the website for each account"
         },
         {
           "id": "c",
@@ -1564,7 +1564,7 @@
         },
         {
           "id": "b",
-          "text": "A record page"
+          "text": "A Lightning record page for the User object"
         },
         {
           "id": "c",
@@ -1599,7 +1599,7 @@
         },
         {
           "id": "d",
-          "text": "Deploy twice"
+          "text": "Deploy the same change set twice so the field is created first"
         }
       ],
       "answer": [
@@ -1618,7 +1618,7 @@
         },
         {
           "id": "b",
-          "text": "A sharing rule"
+          "text": "A sharing rule giving the sandbox users access to production"
         },
         {
           "id": "c",
@@ -1649,7 +1649,7 @@
         },
         {
           "id": "c",
-          "text": "Deploy during business hours without notice"
+          "text": "Deploy during business hours without notice so users see changes at once"
         },
         {
           "id": "d",

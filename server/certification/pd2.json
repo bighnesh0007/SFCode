@@ -104,7 +104,7 @@
         },
         {
           "id": "b",
-          "text": "Directly in the trigger with `Http.send()`"
+          "text": "Directly in the trigger with `Http.send()`, after setting a longer timeout so the save waits for the response to come back"
         },
         {
           "id": "c",
@@ -135,7 +135,7 @@
         },
         {
           "id": "c",
-          "text": "Insert them in the opposite order"
+          "text": "Insert them in the opposite order, so the Account is saved before the User record"
         },
         {
           "id": "d",
@@ -239,7 +239,7 @@
         },
         {
           "id": "b",
-          "text": "A lookup field"
+          "text": "A lookup field to a custom object with a large number of records"
         },
         {
           "id": "c",
@@ -262,7 +262,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Increasing the callout timeout"
+          "text": "Increasing the callout timeout on the HttpRequest to the 120-second maximum"
         },
         {
           "id": "b",
@@ -316,7 +316,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Call `UserInfo.setUser()`"
+          "text": "Call `UserInfo.setUser()` with the Id of a user who has that profile"
         },
         {
           "id": "b",
@@ -343,7 +343,7 @@
       "options": [
         {
           "id": "a",
-          "text": "A JSON file in the test class"
+          "text": "A JSON file stored inline in the test class as a string"
         },
         {
           "id": "b",
@@ -436,7 +436,7 @@
         },
         {
           "id": "d",
-          "text": "It works but isn't cached"
+          "text": "It works, but the result isn't cached by the client"
         }
       ],
       "answer": [
@@ -455,7 +455,7 @@
         },
         {
           "id": "b",
-          "text": "window.location.reload()"
+          "text": "window.location.reload() once the update resolves"
         },
         {
           "id": "c",
@@ -532,7 +532,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Content Security Policy only"
+          "text": "The browser's Content Security Policy on its own"
         },
         {
           "id": "b",
@@ -563,7 +563,7 @@
         },
         {
           "id": "b",
-          "text": "Schema.newClass(name)"
+          "text": "Schema.getGlobalDescribe().get(name).newInstance()"
         },
         {
           "id": "c",
@@ -625,7 +625,7 @@
         },
         {
           "id": "d",
-          "text": "A try/catch that ignores the error"
+          "text": "A try/catch around the lines that logs the error and carries on"
         }
       ],
       "answer": [
@@ -644,7 +644,7 @@
         },
         {
           "id": "b",
-          "text": "One class with a big if/else"
+          "text": "One class with an if/else branch for each provider name"
         },
         {
           "id": "c",
@@ -698,7 +698,7 @@
         },
         {
           "id": "b",
-          "text": "Prevents the job from failing"
+          "text": "Prevents the job from failing by catching every exception it throws"
         },
         {
           "id": "c",
@@ -729,7 +729,7 @@
         },
         {
           "id": "c",
-          "text": "Concatenate the term"
+          "text": "Concatenate the term after calling String.escapeSingleQuotes on half of it"
         },
         {
           "id": "d",
@@ -779,7 +779,7 @@
         },
         {
           "id": "b",
-          "text": "The DML is rolled back automatically"
+          "text": "The DML is rolled back automatically and the callout runs on its own"
         },
         {
           "id": "c",
@@ -856,7 +856,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Regular expressions"
+          "text": "Regular expressions that pull out each field you need from the body"
         },
         {
           "id": "b",
@@ -968,7 +968,7 @@
         },
         {
           "id": "b",
-          "text": "The trigger, directly"
+          "text": "The trigger itself, calling Http.send() in an after-insert context"
         },
         {
           "id": "c",
@@ -991,7 +991,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Insert, then delete duplicates nightly"
+          "text": "Insert every request, then delete the duplicate Orders with a nightly batch"
         },
         {
           "id": "b",
@@ -1127,7 +1127,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Increase heap"
+          "text": "Increase the heap size allowed for the page's controller"
         },
         {
           "id": "b",
@@ -1158,7 +1158,7 @@
         },
         {
           "id": "b",
-          "text": "innerHTML"
+          "text": "Set innerHTML on a div in renderedCallback"
         },
         {
           "id": "c",
@@ -1220,7 +1220,7 @@
         },
         {
           "id": "d",
-          "text": "Insert them in one statement"
+          "text": "Insert the User and Account together in one DML statement"
         }
       ],
       "answer": [
@@ -1239,7 +1239,7 @@
         },
         {
           "id": "b",
-          "text": "Update CreatedDate directly"
+          "text": "Set CreatedDate in the record before inserting it"
         },
         {
           "id": "c",
@@ -1293,7 +1293,7 @@
         },
         {
           "id": "b",
-          "text": "Database.load('file')"
+          "text": "Database.load('resourceName') with the object type inferred from the file"
         },
         {
           "id": "c",
@@ -1316,7 +1316,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Use System.schedule only"
+          "text": "Schedule it with System.schedule and wait for the cron to fire"
         },
         {
           "id": "b",
@@ -1374,7 +1374,7 @@
         },
         {
           "id": "b",
-          "text": "Test.getQueryCount()"
+          "text": "Test.getQueryCount() after calling the method"
         },
         {
           "id": "c",
@@ -1428,7 +1428,7 @@
         },
         {
           "id": "b",
-          "text": "Two Test.setMock calls"
+          "text": "Call Test.setMock twice, once for each endpoint's mock class"
         },
         {
           "id": "c",
@@ -1532,7 +1532,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Using a Set instead of a List"
+          "text": "Store the results in a Set instead of a List to save memory"
         },
         {
           "id": "b",
@@ -1567,7 +1567,7 @@
         },
         {
           "id": "c",
-          "text": "Querying inside the loop"
+          "text": "Querying the related records inside the loop instead of before it"
         },
         {
           "id": "d",
@@ -1621,7 +1621,7 @@
         },
         {
           "id": "c",
-          "text": "Health Check"
+          "text": "Health Check in Setup, under the security settings"
         },
         {
           "id": "d",
