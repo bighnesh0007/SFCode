@@ -95,7 +95,7 @@ export default function RoadmapPage() {
 
   const byId = useMemo(() => new Map((view?.nodes ?? []).map((n) => [n.id, n])), [view]);
   const rows = Math.max(0, ...(view?.nodes ?? []).map((n) => n.depth)) + 1;
-  // As many columns as the roadmap uses (3 or 4).
+  // As many columns as the roadmap uses (3 to 5).
   const cols = Math.max(3, ...(view?.nodes ?? []).map((n) => n.col + 1));
   const pos = (n: RoadmapNode) => ({ x: n.col * COL_W + (COL_W - BOX_W) / 2, y: n.depth * ROW_H + 8 });
   const selected = open ? byId.get(open) : undefined;

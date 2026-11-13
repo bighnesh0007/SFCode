@@ -42,7 +42,7 @@ const nodeSchema = z.strictObject({
   /** Nice to know, not on the main path: excluded from progress. */
   optional: z.boolean().optional(),
   level: z.number().int().min(1).max(4),
-  col: z.number().int().min(0).max(3),
+  col: z.number().int().min(0).max(4),
   requires: z.array(z.string()),
   problems: z.array(z.string()),
   cert: z.strictObject({ exam: z.string(), section: z.string().optional() }).optional(),
