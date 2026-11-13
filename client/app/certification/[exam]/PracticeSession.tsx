@@ -91,7 +91,7 @@ export function PracticeSession({ exam, section, load, title }: { exam: string; 
         <Link href="/certification" className="flex items-center gap-1 text-muted-foreground hover:text-foreground">
           <ChevronLeft className="h-4 w-4" /> All exams
         </Link>
-        {title && <span className="font-medium">{title}</span>}
+        <h1 className="font-medium">{title ?? "Practice questions"}</h1>
         <span className="tabular-nums text-muted-foreground">
           {done ? `${questions.length}/${questions.length}` : `Question ${index + 1} of ${questions.length}`} · {score} correct
         </span>
@@ -99,9 +99,9 @@ export function PracticeSession({ exam, section, load, title }: { exam: string; 
 
       {done ? (
         <div className="rounded-xl border p-8 text-center">
-          <h1 className="text-2xl font-bold">
+          <h2 className="text-2xl font-bold">
             {score}/{questions.length} correct
-          </h1>
+          </h2>
           <p className="mt-2 text-muted-foreground">
             {load
               ? "Each question comes back later: sooner if you missed it, later each time you get it right."

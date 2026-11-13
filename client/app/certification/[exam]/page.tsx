@@ -29,7 +29,7 @@ export default async function Page({ params }: Props) {
   if (list && !e) notFound();
   return (
     <>
-      <Session exam={exam} />
+      <Session exam={exam} title={e ? `${e.title} practice questions` : undefined} />
       {e && (
         <section className="container mx-auto max-w-3xl px-4 pb-12 text-sm text-muted-foreground">
           <JsonLd
