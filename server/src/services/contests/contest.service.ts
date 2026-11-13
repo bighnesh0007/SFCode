@@ -64,6 +64,15 @@ function slugify(title: string): string {
   return `${base || "contest"}-${randomBytes(2).toString("hex")}`;
 }
 
+export interface RatingRow {
+  rank: number;
+  handle: string;
+  displayName: string;
+  imageUrl: string | null;
+  rating: number;
+  contests: number;
+}
+
 export class ContestService {
   constructor(
     private readonly repo: ContestRepository,
@@ -168,6 +177,34 @@ export class ContestService {
       placings.push({ contestSlug: c.slug, title: c.title, endsAt: c.endsAt.toISOString(), ranks: new Map(rows.map((r) => [r.userId, r.rank])) });
     }
     return replayRatings(placings).get(userId) ?? [];
+  }
+
+  private ratingCache: { at: number; rows: RatingRow[] } | null = null;
+
+  /** Everyone's current contest rating, best first. Cached briefly: it replays every finished contest. */
+  async ratingBoard(limit = 100): Promise<RatingRow[]> {
+    const now = this.clock.nowMs();
+    if (this.ratingCache && now - this.ratingCache.at < 60_000) return this.ratingCache.rows.slice(0, limit);
+    const placings: ContestPlacing[] = [];
+    for (const c of await this.repo.list()) {
+      if (this.phase(c) !== "ended") continue;
+      const rows = await this.finalRows(c);
+      placings.push({ contestSlug: c.slug, title: c.title, endsAt: c.endsAt.toISOString(), ranks: new Map(rows.map((r) => [r.userId, r.rank])) });
+    }
+    const latest = [...replayRatings(placings)].flatMap(([userId, h]) => {
+      const last = h.at(-1);
+      return last ? [{ userId, rating: last.rating, contests: h.length }] : [];
+    });
+    const profiles = new Map((await this.profiles.findByUsers(latest.map((r) => r.userId))).map((p) => [p.userId, p]));
+    const rows = latest
+      .flatMap((r) => {
+        const p = profiles.get(r.userId);
+        return p ? [{ handle: p.handle, displayName: p.displayName, imageUrl: p.imageUrl, rating: r.rating, contests: r.contests }] : [];
+      })
+      .sort((a, b) => b.rating - a.rating || b.contests - a.contests)
+      .map((r, i) => ({ rank: i + 1, ...r }));
+    this.ratingCache = { at: now, rows };
+    return rows.slice(0, limit);
   }
 
   /** Finished contests the user entered, newest first, with their rank. */

@@ -110,10 +110,11 @@ export interface LeaderboardRow {
   solved: number;
 }
 
-export type LeaderboardWindow = "all" | "30d";
+export type LeaderboardWindow = "all" | "30d" | "7d";
+const WINDOW_DAYS: Record<LeaderboardWindow, number | null> = { all: null, "30d": 30, "7d": 7 };
 
 export class CommunityService {
-  private cached = new Map<LeaderboardWindow, { at: number; rows: LeaderboardRow[] }>();
+  private cached = new Map<string, { at: number; rows: LeaderboardRow[] }>();
   /** Set after construction: the store depends on contests, which depend on this. */
   private cosmeticsSource: CosmeticsSource | undefined;
 
@@ -223,17 +224,20 @@ export class CommunityService {
     return rankFor(points);
   }
 
-  async leaderboard(window: LeaderboardWindow, limit = 100): Promise<LeaderboardRow[]> {
+  /** `track` narrows the board to one track's solves; omitted, every scored track counts. */
+  async leaderboard(window: LeaderboardWindow, limit = 100, track?: Track): Promise<LeaderboardRow[]> {
     const now = this.clock.nowMs();
-    const hit = this.cached.get(window);
+    const key = `${window}:${track ?? "*"}`;
+    const hit = this.cached.get(key);
     if (hit !== undefined && now - hit.at < LEADERBOARD_TTL_MS) return hit.rows.slice(0, limit);
 
-    const since = window === "30d" ? new Date(now - 30 * 86_400_000) : undefined;
+    const days = WINDOW_DAYS[window];
+    const since = days === null ? undefined : new Date(now - days * 86_400_000);
     const table = await this.points.table();
     const totals = new Map<string, { score: number; solved: number; last: number }>();
     for (const s of await this.submissions.firstSolves(since)) {
       const c = this.catalog.get(s.slug);
-      if (!c || !SCORED_TRACKS.includes(c.track)) continue;
+      if (!c || !SCORED_TRACKS.includes(c.track) || (track && c.track !== track)) continue;
       const t = totals.get(s.userId) ?? { score: 0, solved: 0, last: 0 };
       t.score += table.points(c.track, c.difficulty);
       t.solved += 1;
@@ -250,7 +254,7 @@ export class CommunityService {
       .sort((a, b) => b.t.score - a.t.score || a.t.last - b.t.last);
     const looks = await this.cosmeticsOf(ordered.map(({ p }) => p.userId));
     const rows = ordered.map(({ p, t }, i) => ({ rank: i + 1, handle: p.handle, displayName: p.displayName, imageUrl: p.imageUrl, score: t.score, solved: t.solved, cosmetics: looks.get(p.userId) ?? {}, tier: { id: rankFor(t.score).id, title: rankFor(t.score).title } }));
-    this.cached.set(window, { at: now, rows });
+    this.cached.set(key, { at: now, rows });
     return rows.slice(0, limit);
   }
 

@@ -110,7 +110,20 @@ export const getMyProfile = (token: Token) => apiRequest<ProfileView>("/api/v1/p
 export const getProfile = (handle: string) => apiRequest<ProfileView>(`/api/v1/profile/${encodeURIComponent(handle)}`);
 export const updateMyProfile = (token: Token, changes: { handle?: string; displayName?: string }) =>
   apiRequest<ProfileView>("/api/v1/profile/me", { method: "PATCH", token, body: changes });
-export const getLeaderboard = (window: "all" | "30d") => apiRequest<LeaderboardRow[]>(`/api/v1/leaderboard?window=${window}`);
+export type LeaderboardWindow = "all" | "30d" | "7d";
+export type ScoredTrack = "apex" | "soql" | "debug" | "flow" | "lwc";
+export const getLeaderboard = (window: LeaderboardWindow, track?: ScoredTrack) =>
+  apiRequest<LeaderboardRow[]>(`/api/v1/leaderboard?window=${window}${track ? `&track=${track}` : ""}`);
+
+export interface RatingRow {
+  rank: number;
+  handle: string;
+  displayName: string;
+  imageUrl: string | null;
+  rating: number;
+  contests: number;
+}
+export const getRatingBoard = () => apiRequest<RatingRow[]>("/api/v1/leaderboard/rating");
 
 export const updateMyAbout = (token: Token, about: { bio: string; company: string; location: string; trailheadUrl: string; linkedinUrl: string; githubUrl: string; certifications: string[]; openToWork: boolean }) =>
   apiRequest<ProfileView>("/api/v1/profile/me/about", { method: "PUT", token, body: about });
