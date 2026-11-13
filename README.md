@@ -22,7 +22,7 @@ Live at **https://sf.bighnesh.space**
 | **Apex Playground** | Run anonymous Apex in your org and read the debug log |
 | **Flows** | Build record-triggered and autolaunched flows in your org's Flow Builder; hidden Apex tests grade them |
 | **LWC** | Build components in the browser; compiled on the server, tested in a sandboxed iframe |
-| **Certification Prep** | Original Administrator, PD I and PD II questions with explanations, timed mock exams weighted like the real ones, and a readiness meter |
+| **Certification Prep** | Original questions with explanations for Administrator, Platform App Builder, PD I, PD II and JavaScript Developer I, timed mock exams weighted like the real ones, and a readiness meter |
 | **Roadmaps** | Developer and Admin paths: a one-time welcome quiz places you, steps link real problems, lessons and quizzes, and a weekly plan fits your time |
 | **Daily Challenge** | One problem a day for everyone, with bonus coins and a streak |
 | **Contests** | Timed rounds with live standings; the top three win coins |

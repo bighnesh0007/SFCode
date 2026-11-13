@@ -1,0 +1,868 @@
+{
+  "exam": "js-dev-1",
+  "title": "JavaScript Developer I",
+  "order": 5,
+  "description": "Core JavaScript: types, objects and classes, the browser and events, async code, Node.js and testing. (The certification also needs the LWC Specialist superbadge.)",
+  "sections": [
+    {
+      "id": "variables",
+      "title": "Variables, Types and Collections"
+    },
+    {
+      "id": "objects",
+      "title": "Objects, Functions and Classes"
+    },
+    {
+      "id": "browser",
+      "title": "Browser and Events"
+    },
+    {
+      "id": "debugging",
+      "title": "Debugging and Error Handling"
+    },
+    {
+      "id": "async",
+      "title": "Asynchronous Programming"
+    },
+    {
+      "id": "server",
+      "title": "Server-Side JavaScript"
+    },
+    {
+      "id": "testing",
+      "title": "Testing"
+    }
+  ],
+  "mock": {
+    "questions": 60,
+    "minutes": 105,
+    "passPercent": 65,
+    "weights": {
+      "variables": 23,
+      "objects": 25,
+      "browser": 17,
+      "debugging": 7,
+      "async": 13,
+      "server": 8,
+      "testing": 7
+    }
+  },
+  "questions": [
+    {
+      "id": "js-let-const",
+      "section": "variables",
+      "prompt": "Which statement about `const` is true?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The value can never change"
+        },
+        {
+          "id": "b",
+          "text": "The binding can't be reassigned, but an object it holds can still be mutated"
+        },
+        {
+          "id": "c",
+          "text": "It's function-scoped"
+        },
+        {
+          "id": "d",
+          "text": "It's hoisted and initialised to undefined"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "const prevents reassignment of the variable; the object itself stays mutable."
+    },
+    {
+      "id": "js-equality",
+      "section": "variables",
+      "prompt": "What does `0 == ''` evaluate to, and `0 === ''`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "true, false"
+        },
+        {
+          "id": "b",
+          "text": "false, false"
+        },
+        {
+          "id": "c",
+          "text": "true, true"
+        },
+        {
+          "id": "d",
+          "text": "false, true"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "== coerces both to numbers (0 == 0), while === compares type and value without coercion."
+    },
+    {
+      "id": "js-typeof-null",
+      "section": "variables",
+      "prompt": "What does `typeof null` return?",
+      "options": [
+        {
+          "id": "a",
+          "text": "\"null\""
+        },
+        {
+          "id": "b",
+          "text": "\"object\""
+        },
+        {
+          "id": "c",
+          "text": "\"undefined\""
+        },
+        {
+          "id": "d",
+          "text": "\"number\""
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A long-standing quirk: typeof null is 'object'."
+    },
+    {
+      "id": "js-falsy",
+      "section": "variables",
+      "prompt": "Which values are falsy? Choose 3.",
+      "options": [
+        {
+          "id": "a",
+          "text": "0"
+        },
+        {
+          "id": "b",
+          "text": "\"\""
+        },
+        {
+          "id": "c",
+          "text": "null"
+        },
+        {
+          "id": "d",
+          "text": "\"0\""
+        },
+        {
+          "id": "e",
+          "text": "[]"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanation": "0, empty string, null, undefined, NaN and false are falsy; '0' and [] are truthy."
+    },
+    {
+      "id": "js-spread-copy",
+      "section": "variables",
+      "prompt": "Which creates a shallow copy of the array `a`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "const b = a;"
+        },
+        {
+          "id": "b",
+          "text": "const b = [...a];"
+        },
+        {
+          "id": "c",
+          "text": "const b = a.push();"
+        },
+        {
+          "id": "d",
+          "text": "const b = &a;"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Spread copies elements into a new array; assignment just shares the reference."
+    },
+    {
+      "id": "js-map-filter",
+      "section": "variables",
+      "prompt": "What does `[1, 2, 3, 4].filter(n => n % 2).map(n => n * 10)` return?",
+      "options": [
+        {
+          "id": "a",
+          "text": "[10, 30]"
+        },
+        {
+          "id": "b",
+          "text": "[20, 40]"
+        },
+        {
+          "id": "c",
+          "text": "[10, 20, 30, 40]"
+        },
+        {
+          "id": "d",
+          "text": "[1, 3]"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "filter keeps odd numbers (1, 3), then map multiplies each by 10."
+    },
+    {
+      "id": "js-number-string",
+      "section": "variables",
+      "prompt": "What is `'5' + 2` and `'5' - 2`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "'52' and 3"
+        },
+        {
+          "id": "b",
+          "text": "7 and 3"
+        },
+        {
+          "id": "c",
+          "text": "'52' and '3'"
+        },
+        {
+          "id": "d",
+          "text": "7 and '3'"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "+ with a string concatenates; - converts both to numbers."
+    },
+    {
+      "id": "js-this-arrow",
+      "section": "objects",
+      "prompt": "Inside an arrow function, what does `this` refer to?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The arrow function itself"
+        },
+        {
+          "id": "b",
+          "text": "The `this` of the enclosing scope"
+        },
+        {
+          "id": "c",
+          "text": "Always the global object"
+        },
+        {
+          "id": "d",
+          "text": "The caller"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Arrow functions don't bind their own this; they use the surrounding one."
+    },
+    {
+      "id": "js-class-static",
+      "section": "objects",
+      "prompt": "How do you call a static method `create` on class `Order`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "new Order().create()"
+        },
+        {
+          "id": "b",
+          "text": "Order.create()"
+        },
+        {
+          "id": "c",
+          "text": "Order.prototype.create()"
+        },
+        {
+          "id": "d",
+          "text": "this.create()"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Static methods belong to the class itself, not instances."
+    },
+    {
+      "id": "js-destructuring",
+      "section": "objects",
+      "prompt": "What is `b` after `const { a, b = 2 } = { a: 1 };`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "undefined"
+        },
+        {
+          "id": "b",
+          "text": "2"
+        },
+        {
+          "id": "c",
+          "text": "1"
+        },
+        {
+          "id": "d",
+          "text": "An error"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Destructuring defaults apply when the property is undefined."
+    },
+    {
+      "id": "js-closure",
+      "section": "objects",
+      "prompt": "Given `function makeCounter() { let n = 0; return () => ++n; }` and `const next = makeCounter();`, what do two calls to `next()` return?",
+      "options": [
+        {
+          "id": "a",
+          "text": "1 then 1"
+        },
+        {
+          "id": "b",
+          "text": "1 then 2"
+        },
+        {
+          "id": "c",
+          "text": "0 then 1"
+        },
+        {
+          "id": "d",
+          "text": "undefined"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The returned function closes over n, which persists between calls."
+    },
+    {
+      "id": "js-prototype",
+      "section": "objects",
+      "prompt": "Where does `obj.toString()` come from on a plain object?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The object itself"
+        },
+        {
+          "id": "b",
+          "text": "Object.prototype, via the prototype chain"
+        },
+        {
+          "id": "c",
+          "text": "The window object"
+        },
+        {
+          "id": "d",
+          "text": "A global function"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Property lookups walk the prototype chain up to Object.prototype."
+    },
+    {
+      "id": "js-object-freeze",
+      "section": "objects",
+      "prompt": "After `const o = Object.freeze({ x: 1 }); o.x = 2;` in non-strict code, what is o.x?",
+      "options": [
+        {
+          "id": "a",
+          "text": "2"
+        },
+        {
+          "id": "b",
+          "text": "1"
+        },
+        {
+          "id": "c",
+          "text": "undefined"
+        },
+        {
+          "id": "d",
+          "text": "It throws"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Frozen objects can't be changed; the assignment is ignored (it throws only in strict mode)."
+    },
+    {
+      "id": "js-getter",
+      "section": "objects",
+      "prompt": "Which defines a computed property `full` on a class?",
+      "options": [
+        {
+          "id": "a",
+          "text": "get full() { return this.first + ' ' + this.last; }"
+        },
+        {
+          "id": "b",
+          "text": "full: function() {}"
+        },
+        {
+          "id": "c",
+          "text": "computed full()"
+        },
+        {
+          "id": "d",
+          "text": "@full"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "get defines a getter, read like a property: person.full."
+    },
+    {
+      "id": "js-extends-super",
+      "section": "objects",
+      "prompt": "In a subclass constructor, what must happen before using `this`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Nothing"
+        },
+        {
+          "id": "b",
+          "text": "Call super(...)"
+        },
+        {
+          "id": "c",
+          "text": "Call this.init()"
+        },
+        {
+          "id": "d",
+          "text": "Return this"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Derived class constructors must call super() before accessing this."
+    },
+    {
+      "id": "js-event-bubbling",
+      "section": "browser",
+      "prompt": "A click on a button inside a div with its own click listener runs which listeners by default?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Only the button's"
+        },
+        {
+          "id": "b",
+          "text": "The button's, then the div's (bubbling)"
+        },
+        {
+          "id": "c",
+          "text": "The div's, then the button's"
+        },
+        {
+          "id": "d",
+          "text": "Neither"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Events bubble from the target up through its ancestors."
+    },
+    {
+      "id": "js-stop-propagation",
+      "section": "browser",
+      "prompt": "Which stops an event reaching parent listeners?",
+      "options": [
+        {
+          "id": "a",
+          "text": "event.preventDefault()"
+        },
+        {
+          "id": "b",
+          "text": "event.stopPropagation()"
+        },
+        {
+          "id": "c",
+          "text": "return false in addEventListener"
+        },
+        {
+          "id": "d",
+          "text": "event.cancel()"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "stopPropagation stops bubbling; preventDefault stops the default action (like following a link)."
+    },
+    {
+      "id": "js-dom-query",
+      "section": "browser",
+      "prompt": "Which returns all elements with class `item`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "document.querySelector('.item')"
+        },
+        {
+          "id": "b",
+          "text": "document.querySelectorAll('.item')"
+        },
+        {
+          "id": "c",
+          "text": "document.getElementById('item')"
+        },
+        {
+          "id": "d",
+          "text": "document.item"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "querySelectorAll returns a NodeList of every match; querySelector returns the first."
+    },
+    {
+      "id": "js-local-storage",
+      "section": "browser",
+      "prompt": "What is true of localStorage?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Data expires when the tab closes"
+        },
+        {
+          "id": "b",
+          "text": "It stores strings per origin and persists across sessions"
+        },
+        {
+          "id": "c",
+          "text": "It's shared across all sites"
+        },
+        {
+          "id": "d",
+          "text": "It can store functions"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "localStorage keeps string values per origin until cleared; sessionStorage lasts for the tab."
+    },
+    {
+      "id": "js-custom-event",
+      "section": "browser",
+      "prompt": "How do you send data with a custom event?",
+      "options": [
+        {
+          "id": "a",
+          "text": "new CustomEvent('saved', { detail: { id } })"
+        },
+        {
+          "id": "b",
+          "text": "new Event('saved', id)"
+        },
+        {
+          "id": "c",
+          "text": "dispatch('saved', id)"
+        },
+        {
+          "id": "d",
+          "text": "window.saved = id"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "CustomEvent's detail carries data to listeners."
+    },
+    {
+      "id": "js-try-finally",
+      "section": "debugging",
+      "prompt": "When does a `finally` block run?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Only when no error occurs"
+        },
+        {
+          "id": "b",
+          "text": "Only when an error occurs"
+        },
+        {
+          "id": "c",
+          "text": "Always, after try (and catch if one ran)"
+        },
+        {
+          "id": "d",
+          "text": "Never with return"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "finally runs whether or not an error was thrown or caught."
+    },
+    {
+      "id": "js-console-table",
+      "section": "debugging",
+      "prompt": "Which prints an array of objects as a table in the browser console?",
+      "options": [
+        {
+          "id": "a",
+          "text": "console.log"
+        },
+        {
+          "id": "b",
+          "text": "console.table"
+        },
+        {
+          "id": "c",
+          "text": "console.dir"
+        },
+        {
+          "id": "d",
+          "text": "console.trace"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "console.table shows rows and columns, handy for arrays of objects."
+    },
+    {
+      "id": "js-promise-all",
+      "section": "async",
+      "prompt": "What does Promise.all reject with if one of three promises rejects?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Nothing; it waits for all"
+        },
+        {
+          "id": "b",
+          "text": "The first rejection reason"
+        },
+        {
+          "id": "c",
+          "text": "An array of all results"
+        },
+        {
+          "id": "d",
+          "text": "undefined"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Promise.all rejects as soon as one input rejects. Promise.allSettled waits for all."
+    },
+    {
+      "id": "js-event-loop",
+      "section": "async",
+      "prompt": "What is logged? `console.log(1); setTimeout(() => console.log(2), 0); Promise.resolve().then(() => console.log(3)); console.log(4);`",
+      "options": [
+        {
+          "id": "a",
+          "text": "1 2 3 4"
+        },
+        {
+          "id": "b",
+          "text": "1 4 3 2"
+        },
+        {
+          "id": "c",
+          "text": "1 4 2 3"
+        },
+        {
+          "id": "d",
+          "text": "1 3 4 2"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Synchronous code first (1, 4), then microtasks (promise: 3), then macrotasks (timeout: 2)."
+    },
+    {
+      "id": "js-async-await-error",
+      "section": "async",
+      "prompt": "How do you handle a rejected promise in an async function?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Wrap the await in try/catch"
+        },
+        {
+          "id": "b",
+          "text": "Use if/else"
+        },
+        {
+          "id": "c",
+          "text": "It can't be handled"
+        },
+        {
+          "id": "d",
+          "text": "Use finally only"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "An awaited rejection throws, so try/catch handles it."
+    },
+    {
+      "id": "js-async-return",
+      "section": "async",
+      "prompt": "What does an async function always return?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The raw value"
+        },
+        {
+          "id": "b",
+          "text": "A Promise"
+        },
+        {
+          "id": "c",
+          "text": "undefined"
+        },
+        {
+          "id": "d",
+          "text": "A callback"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "async functions wrap their return value in a Promise."
+    },
+    {
+      "id": "js-node-modules",
+      "section": "server",
+      "prompt": "In Node.js with CommonJS, how do you load a module?",
+      "options": [
+        {
+          "id": "a",
+          "text": "import x from 'x' only"
+        },
+        {
+          "id": "b",
+          "text": "const x = require('x')"
+        },
+        {
+          "id": "c",
+          "text": "include('x')"
+        },
+        {
+          "id": "d",
+          "text": "load('x')"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "CommonJS uses require; ES modules use import (also supported in modern Node)."
+    },
+    {
+      "id": "js-npm-semver",
+      "section": "server",
+      "prompt": "In package.json, what does `\"^1.4.2\"` allow?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Exactly 1.4.2"
+        },
+        {
+          "id": "b",
+          "text": "Any 1.x.x from 1.4.2, but not 2.0.0"
+        },
+        {
+          "id": "c",
+          "text": "Any version"
+        },
+        {
+          "id": "d",
+          "text": "Only 1.4.x"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The caret allows minor and patch updates within the same major version."
+    },
+    {
+      "id": "js-jest-expect",
+      "section": "testing",
+      "prompt": "In Jest, which checks deep equality of two objects?",
+      "options": [
+        {
+          "id": "a",
+          "text": "expect(a).toBe(b)"
+        },
+        {
+          "id": "b",
+          "text": "expect(a).toEqual(b)"
+        },
+        {
+          "id": "c",
+          "text": "expect(a).same(b)"
+        },
+        {
+          "id": "d",
+          "text": "assert(a == b)"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "toEqual compares structure; toBe checks identity (===)."
+    },
+    {
+      "id": "js-mock-fn",
+      "section": "testing",
+      "prompt": "How do you check that a callback was called once with 'ok' in Jest?",
+      "options": [
+        {
+          "id": "a",
+          "text": "const cb = jest.fn(); ... expect(cb).toHaveBeenCalledWith('ok') and toHaveBeenCalledTimes(1)"
+        },
+        {
+          "id": "b",
+          "text": "console.log in the callback"
+        },
+        {
+          "id": "c",
+          "text": "expect(cb).toBe('ok')"
+        },
+        {
+          "id": "d",
+          "text": "It isn't possible"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "jest.fn() records calls so you can assert on arguments and counts."
+    }
+  ]
+}

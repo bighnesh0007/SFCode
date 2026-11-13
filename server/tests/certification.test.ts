@@ -44,11 +44,13 @@ const valid = () => ({
 });
 
 describe("question bank", () => {
-  it("ships Administrator, PD I and PD II, valid, each with a mock shape", () => {
+  it("ships five exams, valid, each with a mock shape", () => {
     expect(bank.all().map((e) => [e.exam, e.questions.length, e.mock?.questions])).toEqual([
       ["admin", 60, 60],
       ["pd1", 60, 60],
       ["pd2", 60, 60],
+      ["app-builder", 30, 60],
+      ["js-dev-1", 30, 60],
     ]);
   });
 
