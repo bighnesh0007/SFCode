@@ -42,7 +42,7 @@ const nodeSchema = z.strictObject({
   /** Nice to know, not on the main path: excluded from progress. */
   optional: z.boolean().optional(),
   level: z.number().int().min(1).max(4),
-  col: z.number().int().min(0).max(2),
+  col: z.number().int().min(0).max(3),
   requires: z.array(z.string()),
   problems: z.array(z.string()),
   cert: z.strictObject({ exam: z.string(), section: z.string().optional() }).optional(),
@@ -122,6 +122,14 @@ export function loadRoadmaps(dir: string, problemExists: (slug: string) => boole
       return d;
     };
     raw.nodes.forEach((n) => walk(n.id));
+    // The map places a step at (depth, col): two in one cell would draw on top of each other.
+    const cells = new Map<string, string>();
+    for (const n of raw.nodes) {
+      const cell = `${depth[n.id]}:${n.col}`;
+      const other = cells.get(cell);
+      if (other) throw new Error(`${where}: "${n.id}" and "${other}" share a spot on the map (row ${depth[n.id]}, column ${n.col}); move one to another column`);
+      cells.set(cell, n.id);
+    }
     out.set(raw.id, { ...raw, depth });
   }
   return out;

@@ -83,7 +83,7 @@ describe("RoadmapService", () => {
   it("solves complete nodes; failures flag struggling; reading completes lessons", async () => {
     const { svc, solve } = setup();
     await svc.saveOnboarding("u", { role: "developer", level: "new", goal: "pd1", hours: "3-5" });
-    await svc.setRead("u", "developer", "data-model", true);
+    await svc.submitQuiz("u", "developer", "data-model", [1, 1, 1, 1]); // data-model now completes by its quiz
     await solve("u", "soql-hot-tech-accounts");
     let v = await svc.view("developer", "u");
     expect(v.nodes.find((n) => n.id === "data-model")?.state).toBe("done");
@@ -95,6 +95,7 @@ describe("RoadmapService", () => {
     expect(v.nodes.find((n) => n.id === "soql-basics")?.struggling).toBe(true);
 
     await solve("u", "soql-contacts-in-city");
+    await solve("u", "soql-open-high-cases");
     v = await svc.view("developer", "u");
     expect(v.nodes.find((n) => n.id === "soql-basics")?.state).toBe("done");
     expect(v.nodes.find((n) => n.id === "apex-basics")?.state).toBe("available");
@@ -119,7 +120,7 @@ describe("RoadmapService", () => {
 
   it("marking read needs the quiz and a real node", async () => {
     const { svc } = setup();
-    await expect(svc.setRead("nobody", "developer", "data-model", true)).rejects.toThrow(/welcome quiz/);
+    await expect(svc.setRead("nobody", "developer", "pd1-ready", true)).rejects.toThrow(/welcome quiz/);
     await svc.saveOnboarding("u", { role: "developer", level: "new", goal: "pd1", hours: "3-5" });
     await expect(svc.setRead("u", "developer", "nope", true)).rejects.toMatchObject({ status: 404 });
   });
@@ -190,6 +191,11 @@ describe("roadmap diagrams, resources and optional steps", () => {
     expect(() => loadRoadmaps(withDiagram([{ ...node("a"), ...extra }]), exists)).toThrow(error);
   });
 
+  it("refuses two steps in the same spot on the map", () => {
+    expect(() => loadRoadmaps(roadmapDir([node("a"), node("b")]), exists)).toThrow(/share a spot/);
+    expect(() => loadRoadmaps(roadmapDir([node("a"), { ...node("b"), col: 1 }]), exists)).not.toThrow();
+  });
+
   it("the shipped picture questions keep their image but never their answer", async () => {
     const svc = new RoadmapService(loadRoadmaps(ROADMAPS_DIR, exists), catalog, new MemoryOnboarding(), new MemorySubmissionRepository(fixedClock()));
     const triggers = (await svc.view("developer", null)).nodes.find((n) => n.id === "triggers");
@@ -199,7 +205,7 @@ describe("roadmap diagrams, resources and optional steps", () => {
   });
 
   it("optional steps are never 'next' and don't count toward progress", async () => {
-    const dir = roadmapDir([node("a"), { ...node("extra"), optional: true }, node("b", ["a"])]);
+    const dir = roadmapDir([node("a"), { ...node("extra"), col: 1, optional: true }, node("b", ["a"])]);
     const ob = new MemoryOnboarding();
     const svc = new RoadmapService(loadRoadmaps(dir, exists), catalog, ob, new MemorySubmissionRepository(fixedClock()));
     await svc.saveOnboarding("u", { role: "developer", level: "new", goal: "pd1", hours: "3-5" });
