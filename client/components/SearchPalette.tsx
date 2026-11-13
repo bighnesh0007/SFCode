@@ -20,6 +20,7 @@ interface Item {
 const PAGES: Item[] = [
   { href: "/problems", title: "Problems", detail: "All tracks", group: "Pages" },
   { href: "/playground/apex", title: "Apex Playground", detail: "Run anonymous Apex", group: "Pages" },
+  { href: "/playground/soql", title: "SOQL Playground", detail: "Run a query against your org", group: "Pages" },
   { href: "/certification", title: "Certification Prep", detail: "PD I and PD II", group: "Pages" },
   { href: "/certification/pd1", title: "Platform Developer I practice", detail: "Certification", group: "Pages" },
   { href: "/certification/pd2", title: "Platform Developer II practice", detail: "Certification", group: "Pages" },

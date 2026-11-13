@@ -222,3 +222,31 @@ describe("SalesforceConnectionService — executeAnonymous", () => {
     await expect(s.service.executeAnonymous("nobody", "x")).rejects.toBeInstanceOf(OrgNotConnectedError);
   });
 });
+
+describe("SalesforceConnectionService — query", () => {
+  it("returns flattened rows and the column order", async () => {
+    const s = setup((c) =>
+      c.url.includes("/services/data/")
+        ? json(200, { totalSize: 1, done: true, records: [{ attributes: { type: "Contact" }, Id: "003", Name: "Ada", Account: { attributes: {}, Name: "Acme" } }] })
+        : happyOAuth(c),
+    );
+    await connect(s);
+    const r = await s.service.query("user_1", "SELECT Id, Name, Account.Name FROM Contact");
+    expect(r).toEqual({ totalSize: 1, columns: ["Id", "Name", "Account.Name"], rows: [{ Id: "003", Name: "Ada", "Account.Name": "Acme" }], truncated: false });
+    const call = s.fetch.calls.find((c) => c.url.includes("/services/data/"));
+    expect(call?.url).toBe(`${INSTANCE}/services/data/v62.0/query?q=${encodeURIComponent("SELECT Id, Name, Account.Name FROM Contact")}`);
+    expect(call?.init.redirect).toBe("error");
+  });
+
+  it("turns a malformed query into a 422 with Salesforce's message", async () => {
+    const s = setup((c) => (c.url.includes("/services/data/") ? json(400, [{ message: "unexpected token: FORM", errorCode: "MALFORMED_QUERY" }]) : happyOAuth(c)));
+    await connect(s);
+    await expect(s.service.query("user_1", "SELECT Id FORM Account")).rejects.toMatchObject({ status: 422, message: "unexpected token: FORM" });
+  });
+
+  it("flags a result Salesforce split into batches", async () => {
+    const s = setup((c) => (c.url.includes("/services/data/") ? json(200, { totalSize: 5000, done: false, records: [{ Id: "1" }] }) : happyOAuth(c)));
+    await connect(s);
+    expect(await s.service.query("user_1", "SELECT Id FROM Account")).toMatchObject({ totalSize: 5000, truncated: true });
+  });
+});

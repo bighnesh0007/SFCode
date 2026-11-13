@@ -82,6 +82,7 @@ export type BusinessEvent =
   | "salesforce.disconnected"
   | "salesforce.token_refreshed"
   | "apex.executed"
+  | "soql.executed"
   | "admin.role_granted"
   | "admin.points_updated"
   | "buddy.applied"

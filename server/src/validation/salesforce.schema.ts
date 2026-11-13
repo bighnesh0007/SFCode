@@ -22,3 +22,15 @@ export const executeBody = z.strictObject({
   code: z.string().min(1).max(MAX_APEX_CHARS),
 });
 export type ExecuteBody = z.infer<typeof executeBody>;
+
+// SOQL is read-only by construction; the SELECT check only gives a clear error
+// for things that aren't queries (SOSL, DML typed into the wrong box).
+export const queryBody = z.strictObject({
+  soql: z
+    .string()
+    .trim()
+    .min(1)
+    .max(20_000)
+    .refine((q) => /^select\s/i.test(q), "Only SELECT queries can run here."),
+});
+export type QueryBody = z.infer<typeof queryBody>;

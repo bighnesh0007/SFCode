@@ -52,3 +52,19 @@ export function executeAnonymous(token: Token, code: string, signal?: AbortSigna
     ...(signal ? { signal } : {}),
   });
 }
+
+export interface SoqlQueryResult {
+  totalSize: number;
+  columns: string[];
+  rows: Record<string, unknown>[];
+  truncated: boolean;
+}
+
+export function runSoql(token: Token, soql: string, signal?: AbortSignal): Promise<SoqlQueryResult> {
+  return apiRequest<SoqlQueryResult>("/api/v1/salesforce/soql/query", {
+    method: "POST",
+    token,
+    body: { soql },
+    ...(signal ? { signal } : {}),
+  });
+}

@@ -42,6 +42,28 @@ export interface ApexExecutionResult {
  * user, so it's a 422 with the message, not a 502: it isn't a gateway failure,
  * and proxies (Cloudflare) may swap a 5xx body for their own error page.
  */
+export interface SoqlQueryResult {
+  totalSize: number;
+  /** Column names in SELECT order (first row's keys; relationship fields flattened with dots). */
+  columns: string[];
+  rows: Record<string, unknown>[];
+  /** True when Salesforce had more rows than the first batch we return. */
+  truncated: boolean;
+}
+
+/** Flattens `{ Account: { Name: "x", attributes } }` to `{ "Account.Name": "x" }`; drops `attributes`. */
+export function flattenRecord(rec: Record<string, unknown>, prefix = ""): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(rec)) {
+    if (k === "attributes") continue;
+    const key = prefix ? `${prefix}.${k}` : k;
+    if (v && typeof v === "object" && !Array.isArray(v) && !("records" in v)) Object.assign(out, flattenRecord(v as Record<string, unknown>, key));
+    else if (v && typeof v === "object" && "records" in v) out[key] = `${(v as { totalSize?: number }).totalSize ?? 0} rows`;
+    else out[key] = v;
+  }
+  return out;
+}
+
 export class SalesforceRefusedError extends AppError {
   constructor(message: string) {
     super({ code: ErrorCode.UNPROCESSABLE, message, status: 422, expose: true });
@@ -202,6 +224,25 @@ export class SalesforceClient {
       column: num(result.column),
       debugLog: str(debugging?.DebuggingInfo?.debugLog) ?? "",
     };
+  }
+
+  /** Runs one SOQL query over REST and returns at most the first batch (≤2000 rows). */
+  async query(instanceUrl: string, accessToken: string, soql: string): Promise<SoqlQueryResult> {
+    const res = await this.send(`${instanceUrl}/services/data/v${this.opts.apiVersion}/query?q=${encodeURIComponent(soql)}`, {
+      headers: { Authorization: `Bearer ${accessToken}`, Accept: "application/json" },
+    });
+    if (res.status === 401) throw new SessionExpiredError();
+    const body = (await res.json().catch(() => null)) as unknown;
+    if (!res.ok) {
+      // Errors come back as [{ message, errorCode }]: a malformed query is the user's to fix.
+      const first = Array.isArray(body) ? (body[0] as { message?: unknown } | undefined) : undefined;
+      if (res.status === 400 && first && typeof first.message === "string") throw new SalesforceRefusedError(first.message);
+      throw new UpstreamError(`Salesforce query failed (HTTP ${res.status}).`);
+    }
+    const b = body as { totalSize?: number; done?: boolean; records?: Record<string, unknown>[] };
+    const rows = (b.records ?? []).map((r) => flattenRecord(r));
+    const columns = [...new Set(rows.flatMap((r) => Object.keys(r)))];
+    return { totalSize: b.totalSize ?? rows.length, columns, rows, truncated: b.done === false };
   }
 
   /** Starts a check-only deploy that runs only `testClass`. Returns the async deploy id. */

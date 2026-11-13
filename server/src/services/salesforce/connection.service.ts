@@ -13,7 +13,7 @@ import { contextLogger, logEvent } from "../../lib/logger.ts";
 import type { SalesforceConnectionRepository, StoredConnection } from "../../repositories/salesforceConnection.repository.ts";
 import type { Clock } from "../../types/ports.ts";
 import { resolveLoginUrl } from "./loginUrl.ts";
-import { RefreshRevokedError, SessionExpiredError, type ApexExecutionResult, type SalesforceClient } from "./salesforceClient.ts";
+import { RefreshRevokedError, SessionExpiredError, type ApexExecutionResult, type SalesforceClient, type SoqlQueryResult } from "./salesforceClient.ts";
 
 export class OrgNotConnectedError extends AppError {
   constructor(message = "Connect a Salesforce org first.") {
@@ -131,6 +131,12 @@ export class SalesforceConnectionService {
   async executeAnonymous(userId: string, apex: string): Promise<ApexExecutionResult> {
     const result = await this.withOrg(userId, (org) => this.sf.executeAnonymous(org.instanceUrl, org.accessToken, apex));
     logEvent("apex.executed", { compiled: result.compiled, success: result.success, chars: apex.length });
+    return result;
+  }
+
+  async query(userId: string, soql: string): Promise<SoqlQueryResult> {
+    const result = await this.withOrg(userId, (org) => this.sf.query(org.instanceUrl, org.accessToken, soql));
+    logEvent("soql.executed", { rows: result.rows.length });
     return result;
   }
 
