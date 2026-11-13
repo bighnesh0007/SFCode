@@ -67,6 +67,48 @@ describe.skipIf(!safe)("teams, mentors, jobs on Postgres", () => {
     expect((await hub.myTeams("bob")).length).toBe(0);
   });
 
+  it("public team board: only teams their owner listed; owner-only switch; no member ids", async () => {
+    const a = await hub.createTeam("ann", "Listed Team");
+    const b = await hub.createTeam("cyd", "Private Team");
+    await hub.join("bob", a.joinCode ?? "");
+    await solve("bob", "won-revenue-rollup"); // 6
+    await solve("cyd", "text-utils"); // 3
+    expect(await hub.teamBoard()).toEqual([]);
+    await expect(hub.setListed("bob", a.slug, true)).rejects.toMatchObject({ status: 403 });
+    expect((await hub.setListed("ann", a.slug, true)).listed).toBe(true);
+    const board = await hub.teamBoard();
+    expect(board).toEqual([{ rank: 1, slug: a.slug, name: "Listed Team", members: 2, score: 6, solved: 1 }]);
+    expect(JSON.stringify(board)).not.toMatch(/ann|bob|cyd/);
+    await hub.setListed("cyd", b.slug, true);
+    expect((await hub.teamBoard()).map((t) => [t.name, t.score])).toEqual([["Listed Team", 6], ["Private Team", 3]]);
+  });
+
+  it("country board and the points board filtered by country", async () => {
+    const about = new PgAboutRepository(db);
+    const profiles = new PgProfileRepository(db);
+    const subs = new PgChallengeSubmissionRepository(db);
+    const catalog = ChallengeCatalog.load(PROBLEMS_DIR);
+    const community = new CommunityService(catalog, subs, profiles, { lookup: (id: string) => Promise.resolve({ username: id, displayName: id.toUpperCase(), imageUrl: null }) }, fixedClock(Date.UTC(2026, 10, 13, 12)), about);
+    await community.updateAbout("ann", { ...EMPTY_ABOUT, country: "IN" });
+    await community.updateAbout("bob", { ...EMPTY_ABOUT, country: "IN" });
+    await community.updateAbout("cyd", { ...EMPTY_ABOUT, country: "DE" });
+    await solve("ann", "won-revenue-rollup"); // 6
+    await solve("bob", "text-utils"); // 3
+    await solve("cyd", "protect-closed-won"); // 3
+    expect((await community.countryBoard()).map((c) => [c.rank, c.country, c.learners, c.score, c.top.handle])).toEqual([
+      [1, "IN", 2, 9, "ann"],
+      [2, "DE", 1, 3, "cyd"],
+    ]);
+    expect((await community.leaderboard("all", 100, undefined, "DE")).map((r) => r.handle)).toEqual(["cyd"]);
+    // An older client that doesn't send country leaves it alone; null clears it.
+    const withoutCountry: Partial<typeof EMPTY_ABOUT> = { ...EMPTY_ABOUT };
+    delete withoutCountry.country;
+    await community.updateAbout("cyd", withoutCountry as Omit<typeof EMPTY_ABOUT, "country">);
+    expect((await about.get("cyd"))?.country).toBe("DE");
+    await community.updateAbout("cyd", { ...EMPTY_ABOUT, country: null });
+    expect((await about.get("cyd"))?.country).toBeNull();
+  });
+
   it("mentors: Ranger and up only; requests become notifications", async () => {
     await expect(hub.setMentor("ann", { topics: ["Apex"], note: "", active: true })).rejects.toMatchObject({ status: 403 });
     // 30+ points: Ranger.

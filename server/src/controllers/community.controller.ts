@@ -13,7 +13,7 @@ export function communityController(service: CommunityService) {
   const byHandle: RequestHandler = async (req, res) => ok(res, await service.byHandle(validatedParams<HandleParams>(req).handle));
   const leaderboard: RequestHandler = async (req, res) => {
     const q = validatedQuery<LeaderboardQuery>(req);
-    ok(res, await service.leaderboard(q.window, 100, q.track));
+    ok(res, await service.leaderboard(q.window, 100, q.track, q.country));
   };
   const updateAbout: RequestHandler = async (req, res) => {
     const b = validatedBody<AboutBody>(req);

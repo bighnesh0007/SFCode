@@ -1,5 +1,6 @@
 import { SCORED_TRACKS } from "../domain/challenge.ts";
 import { z } from "zod";
+import { isCountryCode } from "../domain/countries.ts";
 import { CERTIFICATIONS } from "../domain/achievements.ts";
 
 export const handleParams = z.strictObject({ handle: z.string().min(1).max(40) });
@@ -13,6 +14,7 @@ export type ProfileUpdateBody = z.infer<typeof profileUpdateBody>;
 export const leaderboardQuery = z.object({
   window: z.enum(["all", "30d", "7d"]).default("all"),
   track: z.enum(SCORED_TRACKS).optional(),
+  country: z.string().regex(/^[A-Z]{2}$/).optional(),
 });
 export type LeaderboardQuery = z.infer<typeof leaderboardQuery>;
 
@@ -40,6 +42,13 @@ export const aboutBody = z.strictObject({
   githubUrl: linkOn(["github.com"], "github.com"),
   certifications: z.array(z.enum(CERTIFICATIONS)).max(CERTIFICATIONS.length),
   openToWork: z.boolean(),
+  // Optional so an older client that doesn't send it leaves the saved country alone; null clears it.
+  country: z
+    .string()
+    .regex(/^[A-Z]{2}$/)
+    .refine(isCountryCode, "Pick a country from the list.")
+    .nullable()
+    .optional(),
 });
 export type AboutBody = z.infer<typeof aboutBody>;
 

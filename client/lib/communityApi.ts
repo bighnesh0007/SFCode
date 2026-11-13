@@ -33,6 +33,7 @@ export interface About {
   githubUrl: string | null;
   certifications: string[];
   openToWork: boolean;
+  country: string | null;
 }
 
 export interface Achievement {
@@ -114,8 +115,28 @@ export const updateMyProfile = (token: Token, changes: { handle?: string; displa
   apiRequest<ProfileView>("/api/v1/profile/me", { method: "PATCH", token, body: changes });
 export type LeaderboardWindow = "all" | "30d" | "7d";
 export type ScoredTrack = "apex" | "soql" | "debug" | "flow" | "lwc";
-export const getLeaderboard = (window: LeaderboardWindow, track?: ScoredTrack) =>
-  apiRequest<LeaderboardRow[]>(`/api/v1/leaderboard?window=${window}${track ? `&track=${track}` : ""}`);
+export const getLeaderboard = (window: LeaderboardWindow, track?: ScoredTrack, country?: string) =>
+  apiRequest<LeaderboardRow[]>(`/api/v1/leaderboard?window=${window}${track ? `&track=${track}` : ""}${country ? `&country=${country}` : ""}`);
+
+export interface CountryRow {
+  rank: number;
+  country: string;
+  learners: number;
+  score: number;
+  solved: number;
+  top: { handle: string; displayName: string; score: number };
+}
+export const getCountryBoard = (window: LeaderboardWindow) => apiRequest<CountryRow[]>(`/api/v1/leaderboard/countries?window=${window}`);
+
+export interface TeamRow {
+  rank: number;
+  slug: string;
+  name: string;
+  members: number;
+  score: number;
+  solved: number;
+}
+export const getTeamBoard = () => apiRequest<TeamRow[]>("/api/v1/leaderboard/teams");
 
 export interface RatingRow {
   rank: number;
@@ -127,7 +148,7 @@ export interface RatingRow {
 }
 export const getRatingBoard = () => apiRequest<RatingRow[]>("/api/v1/leaderboard/rating");
 
-export const updateMyAbout = (token: Token, about: { bio: string; company: string; location: string; trailheadUrl: string; linkedinUrl: string; githubUrl: string; certifications: string[]; openToWork: boolean }) =>
+export const updateMyAbout = (token: Token, about: { bio: string; company: string; location: string; trailheadUrl: string; linkedinUrl: string; githubUrl: string; certifications: string[]; openToWork: boolean; country: string | null }) =>
   apiRequest<ProfileView>("/api/v1/profile/me/about", { method: "PUT", token, body: about });
 
 export const getMyTier = (token: Token) => apiRequest<Tier>("/api/v1/profile/me/tier", { token });

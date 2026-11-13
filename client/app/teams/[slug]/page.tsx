@@ -9,7 +9,7 @@ import { RankBadge } from "@/components/RankBadge";
 import { useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
-import { getTeam, leaveTeam, removeMember, rotateCode, type TeamView } from "@/lib/hubApi";
+import { getTeam, leaveTeam, removeMember, rotateCode, setTeamListed, type TeamView } from "@/lib/hubApi";
 import { cn } from "@/lib/utils";
 
 export default function TeamPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -57,6 +57,15 @@ export default function TeamPage({ params }: { params: Promise<{ slug: string }>
           </Button>
           <Button size="sm" variant="ghost" onClick={() => void act((t) => rotateCode(t, slug))} title="Old code stops working"><RefreshCw className="mr-1 h-3.5 w-3.5" /> New code</Button>
         </div>
+      )}
+      {team.owner && (
+        <label className="mt-4 flex items-start gap-2 text-sm">
+          <input type="checkbox" className="mt-1" checked={team.listed} onChange={(e) => void act((t) => setTeamListed(t, slug, e.target.checked))} />
+          <span>
+            List on the public team leaderboard
+            <span className="block text-xs text-muted-foreground">Shows the team name, member count and the combined points of its top 10 members. Member names stay private.</span>
+          </span>
+        </label>
       )}
       {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
       <ol className="mt-6 divide-y rounded-xl border">

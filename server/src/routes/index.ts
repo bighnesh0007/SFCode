@@ -30,6 +30,7 @@ import { join } from "node:path";
 import { DIAGRAM_DIR } from "../domain/roadmap.ts";
 import { ROADMAPS_DIR } from "../container.ts";
 import { placementLevel, placementQuestions } from "../domain/placement.ts";
+import { COUNTRY_CODES } from "../domain/countries.ts";
 import { pointsMatrixSchema } from "../services/points/points.service.ts";
 import { problemContentSchema } from "../services/problems/problemDraft.service.ts";
 import { MENTOR_TOPICS } from "../services/hub/hub.service.ts";
@@ -136,6 +137,10 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.put("/profile/me/about", signedIn, limiter(20), validate({ body: aboutBody }), c.updateAbout);
     v1.get("/profile/:handle", validate({ params: handleParams }), c.byHandle);
     v1.get("/leaderboard", validate({ query: leaderboardQuery }), c.leaderboard);
+    v1.get("/countries", (_req, res) => ok(res, COUNTRY_CODES));
+    const communityForBoards = container.community;
+    const countryQ = z.object({ window: z.enum(["all", "30d", "7d"]).default("all") });
+    v1.get("/leaderboard/countries", limiter(60), validate({ query: countryQ }), (async (req, res) => ok(res, await communityForBoards.countryBoard(validatedQuery<z.infer<typeof countryQ>>(req).window))) as RequestHandler);
     const community = container.community;
     v1.get("/stats", (async (_req, res) => ok(res, await community.stats())) as RequestHandler);
   } else {
@@ -494,6 +499,9 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.post("/teams/join", auth, limiter(20), validate({ body: codeB }), (async (req, res) => ok(res, await hub.join(me(req), validatedBody<z.infer<typeof codeB>>(req).code))) as RequestHandler);
     v1.get("/teams/:slug", auth, validate({ params: slugP }), (async (req, res) => ok(res, await hub.team(me(req), slugOf(req)))) as RequestHandler);
     v1.post("/teams/:slug/code", auth, limiter(10), validate({ params: slugP }), (async (req, res) => ok(res, await hub.rotateCode(me(req), slugOf(req)))) as RequestHandler);
+    const listedB = z.strictObject({ listed: z.boolean() });
+    v1.post("/teams/:slug/listed", limiter(20), auth, validate({ params: slugP, body: listedB }), (async (req, res) => ok(res, await hub.setListed(me(req), slugOf(req), validatedBody<z.infer<typeof listedB>>(req).listed))) as RequestHandler);
+    v1.get("/leaderboard/teams", limiter(60), (async (_req, res) => ok(res, await hub.teamBoard())) as RequestHandler);
     v1.post("/teams/:slug/leave", auth, limiter(10), validate({ params: slugP }), (async (req, res) => {
       await hub.leave(me(req), slugOf(req));
       ok(res, { ok: true });
