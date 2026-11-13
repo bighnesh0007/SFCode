@@ -10,7 +10,9 @@ import { SOLVED_EVENT } from "@/lib/communityApi";
 import { Results } from "./Results";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup, useSavedLayout } from "@/components/ui/resizable";
+import { useSubmitShortcut } from "@/components/challenge/useSubmitShortcut";
+import { useIsNarrow } from "@/lib/useIsNarrow";
 import { Markdown } from "@/components/Markdown";
 import { LearningPanel } from "@/components/challenge/LearningPanel";
 import { ApiError } from "@/lib/apiClient";
@@ -107,6 +109,13 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
+  // Hooks before the early return below.
+  const narrow = useIsNarrow();
+  // Stacked on phones; its sizes are saved separately from the desktop split.
+  const hLayout = useSavedLayout(narrow ? "lwc-stack" : "lwc-h");
+  const vLayout = useSavedLayout("lwc-v");
+  const shortcut = useSubmitShortcut(() => void submit(), isSignedIn && !submitting && run.kind !== "compiling" && run.kind !== "running");
+
   if (!lwc) return null;
 
   async function start(mode: "preview" | "tests") {
@@ -137,8 +146,8 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
     <>
     {celebrate && <Celebration title="Accepted!" detail="Every hidden test passed. Nice work." onDone={endCelebration} />}
     <div className="flex h-[calc(100vh-3rem)] flex-col">
-      <ResizablePanelGroup orientation="horizontal" className="flex-1">
-        <ResizablePanel defaultSize="38%" minSize="25%">
+      <ResizablePanelGroup key={narrow ? "stack" : "split"} orientation={narrow ? "vertical" : "horizontal"} className="flex-1" {...hLayout}>
+        <ResizablePanel id="statement" defaultSize="38%" minSize="25%">
           <div className="flex h-full flex-col">
             <div className="flex h-10 items-center gap-1 border-b px-2">
               <Link href={backHref} className="mr-1 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label="Back to the list">
@@ -168,9 +177,9 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize="62%" minSize="30%">
-          <ResizablePanelGroup orientation="vertical">
-            <ResizablePanel defaultSize="58%" minSize="20%">
+        <ResizablePanel id="work" defaultSize="62%" minSize="30%">
+          <ResizablePanelGroup orientation="vertical" {...vLayout}>
+            <ResizablePanel id="code" defaultSize="58%" minSize="20%">
               <div className="flex h-full flex-col">
                 <div className="flex h-10 items-center gap-2 border-b px-2">
                   <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
@@ -191,7 +200,7 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
                       {busy ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" /> : <FlaskConical className="mr-1 h-3.5 w-3.5" />}
                       Run tests
                     </Button>
-                    <Button size="sm" disabled={busy || submitting || !isSignedIn} title={isSignedIn ? "Graded on the server with hidden tests" : "Sign in to submit"} onClick={() => void submit()}>
+                    <Button size="sm" disabled={busy || submitting || !isSignedIn} title={isSignedIn ? "Graded on the server with hidden tests (Ctrl/⌘ + Enter)" : "Sign in to submit"} onClick={() => void submit()}>
                       {submitting ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" /> : <Send className="mr-1 h-3.5 w-3.5" />}
                       Submit
                     </Button>
@@ -205,13 +214,14 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
                     beforeMount={defineSfcThemes}
                     value={sources[activeFile.name] ?? ""}
                     onChange={(v) => setSources((s) => ({ ...s, [activeFile.name]: v ?? "" }))}
+                    onMount={(editor, monaco) => shortcut.bindEditor(editor, monaco)}
                     options={{ minimap: { enabled: false }, fontSize: 14, scrollBeyondLastLine: false, automaticLayout: true, tabSize: 4 }}
                   />
                 )}
               </div>
             </ResizablePanel>
             <ResizableHandle withHandle />
-            <ResizablePanel defaultSize="42%" minSize="15%">
+            <ResizablePanel id="results" defaultSize="42%" minSize="15%">
               <div className="relative h-full">
                 {/* Kept mounted while tests run so they execute; shown only for Preview. */}
                 {doc !== null && (

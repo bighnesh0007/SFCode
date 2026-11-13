@@ -13,6 +13,33 @@ const HINT: Partial<Record<Submission["status"], string>> = {
 const FLOW_HINT =
   "Most flow failures come down to three things: the flow isn't Active, its API name doesn't match the statement exactly, or its entry conditions differ from what's asked. The messages below come from the hidden tests.";
 
+/**
+ * Splits an Apex assertion failure into its parts. System.assertEquals reports
+ * "Assertion Failed: <message>: Expected: X, Actual: Y"; anything else is shown as is.
+ */
+export function parseAssertion(raw: string): { note: string | null; expected: string; actual: string; rest: string } | null {
+  const m = /^(?:System\.AssertException: )?Assertion Failed: (?:(.*?): )?Expected: ([\s\S]*?), Actual: ([^\n]*)([\s\S]*)$/.exec(raw.trim());
+  if (!m) return null;
+  return { note: m[1] ?? null, expected: m[2] ?? "", actual: m[3] ?? "", rest: (m[4] ?? "").trim() };
+}
+
+function FailureMessage({ message }: { message: string }) {
+  const a = parseAssertion(message);
+  if (!a) return <pre className="mt-1.5 whitespace-pre-wrap font-mono text-xs text-red-600 dark:text-red-400">{message}</pre>;
+  return (
+    <div className="mt-2 space-y-1.5 text-xs">
+      {a.note && <p className="text-foreground">{a.note}</p>}
+      <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 font-mono">
+        <dt className="text-muted-foreground">Expected</dt>
+        <dd className="whitespace-pre-wrap rounded bg-green-500/10 px-1.5 py-0.5 text-green-700 dark:text-green-300">{a.expected || "(empty)"}</dd>
+        <dt className="text-muted-foreground">Got</dt>
+        <dd className="whitespace-pre-wrap rounded bg-red-500/10 px-1.5 py-0.5 text-red-700 dark:text-red-300">{a.actual || "(empty)"}</dd>
+      </dl>
+      {a.rest && <pre className="whitespace-pre-wrap font-mono text-muted-foreground">{a.rest}</pre>}
+    </div>
+  );
+}
+
 export function Results({ submission, isFlow = false, onOpenFile }: { submission: Submission | null; isFlow?: boolean; onOpenFile: (fileName: string) => void }) {
   if (!submission) return <p className="text-sm text-muted-foreground">Submit to grade your solution against the hidden tests.</p>;
   if (submission.status === "running")
@@ -68,7 +95,7 @@ export function Results({ submission, isFlow = false, onOpenFile }: { submission
                 <span className="font-mono text-xs">{t.method}</span>
                 {t.timeMs !== null && <span className="ml-auto text-xs tabular-nums text-muted-foreground">{t.timeMs} ms</span>}
               </div>
-              {!t.passed && t.message && <pre className="mt-1.5 whitespace-pre-wrap font-mono text-xs text-red-600 dark:text-red-400">{t.message}</pre>}
+              {!t.passed && t.message && <FailureMessage message={t.message} />}
             </li>
           ))}
         </ul>
