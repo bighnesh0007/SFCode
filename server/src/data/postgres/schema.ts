@@ -447,3 +447,40 @@ export const adminAudit = pgTable(
   },
   (t) => [index("admin_audit_at_idx").on(t.at)],
 );
+
+/**
+ * Crashes from browsers and the server, grouped: one row per distinct error
+ * (fingerprint), counting how often it happens. No request bodies, query
+ * strings or email addresses are ever stored.
+ */
+export const errorEvents = pgTable(
+  "error_events",
+  {
+    fingerprint: text("fingerprint").primaryKey(),
+    source: text("source").$type<"client" | "server">().notNull(),
+    name: text("name").notNull(),
+    message: text("message").notNull(),
+    stack: text("stack"),
+    /** Last path it happened on, without the query string. */
+    path: text("path"),
+    userAgent: text("user_agent"),
+    occurrences: integer("occurrences").notNull().default(1),
+    /** Distinct signed-in users who hit it, capped list (for "how many people"). */
+    users: jsonb("users").$type<string[]>().notNull().default([]),
+    firstSeen: timestamp("first_seen", { withTimezone: true }).notNull().defaultNow(),
+    lastSeen: timestamp("last_seen", { withTimezone: true }).notNull().defaultNow(),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+  },
+  (t) => [index("error_events_last_seen_idx").on(t.lastSeen)],
+);
+
+/** Cookie-free page views: a count per path per UTC day, nothing per visitor. */
+export const pageViews = pgTable(
+  "page_views",
+  {
+    day: text("day").notNull(), // YYYY-MM-DD
+    path: text("path").notNull(),
+    views: integer("views").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.day, t.path] })],
+);

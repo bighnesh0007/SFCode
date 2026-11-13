@@ -27,11 +27,11 @@ import {
 import { communityProblems, reviewQueue, setProblemActive, type CommunityProblemRow, type DraftRow } from "@/lib/draftsApi";
 import { cn } from "@/lib/utils";
 import { getEmailUsage, sendTestDigest } from "@/lib/emailApi";
-import { AnnouncementTab, AuditTab, DashboardTab, UserDrawer } from "@/components/admin/AdminTools";
+import { AnnouncementTab, AuditTab, DashboardTab, ErrorsTab, TrafficTab, UserDrawer } from "@/components/admin/AdminTools";
 import { STATUS_LABEL } from "@/lib/verdicts";
 import { PageSkeleton } from "@/components/ui/skeleton";
 
-type Tab = "dashboard" | "review" | "people" | "applications" | "problems" | "points" | "email" | "announcement" | "audit";
+type Tab = "dashboard" | "review" | "people" | "applications" | "problems" | "points" | "email" | "announcement" | "audit" | "errors" | "traffic";
 const ROLE_LABEL: Record<StaffRole, string> = { admin: "Admin", reviewer: "Reviewer", buddy: "Buddy" };
 
 export default function AdminPage() {
@@ -83,6 +83,8 @@ export default function AdminPage() {
     : [];
   const tabs: { id: Tab; label: string; show: boolean }[] = [
     { id: "dashboard", label: "Dashboard", show: true },
+    { id: "traffic", label: "Traffic", show: true },
+    { id: "errors", label: "Errors", show: view === "owner" || view === "admin" },
     { id: "review", label: "Review queue", show: true },
     { id: "people", label: "People", show: true },
     { id: "applications", label: "Buddy applications", show: true },
@@ -135,6 +137,8 @@ export default function AdminPage() {
       {tab === "dashboard" && <DashboardTab />}
       {tab === "announcement" && <AnnouncementTab />}
       {tab === "audit" && <AuditTab />}
+      {tab === "errors" && <ErrorsTab />}
+      {tab === "traffic" && <TrafficTab />}
     </div>
   );
 }
