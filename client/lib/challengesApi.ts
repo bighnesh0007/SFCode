@@ -109,3 +109,13 @@ export interface LearningView {
 export const getLearning = (token: Token, slug: string) => apiRequest<LearningView>(`/api/v1/challenges/${encodeURIComponent(slug)}/learning`, { token });
 export const revealHint = (token: Token, slug: string, n: number) =>
   apiRequest<LearningView>(`/api/v1/challenges/${encodeURIComponent(slug)}/hints/${n}`, { method: "POST", token });
+
+/** How your accepted solution's size compares; null until you've solved it. */
+export interface SizeStats {
+  mine: number;
+  median: number;
+  smallest: number;
+  solvers: number;
+  smallerThan: number;
+}
+export const getSolutionSize = (token: Token, slug: string) => apiRequest<SizeStats | null>(`/api/v1/challenges/${encodeURIComponent(slug)}/size`, { token });

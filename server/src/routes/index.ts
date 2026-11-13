@@ -333,6 +333,11 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.get("/challenges/:slug/learning", limiter(120), identify, validate({ params: slugParams }), (async (req, res) => {
       ok(res, await store.learning(req.auth?.userId ?? null, validatedParams<z.infer<typeof slugParams>>(req).slug));
     }) as RequestHandler);
+    const sizes = container.solutionSize;
+    if (sizes)
+      v1.get("/challenges/:slug/size", limiter(60), signedIn, validate({ params: slugParams }), (async (req, res) => {
+        ok(res, await sizes.stats(req.auth?.userId ?? "", validatedParams<z.infer<typeof slugParams>>(req).slug));
+      }) as RequestHandler);
     v1.post("/challenges/:slug/hints/:n", limiter(30), signedIn, validate({ params: hintParams }), (async (req, res) => {
       const { slug, n } = validatedParams<z.infer<typeof hintParams>>(req);
       ok(res, await store.revealHint(req.auth?.userId ?? "", slug, n));
