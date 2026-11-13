@@ -1,11 +1,31 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "sfcode", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 8100 },
+    {
+      "name": "sfcode",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 8100
+    },
     {
       "name": "sfcode-preview",
       "runtimeExecutable": "bash",
-      "runtimeArgs": ["-c", "export DATABASE_URL=postgres://sfcode:sfcode@127.0.0.1:5433/sfcode_test API_PORT=4200 BACKEND_INTERNAL_URL=http://127.0.0.1:4200 CORS_ALLOWED_ORIGINS=http://localhost:8200; npx concurrently -n client,server \"npm run dev -w sfcode-server\" \"npm exec -w sfcode-client -- next dev -p 8200\""],
+      "runtimeArgs": [
+        "-c",
+        "export DATABASE_URL=postgres://sfcode:sfcode@127.0.0.1:5433/sfcode_test API_PORT=4200 BACKEND_INTERNAL_URL=http://127.0.0.1:4200 CORS_ALLOWED_ORIGINS=http://localhost:8200; npx concurrently -n client,server \"npm run dev -w sfcode-server\" \"npm exec -w sfcode-client -- next dev -p 8200\""
+      ],
+      "port": 8200
+    },
+    {
+      "name": "sfcode-worktree-preview",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "cd /home/bighnesh/Desktop/Projects/SFCode-lwc && export DATABASE_URL=postgres://sfcode:sfcode@127.0.0.1:5433/sfcode_test API_PORT=4200 BACKEND_INTERNAL_URL=http://127.0.0.1:4200 CORS_ALLOWED_ORIGINS=http://localhost:8200; npx concurrently -n client,server \"npm run dev -w sfcode-server\" \"npm exec -w sfcode-client -- next dev -p 8200\""
+      ],
       "port": 8200
     }
   ]
