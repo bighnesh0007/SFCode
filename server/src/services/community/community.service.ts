@@ -11,6 +11,7 @@ import { achievements, streaks, type Achievement } from "../../domain/achievemen
 import { EMPTY_ABOUT, type AboutRecord, type AboutRepository } from "../../repositories/about.repository.ts";
 import { PointsService } from "../points/points.service.ts";
 import { rankFor, type RankView } from "../../domain/ranks.ts";
+import type { RatingPoint } from "../../domain/rating.ts";
 import type { ChallengeSubmissionRepository } from "../../repositories/challengeSubmission.repository.ts";
 import type { ProfileRecord, ProfileRepository } from "../../repositories/profile.repository.ts";
 import type { Clock } from "../../types/ports.ts";
@@ -37,6 +38,8 @@ export interface ProfileExtras {
   roadmapProgress(userId: string): Promise<{ title: string; done: number; total: number } | null>;
   /** Live community problems this user wrote. */
   contributions(userId: string): Promise<number>;
+  /** Contest rating history, oldest first. */
+  ratingHistory(userId: string): Promise<RatingPoint[]>;
 }
 
 export interface ContestResult {
@@ -68,6 +71,8 @@ export interface ProfileStats {
 }
 
 export interface ProfileView {
+  /** Contest rating (Elo-style), null before the first rated contest. */
+  rating: { current: number; peak: number; history: RatingPoint[] } | null;
   /** Rank-from-points with progress to the next one. */
   tier: RankView;
   cosmetics: Cosmetics;
@@ -246,18 +251,21 @@ export class CommunityService {
     const since = new Date(this.clock.nowMs() - ACTIVITY_DAYS * 86_400_000);
     const activity = await this.submissions.dailyActivity(p.userId, since);
     const streak = streaks(activity.filter((d) => d.count > 0).map((d) => d.day), this.clock.now().toISOString().slice(0, 10));
-    const [coins, contests, roadmap, about, contributions] = await Promise.all([
+    const [coins, contests, roadmap, about, contributions, ratingHistory] = await Promise.all([
       this.extras ? this.extras.coins(p.userId) : Promise.resolve(null),
       this.extras ? this.extras.contestHistory(p.userId) : Promise.resolve([]),
       this.extras ? this.extras.roadmapProgress(p.userId) : Promise.resolve(null),
       this.about ? this.about.get(p.userId) : Promise.resolve(null),
       this.extras ? this.extras.contributions(p.userId) : Promise.resolve(0),
+      this.extras ? this.extras.ratingHistory(p.userId) : Promise.resolve([]),
     ]);
     const bestPlacement = contests.length ? Math.min(...contests.map((c) => c.rank)) : null;
     const table = await this.points.table();
     const score = solvedScored.reduce((sum, c) => sum + table.points(c.track, c.difficulty), 0);
 
+    const lastRating = ratingHistory.at(-1);
     return {
+      rating: lastRating ? { current: lastRating.rating, peak: Math.max(...ratingHistory.map((r) => r.rating)), history: ratingHistory } : null,
       tier: rankFor(score),
       about: about ?? EMPTY_ABOUT,
       stats: { streak: streak.current, longestStreak: streak.longest, coins, contests: contests.length, bestPlacement, activeDays: activity.filter((d) => d.count > 0).length, contributions },

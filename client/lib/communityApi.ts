@@ -63,7 +63,18 @@ export interface Tier {
   progress: number;
 }
 
+export interface RatingPoint {
+  contestSlug: string;
+  title: string;
+  endsAt: string;
+  rank: number;
+  entrants: number;
+  rating: number;
+  delta: number;
+}
+
 export interface ProfileView {
+  rating: { current: number; peak: number; history: RatingPoint[] } | null;
   tier: Tier;
   cosmetics: Cosmetics;
   about: About;

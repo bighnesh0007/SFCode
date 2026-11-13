@@ -10,6 +10,7 @@
 import { randomBytes } from "node:crypto";
 import { ConflictError, NotFoundError, ValidationError } from "../../errors/AppError.ts";
 import { SCORED_TRACKS } from "../../domain/challenge.ts";
+import { replayRatings, type ContestPlacing, type RatingPoint } from "../../domain/rating.ts";
 import type { ContestRecord, ContestRepository } from "../../repositories/contest.repository.ts";
 import type { ProfileRecord, ProfileRepository } from "../../repositories/profile.repository.ts";
 import type { Clock } from "../../types/ports.ts";
@@ -156,6 +157,17 @@ export class ContestService {
     const rows = (await this.standings(c)).map((r) => ({ userId: r.userId, rank: r.rank, score: r.score }));
     if (this.clock.nowMs() >= c.endsAt.getTime() + SETTLE_MS) this.settled.set(c.id, rows);
     return rows;
+  }
+
+  /** The user's contest-rating history (oldest first), replayed from every finished contest. */
+  async ratingHistory(userId: string): Promise<RatingPoint[]> {
+    const placings: ContestPlacing[] = [];
+    for (const c of await this.repo.list()) {
+      if (this.phase(c) !== "ended") continue;
+      const rows = await this.finalRows(c);
+      placings.push({ contestSlug: c.slug, title: c.title, endsAt: c.endsAt.toISOString(), ranks: new Map(rows.map((r) => [r.userId, r.rank])) });
+    }
+    return replayRatings(placings).get(userId) ?? [];
   }
 
   /** Finished contests the user entered, newest first, with their rank. */
