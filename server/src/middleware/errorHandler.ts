@@ -10,6 +10,13 @@ import { RateLimitError } from "../errors/AppError.ts";
 import { toAppError } from "../errors/toAppError.ts";
 import type { ApiFailure } from "../types/envelope.ts";
 
+/** Where unexpected (5xx) errors are sent for grouping; set once at startup. */
+type ErrorSink = (e: { name: string; message: string; stack: string | null; path: string; userId: string | null }) => void;
+let sink: ErrorSink | undefined;
+export function setErrorSink(fn: ErrorSink | undefined): void {
+  sink = fn;
+}
+
 export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   // If the response already started streaming there is nothing safe to do but
   // hand off to Express's default handler, which destroys the socket.
@@ -31,7 +38,12 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   };
 
   // 5xx is a defect worth paging on; 4xx is routine client behaviour.
-  if (appError.status >= 500) req.log?.error(logPayload, appError.message);
+  if (appError.status >= 500) {
+    req.log?.error(logPayload, appError.message);
+    // The original error, not the wrapper: its stack points at the real bug.
+    const original = err instanceof Error ? err : appError;
+    sink?.({ name: original.name, message: original.message, stack: original.stack ?? null, path: req.path, userId: req.auth?.userId ?? null });
+  }
   else req.log?.warn(logPayload, appError.message);
 
   if (appError instanceof RateLimitError && appError.retryAfterSeconds !== undefined) {

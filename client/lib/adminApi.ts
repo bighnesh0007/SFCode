@@ -139,3 +139,33 @@ export interface Announcement {
 export const getAnnouncement = () => apiRequest<{ announcement: Announcement | null }>("/api/v1/announcement").then((r) => r.announcement);
 export const saveAnnouncement = (token: Token, value: { text: string; tone: AnnouncementTone } | null) =>
   apiRequest<{ announcement: Announcement | null }>("/api/v1/admin/announcement", { method: "PUT", token, body: { announcement: value } }).then((r) => r.announcement);
+
+export interface ErrorGroup {
+  fingerprint: string;
+  source: "client" | "server";
+  name: string;
+  message: string;
+  stack: string | null;
+  path: string | null;
+  userAgent: string | null;
+  occurrences: number;
+  users: number;
+  firstSeen: string;
+  lastSeen: string;
+  resolvedAt: string | null;
+}
+export const getErrors = (token: Token, open: boolean) => apiRequest<ErrorGroup[]>(`/api/v1/admin/errors?open=${open}`, { token });
+export async function resolveError(token: Token, fingerprint: string): Promise<void> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "/backend"}/api/v1/admin/errors/${fingerprint}/resolve`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new Error(`Could not resolve (HTTP ${res.status}).`);
+}
+
+export interface Analytics {
+  days: { day: string; views: number }[];
+  pages: { path: string; views: number }[];
+  total: number;
+}
+export const getAnalytics = (token: Token) => apiRequest<Analytics>("/api/v1/admin/analytics", { token });

@@ -6,7 +6,11 @@ import { Ban, Loader2, Megaphone, RotateCcw, X } from "lucide-react";
 import { useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import {
+  getAnalytics,
   getAnnouncement,
+  getErrors,
+  resolveError,
+  type ErrorGroup,
   getAudit,
   getDashboard,
   getUserDetail,
@@ -299,6 +303,7 @@ const ACTION_LABEL: Record<string, string> = {
   "points.update": "changed the points table",
   "announcement.set": "posted an announcement",
   "announcement.clear": "cleared the announcement",
+  "error.resolve": "resolved an error",
 };
 
 export function AuditTab() {
@@ -434,5 +439,130 @@ export function BannerView({ a, onDismiss }: { a: Announcement; onDismiss?: () =
         </button>
       )}
     </div>
+  );
+}
+
+// ── Errors ───────────────────────────────────────────────────────────────────
+
+const ago = (iso: string) => {
+  const m = Math.round((Date.now() - new Date(iso).getTime()) / 60_000);
+  if (m < 60) return `${m}m ago`;
+  if (m < 48 * 60) return `${Math.round(m / 60)}h ago`;
+  return `${Math.round(m / 1440)}d ago`;
+};
+
+export function ErrorsTab() {
+  const { getToken } = useAuthState();
+  const [open, setOpen] = useState(true);
+  const { data, error, reload } = useLoad((t) => getErrors(t, open), [open]);
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+
+  async function resolve(e: ErrorGroup) {
+    setMessage(null);
+    try {
+      await resolveError(await getToken(), e.fingerprint);
+      reload();
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Could not resolve.");
+    }
+  }
+
+  return (
+    <section className="mt-5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs text-muted-foreground">Crashes from browsers and the server, grouped. Resolve one when it&apos;s fixed; it reopens if it happens again.</p>
+        <label className="flex items-center gap-2 text-sm text-muted-foreground">
+          <input type="checkbox" checked={!open} onChange={(e) => setOpen(!e.target.checked)} /> Include resolved
+        </label>
+      </div>
+      {message && <p className="mt-2 text-sm text-destructive">{message}</p>}
+      {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
+      {!data && !error && <div className="mt-3 h-40 animate-pulse rounded-lg bg-muted/50" />}
+      {data?.length === 0 && <p className="mt-6 rounded-lg border border-dashed py-10 text-center text-sm text-muted-foreground">No {open ? "open " : ""}errors. 🎉</p>}
+      <ul className="mt-3 space-y-2">
+        {data?.map((e) => (
+          <li key={e.fingerprint} className={cn("rounded-lg border", e.resolvedAt && "opacity-60")}>
+            <button type="button" className="flex w-full items-start gap-3 px-4 py-3 text-left" aria-expanded={expanded === e.fingerprint} onClick={() => setExpanded((x) => (x === e.fingerprint ? null : e.fingerprint))}>
+              <span className={cn("mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium uppercase", e.source === "server" ? "bg-destructive/10 text-destructive" : "bg-amber-500/10 text-amber-700 dark:text-amber-400")}>{e.source}</span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-medium">
+                  {e.name}: {e.message}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {e.occurrences}× · {e.users} {e.users === 1 ? "user" : "users"} · last {ago(e.lastSeen)} · first {ago(e.firstSeen)}
+                  {e.path && ` · ${e.path}`}
+                </span>
+              </span>
+            </button>
+            {expanded === e.fingerprint && (
+              <div className="space-y-2 border-t px-4 py-3 text-xs">
+                {e.stack ? <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded bg-muted/50 p-2 font-mono">{e.stack}</pre> : <p className="text-muted-foreground">No stack trace.</p>}
+                {e.userAgent && <p className="text-muted-foreground">Browser: {e.userAgent}</p>}
+                {!e.resolvedAt && (
+                  <Button size="sm" variant="outline" onClick={() => void resolve(e)}>
+                    Mark resolved
+                  </Button>
+                )}
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+// ── Traffic ──────────────────────────────────────────────────────────────────
+
+export function TrafficTab() {
+  const { data, error } = useLoad(getAnalytics);
+  const [hover, setHover] = useState<number | null>(null);
+  if (error) return <p className="mt-5 text-sm text-destructive">{error}</p>;
+  if (!data) return <div className="mt-5 h-64 animate-pulse rounded-lg bg-muted/50" />;
+  const max = Math.max(1, ...data.days.map((d) => d.views));
+  const shown = hover === null ? null : data.days[hover];
+  return (
+    <section className="mt-5 space-y-6">
+      <p className="text-xs text-muted-foreground">Page views, last 30 days (UTC). Counted without cookies: no visitor is tracked, so this is views, not people.</p>
+      <figure className="rounded-lg border p-4">
+        <figcaption className="flex items-baseline justify-between gap-2">
+          <span className="text-sm font-medium">Page views</span>
+          <span className="text-xs tabular-nums text-muted-foreground">{shown ? `${shortDate(shown.day)}: ${shown.views}` : `total ${data.total}`}</span>
+        </figcaption>
+        <div className="mt-3 flex h-32 items-end gap-[2px]" onMouseLeave={() => setHover(null)} role="img" aria-label={`Page views per day, ${data.total} in total`}>
+          {data.days.map((d, i) => (
+            <div key={d.day} className="flex h-full flex-1 items-end" onMouseEnter={() => setHover(i)}>
+              <div className={cn("w-full rounded-t-[3px]", d.views === 0 ? "bg-muted" : hover === i ? "bg-primary" : "bg-primary/70")} style={{ height: d.views === 0 ? 2 : `${Math.max(4, (d.views / max) * 100)}%` }} />
+            </div>
+          ))}
+        </div>
+        <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+          <span>{data.days[0] ? shortDate(data.days[0].day) : ""}</span>
+          <span>{shortDate(data.days.at(-1)?.day ?? "")}</span>
+        </div>
+      </figure>
+      <div className="overflow-x-auto rounded-lg border">
+        <p className="border-b px-4 py-2.5 text-sm font-medium">Most viewed pages</p>
+        {data.pages.length === 0 ? (
+          <p className="px-4 py-6 text-center text-sm text-muted-foreground">No views recorded yet.</p>
+        ) : (
+          <table className="w-full text-sm">
+            <tbody>
+              {data.pages.map((p) => (
+                <tr key={p.path} className="border-t first:border-t-0">
+                  <td className="max-w-72 truncate py-2 pl-4 font-mono text-xs">
+                    <Link href={p.path} className="hover:text-primary hover:underline">
+                      {p.path}
+                    </Link>
+                  </td>
+                  <td className="py-2 pr-4 text-right tabular-nums">{p.views}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </section>
   );
 }

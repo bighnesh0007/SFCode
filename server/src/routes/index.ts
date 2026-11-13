@@ -8,7 +8,7 @@ import { optionalAuth, requireAuth } from "../middleware/auth.ts";
 import { notFound } from "../middleware/notFound.ts";
 import { v1Cors } from "../middleware/security.ts";
 import { validate } from "../middleware/validate.ts";
-import { ok } from "../utils/respond.ts";
+import { noContent, ok } from "../utils/respond.ts";
 import { callbackQuery, connectBody, executeBody, queryBody } from "../validation/salesforce.schema.ts";
 import { challengeController } from "../controllers/challenge.controller.ts";
 import { certificationController } from "../controllers/certification.controller.ts";
@@ -154,6 +154,41 @@ export function mountRoutes(app: Application, container: Container): void {
   } else {
     v1.use("/admin", disabled("Admin"));
   }
+  // Error reports and page views from browsers (anonymous allowed); the admin views of both.
+  if (container.telemetry) {
+    const t = container.telemetry;
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    const errorBody = z.object({
+      name: z.string().max(200).default("Error"),
+      message: z.string().max(2000).default(""),
+      stack: z.string().max(8000).nullish(),
+      path: z.string().max(500).nullish(),
+    });
+    const viewBody = z.object({ path: z.string().max(500) });
+    v1.post("/telemetry/error", limiter(20), identify, validate({ body: errorBody }), (async (req, res) => {
+      const b = validatedBody<z.infer<typeof errorBody>>(req);
+      await t.report({ source: "client", name: b.name, message: b.message, stack: b.stack ?? null, path: b.path ?? null, userAgent: req.get("user-agent") ?? null, userId: req.auth?.userId ?? null });
+      noContent(res);
+    }) as RequestHandler);
+    v1.post("/telemetry/view", limiter(120), validate({ body: viewBody }), (async (req, res) => {
+      await t.pageView(validatedBody<z.infer<typeof viewBody>>(req).path);
+      noContent(res);
+    }) as RequestHandler);
+    if (verifier) {
+      const auth = requireAuth(verifier);
+      const openQuery = z.object({ open: z.enum(["true", "false"]).default("true") });
+      const fpParams = z.strictObject({ fingerprint: z.string().regex(/^[0-9a-f]{32}$/) });
+      v1.get("/admin/errors", limiter(60), auth, validate({ query: openQuery }), (async (req, res) => {
+        ok(res, await t.errors(req.auth?.userId ?? "", validatedQuery<z.infer<typeof openQuery>>(req).open === "true"));
+      }) as RequestHandler);
+      v1.post("/admin/errors/:fingerprint/resolve", limiter(60), auth, validate({ params: fpParams }), (async (req, res) => {
+        await t.resolve(req.auth?.userId ?? "", validatedParams<z.infer<typeof fpParams>>(req).fingerprint);
+        noContent(res);
+      }) as RequestHandler);
+      v1.get("/admin/analytics", limiter(60), auth, (async (req, res) => ok(res, await t.analytics(req.auth?.userId ?? ""))) as RequestHandler);
+    }
+  }
+
   // The site-wide banner: public, cached briefly by the browser.
   if (container.admin) {
     const a = adminController(container.admin);

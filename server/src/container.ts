@@ -35,6 +35,9 @@ import { makeOrgChecker } from "./services/problems/orgChecker.ts";
 import { ProblemDraftService } from "./services/problems/problemDraft.service.ts";
 import { PgBuddyRepository } from "./repositories/buddy.repository.ts";
 import { PgSettingsRepository } from "./repositories/settings.repository.ts";
+import { PgTelemetryRepository } from "./repositories/telemetry.repository.ts";
+import { TelemetryService } from "./services/telemetry/telemetry.service.ts";
+import { setErrorSink } from "./middleware/errorHandler.ts";
 import { BuddyService } from "./services/buddy/buddy.service.ts";
 import { PointsService } from "./services/points/points.service.ts";
 import { PgDailyRepository } from "./repositories/daily.repository.ts";
@@ -68,6 +71,7 @@ export interface Container {
   drafts?: ProblemDraftService;
   social?: SocialService;
   digest?: DigestService;
+  telemetry?: TelemetryService;
   hub?: HubService;
 }
 
@@ -124,6 +128,9 @@ export function buildContainer(): Container {
       config.clerk.secretKey ? new ClerkIdentityLookup(config.clerk.secretKey) : undefined,
     );
     container.admin.setProblemTitles((slug) => catalog.get(slug)?.title);
+    const telemetry = new TelemetryService(new PgTelemetryRepository(container.db), container.admin, systemClock);
+    container.telemetry = telemetry;
+    setErrorSink((e) => void telemetry.report({ source: "server", ...e }));
   }
   container.points = new PointsService(container.db ? new PgSettingsRepository(container.db) : undefined, container.admin);
 

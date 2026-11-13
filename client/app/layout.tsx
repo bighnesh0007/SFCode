@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import { OnboardingGate } from "@/components/OnboardingGate";
 import { ContestBanner } from "@/components/ContestBanner";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { Telemetry } from "@/components/Telemetry";
 import { RankWatcher } from "@/components/RankWatcher";
 import { Footer } from "@/components/Footer";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <ContestBanner />
             <OnboardingGate />
             <RankWatcher />
+            <Telemetry />
             <main id="main" tabIndex={-1} className="flex-1 flex flex-col outline-none">{children}</main>
             <Footer />
           </ThemeProvider>
