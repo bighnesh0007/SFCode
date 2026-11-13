@@ -1,0 +1,5 @@
+[
+  "Store the search term in a field and update it in an oninput handler from event.target.value.",
+  "A getter matches filters this.contacts by name.toLowerCase().includes(term.toLowerCase()). Templates can't filter, but getters can.",
+  "Render with for:each and key={contact.id}, and use lwc:if / lwc:else to show 'No contacts match.' when the list is empty."
+]

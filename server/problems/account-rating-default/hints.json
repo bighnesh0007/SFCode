@@ -1,0 +1,5 @@
+[
+  "A before-insert trigger can change fields on Trigger.new directly; the save that follows stores them. No DML is needed.",
+  "Two conditions: Industry is exactly 'Technology', and Rating is blank. String.isBlank() covers both null and empty.",
+  "Loop over Trigger.new and set a.Rating = 'Hot' only when both conditions hold, so a rating the user chose is never overwritten."
+]

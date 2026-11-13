@@ -1,0 +1,5 @@
+[
+  "Batch Apex has three methods: start returns what to process, execute handles one chunk, finish runs once at the end.",
+  "start can return Database.getQueryLocator([...]) over open opportunities (IsClosed = false) whose CloseDate is before TODAY.",
+  "In execute, set StageName = 'Closed Lost' on every record in scope, then call update scope once. That's one DML statement per chunk."
+]

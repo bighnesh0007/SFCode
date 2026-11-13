@@ -1,0 +1,5 @@
+[
+  "You can filter a child by its parent's fields with dot notation, child to parent.",
+  "Contact's lookup to Account is the Account relationship: Account.BillingCity.",
+  "SELECT Id, LastName, Account.Name FROM Contact WHERE Account.BillingCity = 'Pune'."
+]

@@ -1,0 +1,5 @@
+[
+  "Create a Record-Triggered Flow on Account, triggered when a record is created, optimized for Fast Field Updates. That makes it a before-save flow.",
+  "Put the conditions in the Start element's entry criteria: Industry Equals Technology AND Rating Is Null True.",
+  "Add an Update Triggering Record element (or an Assignment to $Record.Rating) setting Rating to Hot. Save with the API name SFC_Account_Default_Rating and Activate it."
+]

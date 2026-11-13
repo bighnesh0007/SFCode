@@ -1,0 +1,5 @@
+[
+  "Two parts: which accounts (only those with a won deal) and what to show for each (their won opportunities).",
+  "A child subquery (SELECT ... FROM Opportunities WHERE ...) returns related rows. A semi-join WHERE Id IN (SELECT AccountId FROM Opportunity WHERE StageName = 'Closed Won') limits the accounts.",
+  "Order the children with ORDER BY Amount DESC inside the subquery, and the parents with ORDER BY Name ASC outside."
+]

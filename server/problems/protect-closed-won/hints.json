@@ -1,0 +1,5 @@
+[
+  "Blocking a delete has to happen before it: use a before delete trigger.",
+  "In delete triggers the records are in Trigger.old. Trigger.new is null.",
+  "Call o.addError('...') on each Closed Won opportunity. That cancels the delete for that record and shows the message."
+]

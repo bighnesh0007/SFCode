@@ -1,0 +1,5 @@
+[
+  "Variables: opportunities (Record collection of Opportunity, input) and wonTotal (Currency, default 0, output).",
+  "Add a Loop over {!opportunities}. Inside it, a Decision checks the current item's StageName Equals Closed Won.",
+  "On the won path, an Assignment: {!wonTotal} Add {!Loop_Item.Amount}. Connect both Decision paths back to the Loop, and the loop's 'After Last Item' path to the end."
+]

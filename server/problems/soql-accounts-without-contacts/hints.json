@@ -1,0 +1,5 @@
+[
+  "You need accounts for which no Contact points at them. Think 'NOT IN'.",
+  "SOQL allows a semi-join on Id fields: WHERE Id NOT IN (SELECT AccountId FROM Contact).",
+  "Select Id and Name from Account with that anti-join filter."
+]

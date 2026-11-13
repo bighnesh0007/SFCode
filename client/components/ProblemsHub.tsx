@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle2, CircleDot, Search } from "lucide-react";
+import { CheckCircle2, CircleDot, Search, Shuffle } from "lucide-react";
 import { useAuthState } from "@/components/auth";
 import { ApiError } from "@/lib/apiClient";
 import { listChallenges, type ChallengeSummary, type DifficultyDef, type Track } from "@/lib/challengesApi";
@@ -28,6 +28,7 @@ export function ProblemsHub() {
   const [query, setQuery] = useState("");
   const [difficulty, setDifficulty] = useState("all");
   const [status, setStatus] = useState<Status>("all");
+  const [topic, setTopic] = useState("all");
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -52,10 +53,12 @@ export function ProblemsHub() {
     return (data?.challenges ?? []).filter(
       (c) =>
         (difficulty === "all" || c.difficulty === difficulty) &&
+        (topic === "all" || c.category === topic) &&
         (status === "all" || (status === "todo" ? c.progress === null : c.progress === status)) &&
         (q === "" || [c.title, c.category, ...c.tags].some((s) => s.toLowerCase().includes(q))),
     );
-  }, [data, query, difficulty, status]);
+  }, [data, query, difficulty, status, topic]);
+  const topics = useMemo(() => [...new Set((data?.challenges ?? []).map((c) => c.category))].sort(), [data]);
 
   const solved = data?.challenges.filter((c) => c.progress === "solved").length ?? 0;
   const info = trackInfo(track);
@@ -119,6 +122,14 @@ export function ProblemsHub() {
             <option key={d.id} value={d.id}>{d.id}</option>
           ))}
         </select>
+        {topics.length > 1 && (
+          <select aria-label="Topic" value={topic} onChange={(e) => setTopic(e.target.value)} className="h-9 rounded-md border bg-background px-2 text-sm">
+            <option value="all">Any topic</option>
+            {topics.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        )}
         {isSignedIn && (
           <select aria-label="Status" value={status} onChange={(e) => setStatus(e.target.value as Status)} className="h-9 rounded-md border bg-background px-2 text-sm">
             {(Object.keys(STATUS_LABEL) as Status[]).map((s) => (
@@ -126,6 +137,20 @@ export function ProblemsHub() {
             ))}
           </select>
         )}
+        <button
+          type="button"
+          disabled={rows.length === 0}
+          title="Open a random problem from this list, preferring ones you haven't solved"
+          onClick={() => {
+            const pool = rows.filter((c) => c.progress !== "solved");
+            const from = pool.length > 0 ? pool : rows;
+            const pick = from[Math.floor(Math.random() * from.length)];
+            if (pick) router.push(`${info.base}/${pick.slug}`);
+          }}
+          className="flex h-9 items-center gap-1.5 rounded-md border px-3 text-sm hover:bg-accent disabled:opacity-50"
+        >
+          <Shuffle className="h-4 w-4" /> Random
+        </button>
       </div>
 
       {error && <p className="mt-4 text-sm text-destructive">{error}</p>}

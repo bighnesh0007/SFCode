@@ -1,0 +1,5 @@
+[
+  "Count the queries: one per contact means 200 contacts make 200 queries, and the limit is 100.",
+  "Collect every AccountId first into a Set<Id>, then run ONE query: [SELECT Name FROM Account WHERE Id IN :accountIds].",
+  "Put the results in a Map<Id, Account> (the constructor takes the query directly), then loop over Trigger.new again and read from the map."
+]

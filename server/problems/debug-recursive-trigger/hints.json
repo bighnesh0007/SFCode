@@ -1,0 +1,5 @@
+[
+  "An after update trigger that updates the same records fires itself again, and again, until the trigger depth limit stops it.",
+  "In a before trigger you can change Trigger.new directly and Salesforce saves it, with no DML and no re-fire.",
+  "Change the trigger event to before update and just set a.Description = 'Reviewed' on Trigger.new. No list, no update statement."
+]

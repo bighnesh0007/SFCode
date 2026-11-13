@@ -1,0 +1,5 @@
+[
+  "toTitleCase: split on single spaces with split(' ', -1) so empty pieces (double spaces) survive, then rebuild with String.join.",
+  "For each word: first letter substring(0, 1).toUpperCase() plus the rest substring(1).toLowerCase(). Skip empty strings.",
+  "isPalindrome: lower-case, remove everything that isn't a-z or 0-9 with replaceAll('[^a-z0-9]', ''), then compare with reverse()."
+]

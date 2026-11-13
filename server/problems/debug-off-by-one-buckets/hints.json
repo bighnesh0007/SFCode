@@ -1,0 +1,5 @@
+[
+  "Write down the boundaries: is a case exactly 7 days old 'New' or 'Ageing'? Is 30 days 'Ageing' or 'Stale'? The statement says which.",
+  "Date.daysBetween(other) counts from this date to other. opened.daysBetween(today) is positive for a case opened in the past.",
+  "Use <= 7 for New and <= 30 for Ageing, and check for invalid input (null dates, or opened after today) first."
+]

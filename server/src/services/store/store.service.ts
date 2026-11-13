@@ -42,6 +42,22 @@ export interface StoreView {
   items: (StoreItem & { owned: boolean; equipped: boolean })[];
 }
 
+/** Hint n (1-based) costs 2n coins: cheap nudges, pricier near-answers. Free after solving. */
+export const hintPrice = (n: number) => 2 * n;
+const hintItemId = (slug: string, n: number) => `hint:${slug}:${n}`;
+
+export interface LearningView {
+  hintCount: number;
+  /** Price of each hint, cheapest first. */
+  prices: number[];
+  /** Revealed hints, in order. */
+  hints: string[];
+  solved: boolean;
+  /** Only once solved; null otherwise or when the problem has none. */
+  editorial: string | null;
+  hasEditorial: boolean;
+}
+
 export class StoreService {
   constructor(
     private readonly repo: StoreRepository,
@@ -135,5 +151,39 @@ export class StoreService {
       out.set(userId, styles);
     }
     return out;
+  }
+
+  private async solved(userId: string, slug: string): Promise<boolean> {
+    return (await this.submissions.firstSolves(undefined, userId)).some((s) => s.slug === slug);
+  }
+
+  /** Hints and the editorial for one problem, as far as this learner has unlocked them. */
+  async learning(userId: string | null, slug: string): Promise<LearningView> {
+    const c = this.catalog.get(slug);
+    if (!c) throw new NotFoundError("Problem not found.");
+    const all = c.hints ?? [];
+    const prices = all.map((_, i) => hintPrice(i + 1));
+    const base = { hintCount: all.length, prices, hasEditorial: c.editorial !== undefined };
+    if (!userId) return { ...base, hints: [], solved: false, editorial: null };
+    const solved = await this.solved(userId, slug);
+    if (solved) return { ...base, hints: all, solved, editorial: c.editorial ?? null };
+    const owned = new Set(await this.repo.owned(userId));
+    // Hints are bought in order, so the revealed ones are a prefix.
+    let n = 0;
+    while (n < all.length && owned.has(hintItemId(slug, n + 1))) n++;
+    return { ...base, hints: all.slice(0, n), solved, editorial: null };
+  }
+
+  /** Buys the next hint. Asking for one already revealed is a no-op; skipping ahead is refused. */
+  async revealHint(userId: string, slug: string, n: number): Promise<LearningView> {
+    const view = await this.learning(userId, slug);
+    if (n < 1 || n > view.hintCount) throw new NotFoundError("That hint doesn't exist.");
+    if (n <= view.hints.length) return view;
+    if (n !== view.hints.length + 1) throw new ValidationError(`Reveal hint ${view.hints.length + 1} first.`);
+    const w = await this.wallet(userId);
+    const price = hintPrice(n);
+    const outcome = await this.repo.purchase(userId, hintItemId(slug, n), price, w.earnedFromSolves + w.earnedFromContests + w.earnedFromDaily);
+    if (outcome === "insufficient") throw new ValidationError(`Hint ${n} costs ${price} coins; you have ${w.balance}. Solve a problem or the daily challenge to earn more.`);
+    return this.learning(userId, slug);
   }
 }

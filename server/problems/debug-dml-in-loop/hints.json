@@ -1,0 +1,5 @@
+[
+  "Count how many update statements run when 200 tasks are passed in. The limit is 150 DML statements per transaction.",
+  "Changing a field on an sObject in memory costs nothing. Only the update statement counts against the limit.",
+  "Set Status in the loop, then call update tasks once after the loop. Also return early for a null or empty list."
+]

@@ -1,0 +1,5 @@
+[
+  "Count open opportunities per account: GROUP BY AccountId with COUNT(Id).",
+  "WHERE filters rows before grouping (IsClosed = false). HAVING filters groups after counting.",
+  "HAVING COUNT(Id) >= 2. Give the count the alias the statement asks for: COUNT(Id) openDeals."
+]

@@ -1,0 +1,5 @@
+[
+  "A Queueable class implements Queueable and has one method: execute(QueueableContext context).",
+  "Pass the account ids in through the constructor and keep them in a field. Queueables can hold state, unlike @future methods.",
+  "In execute: one query for contacts WHERE AccountId IN :accountIds (with Account.BillingCity), copy the city in a loop, then one update."
+]

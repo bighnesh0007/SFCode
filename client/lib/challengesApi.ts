@@ -40,6 +40,9 @@ export interface ChallengeView {
   category: string;
   tags: string[];
   statement: string;
+  /** Absent on community problems served by an older server. */
+  hintCount?: number;
+  hasEditorial?: boolean;
   files: ChallengeFile[];
   /** Flow problems: built in the learner's org; there are no files. */
   flow?: { apiName: string; kind: "record-triggered" | "autolaunched" };
@@ -94,3 +97,15 @@ export const getSubmission = (token: Token, id: string) => apiRequest<Submission
 
 export const listSubmissions = (token: Token, slug: string) =>
   apiRequest<SubmissionSummary[]>(`/api/v1/challenges/${encodeURIComponent(slug)}/submissions`, { token });
+
+export interface LearningView {
+  hintCount: number;
+  prices: number[];
+  hints: string[];
+  solved: boolean;
+  editorial: string | null;
+  hasEditorial: boolean;
+}
+export const getLearning = (token: Token, slug: string) => apiRequest<LearningView>(`/api/v1/challenges/${encodeURIComponent(slug)}/learning`, { token });
+export const revealHint = (token: Token, slug: string, n: number) =>
+  apiRequest<LearningView>(`/api/v1/challenges/${encodeURIComponent(slug)}/hints/${n}`, { method: "POST", token });

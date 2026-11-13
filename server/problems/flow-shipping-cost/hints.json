@@ -1,0 +1,5 @@
+[
+  "Create an Autolaunched Flow (No Trigger) with two variables: weightKg (Number, input) and cost (Currency, output). The names must match exactly.",
+  "Make a formula resource: MIN(50, 5 + 2 * {!weightKg}).",
+  "An Assignment sets {!cost} to that formula. Save as SFC_Shipping_Cost and activate. Apex calls it with Flow.Interview.createInterview."
+]
