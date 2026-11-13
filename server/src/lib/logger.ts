@@ -91,6 +91,9 @@ export type BusinessEvent =
   | "problem.published"
   | "problem.visibility"
   | "admin.role_revoked"
+  | "admin.user_suspended"
+  | "admin.user_restored"
+  | "admin.audit_failed"
   | "challenge.submitted"
   | "challenge.graded"
   | "ratelimit.exceeded";

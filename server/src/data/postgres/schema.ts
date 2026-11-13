@@ -433,3 +433,17 @@ export const jobs = pgTable("jobs", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
 });
+
+/** Who did what in the admin tools: roles, points, suspensions, announcements. Append-only. */
+export const adminAudit = pgTable(
+  "admin_audit",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    actorId: text("actor_id").notNull(),
+    action: text("action").notNull(),
+    targetId: text("target_id"),
+    detail: jsonb("detail").$type<Record<string, unknown>>().notNull().default({}),
+    at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("admin_audit_at_idx").on(t.at)],
+);

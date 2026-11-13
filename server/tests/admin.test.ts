@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { AdminRepository, AdminUserRow, StaffRole, StoredRole } from "../src/repositories/admin.repository.ts";
-import { AdminService } from "../src/services/admin/admin.service.ts";
+import type { AdminRepository, AdminUserRow, AuditRow, Dashboard, StaffRole, StoredRole, UserDetail } from "../src/repositories/admin.repository.ts";
+import type { SettingsRepository } from "../src/repositories/settings.repository.ts";
+import { AdminService, type AccountModeration } from "../src/services/admin/admin.service.ts";
 import { fixedClock } from "./fakes.ts";
 
 class MemoryAdmin implements AdminRepository {
@@ -28,6 +29,61 @@ class MemoryAdmin implements AdminRepository {
   profileExists(userId: string) {
     return Promise.resolve(this.profiles.has(userId));
   }
+  stats: Dashboard = { days: [], problems: [] };
+  dashboard() {
+    return Promise.resolve(this.stats);
+  }
+  userDetail(userId: string): Promise<UserDetail | null> {
+    if (!this.profiles.has(userId)) return Promise.resolve(null);
+    return Promise.resolve({
+      userId, handle: userId, displayName: userId, imageUrl: null, joined: new Date(0), roles: [], submissions: 2, accepted: 1, solved: 1,
+      lastActive: new Date(1000), certAnswers: 0, org: null, recent: [{ slug: "apex-one", status: "accepted", at: new Date(1000) }],
+    });
+  }
+  log: AuditRow[] = [];
+  failAudit = false;
+  audit(e: { actorId: string; action: string; targetId?: string | null; detail?: Record<string, unknown> }) {
+    if (this.failAudit) return Promise.reject(new Error("db down"));
+    this.log.unshift({ id: String(this.log.length), actorId: e.actorId, action: e.action, targetId: e.targetId ?? null, detail: e.detail ?? {}, at: new Date(0) });
+    return Promise.resolve();
+  }
+  auditLog(limit: number) {
+    return Promise.resolve(this.log.slice(0, limit));
+  }
+}
+
+class MemorySettings implements SettingsRepository {
+  values = new Map<string, unknown>();
+  get(key: string) {
+    return Promise.resolve(this.values.get(key) ?? null);
+  }
+  set(key: string, value: unknown) {
+    this.values.set(key, value);
+    return Promise.resolve();
+  }
+}
+
+class FakeModeration implements AccountModeration {
+  banned = new Set<string>();
+  ban(id: string) {
+    this.banned.add(id);
+    return Promise.resolve();
+  }
+  unban(id: string) {
+    this.banned.delete(id);
+    return Promise.resolve();
+  }
+  isBanned(id: string) {
+    return Promise.resolve(this.banned.has(id));
+  }
+}
+
+function fullSetup() {
+  const repo = new MemoryAdmin();
+  const settings = new MemorySettings();
+  const moderation = new FakeModeration();
+  const service = new AdminService(repo, "owner", fixedClock(), settings, moderation);
+  return { repo, settings, moderation, service };
 }
 
 function setup() {
@@ -105,5 +161,94 @@ describe("AdminService authorisation", () => {
     const repo = new MemoryAdmin();
     const service = new AdminService(repo, undefined, fixedClock());
     expect(await service.standing("owner")).toBeNull();
+  });
+});
+
+describe("admin tools", () => {
+  it("audits role changes, and only admins read the audit log", async () => {
+    const { repo, service } = fullSetup();
+    await service.grant("owner", "alice", "admin");
+    await service.grant("alice", "bob", "reviewer");
+    await service.revoke("alice", "bob", "reviewer");
+    expect(repo.log.map((r) => [r.actorId, r.action, r.targetId, r.detail])).toEqual([
+      ["alice", "role.revoke", "bob", { role: "reviewer" }],
+      ["alice", "role.grant", "bob", { role: "reviewer" }],
+      ["owner", "role.grant", "alice", { role: "admin" }],
+    ]);
+    await service.grant("alice", "carol", "reviewer");
+    await expect(service.auditLog("carol")).rejects.toThrow(/Admin access/);
+    expect(await service.auditLog("alice")).toHaveLength(4);
+  });
+
+  it("a failed audit write doesn't undo the action", async () => {
+    const { repo, service } = fullSetup();
+    repo.failAudit = true;
+    await service.grant("owner", "alice", "admin");
+    expect(await repo.rolesOf("alice")).toEqual(["admin"]);
+  });
+
+  it("suspend: admins only; never yourself or the owner; only the owner suspends an admin; audited", async () => {
+    const { repo, moderation, service } = fullSetup();
+    await service.grant("owner", "alice", "admin");
+    await service.grant("owner", "bob", "admin");
+    await service.grant("alice", "carol", "reviewer");
+    await expect(service.setSuspended("carol", "dave", true, "")).rejects.toThrow(/Admin access/);
+    await expect(service.setSuspended("alice", "alice", true, "")).rejects.toThrow(/yourself/);
+    await expect(service.setSuspended("alice", "owner", true, "")).rejects.toThrow(/owner/);
+    await expect(service.setSuspended("alice", "bob", true, "")).rejects.toThrow(/Only the owner/);
+    await expect(service.setSuspended("alice", "nobody", true, "")).rejects.toThrow(/No learner/);
+    expect(moderation.banned.size).toBe(0);
+
+    await service.setSuspended("alice", "dave", true, "spam");
+    expect((await service.user("carol", "dave")).suspended).toBe(true);
+    await service.setSuspended("owner", "bob", true, "");
+    await service.setSuspended("alice", "dave", false, "");
+    expect([...moderation.banned]).toEqual(["bob"]);
+    expect(repo.log.slice(0, 3).map((r) => [r.action, r.targetId])).toEqual([["user.restore", "dave"], ["user.suspend", "bob"], ["user.suspend", "dave"]]);
+    expect(repo.log[2]?.detail).toEqual({ reason: "spam" });
+  });
+
+  it("user detail is for reviewers and up, with titles and ISO dates", async () => {
+    const { service } = fullSetup();
+    service.setProblemTitles((slug) => (slug === "apex-one" ? "Apex One" : undefined));
+    await service.grant("owner", "alice", "admin");
+    await service.grant("alice", "carol", "reviewer");
+    await expect(service.user("dave", "erin")).rejects.toThrow(/Admin access/);
+    const u = await service.user("carol", "erin");
+    expect(u).toMatchObject({ handle: "erin", owner: false, suspended: false, lastActive: new Date(1000).toISOString() });
+    expect(u.recent[0]).toMatchObject({ title: "Apex One", status: "accepted" });
+    expect((await service.user("carol", "owner")).owner).toBe(true);
+    await expect(service.user("carol", "nobody")).rejects.toThrow(/No learner/);
+  });
+
+  it("dashboard: top by volume; hardest by acceptance rate, only with enough attempts", async () => {
+    const { repo, service } = fullSetup();
+    await service.grant("owner", "alice", "admin");
+    repo.stats = {
+      days: [],
+      problems: [
+        { slug: "easy", submissions: 10, accepted: 9, solvers: 9 },
+        { slug: "hard", submissions: 8, accepted: 1, solvers: 1 },
+        { slug: "rare", submissions: 4, accepted: 0, solvers: 0 },
+      ],
+    };
+    const d = await service.dashboard("alice");
+    expect(d.top.map((p) => p.slug)).toEqual(["easy", "hard", "rare"]);
+    expect(d.hardest.map((p) => [p.slug, p.rate])).toEqual([["hard", 13], ["easy", 90]]);
+    expect(d.top.find((p) => p.slug === "rare")?.rate).toBeNull();
+  });
+
+  it("announcements: admins set and clear them; anyone reads; each new text gets a new id", async () => {
+    const { repo, service } = fullSetup();
+    await service.grant("owner", "alice", "admin");
+    await service.grant("alice", "carol", "reviewer");
+    expect(await service.announcement()).toBeNull();
+    await expect(service.setAnnouncement("carol", { text: "hi", tone: "info" })).rejects.toThrow(/Admin access/);
+    const a = await service.setAnnouncement("alice", { text: "  Contest on Friday  ", tone: "success" });
+    expect(await service.announcement()).toEqual(a);
+    expect(a).toMatchObject({ text: "Contest on Friday", tone: "success" });
+    await service.setAnnouncement("alice", { text: "   ", tone: "info" });
+    expect(await service.announcement()).toBeNull();
+    expect(repo.log[0]?.action).toBe("announcement.clear");
   });
 });
