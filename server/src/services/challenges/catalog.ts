@@ -51,6 +51,7 @@ const problemJson = z.strictObject({
 });
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+export const MAX_HINTS = 3;
 
 export const extensionFor = (type: ApexFileType): string => ({ class: "cls", trigger: "trigger", soql: "soql" })[type];
 
@@ -124,7 +125,28 @@ function loadLwcChallenge(dir: string, slug: string, meta: z.infer<typeof proble
   };
 }
 
+/** Optional learning aids next to the problem: up to three hints, cheapest first, and a write-up. */
+const hintsJson = z.array(z.string().trim().min(10).max(600)).min(1).max(MAX_HINTS);
+
 export function loadChallenge(root: string, slug: string): Challenge {
+  const c = loadCore(root, slug);
+  const dir = join(root, slug);
+  const hintsPath = join(dir, "hints.json");
+  if (existsSync(hintsPath)) {
+    const parsed = hintsJson.safeParse(JSON.parse(readFileSync(hintsPath, "utf8")));
+    if (!parsed.success) throw new Error(`problems/${slug}/hints.json: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`);
+    c.hints = parsed.data;
+  }
+  const editorialPath = join(dir, "editorial.md");
+  if (existsSync(editorialPath)) {
+    const text = readFileSync(editorialPath, "utf8").trim();
+    if (text.length < 50) throw new Error(`problems/${slug}/editorial.md is too short to help anyone`);
+    c.editorial = text;
+  }
+  return c;
+}
+
+function loadCore(root: string, slug: string): Challenge {
   if (!SLUG.test(slug)) throw new Error(`problem folder "${slug}" is not a kebab-case slug`);
   const dir = join(root, slug);
   const where = `problems/${slug}`;

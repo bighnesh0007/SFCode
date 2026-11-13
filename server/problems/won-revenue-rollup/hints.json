@@ -1,0 +1,5 @@
+[
+  "A trigger on Opportunity updates the parent Account. Fire it after insert, update, delete and undelete, because all four change the total.",
+  "Collect AccountIds from Trigger.new, plus Trigger.old on update and delete. An opportunity can move to a different account, so both old and new accounts need recalculating.",
+  "Recalculate with one aggregate query: SELECT AccountId, SUM(Amount) FROM Opportunity WHERE AccountId IN :ids AND StageName = 'Closed Won' GROUP BY AccountId. Accounts with no rows get 0."
+]

@@ -1,0 +1,5 @@
+[
+  "Keep count as a plain class field. Every field in an LWC is reactive: reassigning it re-renders the template.",
+  "Expose label with @api so a parent can set it. Give it a default of 'Clicks'.",
+  "A getter isZero returns this.count === 0. Bind it to the reset button's disabled attribute: disabled={isZero}."
+]

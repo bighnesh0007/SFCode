@@ -1,0 +1,5 @@
+[
+  "This creates a different record (a Task), so it must be an after-save flow: optimize for Actions and Related Records.",
+  "In the Start element, set the condition AnnualRevenue Greater Than 1000000 and choose 'Only when a record is updated to meet the condition requirements'.",
+  "Add a Create Records element for a Task: Subject 'Review key account', WhatId = {!$Record.Id}, OwnerId = {!$Record.OwnerId}."
+]

@@ -46,6 +46,10 @@ export interface Challenge {
   lwc?: { component: string; tests: string; /** Hidden: graded on the server, never sent to a client. */ hiddenTests: string };
   /** Community problems: the Buddy who wrote it (built-in problems have none). */
   authorId?: string;
+  /** Hidden until bought (or solved). Cheapest first. */
+  hints?: string[];
+  /** Hidden until the learner has an accepted solve. Markdown. */
+  editorial?: string;
 }
 
 export const VERDICTS = ["accepted", "wrong_answer", "compile_error", "coverage", "error"] as const;

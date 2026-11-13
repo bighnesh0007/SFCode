@@ -1,0 +1,5 @@
+[
+  "Templates can't loop over a number, so a getter builds an array of five star objects: [1..5].map(n => ({ n, className })).",
+  "Each star's class is 'star selected' when n <= this.value. Compute it in the getter, since templates can't do comparisons.",
+  "On click, read data-n from event.currentTarget.dataset and fire new CustomEvent('rate', { detail: n }). Don't change value yourself: the parent owns it."
+]

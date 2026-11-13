@@ -69,7 +69,20 @@ SOQL problems use `"files": [{ "name": "query", "type": "soql" }]`.
 - **Statement:** must name every class, method, field and alias the tests rely on.
   A learner should never fail because of something the statement didn't say.
 
-## 5. Prove it
+## 5. Hints and an editorial (recommended)
+
+```
+server/problems/my-problem/
+  hints.json     # ["a nudge", "a bigger nudge", "nearly the answer"]: 1 to 3, cheapest first
+  editorial.md   # the approach, the pitfalls, and why it works
+```
+
+Learners buy hints with coins (2, 4, 6) and see everything once they solve the
+problem. Write hints as a ladder: the first points at the idea, the last is one
+step from the answer. The editorial explains the *why*. You can include the
+solution, since only learners who have solved the problem see it.
+
+## 6. Prove it
 
 ```bash
 npm test                                              # structure

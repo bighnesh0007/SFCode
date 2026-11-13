@@ -1,0 +1,5 @@
+[
+  "One row per stage: GROUP BY StageName.",
+  "Use two aggregates in the same query: COUNT(Id) and SUM(Amount).",
+  "Alias them as the statement asks: COUNT(Id) total, SUM(Amount) amount."
+]

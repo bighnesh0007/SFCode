@@ -1,0 +1,5 @@
+[
+  "A Decision element checks its outcomes top to bottom and takes the first that matches.",
+  "Order the outcomes: Hot (AnnualRevenue >= 10000000), then Warm (>= 1000000). The Default Outcome catches everything else, blank revenue included.",
+  "Each outcome leads to an Assignment that sets {!$Record.Rating}. Use Fast Field Updates on create, save as SFC_Rate_By_Revenue and activate."
+]

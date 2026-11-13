@@ -203,6 +203,17 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.get("/store", identify, st.view);
     v1.post("/store/buy", signedIn, limiter(20), validate({ body: storeItemBody }), st.buy);
     v1.post("/store/equip", signedIn, limiter(40), validate({ body: equipBody }), st.equip);
+    // Hints and editorials: what's unlocked depends on coins spent and solves.
+    const store = container.store;
+    const slugParams = z.strictObject({ slug: z.string().regex(/^[a-z0-9-]{1,100}$/) });
+    const hintParams = slugParams.extend({ n: z.coerce.number().int().min(1).max(10) });
+    v1.get("/challenges/:slug/learning", limiter(120), identify, validate({ params: slugParams }), (async (req, res) => {
+      ok(res, await store.learning(req.auth?.userId ?? null, validatedParams<z.infer<typeof slugParams>>(req).slug));
+    }) as RequestHandler);
+    v1.post("/challenges/:slug/hints/:n", limiter(30), signedIn, validate({ params: hintParams }), (async (req, res) => {
+      const { slug, n } = validatedParams<z.infer<typeof hintParams>>(req);
+      ok(res, await store.revealHint(req.auth?.userId ?? "", slug, n));
+    }) as RequestHandler);
   } else {
     v1.use("/store", disabled("The store"));
   }

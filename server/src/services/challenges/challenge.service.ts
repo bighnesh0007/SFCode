@@ -49,6 +49,8 @@ export interface ChallengeView {
   category: string;
   tags: string[];
   statement: string;
+  hintCount: number;
+  hasEditorial: boolean;
   files: { name: string; type: ApexFileType | "lwc"; fileName: string; starter: string }[];
   /** LWC problems: compiled by POST /lwc/compile and tested in the browser. */
   lwc?: { component: string; tests: string };
@@ -167,6 +169,8 @@ export class ChallengeService {
       category: c.category,
       tags: c.tags,
       statement: c.statement,
+      hintCount: c.hints?.length ?? 0,
+      hasEditorial: c.editorial !== undefined,
       files: c.lwc
         ? (["html", "js", "css"] as const).map((ext) => ({ name: ext, type: "lwc" as const, fileName: `${c.lwc?.component ?? ""}.${ext}`, starter: c.starter[ext] ?? "" }))
         : c.files.map((f) => ({ name: f.name, type: f.type, fileName: `${f.name}.${extensionFor(f.type)}`, starter: c.starter[f.name] ?? "" })),

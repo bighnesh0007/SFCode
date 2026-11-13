@@ -1,0 +1,5 @@
+[
+  "Build a Map<Id, List<Contact>>. For each contact, get or create the list for its AccountId.",
+  "Guard the edge cases the tests use: a null input list, null contacts in the list, and contacts with no AccountId.",
+  "countByAccount can reuse byAccount: walk its keySet() and put each list's size()."
+]

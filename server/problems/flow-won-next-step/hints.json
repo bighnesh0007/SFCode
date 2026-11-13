@@ -1,0 +1,5 @@
+[
+  "Trigger on 'A record is created or updated' so both new and changed opportunities are covered.",
+  "Entry condition: StageName Equals Closed Won. Fast Field Updates means no DML.",
+  "Update the triggering record: NextStep = 'Hand off to onboarding' (exact text). Save as SFC_Opportunity_Won_Next_Step and activate."
+]

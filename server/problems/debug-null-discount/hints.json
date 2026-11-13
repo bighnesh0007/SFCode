@@ -1,0 +1,5 @@
+[
+  "Which arguments can be null? Any arithmetic on a null Decimal throws a NullPointerException.",
+  "Decide the defaults the statement asks for: a null amount gives 0, and a null percent means no discount.",
+  "Clamp percent to 0-100 with Math.min(Math.max(percent, 0), 100), then round the result with setScale(2, RoundingMode.HALF_UP)."
+]

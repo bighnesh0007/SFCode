@@ -1,0 +1,5 @@
+[
+  "Filter with AND: Industry = 'Technology' AND Rating = 'Hot'.",
+  "Sort by AnnualRevenue from biggest down. By default nulls sort first in DESC order, but the statement wants them last.",
+  "ORDER BY AnnualRevenue DESC NULLS LAST, Name ASC. The second key breaks ties."
+]
