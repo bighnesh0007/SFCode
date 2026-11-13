@@ -367,3 +367,27 @@ export const notifications = pgTable(
   },
   (t) => [index("notifications_user_created_idx").on(t.userId, t.createdAt)],
 );
+
+/** Opt-in email preferences. No row = nothing is sent. */
+export const emailPrefs = pgTable("email_prefs", {
+  userId: text("user_id").primaryKey(),
+  weeklyDigest: boolean("weekly_digest").notNull().default(false),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/**
+ * Every email we attempt, for the monthly caps and to never send the same
+ * digest twice: (user, kind, period) is unique; period is e.g. "2026-W46".
+ */
+export const emailLog = pgTable(
+  "email_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    kind: text("kind").notNull(),
+    period: text("period").notNull(),
+    status: text("status").$type<"sent" | "failed">().notNull(),
+    sentAt: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("email_log_once_idx").on(t.userId, t.kind, t.period), index("email_log_sent_idx").on(t.sentAt)],
+);

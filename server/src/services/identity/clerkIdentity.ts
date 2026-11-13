@@ -31,4 +31,15 @@ export class ClerkIdentityLookup implements IdentityLookup {
       return { username: null, displayName: null, imageUrl: null };
     }
   }
+
+  /** The user's primary, verified email address (for opt-in emails only), or null. */
+  async email(userId: string): Promise<string | null> {
+    try {
+      const u = await this.clerk.users.getUser(userId);
+      const primary = u.emailAddresses.find((e) => e.id === u.primaryEmailAddressId);
+      return primary && primary.verification?.status === "verified" ? primary.emailAddress : null;
+    } catch {
+      return null;
+    }
+  }
 }

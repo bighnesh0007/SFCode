@@ -26,9 +26,10 @@ import {
 } from "@/lib/adminApi";
 import { communityProblems, reviewQueue, setProblemActive, type CommunityProblemRow, type DraftRow } from "@/lib/draftsApi";
 import { cn } from "@/lib/utils";
+import { getEmailUsage, sendTestDigest } from "@/lib/emailApi";
 import { STATUS_LABEL } from "@/lib/verdicts";
 
-type Tab = "review" | "people" | "applications" | "problems" | "points";
+type Tab = "review" | "people" | "applications" | "problems" | "points" | "email";
 const ROLE_LABEL: Record<StaffRole, string> = { admin: "Admin", reviewer: "Reviewer", buddy: "Buddy" };
 
 export default function AdminPage() {
@@ -86,6 +87,7 @@ export default function AdminPage() {
     { id: "applications", label: "Buddy applications", show: true },
     { id: "problems", label: "Community problems", show: true },
     { id: "points", label: "Points", show: view === "owner" || view === "admin" },
+    { id: "email", label: "Email", show: view === "owner" || view === "admin" },
   ];
 
   return (
@@ -126,6 +128,7 @@ export default function AdminPage() {
       {tab === "people" && <People view={view} />}
       {tab === "applications" && <Applications />}
       {tab === "points" && <Points />}
+      {tab === "email" && <EmailTab />}
     </div>
   );
 }
@@ -415,6 +418,45 @@ function Points() {
         <Button size="sm" onClick={() => void save()}>Save points</Button>
         {message && <span className="text-sm text-muted-foreground">{message}</span>}
       </div>
+    </section>
+  );
+}
+
+function EmailTab() {
+  const { getToken } = useAuthState();
+  const [usage, setUsage] = useState<{ sentThisMonth: number; cap: number; perUser: number; enabled: boolean } | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const load = useCallback(() => {
+    getToken()
+      .then((t) => getEmailUsage(t))
+      .then(setUsage)
+      .catch(() => setMessage("Could not load email usage."));
+  }, [getToken]);
+  useEffect(load, [load]);
+  async function test() {
+    setMessage(null);
+    try {
+      const r = await sendTestDigest(await getToken());
+      setMessage(r.result === "sent" ? "Sent: check your inbox." : `Not sent: ${r.result.replace("_", " ")}.`);
+      load();
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Could not send.");
+    }
+  }
+  if (!usage) return <div className="mt-5 h-24 animate-pulse rounded-lg bg-muted/50" />;
+  const pct = usage.cap ? Math.min(100, Math.round((100 * usage.sentThisMonth) / usage.cap)) : 0;
+  return (
+    <section className="mt-5 space-y-4">
+      <p className="text-sm text-muted-foreground">
+        Weekly digest via EmailJS: opt-in, Mondays 09:00 UTC, at most {usage.perUser} per user and {usage.cap} in total per month.
+        {!usage.enabled && " Email is off: set the four EMAILJS_* values in server/.env and restart."}
+      </p>
+      <div>
+        <div className="flex justify-between text-sm"><span>This month</span><span className="tabular-nums">{usage.sentThisMonth} / {usage.cap}</span></div>
+        <div className="mt-1 h-2 overflow-hidden rounded-full bg-muted"><div className={cn("h-full rounded-full", pct > 85 ? "bg-rose-500" : "bg-sky-500")} style={{ width: `${pct}%` }} /></div>
+      </div>
+      <Button size="sm" disabled={!usage.enabled} onClick={() => void test()}>Send me a test digest</Button>
+      {message && <p className="text-sm text-muted-foreground">{message}</p>}
     </section>
   );
 }

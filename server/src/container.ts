@@ -23,6 +23,9 @@ import { PgBlogRepository } from "./repositories/blog.repository.ts";
 import { BlogService } from "./services/blog/blog.service.ts";
 import { compileLwc } from "./services/lwc/compiler.ts";
 import { LwcSandbox } from "./services/lwc/lwcSandbox.ts";
+import { PgEmailRepository } from "./repositories/email.repository.ts";
+import { DigestService } from "./services/email/digest.service.ts";
+import { emailJsSender } from "./services/email/emailjs.ts";
 import { PgSocialRepository } from "./repositories/social.repository.ts";
 import { SocialService } from "./services/social/social.service.ts";
 import { PgProblemDraftRepository } from "./repositories/problemDraft.repository.ts";
@@ -62,6 +65,7 @@ export interface Container {
   buddies?: BuddyService;
   drafts?: ProblemDraftService;
   social?: SocialService;
+  digest?: DigestService;
 }
 
 /** server/certification (question banks), resolved like PROBLEMS_DIR. */
@@ -156,6 +160,38 @@ export function buildContainer(): Container {
     const social = container.social;
     container.drafts.setNotifier((userId, kind, data) => social.notify(userId, kind, data));
     container.buddies = new BuddyService(new PgBuddyRepository(container.db), container.admin, container.community, new PgProfileRepository(container.db));
+    // Weekly digest (opt-in). Sending needs all four EmailJS settings and Clerk (for addresses).
+    const { serviceId, templateId, publicKey, privateKey, monthlyCap, perUserMonthly } = config.email;
+    const sender = serviceId && templateId && publicKey && privateKey && config.clerk.secretKey ? emailJsSender({ serviceId, templateId, publicKey, privateKey }) : undefined;
+    const clerkForEmail = config.clerk.secretKey ? new ClerkIdentityLookup(config.clerk.secretKey) : undefined;
+    const communityForDigest = container.community;
+    const dailyForDigest = container.daily;
+    const contestsForDigest = container.contests;
+    const site = config.http.appUrl;
+    container.digest = new DigestService(
+      new PgEmailRepository(container.db),
+      sender,
+      {
+        email: (userId) => (clerkForEmail ? clerkForEmail.email(userId) : Promise.resolve(null)),
+        content: async (userId) => {
+          const me = await communityForDigest.me(userId);
+          const daily = await dailyForDigest.view(null);
+          const now = Date.now();
+          const contests = (await contestsForDigest.list()).filter((c) => Date.parse(c.endsAt) > now && Date.parse(c.startsAt) < now + 7 * 86_400_000);
+          return {
+            name: me.displayName,
+            rank: me.tier.title,
+            points: me.tier.points,
+            streak: me.stats.streak,
+            daily: { title: daily.problem.title, url: `${site}/problems` },
+            contests: contests.map((c) => ({ title: c.title, url: `${site}/contests/${c.slug}`, startsAt: c.startsAt })),
+          };
+        },
+      },
+      systemClock,
+      { total: monthlyCap, perUser: perUserMonthly },
+      site,
+    );
     container.buddies.setNotifier((userId, kind, data) => social.notify(userId, kind, data));
     container.community.setCosmeticsSource(container.store);
     const communityForFreezes = container.community;

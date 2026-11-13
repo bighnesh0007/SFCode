@@ -297,6 +297,26 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.use(["/social", "/feed", "/notifications"], disabled("Social features"));
   }
 
+  // Email: your own opt-in preferences; staff can send themselves a test digest and see usage.
+  if (container.digest && verifier) {
+    const digest = container.digest;
+    const admin = container.admin;
+    const auth = requireAuth(verifier);
+    const prefsBody = z.strictObject({ weeklyDigest: z.boolean() });
+    v1.get("/email/prefs", auth, (async (req, res) => ok(res, await digest.prefs(req.auth?.userId ?? ""))) as RequestHandler);
+    v1.put("/email/prefs", auth, limiter(20), validate({ body: prefsBody }), (async (req, res) => {
+      ok(res, await digest.setPrefs(req.auth?.userId ?? "", validatedBody<z.infer<typeof prefsBody>>(req).weeklyDigest));
+    }) as RequestHandler);
+    v1.get("/admin/email", auth, (async (req, res) => {
+      await admin?.require(req.auth?.userId ?? "", "admin");
+      ok(res, await digest.usage());
+    }) as RequestHandler);
+    v1.post("/admin/email/test", auth, limiter(5), (async (req, res) => {
+      await admin?.require(req.auth?.userId ?? "", "admin");
+      ok(res, { result: await digest.sendTest(req.auth?.userId ?? "") });
+    }) as RequestHandler);
+  }
+
   // Daily Challenge: public; signed-in viewers also get their own status.
   if (container.daily) {
     const daily = container.daily;

@@ -21,6 +21,14 @@ export const config = Object.freeze({
 
   superAdminUserId: env.SUPER_ADMIN_USER_ID,
   lwcRunnerImage: env.LWC_RUNNER_IMAGE,
+  email: {
+    serviceId: env.EMAILJS_SERVICE_ID,
+    templateId: env.EMAILJS_TEMPLATE_ID,
+    publicKey: env.EMAILJS_PUBLIC_KEY,
+    privateKey: env.EMAILJS_PRIVATE_KEY,
+    monthlyCap: env.EMAIL_MONTHLY_CAP,
+    perUserMonthly: env.EMAIL_PER_USER_MONTHLY,
+  },
 
   salesforce: Object.freeze({
     clientId: env.SF_CLIENT_ID,
