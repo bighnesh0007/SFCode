@@ -3,3 +3,9 @@ contact_links:
   - name: Report a security vulnerability
     url: https://github.com/bighnesh0007/SFCode/security/advisories/new
     about: Please report vulnerabilities privately, not as a public issue.
+  - name: Ask a question or share an idea
+    url: https://github.com/bighnesh0007/SFCode/discussions
+    about: Questions, ideas and show-and-tell go in Discussions.
+  - name: Try SFCode
+    url: https://sf.bighnesh.space
+    about: The live site.
