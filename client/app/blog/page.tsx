@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUp, MessageSquare, PenSquare } from "lucide-react";
+import { ArrowUp, MessageSquare, PenLine, PenSquare } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { useAuthState } from "@/components/auth";
 import { buttonVariants } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
 import { listPosts, type PostSummary } from "@/lib/blogApi";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/EmptyState";
 
 export default function BlogPage() {
   const { isSignedIn } = useAuthState();
@@ -70,7 +71,13 @@ export default function BlogPage() {
                 </div>
               </li>
             ))}
-        {posts?.length === 0 && <li className="p-10 text-center text-sm text-muted-foreground">No posts yet.{isSignedIn ? " Write the first one." : ""}</li>}
+        {posts?.length === 0 && (
+          <li>
+            <EmptyState icon={PenLine} title="No posts yet" action={isSignedIn ? { href: "/blog/new", label: "Write the first one" } : undefined}>
+              Tips, war stories and study notes from Salesforce developers will show up here.
+            </EmptyState>
+          </li>
+        )}
       </ul>
     </div>
   );

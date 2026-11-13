@@ -63,7 +63,7 @@ function OrgSettings() {
 
   return (
     <div className="container mx-auto max-w-2xl px-4 py-12">
-      <h1 className="text-2xl font-bold tracking-tight">Salesforce org</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Salesforce org</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         SFCode runs your Apex in an org you connect. Use a Developer Edition or sandbox — never production data you care about.
       </p>

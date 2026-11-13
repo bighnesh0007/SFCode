@@ -8,6 +8,7 @@ import { SignInButton, useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
 import { createTeam, joinTeam, myTeams, type TeamSummary } from "@/lib/hubApi";
+import { EmptyState } from "@/components/EmptyState";
 
 export default function TeamsPage() {
   const { isLoaded, isSignedIn, getToken } = useAuthState();
@@ -55,7 +56,13 @@ export default function TeamsPage() {
           <h2 className="mt-10 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Your teams</h2>
           <ul className="mt-3 divide-y rounded-xl border">
             {teams === null && <li className="p-4"><div className="h-5 animate-pulse rounded bg-muted" /></li>}
-            {teams?.length === 0 && <li className="p-6 text-center text-sm text-muted-foreground">No teams yet: create one or ask a friend for their code.</li>}
+            {teams?.length === 0 && (
+              <li>
+                <EmptyState icon={Users} title="No teams yet">
+                  Create one for your study group or company, or ask a friend for their join code.
+                </EmptyState>
+              </li>
+            )}
             {teams?.map((t) => (
               <li key={t.slug}>
                 <Link href={`/teams/${t.slug}`} className="flex items-center gap-3 px-4 py-3 hover:bg-accent/60">

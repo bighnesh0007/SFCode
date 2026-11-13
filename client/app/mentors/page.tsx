@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { PageHeader } from "@/components/PageHeader";
 import { HeartHandshake, Send } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { RankBadge } from "@/components/RankBadge";
@@ -10,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
 import { askMentor, listMentors, MENTOR_TOPICS, myMentor, saveMentor, type Mentor, type MyMentor } from "@/lib/hubApi";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/EmptyState";
 
 export default function MentorsPage() {
   const { isSignedIn, getToken } = useAuthState();
@@ -43,8 +45,7 @@ export default function MentorsPage() {
   const shown = (mentors ?? []).filter((m) => !topic || m.topics.includes(topic));
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-10">
-      <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight"><HeartHandshake className="h-6 w-6 text-emerald-700 dark:text-emerald-400" /> Mentors</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Learners at Ranger rank and above who offer to help. Ask a short question; it arrives in their notifications.</p>
+      <PageHeader icon={HeartHandshake} title="Mentors" description="Learners at Ranger rank and above who offer to help. Ask a short question; it arrives in their notifications." />
 
       <div className="mt-5 flex flex-wrap gap-1.5">
         {[null, ...MENTOR_TOPICS].map((t) => (
@@ -55,7 +56,11 @@ export default function MentorsPage() {
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         {mentors === null && [0, 1].map((i) => <div key={i} className="h-32 animate-pulse rounded-xl border bg-muted/40" />)}
-        {mentors !== null && shown.length === 0 && <p className="col-span-full py-10 text-center text-sm text-muted-foreground">No mentors {topic ? `for ${topic} ` : ""}yet. Reach Ranger and be the first!</p>}
+        {mentors !== null && shown.length === 0 && (
+          <EmptyState icon={HeartHandshake} title={`No mentors ${topic ? `for ${topic} ` : ""}yet`} className="col-span-full">
+            Reach the Ranger rank and you can offer to mentor others here.
+          </EmptyState>
+        )}
         {shown.map((m) => (
           <div key={m.handle} className="rounded-xl border p-4">
             <div className="flex items-center gap-3">

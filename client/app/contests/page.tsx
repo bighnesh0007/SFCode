@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Trophy } from "lucide-react";
+import { Swords, Trophy } from "lucide-react";
 import { useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { getStanding } from "@/lib/adminApi";
@@ -10,6 +10,7 @@ import { ApiError } from "@/lib/apiClient";
 import { listChallenges, type ChallengeSummary } from "@/lib/challengesApi";
 import { createContest, listContests, type ContestPhase, type ContestSummary } from "@/lib/contestApi";
 import { PhasePill } from "@/components/PhasePill";
+import { EmptyState } from "@/components/EmptyState";
 
 const fmt = (iso: string) => new Date(iso).toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
@@ -66,7 +67,13 @@ export default function ContestsPage() {
             </Link>
           </li>
         ))}
-        {contests?.length === 0 && <li className="p-10 text-center text-sm text-muted-foreground">No contests scheduled yet. Check back soon.</li>}
+        {contests?.length === 0 && (
+          <li>
+            <EmptyState icon={Swords} title="No contests scheduled yet" action={{ href: "/problems", label: "Practise in the meantime" }}>
+              Contests are timed sets of problems with a live leaderboard. The next one will be announced here.
+            </EmptyState>
+          </li>
+        )}
       </ul>
     </div>
   );

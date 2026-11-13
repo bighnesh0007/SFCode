@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 import { SignInButton, useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { getMyProfile } from "@/lib/communityApi";
+import { PageSkeleton } from "@/components/ui/skeleton";
 
 /** /profile → your own /u/<handle> (creating the profile on first visit). */
 export default function MyProfile() {
@@ -30,5 +30,5 @@ export default function MyProfile() {
         </SignInButton>
       </div>
     );
-  return <div className="flex flex-1 items-center justify-center py-24">{error ? <p className="text-destructive">{error}</p> : <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}</div>;
+  return error ? <div className="flex flex-1 items-center justify-center py-24"><p className="text-destructive">{error}</p></div> : <PageSkeleton blocks={3} />;
 }

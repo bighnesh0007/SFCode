@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { PageHeader } from "@/components/PageHeader";
 import { Briefcase, ExternalLink, MapPin } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { useAuthState } from "@/components/auth";
@@ -24,8 +25,7 @@ export default function JobsPage() {
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-10">
-      <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight"><Briefcase className="h-6 w-6 text-sky-700 dark:text-sky-400" /> Job corner</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Salesforce roles shared with the community, and learners who are open to work.</p>
+      <PageHeader icon={Briefcase} title="Job corner" description="Salesforce roles shared with the community, and learners who are open to work." />
       {isAdmin && <PostJob onPosted={setView} />}
       <section className="mt-8">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Open roles</h2>

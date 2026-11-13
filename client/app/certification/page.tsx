@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { PageHeader } from "@/components/PageHeader";
 import { useAuthState } from "@/components/auth";
 import { GraduationCap, Play, Timer } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
@@ -30,13 +31,15 @@ export default function CertificationPage() {
 
   return (
     <div className="container mx-auto max-w-5xl space-y-6 px-4 py-10">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Certification Prep</h1>
-        <p className="mt-1 text-muted-foreground">
-          Original practice questions for Salesforce certifications, organised by the official exam sections. Every
-          answer comes with an explanation, and each exam has a timed mock weighted like the real one.{!isSignedIn && " Sign in to save your progress."}
-        </p>
-      </div>
+      <PageHeader
+        title="Certification Prep"
+        description={
+          <>
+            Original practice questions for Salesforce certifications, organised by the official exam sections. Every answer comes with an
+            explanation, and each exam has a timed mock weighted like the real one.{!isSignedIn && " Sign in to save your progress."}
+          </>
+        }
+      />
       {error && <p className="text-sm text-destructive">{error}</p>}
       <ReviewCard />
       <div className="grid gap-4 md:grid-cols-2">

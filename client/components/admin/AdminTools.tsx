@@ -115,7 +115,7 @@ function DailyBars({ label, days, field }: { label: string; days: DailyPoint[]; 
 
 function ProblemTable({ title, rows, empty }: { title: string; rows: ProblemRow[]; empty: string }) {
   return (
-    <div className="rounded-lg border">
+    <div className="overflow-x-auto rounded-lg border">
       <p className="border-b px-4 py-2.5 text-sm font-medium">{title}</p>
       {rows.length === 0 ? (
         <p className="px-4 py-6 text-center text-sm text-muted-foreground">{empty}</p>

@@ -11,6 +11,7 @@ import { ApiError } from "@/lib/apiClient";
 import { checkDraft, getDraft, reviewDraft, saveDraft, STATUS_TEXT, submitDraft, type DraftView, type ProblemContent } from "@/lib/draftsApi";
 import { trackInfo } from "@/lib/tracks";
 import { cn } from "@/lib/utils";
+import { PageSkeleton } from "@/components/ui/skeleton";
 
 const input = "h-9 w-full rounded-md border bg-background px-2 text-sm";
 const code = "min-h-40 w-full rounded-md border bg-muted/30 p-2 font-mono text-xs leading-relaxed";
@@ -56,7 +57,7 @@ export function DraftEditor({ id }: { id: string }) {
   }, [running, load]);
 
   if (error && !draft) return <p className="py-16 text-center text-sm text-destructive">{error}</p>;
-  if (!draft || !content) return <div className="flex justify-center py-24"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>;
+  if (!draft || !content) return <PageSkeleton blocks={4} />;
 
   const editable = draft.canEdit;
   const reviewing = draft.canReview;

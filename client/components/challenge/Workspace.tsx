@@ -288,6 +288,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
                 {challenge.flow && <FlowBrief slug={challenge.slug} flow={challenge.flow} instanceUrl={org.kind === "connected" ? org.connection.instanceUrl : null} />}
                 {activeFile && (
                   <Editor
+                    loading={<div aria-hidden="true" className="h-full w-full animate-pulse bg-muted/40" />}
                     path={activeFile.fileName}
                     // Monaco has no SOQL mode; SQL highlighting is close enough.
                     language={activeFile.type === "soql" ? "sql" : "apex"}
