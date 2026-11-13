@@ -7,6 +7,7 @@ import { Pencil } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { RankBadge } from "@/components/RankBadge";
 import { FollowButton } from "@/components/FollowButton";
+import { EmailPrefs } from "@/components/profile/EmailPrefs";
 import { AboutCard, AchievementsWall, ContestHistory, RoadmapProgress, ShareButtons, SkillRadar, StatsStrip } from "@/components/profile/Sections";
 import { Flair, accentClass, frameClass } from "@/components/Cosmetics";
 import { useAuthState } from "@/components/auth";
@@ -127,7 +128,10 @@ export function ProfileView({ profile: initial, editable }: { profile: Profile; 
       <StatsStrip p={profile} />
 
       <div className="mt-6 grid gap-6 md:grid-cols-2">
-        <AboutCard p={profile} editable={editable} onChange={setProfile} />
+        <div className="space-y-6">
+          <AboutCard p={profile} editable={editable} onChange={setProfile} />
+          {editable && <EmailPrefs />}
+        </div>
         <SkillRadar p={profile} />
       </div>
 

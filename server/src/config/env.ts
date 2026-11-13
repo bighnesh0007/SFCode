@@ -40,6 +40,19 @@ const envSchema = z.object({
   /** Docker image that grades LWC submissions (built by scripts/up.mjs). Unset = LWC submit unavailable. */
   LWC_RUNNER_IMAGE: z.string().regex(/^[a-z0-9][a-z0-9._/-]*:[A-Za-z0-9._-]+$/, "an image name with a tag").optional(),
 
+  // ── Email (EmailJS REST API, server-side) ─────────────────────────────────
+  // All four set = the weekly digest can send; otherwise email is off.
+  // The private key needs "Allow EmailJS API for non-browser applications"
+  // switched on in EmailJS → Account → Security.
+  EMAILJS_SERVICE_ID: z.string().min(1).optional(),
+  EMAILJS_TEMPLATE_ID: z.string().min(1).optional(),
+  EMAILJS_PUBLIC_KEY: z.string().min(1).optional(),
+  EMAILJS_PRIVATE_KEY: z.string().min(1).optional(),
+  /** Total sends per calendar month (EmailJS free plan: 200; keep a margin). */
+  EMAIL_MONTHLY_CAP: z.coerce.number().int().min(0).max(100_000).default(190),
+  /** Sends per user per calendar month. */
+  EMAIL_PER_USER_MONTHLY: z.coerce.number().int().min(0).max(100).default(4),
+
   // ── Salesforce External Client App ─────────────────────────────────────────
   SF_CLIENT_ID: z.string().min(1).optional(),
   SF_CLIENT_SECRET: z.string().min(1).optional(),

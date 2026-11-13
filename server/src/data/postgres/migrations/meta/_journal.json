@@ -92,6 +92,13 @@
       "when": 1794548034902,
       "tag": "0012_social",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794551390401,
+      "tag": "0013_email",
+      "breakpoints": true
     }
   ]
 }
