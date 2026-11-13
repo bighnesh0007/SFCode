@@ -29,3 +29,32 @@ export function extractUserDebug(log: string): UserDebugEntry[] {
   }
   return out;
 }
+
+export interface LimitUsage {
+  name: string;
+  used: number;
+  max: number;
+}
+
+/**
+ * Reads the `LIMIT_USAGE_FOR_NS|(default)|` block, whose following lines look like
+ * `  Number of SOQL queries: 2 out of 100`. Only the default namespace is shown:
+ * that's the learner's own code.
+ */
+export function extractLimits(log: string): LimitUsage[] {
+  const out: LimitUsage[] = [];
+  let inBlock = false;
+  for (const raw of log.split("\n")) {
+    if (EVENT_LINE.test(raw)) {
+      inBlock = raw.includes("|LIMIT_USAGE_FOR_NS|(default)|");
+      continue;
+    }
+    if (!inBlock) continue;
+    const m = /^\s*(.+?):\s*(\d+)\s+out of\s+(\d+)/.exec(raw);
+    if (m) out.push({ name: m[1] ?? "", used: Number(m[2]), max: Number(m[3]) });
+  }
+  // A transaction logs the block more than once; the last one is the final total.
+  const last = new Map<string, LimitUsage>();
+  for (const l of out) last.set(l.name, l);
+  return [...last.values()];
+}
