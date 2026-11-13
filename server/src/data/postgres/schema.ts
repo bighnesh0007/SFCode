@@ -22,6 +22,9 @@ export const salesforceConnections = pgTable("salesforce_connections", {
   // Both stored as `enc:v1:…` (lib/crypto/tokenCipher.ts). Never plaintext.
   accessTokenEnc: text("access_token_enc").notNull(),
   refreshTokenEnc: text("refresh_token_enc").notNull(),
+  /** Set when the learner connected through their own Connected App; null = SFCode's shared app. */
+  clientId: text("client_id"),
+  clientSecretEnc: text("client_secret_enc"),
   connectedAt: timestamp("connected_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -36,6 +39,8 @@ export const oauthPending = pgTable("oauth_pending", {
   userId: text("user_id").notNull(),
   loginUrl: text("login_url").notNull(),
   codeVerifierEnc: text("code_verifier_enc").notNull(),
+  clientId: text("client_id"),
+  clientSecretEnc: text("client_secret_enc"),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
 });
 

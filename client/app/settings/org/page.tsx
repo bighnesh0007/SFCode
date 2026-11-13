@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
 import { SignInButton, useAuthState } from "@/components/auth";
 import { AlertTriangle, CheckCircle2, Cloud, Loader2, LogOut } from "lucide-react";
@@ -30,6 +30,15 @@ function OrgSettings() {
   const [env, setEnv] = useState<Env>("production");
   const [domain, setDomain] = useState("");
   const [busy, setBusy] = useState(false);
+  const [ownApp, setOwnApp] = useState(false);
+  // The server has no window; the browser fills this in after hydration without a mismatch.
+  const origin = useSyncExternalStore(
+    () => () => undefined,
+    () => window.location.origin,
+    () => "https://sf.bighnesh.space",
+  );
+  const [clientId, setClientId] = useState("");
+  const [clientSecret, setClientSecret] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const sf = params.get("sf");
@@ -41,7 +50,8 @@ function OrgSettings() {
     setError(null);
     try {
       const loginUrl = env === "custom" ? domain.trim() : env;
-      window.location.assign(await startConnect(await getToken(), loginUrl, returnTo));
+      const app = ownApp ? { clientId: clientId.trim(), clientSecret: clientSecret.trim() } : undefined;
+      window.location.assign(await startConnect(await getToken(), loginUrl, returnTo, app));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not start the Salesforce sign-in.");
       setBusy(false);
@@ -110,7 +120,8 @@ function OrgSettings() {
                 <span className="h-2 w-2 rounded-full bg-green-500" aria-hidden="true" /> {state.connection.username}
               </CardTitle>
               <CardDescription>
-                Org {state.connection.orgId} · {state.connection.environment} · connected{" "}
+                Org {state.connection.orgId} · {state.connection.environment}
+                {state.connection.ownApp && " · your own Connected App"} · connected{" "}
                 {new Date(state.connection.connectedAt).toLocaleString()}
               </CardDescription>
             </CardHeader>
@@ -154,8 +165,36 @@ function OrgSettings() {
                   <Input id="domain" placeholder="https://yourorg.lightning.force.com" value={domain} onChange={(e) => setDomain(e.target.value)} />
                 </div>
               )}
+              <details className="rounded-lg border px-3 py-2 text-sm" open={ownApp} onToggle={(e) => setOwnApp((e.target as HTMLDetailsElement).open)}>
+                <summary className="cursor-pointer font-medium">Use my own Connected App</summary>
+                <div className="mt-3 space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    For orgs that block SFCode&apos;s app (common at companies). In your org: <b>Setup → External Client App Manager → New</b> (or App Manager → New
+                    Connected App), then:
+                  </p>
+                  <ol className="list-decimal space-y-1 pl-5 text-xs text-muted-foreground">
+                    <li>
+                      Enable OAuth. Callback URL: <code className="break-all rounded bg-muted px-1">{`${origin}/backend/api/v1/salesforce/oauth/callback`}</code>
+                    </li>
+                    <li>
+                      Scopes: <b>Manage user data via APIs (api)</b> and <b>Perform requests at any time (refresh_token, offline_access)</b>.
+                    </li>
+                    <li>Require PKCE and require the secret for the web server flow.</li>
+                    <li>Copy the Consumer Key and Consumer Secret here. It can take a few minutes before a new app accepts sign-ins.</li>
+                  </ol>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="client-id">Consumer Key</Label>
+                    <Input id="client-id" autoComplete="off" spellCheck={false} value={clientId} onChange={(e) => setClientId(e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="client-secret">Consumer Secret</Label>
+                    <Input id="client-secret" type="password" autoComplete="off" spellCheck={false} value={clientSecret} onChange={(e) => setClientSecret(e.target.value)} />
+                  </div>
+                  <p className="text-xs text-muted-foreground">The secret is stored encrypted, used only to sign in and refresh your connection, and never shown again. Disconnecting deletes it.</p>
+                </div>
+              </details>
               {error && <p className="text-sm text-destructive">{error}</p>}
-              <Button disabled={busy || (env === "custom" && !domain.trim())} onClick={connect}>
+              <Button disabled={busy || (env === "custom" && !domain.trim()) || (ownApp && (!clientId.trim() || !clientSecret.trim()))} onClick={connect}>
                 {busy ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Cloud className="mr-1 h-4 w-4" />}
                 Connect with Salesforce
               </Button>

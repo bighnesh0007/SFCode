@@ -15,6 +15,9 @@ export interface StoredConnection {
   loginUrl: string;
   accessTokenEnc: string;
   refreshTokenEnc: string;
+  /** Both set for a learner's own Connected App; both null for SFCode's shared app. */
+  clientId: string | null;
+  clientSecretEnc: string | null;
   connectedAt: Date;
 }
 
@@ -23,6 +26,8 @@ export interface PendingHandshake {
   userId: string;
   loginUrl: string;
   codeVerifierEnc: string;
+  clientId: string | null;
+  clientSecretEnc: string | null;
   expiresAt: Date;
 }
 
@@ -57,6 +62,8 @@ export class PgSalesforceConnectionRepository implements SalesforceConnectionRep
       loginUrl: row.loginUrl,
       accessTokenEnc: row.accessTokenEnc,
       refreshTokenEnc: row.refreshTokenEnc,
+      clientId: row.clientId,
+      clientSecretEnc: row.clientSecretEnc,
       connectedAt: row.connectedAt,
     };
   }
@@ -73,6 +80,8 @@ export class PgSalesforceConnectionRepository implements SalesforceConnectionRep
       loginUrl: conn.loginUrl,
       accessTokenEnc: conn.accessTokenEnc,
       refreshTokenEnc: conn.refreshTokenEnc,
+      clientId: conn.clientId,
+      clientSecretEnc: conn.clientSecretEnc,
     };
     await this.db
       .insert(salesforceConnections)

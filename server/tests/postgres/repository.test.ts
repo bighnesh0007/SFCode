@@ -37,7 +37,7 @@ describe.skipIf(!safe)("PgSalesforceConnectionRepository", () => {
     await db.execute(sql`TRUNCATE salesforce_connections, oauth_pending, challenge_submissions`);
   });
 
-  const pending = (nonce: string, expiresAt: Date) => ({ nonce, userId: "u1", loginUrl: "https://login.salesforce.com", codeVerifierEnc: "enc:v1:x", expiresAt });
+  const pending = (nonce: string, expiresAt: Date) => ({ nonce, userId: "u1", loginUrl: "https://login.salesforce.com", codeVerifierEnc: "enc:v1:x", clientId: null, clientSecretEnc: null, expiresAt });
 
   it("consumes a pending handshake exactly once, even under a race", async () => {
     await repo.savePending(pending("n1", new Date(Date.now() + 60_000)));
@@ -53,7 +53,7 @@ describe.skipIf(!safe)("PgSalesforceConnectionRepository", () => {
   });
 
   it("upsert replaces the user's connection", async () => {
-    const base = { userId: "u1", orgId: "00D1", sfUserId: "005", username: "a@b.c", instanceUrl: "https://a.my.salesforce.com", loginUrl: "https://login.salesforce.com", accessTokenEnc: "enc:v1:a", refreshTokenEnc: "enc:v1:r" };
+    const base = { userId: "u1", orgId: "00D1", sfUserId: "005", username: "a@b.c", instanceUrl: "https://a.my.salesforce.com", loginUrl: "https://login.salesforce.com", accessTokenEnc: "enc:v1:a", refreshTokenEnc: "enc:v1:r", clientId: null, clientSecretEnc: null };
     await repo.upsert(base);
     await repo.upsert({ ...base, orgId: "00D2" });
     expect((await repo.findByUser("u1"))?.orgId).toBe("00D2");

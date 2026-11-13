@@ -1,9 +1,14 @@
 import { z } from "zod";
 
-export const connectBody = z.strictObject({
-  loginUrl: z.string().min(1).max(255),
-  returnTo: z.string().max(512).default("/settings/org"),
-});
+export const connectBody = z
+  .strictObject({
+    loginUrl: z.string().min(1).max(255),
+    returnTo: z.string().max(512).default("/settings/org"),
+    // A learner's own Connected App: consumer key and secret, both or neither.
+    clientId: z.string().trim().regex(/^[A-Za-z0-9._]{20,255}$/, "That doesn't look like a Consumer Key.").optional(),
+    clientSecret: z.string().trim().regex(/^[A-Za-z0-9]{16,128}$/, "That doesn't look like a Consumer Secret.").optional(),
+  })
+  .refine((b) => (b.clientId === undefined) === (b.clientSecret === undefined), "Enter both the Consumer Key and the Consumer Secret, or neither.");
 export type ConnectBody = z.infer<typeof connectBody>;
 
 // Salesforce may add parameters; only these three are read, the rest ignored.

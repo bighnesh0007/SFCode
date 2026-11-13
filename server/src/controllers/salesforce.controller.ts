@@ -13,7 +13,8 @@ function userId(req: Request): string {
 export function salesforceController(service: SalesforceConnectionService) {
   const start: RequestHandler = async (req, res) => {
     const body = validatedBody<ConnectBody>(req);
-    ok(res, await service.start(userId(req), body.loginUrl, body.returnTo));
+    const app = body.clientId && body.clientSecret ? { clientId: body.clientId, clientSecret: body.clientSecret } : undefined;
+    ok(res, await service.start(userId(req), body.loginUrl, body.returnTo, app));
   };
 
   const callback: RequestHandler = async (req, res: Response) => {

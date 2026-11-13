@@ -250,3 +250,46 @@ describe("SalesforceConnectionService — query", () => {
     expect(await s.service.query("user_1", "SELECT Id FROM Account")).toMatchObject({ totalSize: 5000, truncated: true });
   });
 });
+
+describe("SalesforceConnectionService — the learner's own Connected App", () => {
+  const app = { clientId: "3MVG9OwnAppConsumerKey1234567890", clientSecret: "OWNSECRET1234567890ABCD" };
+
+  it("uses their app to sign in, keeps the secret encrypted, and refreshes with the same app", async () => {
+    let soapCalls = 0;
+    const s = setup((c) => {
+      if (c.url.includes("/services/Soap/")) return ++soapCalls === 1 ? xml(500, fixture("invalidSession.xml")) : xml(200, fixture("executeAnonymous-success.xml"));
+      const form = new URLSearchParams(c.body);
+      if (form.get("grant_type") === "refresh_token") return json(200, { access_token: "AT2", instance_url: INSTANCE });
+      return happyOAuth(c);
+    });
+    const { authorizeUrl } = await s.service.start("user_1", "production", "/settings/org", app);
+    const url = new URL(authorizeUrl);
+    expect(url.searchParams.get("client_id")).toBe(app.clientId);
+    await s.service.complete({ code: "CODE", state: url.searchParams.get("state") ?? "" });
+
+    const exchange = new URLSearchParams(s.fetch.calls.find((c) => c.url.endsWith("/token"))?.body);
+    expect([exchange.get("client_id"), exchange.get("client_secret")]).toEqual([app.clientId, app.clientSecret]);
+
+    const stored = s.repo.connections.get("user_1");
+    expect(stored?.clientId).toBe(app.clientId);
+    expect(stored?.clientSecretEnc).not.toContain(app.clientSecret);
+    expect(decryptToken(stored?.clientSecretEnc ?? "", tokenKey)).toBe(app.clientSecret);
+
+    const view = await s.service.status("user_1");
+    expect(view?.ownApp).toBe(true);
+    expect(JSON.stringify(view)).not.toContain(app.clientSecret);
+
+    // An expired session refreshes with the learner's app, never the shared one.
+    await s.service.executeAnonymous("user_1", "System.debug(1);");
+    const refresh = s.fetch.calls.map((c) => new URLSearchParams(c.body)).find((f) => f.get("grant_type") === "refresh_token");
+    expect([refresh?.get("client_id"), refresh?.get("client_secret")]).toEqual([app.clientId, app.clientSecret]);
+  });
+
+  it("the shared app stays the default", async () => {
+    const s = setup(happyOAuth);
+    const { url } = await connect(s);
+    expect(url.searchParams.get("client_id")).toBe("cid");
+    expect(s.repo.connections.get("user_1")).toMatchObject({ clientId: null, clientSecretEnc: null });
+    expect((await s.service.status("user_1"))?.ownApp).toBe(false);
+  });
+});

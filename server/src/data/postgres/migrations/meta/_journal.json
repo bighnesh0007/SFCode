@@ -120,6 +120,13 @@
       "when": 1794573864747,
       "tag": "0016_error_tracking",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794574524218,
+      "tag": "0017_byo_connected_app",
+      "breakpoints": true
     }
   ]
 }

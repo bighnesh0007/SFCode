@@ -13,7 +13,7 @@ import { contextLogger, logEvent } from "../../lib/logger.ts";
 import type { SalesforceConnectionRepository, StoredConnection } from "../../repositories/salesforceConnection.repository.ts";
 import type { Clock } from "../../types/ports.ts";
 import { resolveLoginUrl } from "./loginUrl.ts";
-import { RefreshRevokedError, SessionExpiredError, type ApexExecutionResult, type SalesforceClient, type SoqlQueryResult } from "./salesforceClient.ts";
+import { RefreshRevokedError, SessionExpiredError, type AppCredentials, type ApexExecutionResult, type SalesforceClient, type SoqlQueryResult } from "./salesforceClient.ts";
 
 export class OrgNotConnectedError extends AppError {
   constructor(message = "Connect a Salesforce org first.") {
@@ -35,11 +35,13 @@ export interface ConnectionView {
   instanceUrl: string;
   environment: "production" | "sandbox" | "custom";
   connectedAt: string;
+  /** Connected through the learner's own Connected App (its secret is never returned). */
+  ownApp: boolean;
 }
 
 function toView(c: StoredConnection): ConnectionView {
   const environment = c.loginUrl === "https://login.salesforce.com" ? "production" : c.loginUrl === "https://test.salesforce.com" ? "sandbox" : "custom";
-  return { orgId: c.orgId, username: c.username, instanceUrl: c.instanceUrl, environment, connectedAt: c.connectedAt.toISOString() };
+  return { orgId: c.orgId, username: c.username, instanceUrl: c.instanceUrl, environment, connectedAt: c.connectedAt.toISOString(), ownApp: c.clientId !== null };
 }
 
 export class SalesforceConnectionService {
@@ -50,7 +52,12 @@ export class SalesforceConnectionService {
     private readonly clock: Clock,
   ) {}
 
-  async start(userId: string, loginInput: string, returnTo: string): Promise<{ authorizeUrl: string }> {
+  private appOf(row: { clientId: string | null; clientSecretEnc: string | null }): AppCredentials | undefined {
+    return row.clientId && row.clientSecretEnc ? { clientId: row.clientId, clientSecret: decryptToken(row.clientSecretEnc, this.secrets.tokenKey) } : undefined;
+  }
+
+  /** `app`: the learner's own Connected App, for orgs that don't allow SFCode's shared one. */
+  async start(userId: string, loginInput: string, returnTo: string, app?: AppCredentials): Promise<{ authorizeUrl: string }> {
     const loginUrl = resolveLoginUrl(loginInput);
     if (!loginUrl) {
       throw new BadRequestError("Enter your org's My Domain URL — the address of any page in your org, e.g. https://yourorg.lightning.force.com.");
@@ -66,10 +73,12 @@ export class SalesforceConnectionService {
       userId,
       loginUrl,
       codeVerifierEnc: encryptToken(pkce.verifier, this.secrets.tokenKey),
+      clientId: app?.clientId ?? null,
+      clientSecretEnc: app ? encryptToken(app.clientSecret, this.secrets.tokenKey) : null,
       expiresAt: new Date(this.clock.nowMs() + OAUTH_STATE_TTL_MS),
     });
-    logEvent("salesforce.connect_started", { loginUrl });
-    return { authorizeUrl: this.sf.authorizeUrl(loginUrl, state, pkce.challenge) };
+    logEvent("salesforce.connect_started", { loginUrl, ownApp: app !== undefined });
+    return { authorizeUrl: this.sf.authorizeUrl(loginUrl, state, pkce.challenge, app) };
   }
 
   /**
@@ -98,7 +107,8 @@ export class SalesforceConnectionService {
 
     try {
       const verifier = decryptToken(pending.codeVerifierEnc, this.secrets.tokenKey);
-      const tokens = await this.sf.exchangeCode(pending.loginUrl, input.code, verifier);
+      const app = this.appOf(pending);
+      const tokens = await this.sf.exchangeCode(pending.loginUrl, input.code, verifier, app);
       const who = await this.sf.identity(tokens.instanceUrl, tokens.accessToken);
       await this.repo.upsert({
         userId: payload.userId,
@@ -109,6 +119,9 @@ export class SalesforceConnectionService {
         loginUrl: pending.loginUrl,
         accessTokenEnc: encryptToken(tokens.accessToken, this.secrets.tokenKey),
         refreshTokenEnc: encryptToken(tokens.refreshToken, this.secrets.tokenKey),
+        // The app the refresh token belongs to: refreshing with any other app fails.
+        clientId: pending.clientId,
+        clientSecretEnc: pending.clientSecretEnc,
       });
       logEvent("salesforce.connected", { orgId: who.orgId });
       return withQuery(returnTo, { sf: "connected" });
@@ -156,7 +169,7 @@ export class SalesforceConnectionService {
 
     let refreshed;
     try {
-      refreshed = await this.sf.refresh(conn.loginUrl, decryptToken(conn.refreshTokenEnc, this.secrets.tokenKey));
+      refreshed = await this.sf.refresh(conn.loginUrl, decryptToken(conn.refreshTokenEnc, this.secrets.tokenKey), this.appOf(conn));
     } catch (err) {
       if (!(err instanceof RefreshRevokedError)) throw err;
       // With refresh-token rotation, a concurrent request may have refreshed

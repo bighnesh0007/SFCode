@@ -7,6 +7,8 @@ export interface OrgConnection {
   instanceUrl: string;
   environment: "production" | "sandbox" | "custom";
   connectedAt: string;
+  /** Connected through the learner's own Connected App. */
+  ownApp?: boolean;
 }
 
 export interface ApexExecutionResult {
@@ -26,11 +28,11 @@ export async function getConnection(token: Token): Promise<OrgConnection | null>
   return (await apiRequest<{ connection: OrgConnection | null }>("/api/v1/salesforce/connection", { token })).connection;
 }
 
-export async function startConnect(token: Token, loginUrl: string, returnTo: string): Promise<string> {
+export async function startConnect(token: Token, loginUrl: string, returnTo: string, app?: { clientId: string; clientSecret: string }): Promise<string> {
   const { authorizeUrl } = await apiRequest<{ authorizeUrl: string }>("/api/v1/salesforce/connect", {
     method: "POST",
     token,
-    body: { loginUrl, returnTo },
+    body: { loginUrl, returnTo, ...(app ? { clientId: app.clientId, clientSecret: app.clientSecret } : {}) },
   });
   return authorizeUrl;
 }

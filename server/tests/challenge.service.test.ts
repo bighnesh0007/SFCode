@@ -29,7 +29,7 @@ function setup(opts: { statusFixture?: () => string } = {}) {
   const connections = new SalesforceConnectionService(conns, sf, { tokenKey, stateSecret: "x".repeat(32) }, clock);
   const service = new ChallengeService(catalog, subs, { connections, sf, apiVersion: "62.0" }, clock);
   const connect = (userId: string, orgId = "00Dorg") =>
-    conns.upsert({ userId, orgId, sfUserId: "005", username: "u@x.com", instanceUrl: "https://acme.my.salesforce.com", loginUrl: "https://login.salesforce.com", accessTokenEnc: encryptToken("AT", tokenKey), refreshTokenEnc: encryptToken("RT", tokenKey) });
+    conns.upsert({ userId, orgId, sfUserId: "005", username: "u@x.com", instanceUrl: "https://acme.my.salesforce.com", loginUrl: "https://login.salesforce.com", accessTokenEnc: encryptToken("AT", tokenKey), refreshTokenEnc: encryptToken("RT", tokenKey), clientId: null, clientSecretEnc: null });
   return { clock, subs, fetch, service, connect, conns };
 }
 
