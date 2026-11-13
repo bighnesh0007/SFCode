@@ -1,0 +1,787 @@
+{
+  "id": "lwc",
+  "title": "Lightning Web Components",
+  "description": "Modern JavaScript to production-ready components: templates, events, data, lifecycle, styling, testing, accessibility and security.",
+  "nodes": [
+    {
+      "id": "fe-javascript",
+      "title": "Modern JavaScript",
+      "level": 1,
+      "col": 1,
+      "requires": [],
+      "summary": "Modules, classes, arrow functions, promises and async/await.",
+      "lesson": "Lightning web components are plain modern JavaScript. Before LWC, be comfortable with:\n\n- `const` and `let`, template literals, destructuring and the spread operator (`[...items, next]`).\n- **Modules**: `import` and `export`; each component is a module.\n- **Classes** with fields, getters and methods; `this` inside them.\n- **Arrow functions**, which keep the surrounding `this`.\n- **Promises** and `async`/`await` for anything that takes time, like a server call; `try`/`catch` for their errors.\n- Array methods: `map`, `filter`, `find`, `reduce`, and why they return new arrays instead of changing the old one.",
+      "concepts": [
+        "let/const, destructuring and spread",
+        "ES modules: import and export",
+        "Classes, getters and `this`",
+        "Promises, async/await and error handling",
+        "map, filter and reduce return new arrays"
+      ],
+      "pitfalls": [
+        "Mutating an array in place (`push`) and expecting a re-render: reassign instead.",
+        "Forgetting `await`, then working with a pending Promise."
+      ],
+      "resources": [
+        {
+          "title": "Modern JavaScript Development (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/modern-javascript-development",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Which creates a new array with one more item, leaving the old one unchanged?",
+          "options": [
+            "items.push(x)",
+            "[...items, x]",
+            "items.length++",
+            "items.add(x)"
+          ],
+          "answer": 1,
+          "why": "Spread copies the array into a new one; push changes the original."
+        },
+        {
+          "q": "What does `await` do inside an async function?",
+          "options": [
+            "Runs code in parallel",
+            "Waits for a Promise to settle and gives its value",
+            "Creates a new thread",
+            "Retries on failure"
+          ],
+          "answer": 1,
+          "why": "await pauses the function until the Promise resolves (or throws if it rejects)."
+        },
+        {
+          "q": "Why do LWC handlers often use arrow functions?",
+          "options": [
+            "They're faster",
+            "They keep `this` from the surrounding code",
+            "They're required by LWC",
+            "They return arrays"
+          ],
+          "answer": 1,
+          "why": "Arrow functions don't rebind `this`."
+        }
+      ]
+    },
+    {
+      "id": "fe-tooling",
+      "title": "Tools and local setup",
+      "level": 1,
+      "col": 0,
+      "requires": [],
+      "summary": "VS Code, the Salesforce CLI, and where components live.",
+      "lesson": "- Components live in `force-app/main/default/lwc/<name>/`: `name.html`, `name.js`, optional `name.css`, and `name.js-meta.xml`, which says where the component can be used (record page, app page, Experience site…) and with which properties.\n- Create one with `sf lightning generate component --type lwc --name myThing`, deploy with `sf project deploy start`.\n- Component folder names are **camelCase**; in markup they become **kebab-case**: `<c-my-thing>`.\n- SFCode's LWC problems run your component in a sandboxed browser frame, so you can practise without an org.",
+      "concepts": [
+        "Component folder structure and the js-meta.xml file",
+        "Targets: where a component can be placed",
+        "camelCase folders, kebab-case tags"
+      ],
+      "pitfalls": [
+        "Forgetting to expose the component (`isExposed` and targets) in js-meta.xml, so it doesn't appear in Lightning App Builder."
+      ],
+      "optional": true,
+      "problems": [],
+      "quiz": [
+        {
+          "q": "A component's folder is `accountCard`. How do you use it in another template?",
+          "options": [
+            "<accountCard>",
+            "<c-account-card>",
+            "<c:accountCard>",
+            "<lwc-account-card>"
+          ],
+          "answer": 1,
+          "why": "Namespace `c`, kebab-case name."
+        },
+        {
+          "q": "Which file decides where a component can be placed in Lightning App Builder?",
+          "options": [
+            "accountCard.html",
+            "accountCard.js-meta.xml",
+            "accountCard.css",
+            "package.xml"
+          ],
+          "answer": 1,
+          "why": "js-meta.xml holds isExposed and targets."
+        },
+        {
+          "q": "Which command deploys your components to an org?",
+          "options": [
+            "sf project deploy start",
+            "sf org open",
+            "sf data query",
+            "npm run lwc"
+          ],
+          "answer": 0,
+          "why": "Components are metadata and deploy like any other source."
+        }
+      ]
+    },
+    {
+      "id": "fe-first-component",
+      "title": "Your first component",
+      "level": 1,
+      "col": 1,
+      "requires": [
+        "fe-javascript"
+      ],
+      "summary": "Template, class, reactive fields and @api.",
+      "lesson": "A component is a class and a template:\n\n```js\nimport { LightningElement, api } from \"lwc\";\nexport default class Greeting extends LightningElement {\n  @api name = \"World\";   // public: a parent can set it\n  count = 0;             // private and reactive\n  increment() { this.count += 1; }\n}\n```\n\n```html\n<template>\n  <p>Hello, {name}! Clicked {count} times.</p>\n  <button onclick={increment}>+1</button>\n</template>\n```\n\n- Every field is **reactive**: reassign it and the template re-renders.\n- `@api` marks public properties (and methods) that a parent can use.\n- Handlers are passed by name (`onclick={increment}`), not called.",
+      "concepts": [
+        "The LightningElement base class",
+        "Reactive fields and re-rendering",
+        "@api public properties",
+        "Event handlers in templates"
+      ],
+      "pitfalls": [
+        "Calling the handler in the template (`onclick={increment()}`).",
+        "Changing an @api property from inside the component: the parent owns it."
+      ],
+      "resources": [
+        {
+          "title": "Lightning Web Components Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/lightning-web-components-basics",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [
+        "lwc-click-counter"
+      ]
+    },
+    {
+      "id": "fe-templates",
+      "title": "Templates and rendering",
+      "level": 2,
+      "col": 1,
+      "requires": [
+        "fe-first-component"
+      ],
+      "summary": "Lists, conditions, getters and dynamic classes.",
+      "lesson": "Templates bind data but can't compute, so logic goes in **getters**:\n\n- **Lists**: `<template for:each={items} for:item=\"item\"><li key={item.id}>…</li></template>`; every item needs a unique `key`.\n- **Conditions**: `<template lwc:if={hasItems}>…</template><template lwc:else>…</template>`.\n- **Getters** compute what to show: `get hasItems() { return this.items.length > 0; }`, and recompute on each render.\n- **Dynamic classes and attributes**: `class={rowClass}` where a getter returns `\"row selected\"`.\n- `lwc:ref` gives you an element without querying for it.",
+      "concepts": [
+        "for:each with a unique key",
+        "lwc:if, lwc:elseif and lwc:else",
+        "Getters for derived values and classes",
+        "lwc:ref"
+      ],
+      "pitfalls": [
+        "Using the array index as the key: re-ordering then confuses rendering.",
+        "Expressions in templates (`{count > 0}`) don't work: use a getter."
+      ],
+      "problems": [
+        "lwc-character-counter",
+        "lwc-contact-filter"
+      ]
+    },
+    {
+      "id": "fe-styling",
+      "title": "Styling and SLDS",
+      "level": 2,
+      "col": 2,
+      "requires": [
+        "fe-first-component"
+      ],
+      "summary": "Shadow DOM, SLDS and styling hooks.",
+      "lesson": "- Component CSS is **scoped**: styles in `myThing.css` only reach that component's own template, thanks to the **shadow DOM**.\n- The **Salesforce Lightning Design System (SLDS)** gives Salesforce's look: utility classes like `slds-p-around_medium` and blueprints for common patterns.\n- To customise base components from outside, use **styling hooks** (CSS custom properties such as `--slds-c-button-brand-color-background`), not selectors that reach inside them.\n- Theme with variables so the component follows the org's branding.",
+      "concepts": [
+        "Scoped CSS and the shadow DOM",
+        "SLDS utility classes and blueprints",
+        "Styling hooks for base components"
+      ],
+      "pitfalls": [
+        "Trying to style inside a base component with deep selectors: shadow DOM blocks it; use styling hooks.",
+        "Hard-coding colours that clash with the org's theme."
+      ],
+      "optional": true,
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Why doesn't a CSS rule in a parent change the inside of a child component?",
+          "options": [
+            "CSS is disabled in LWC",
+            "Shadow DOM scopes each component's styles",
+            "Only inline styles work",
+            "The child must import it"
+          ],
+          "answer": 1,
+          "why": "Each component's styles are encapsulated."
+        },
+        {
+          "q": "How do you change a lightning-button's brand colour?",
+          "options": [
+            "A deep CSS selector",
+            "A styling hook (CSS custom property)",
+            "Editing SLDS",
+            "Inline JavaScript"
+          ],
+          "answer": 1,
+          "why": "Styling hooks are the supported way to customise base components."
+        },
+        {
+          "q": "What does SLDS provide?",
+          "options": [
+            "A JavaScript framework",
+            "Salesforce's design system: CSS classes and patterns",
+            "A testing tool",
+            "A database"
+          ],
+          "answer": 1,
+          "why": "SLDS is the CSS and design guidance for the Salesforce look."
+        }
+      ]
+    },
+    {
+      "id": "fe-events",
+      "title": "Events",
+      "level": 2,
+      "col": 0,
+      "requires": [
+        "fe-first-component"
+      ],
+      "summary": "Children talk to parents with CustomEvents.",
+      "lesson": "Data flows **down** as properties; changes flow **up** as **events**:\n\n```js\nthis.dispatchEvent(new CustomEvent(\"select\", { detail: { id: this.recordId } }));\n```\n\n```html\n<c-tile onselect={handleSelect}></c-tile>\n```\n\n- Event names are lower-case, with no `on` prefix; the parent listens with `on` + the name.\n- Pass data in `detail`; keep it simple (primitives or plain copies).\n- `bubbles: true` lets the event travel up through ancestors; `composed: true` lets it leave the shadow boundary. Use them only when needed.",
+      "concepts": [
+        "CustomEvent and detail",
+        "Lower-case event names; `on` + name in the parent",
+        "bubbles and composed"
+      ],
+      "pitfalls": [
+        "camelCase event names that never match the listener.",
+        "Passing a live object in detail that the parent then mutates."
+      ],
+      "problems": [
+        "lwc-star-rating"
+      ]
+    },
+    {
+      "id": "fe-lifecycle",
+      "title": "Lifecycle hooks",
+      "level": 3,
+      "col": 0,
+      "requires": [
+        "fe-templates",
+        "fe-events"
+      ],
+      "summary": "connectedCallback, renderedCallback and cleaning up.",
+      "lesson": "Components go through a lifecycle, and each hook has a job:\n\n- `constructor()`: set up fields. Don't read attributes or touch the DOM.\n- `connectedCallback()`: the component is in the page: load data, subscribe to channels, start timers.\n- `renderedCallback()`: runs after **every** render; work with the DOM here, and guard with a flag so you don't trigger endless re-renders.\n- `disconnectedCallback()`: unsubscribe and clear timers, or they leak.\n- `errorCallback(error, stack)`: on a parent, catches errors from children, like an error boundary.",
+      "concepts": [
+        "Order of the hooks",
+        "What belongs in connectedCallback versus renderedCallback",
+        "Cleaning up in disconnectedCallback",
+        "errorCallback as an error boundary"
+      ],
+      "pitfalls": [
+        "Setting a field in renderedCallback without a guard: infinite render loop.",
+        "Subscribing in connectedCallback but never unsubscribing."
+      ],
+      "resources": [
+        {
+          "title": "Lifecycle hooks (LWC Developer Guide)",
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/create-lifecycle-hooks.html",
+          "kind": "docs"
+        }
+      ],
+      "diagram": "lwc-lifecycle",
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Look at the diagram. Where do you subscribe to a message channel?",
+          "options": [
+            "constructor()",
+            "connectedCallback()",
+            "renderedCallback()",
+            "errorCallback()"
+          ],
+          "answer": 1,
+          "why": "Subscribe once the component is in the page; unsubscribe in disconnectedCallback.",
+          "image": "lwc-lifecycle",
+          "imageAlt": "Lifecycle diagram: connectedCallback is labelled 'Inserted into the page: load data, subscribe'."
+        },
+        {
+          "q": "Using the diagram, which hook runs after every render?",
+          "options": [
+            "connectedCallback()",
+            "renderedCallback()",
+            "constructor()",
+            "disconnectedCallback()"
+          ],
+          "answer": 1,
+          "why": "renderedCallback runs after each render, so guard work inside it.",
+          "image": "lwc-lifecycle",
+          "imageAlt": "Lifecycle diagram: renderedCallback is labelled 'After every render'."
+        },
+        {
+          "q": "What should disconnectedCallback do?",
+          "options": [
+            "Load data",
+            "Unsubscribe and clear timers",
+            "Render the template",
+            "Set @api properties"
+          ],
+          "answer": 1,
+          "why": "Clean up so nothing keeps running after the component is gone."
+        }
+      ],
+      "diagramCaption": "LWC lifecycle: constructor, connectedCallback when inserted, render, renderedCallback after every render, disconnectedCallback when removed; errorCallback catches errors in children."
+    },
+    {
+      "id": "fe-lds",
+      "title": "Lightning Data Service",
+      "level": 3,
+      "col": 1,
+      "requires": [
+        "fe-templates"
+      ],
+      "summary": "Reading and saving records with security and caching built in.",
+      "lesson": "**Lightning Data Service (LDS)** reads and writes records without Apex:\n\n- `lightning-record-form`, `lightning-record-view-form` and `lightning-record-edit-form` build forms with sharing and field-level security applied.\n- `getRecord` (with `@wire`) and `updateRecord` / `createRecord` from `lightning/uiRecordApi` work with single records in code.\n- LDS keeps one **shared cache**: when one component updates a record, every component showing it refreshes.\n- Prefer LDS for single records; use Apex for queries across many records.",
+      "concepts": [
+        "Record form base components",
+        "getRecord with @wire and field imports",
+        "updateRecord and createRecord",
+        "The shared cache"
+      ],
+      "pitfalls": [
+        "Writing Apex to fetch one record by Id: LDS does it with security and caching.",
+        "Importing fields by string instead of schema imports, so renames aren't caught."
+      ],
+      "resources": [
+        {
+          "title": "Lightning Web Components and Salesforce Data (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/lightning-web-components-and-salesforce-data",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [
+        "lwc-todo-list"
+      ],
+      "quiz": [
+        {
+          "q": "Two components show the same record; one updates it with updateRecord. What happens to the other?",
+          "options": [
+            "Nothing until reload",
+            "It refreshes from the shared LDS cache",
+            "It errors",
+            "It must call refreshApex"
+          ],
+          "answer": 1,
+          "why": "LDS shares one cache per record."
+        },
+        {
+          "q": "Which base component builds an edit form with field-level security applied?",
+          "options": [
+            "lightning-datatable",
+            "lightning-record-edit-form",
+            "lightning-input",
+            "lightning-card"
+          ],
+          "answer": 1,
+          "why": "Record forms use LDS, which respects FLS and sharing."
+        },
+        {
+          "q": "When is Apex the better choice than LDS?",
+          "options": [
+            "Reading one record by Id",
+            "Querying many records with filters",
+            "Updating one field",
+            "Showing a record form"
+          ],
+          "answer": 1,
+          "why": "LDS works with single records; lists and complex queries need Apex (or the list APIs)."
+        }
+      ]
+    },
+    {
+      "id": "fe-apex",
+      "title": "Calling Apex",
+      "level": 3,
+      "col": 2,
+      "requires": [
+        "fe-lds"
+      ],
+      "summary": "@wire versus imperative calls, caching and refreshApex.",
+      "lesson": "```apex\npublic with sharing class ContactController {\n  @AuraEnabled(cacheable=true)\n  public static List<Contact> byAccount(Id accountId) { … }\n}\n```\n\n- **@wire** a `cacheable=true` method: `@wire(byAccount, { accountId: \"$recordId\" }) contacts;`. The `$` makes the parameter reactive.\n- Call **imperatively** (`await saveContact({ c })`) for DML or for calls you start yourself; those methods must **not** be cacheable.\n- After a change, `refreshApex(this.wiredResult)` reloads wired Apex data.\n- Handle errors: wired results have `data` and `error`; imperative calls throw.\n- `@AuraEnabled` methods are reachable by any user who can load the component: check sharing and field access in Apex.",
+      "concepts": [
+        "cacheable=true and @wire with reactive parameters",
+        "Imperative calls for DML",
+        "refreshApex",
+        "Handling errors from both styles"
+      ],
+      "pitfalls": [
+        "DML in a cacheable method: it fails.",
+        "Forgetting refreshApex, so the list stays stale.",
+        "Assuming the UI hides data: the Apex method returns whatever it queries."
+      ],
+      "problems": [
+        "lwc-tabs"
+      ],
+      "quiz": [
+        {
+          "q": "Which Apex methods can be used with @wire?",
+          "options": [
+            "Any public method",
+            "@AuraEnabled(cacheable=true) methods",
+            "Methods with DML",
+            "@future methods"
+          ],
+          "answer": 1,
+          "why": "Wired Apex must be cacheable."
+        },
+        {
+          "q": "What does `$recordId` in a wire's parameters mean?",
+          "options": [
+            "A literal string",
+            "A reactive reference: the wire re-runs when recordId changes",
+            "A global variable",
+            "An Apex variable"
+          ],
+          "answer": 1,
+          "why": "The $ prefix makes the parameter reactive."
+        },
+        {
+          "q": "A list is wired; you update a contact imperatively. What refreshes the list?",
+          "options": [
+            "Reloading the page",
+            "refreshApex on the wired result",
+            "connectedCallback",
+            "Nothing is needed"
+          ],
+          "answer": 1,
+          "why": "refreshApex re-runs the wired call."
+        }
+      ]
+    },
+    {
+      "id": "fe-communication",
+      "title": "Talking across the page",
+      "level": 3,
+      "col": 3,
+      "requires": [
+        "fe-events"
+      ],
+      "summary": "Lightning Message Service and the pub-sub pattern.",
+      "lesson": "Components that aren't parent and child, or LWC talking to Aura and Visualforce on the same page, use **Lightning Message Service (LMS)**:\n\n1. Define a **message channel** (`MyChannel__c.messageChannel-meta.xml`).\n2. Publish: `publish(this.messageContext, CHANNEL, { recordId })`.\n3. Subscribe in `connectedCallback`, unsubscribe in `disconnectedCallback`.\n\nUse events for parent and child, LMS for unrelated components. Don't use LMS just to avoid passing a property.",
+      "concepts": [
+        "Message channels",
+        "publish, subscribe and unsubscribe",
+        "@wire(MessageContext)",
+        "When events are enough"
+      ],
+      "pitfalls": [
+        "Forgetting to unsubscribe: handlers keep firing after the component is gone.",
+        "Reaching for LMS between a parent and its own child."
+      ],
+      "resources": [
+        {
+          "title": "Lightning Message Service (LWC Developer Guide)",
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/use-message-channel.html",
+          "kind": "docs"
+        }
+      ],
+      "diagram": "lwc-communication",
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Look at the diagram. Two components with no parent-child link need to share a selected record. How?",
+          "options": [
+            "@api properties",
+            "A Lightning Message Service channel",
+            "CustomEvent with bubbles",
+            "A shared variable"
+          ],
+          "answer": 1,
+          "why": "Unrelated components publish and subscribe on a message channel.",
+          "image": "lwc-communication",
+          "imageAlt": "Diagram: c-child publishes to a Message channel and c-unrelated subscribes to it."
+        },
+        {
+          "q": "Using the diagram, how does data reach c-child from c-parent?",
+          "options": [
+            "Events",
+            "@api properties",
+            "LMS",
+            "Platform events"
+          ],
+          "answer": 1,
+          "why": "Data flows down through @api properties.",
+          "image": "lwc-communication",
+          "imageAlt": "Diagram: an arrow labelled '@api props down' from c-parent to c-child."
+        },
+        {
+          "q": "Can LMS reach Aura components and Visualforce pages on the same Lightning page?",
+          "options": [
+            "No, only LWC",
+            "Yes",
+            "Only Visualforce",
+            "Only in Experience Cloud"
+          ],
+          "answer": 1,
+          "why": "LMS works across LWC, Aura and Visualforce on a Lightning page."
+        }
+      ],
+      "diagramCaption": "LWC communication: properties down, events up, and a Lightning Message Service channel between unrelated components."
+    },
+    {
+      "id": "fe-navigation",
+      "title": "Navigation and feedback",
+      "level": 3,
+      "col": 4,
+      "requires": [
+        "fe-lds"
+      ],
+      "summary": "NavigationMixin, toasts and modals.",
+      "lesson": "- **NavigationMixin** moves the user without hard-coded URLs: `this[NavigationMixin.Navigate]({ type: \"standard__recordPage\", attributes: { recordId, actionName: \"view\" } })`.\n- **Toasts** confirm or warn: dispatch `ShowToastEvent` with a title, message and variant.\n- **LightningModal** opens a dialog component and returns a result when it closes.\n- Hard-coded URLs break across orgs, sandboxes, Experience sites and mobile; the mixin works everywhere.",
+      "concepts": [
+        "NavigationMixin page references",
+        "ShowToastEvent variants",
+        "LightningModal"
+      ],
+      "pitfalls": [
+        "Building links with string URLs like `/lightning/r/...`: they break in Experience sites and mobile."
+      ],
+      "optional": true,
+      "problems": [],
+      "quiz": [
+        {
+          "q": "How do you open a record page from a component?",
+          "options": [
+            "window.location = '/lightning/r/...'",
+            "NavigationMixin.Navigate with a standard__recordPage reference",
+            "A toast",
+            "An href to the Id"
+          ],
+          "answer": 1,
+          "why": "The mixin builds the right URL for the current context."
+        },
+        {
+          "q": "Which shows a short confirmation like 'Contact saved'?",
+          "options": [
+            "ShowToastEvent",
+            "A modal",
+            "console.log",
+            "A validation rule"
+          ],
+          "answer": 0,
+          "why": "Toasts give brief feedback."
+        },
+        {
+          "q": "Why avoid hard-coded URLs?",
+          "options": [
+            "They're slower",
+            "They break across orgs, Experience sites and mobile",
+            "They aren't allowed",
+            "They need Apex"
+          ],
+          "answer": 1,
+          "why": "Page references adapt to where the component runs."
+        }
+      ]
+    },
+    {
+      "id": "fe-testing",
+      "title": "Jest tests",
+      "level": 4,
+      "col": 2,
+      "requires": [
+        "fe-apex",
+        "fe-lifecycle"
+      ],
+      "summary": "Testing components with sfdx-lwc-jest.",
+      "lesson": "LWC components are tested in **Jest** with `@salesforce/sfdx-lwc-jest`, outside any org:\n\n```js\nconst el = createElement(\"c-greeting\", { is: Greeting });\nel.name = \"Ada\";\ndocument.body.appendChild(el);\nawait Promise.resolve();   // let it re-render\nexpect(el.shadowRoot.querySelector(\"p\").textContent).toBe(\"Hello, Ada!\");\n```\n\n- Query inside the component through `el.shadowRoot`.\n- After changing a property or firing an event, **wait a microtask** before checking the DOM.\n- Mock Apex and wire adapters (`emit` test data, or `emitError`) instead of calling a server.\n- Clean up the DOM in `afterEach`.",
+      "concepts": [
+        "createElement and appending to the document",
+        "Querying through shadowRoot",
+        "Waiting for re-render",
+        "Mocking Apex and wire adapters"
+      ],
+      "pitfalls": [
+        "Checking the DOM straight after a change, before it re-renders.",
+        "Tests that depend on each other because the DOM isn't cleaned between them."
+      ],
+      "resources": [
+        {
+          "title": "Test Lightning Web Components (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/test-lightning-web-components",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Where do you query a component's rendered elements in Jest?",
+          "options": [
+            "document.querySelector",
+            "el.shadowRoot.querySelector",
+            "el.querySelector",
+            "window.find"
+          ],
+          "answer": 1,
+          "why": "The component's DOM is in its shadow root."
+        },
+        {
+          "q": "You set a property then check the text immediately and it's stale. Why?",
+          "options": [
+            "Jest is slow",
+            "Re-rendering is asynchronous: await a microtask first",
+            "Properties can't be set in tests",
+            "The test needs an org"
+          ],
+          "answer": 1,
+          "why": "Wait for the re-render, e.g. `await Promise.resolve()`."
+        },
+        {
+          "q": "How do tests handle a wired Apex method?",
+          "options": [
+            "Call the org",
+            "Mock the adapter and emit test data",
+            "Skip the component",
+            "Use SeeAllData"
+          ],
+          "answer": 1,
+          "why": "Jest tests never reach an org; adapters are mocked."
+        }
+      ]
+    },
+    {
+      "id": "fe-accessibility",
+      "title": "Accessibility and performance",
+      "level": 4,
+      "col": 1,
+      "requires": [
+        "fe-lifecycle"
+      ],
+      "summary": "Keyboard, ARIA, and keeping components fast.",
+      "lesson": "- Use real elements: `<button>` for actions, `<a>` for navigation, labels on every input. Base components handle most of this for you.\n- **Keyboard**: everything clickable must be reachable with Tab and work with Enter/Space; custom widgets (tabs, menus) follow ARIA patterns with arrow keys.\n- **ARIA** fills gaps: `aria-selected`, `aria-expanded`, `aria-live` for updates. Don't add ARIA where native semantics already exist.\n- **Performance**: render only what's visible, avoid heavy work in getters (they run every render), cache server results, and lazy-load rarely used parts.",
+      "concepts": [
+        "Native elements and labels first",
+        "Keyboard support and ARIA patterns",
+        "aria-live for dynamic updates",
+        "Cheap getters, caching and lazy loading"
+      ],
+      "pitfalls": [
+        "Clickable `<div>`s with no keyboard support.",
+        "Expensive loops in getters that run on every render."
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "A row of tabs must work with the keyboard. Which roles do they need?",
+          "options": [
+            "role=button on each",
+            "role=tablist, role=tab and role=tabpanel",
+            "No roles",
+            "role=menu"
+          ],
+          "answer": 1,
+          "why": "The ARIA tabs pattern uses tablist, tab and tabpanel with aria-selected."
+        },
+        {
+          "q": "Why keep getters cheap?",
+          "options": [
+            "They run on every render",
+            "They can't call functions",
+            "They only run once",
+            "They block Apex"
+          ],
+          "answer": 0,
+          "why": "Getters recompute each render, so heavy work slows the component."
+        },
+        {
+          "q": "What should you use for an action a user clicks?",
+          "options": [
+            "<div onclick>",
+            "<button>",
+            "<span>",
+            "<p>"
+          ],
+          "answer": 1,
+          "why": "Buttons are focusable and keyboard-accessible by default."
+        }
+      ]
+    },
+    {
+      "id": "fe-security",
+      "title": "Security in components",
+      "level": 4,
+      "col": 0,
+      "requires": [
+        "fe-apex"
+      ],
+      "summary": "Lightning Web Security, safe DOM work and trusted data.",
+      "lesson": "- **Lightning Web Security** (and Lightning Locker before it) isolates components by namespace: one can't read another's DOM or globals.\n- Avoid `innerHTML` with data; let the template render text, which escapes it. If you must render HTML, use `lightning-formatted-rich-text`.\n- Third-party libraries load as **static resources** with `loadScript`; the Content Security Policy blocks scripts from arbitrary sites unless an admin trusts them.\n- Every `@AuraEnabled` method is an API: enforce sharing and field access in Apex.",
+      "concepts": [
+        "Lightning Web Security and namespace isolation",
+        "Rendering text safely instead of innerHTML",
+        "Static resources and CSP trusted sites",
+        "Server-side security for @AuraEnabled"
+      ],
+      "pitfalls": [
+        "Setting innerHTML from record data: a script-injection risk.",
+        "Loading a library from a CDN URL, blocked by CSP."
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "How should a component show user-entered text?",
+          "options": [
+            "innerHTML",
+            "Bind it in the template ({text}), which escapes it",
+            "eval",
+            "document.write"
+          ],
+          "answer": 1,
+          "why": "Template bindings render text safely."
+        },
+        {
+          "q": "How do you use a third-party JavaScript library?",
+          "options": [
+            "A script tag to a CDN",
+            "Upload it as a static resource and loadScript it",
+            "Paste it into an Apex class",
+            "It isn't possible"
+          ],
+          "answer": 1,
+          "why": "Static resources plus loadScript work within the platform's CSP."
+        },
+        {
+          "q": "What stops a component from reading another namespace's DOM?",
+          "options": [
+            "CSS",
+            "Lightning Web Security (or Locker)",
+            "The js-meta.xml",
+            "SLDS"
+          ],
+          "answer": 1,
+          "why": "LWS isolates components by namespace."
+        }
+      ]
+    },
+    {
+      "id": "fe-ready",
+      "title": "LWC checkpoint",
+      "level": 4,
+      "col": 3,
+      "requires": [
+        "fe-testing",
+        "fe-accessibility",
+        "fe-security",
+        "fe-communication"
+      ],
+      "summary": "Practise the PD I user-interface section.",
+      "lesson": "You can now build, connect, style, test and secure Lightning web components. Practise the **User Interface** section of the PD I questions, and try the LWC problems you haven't solved. JavaScript-heavy roles may also want the **JavaScript Developer I** certification.",
+      "concepts": [
+        "Putting events, data, lifecycle and testing together"
+      ],
+      "pitfalls": [
+        "Skipping tests because the component 'looks right' in the browser."
+      ],
+      "problems": [],
+      "cert": {
+        "exam": "pd1",
+        "section": "ui"
+      }
+    }
+  ]
+}
