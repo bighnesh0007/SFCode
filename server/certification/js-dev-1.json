@@ -863,6 +863,816 @@
         "a"
       ],
       "explanation": "jest.fn() records calls so you can assert on arguments and counts."
+    },
+    {
+      "id": "js-array-includes",
+      "section": "variables",
+      "prompt": "Which returns true if the array `tags` contains 'apex'?",
+      "options": [
+        {
+          "id": "a",
+          "text": "tags.includes('apex')"
+        },
+        {
+          "id": "b",
+          "text": "tags.has('apex')"
+        },
+        {
+          "id": "c",
+          "text": "tags.contains('apex')"
+        },
+        {
+          "id": "d",
+          "text": "'apex' in tags"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Array.prototype.includes checks for a value; `in` checks keys (indexes), not values."
+    },
+    {
+      "id": "js-set-unique",
+      "section": "variables",
+      "prompt": "Which gives the unique values of the array `ids`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "[...new Set(ids)]"
+        },
+        {
+          "id": "b",
+          "text": "ids.unique()"
+        },
+        {
+          "id": "c",
+          "text": "new Map(ids)"
+        },
+        {
+          "id": "d",
+          "text": "ids.filter(Set)"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "A Set keeps unique values; spreading it gives an array back."
+    },
+    {
+      "id": "js-map-keys",
+      "section": "variables",
+      "prompt": "What advantage does a Map have over a plain object for keys?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Keys can be any type, including objects, and insertion order is kept"
+        },
+        {
+          "id": "b",
+          "text": "Maps are faster to type"
+        },
+        {
+          "id": "c",
+          "text": "Maps can't be iterated"
+        },
+        {
+          "id": "d",
+          "text": "Only strings can be keys"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Map keys can be any value; plain object keys are strings or symbols."
+    },
+    {
+      "id": "js-template-literal",
+      "section": "variables",
+      "prompt": "What does `` `Total: ${2 + 3}` `` evaluate to?",
+      "options": [
+        {
+          "id": "a",
+          "text": "'Total: ${2 + 3}'"
+        },
+        {
+          "id": "b",
+          "text": "'Total: 5'"
+        },
+        {
+          "id": "c",
+          "text": "'Total: 23'"
+        },
+        {
+          "id": "d",
+          "text": "An error"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Template literals evaluate expressions inside ${}."
+    },
+    {
+      "id": "js-nan",
+      "section": "variables",
+      "prompt": "How do you reliably check whether `x` is NaN?",
+      "options": [
+        {
+          "id": "a",
+          "text": "x === NaN"
+        },
+        {
+          "id": "b",
+          "text": "Number.isNaN(x)"
+        },
+        {
+          "id": "c",
+          "text": "x == NaN"
+        },
+        {
+          "id": "d",
+          "text": "typeof x === 'NaN'"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "NaN isn't equal to itself, so comparisons fail; Number.isNaN checks correctly."
+    },
+    {
+      "id": "js-json",
+      "section": "variables",
+      "prompt": "Which converts an object to a JSON string?",
+      "options": [
+        {
+          "id": "a",
+          "text": "JSON.parse(obj)"
+        },
+        {
+          "id": "b",
+          "text": "JSON.stringify(obj)"
+        },
+        {
+          "id": "c",
+          "text": "obj.toJSON()"
+        },
+        {
+          "id": "d",
+          "text": "String(obj)"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "JSON.stringify serialises; JSON.parse goes the other way."
+    },
+    {
+      "id": "js-reduce",
+      "section": "variables",
+      "prompt": "What does `[1, 2, 3].reduce((sum, n) => sum + n, 10)` return?",
+      "options": [
+        {
+          "id": "a",
+          "text": "6"
+        },
+        {
+          "id": "b",
+          "text": "16"
+        },
+        {
+          "id": "c",
+          "text": "10"
+        },
+        {
+          "id": "d",
+          "text": "[11, 12, 13]"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "reduce starts from 10 and adds each item: 10 + 1 + 2 + 3 = 16."
+    },
+    {
+      "id": "js-optional-chaining",
+      "section": "objects",
+      "prompt": "What does `user?.address?.city` return when `user.address` is undefined?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It throws"
+        },
+        {
+          "id": "b",
+          "text": "undefined"
+        },
+        {
+          "id": "c",
+          "text": "null"
+        },
+        {
+          "id": "d",
+          "text": "''"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Optional chaining short-circuits to undefined instead of throwing."
+    },
+    {
+      "id": "js-object-entries",
+      "section": "objects",
+      "prompt": "Which turns `{ a: 1, b: 2 }` into `[['a', 1], ['b', 2]]`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Object.entries(obj)"
+        },
+        {
+          "id": "b",
+          "text": "Object.keys(obj)"
+        },
+        {
+          "id": "c",
+          "text": "Object.values(obj)"
+        },
+        {
+          "id": "d",
+          "text": "Array.from(obj)"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Object.entries returns key-value pairs."
+    },
+    {
+      "id": "js-default-params",
+      "section": "objects",
+      "prompt": "What does `greet()` return for `function greet(name = 'there') { return 'Hi ' + name; }`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "'Hi undefined'"
+        },
+        {
+          "id": "b",
+          "text": "'Hi there'"
+        },
+        {
+          "id": "c",
+          "text": "'Hi '"
+        },
+        {
+          "id": "d",
+          "text": "An error"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Default parameters apply when the argument is undefined."
+    },
+    {
+      "id": "js-rest-params",
+      "section": "objects",
+      "prompt": "In `function sum(...nums) {}`, what is `nums` when called as sum(1, 2, 3)?",
+      "options": [
+        {
+          "id": "a",
+          "text": "1"
+        },
+        {
+          "id": "b",
+          "text": "[1, 2, 3]"
+        },
+        {
+          "id": "c",
+          "text": "{0: 1, 1: 2, 2: 3}"
+        },
+        {
+          "id": "d",
+          "text": "6"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Rest parameters collect the remaining arguments into an array."
+    },
+    {
+      "id": "js-call-apply-bind",
+      "section": "objects",
+      "prompt": "Which returns a new function with `this` permanently set?",
+      "options": [
+        {
+          "id": "a",
+          "text": "fn.call(obj)"
+        },
+        {
+          "id": "b",
+          "text": "fn.apply(obj)"
+        },
+        {
+          "id": "c",
+          "text": "fn.bind(obj)"
+        },
+        {
+          "id": "d",
+          "text": "fn.this(obj)"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "bind returns a new function; call and apply invoke immediately."
+    },
+    {
+      "id": "js-private-fields",
+      "section": "objects",
+      "prompt": "How do you declare a truly private field in a JavaScript class?",
+      "options": [
+        {
+          "id": "a",
+          "text": "_balance = 0;"
+        },
+        {
+          "id": "b",
+          "text": "#balance = 0;"
+        },
+        {
+          "id": "c",
+          "text": "private balance = 0;"
+        },
+        {
+          "id": "d",
+          "text": "static balance = 0;"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The # prefix creates a private field, inaccessible outside the class body."
+    },
+    {
+      "id": "js-modules-export",
+      "section": "objects",
+      "prompt": "Which imports the default export of `./utils.js` as `utils` and a named export `format`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "import utils, { format } from './utils.js';"
+        },
+        {
+          "id": "b",
+          "text": "import { utils, format } from './utils.js';"
+        },
+        {
+          "id": "c",
+          "text": "import * as utils, format from './utils.js';"
+        },
+        {
+          "id": "d",
+          "text": "require('./utils.js').format"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Default imports come first, named imports in braces."
+    },
+    {
+      "id": "js-event-delegation",
+      "section": "browser",
+      "prompt": "A list has thousands of items, each needing a click handler. What's efficient?",
+      "options": [
+        {
+          "id": "a",
+          "text": "One listener on the list that checks event.target (delegation)"
+        },
+        {
+          "id": "b",
+          "text": "A listener on each item"
+        },
+        {
+          "id": "c",
+          "text": "An inline onclick per item"
+        },
+        {
+          "id": "d",
+          "text": "setInterval polling"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Event delegation uses bubbling so one listener handles clicks on all children."
+    },
+    {
+      "id": "js-prevent-default",
+      "section": "browser",
+      "prompt": "A form's submit handler should validate input and stop the page reloading. Which call?",
+      "options": [
+        {
+          "id": "a",
+          "text": "event.stopPropagation()"
+        },
+        {
+          "id": "b",
+          "text": "event.preventDefault()"
+        },
+        {
+          "id": "c",
+          "text": "return null"
+        },
+        {
+          "id": "d",
+          "text": "form.reset()"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "preventDefault stops the browser's default submit action."
+    },
+    {
+      "id": "js-dom-content-loaded",
+      "section": "browser",
+      "prompt": "Which event fires when the HTML is parsed, before images finish loading?",
+      "options": [
+        {
+          "id": "a",
+          "text": "load"
+        },
+        {
+          "id": "b",
+          "text": "DOMContentLoaded"
+        },
+        {
+          "id": "c",
+          "text": "ready"
+        },
+        {
+          "id": "d",
+          "text": "beforeunload"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "DOMContentLoaded fires after parsing; load waits for images and other resources."
+    },
+    {
+      "id": "js-fetch",
+      "section": "browser",
+      "prompt": "What does `fetch(url)` return?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The response body as text"
+        },
+        {
+          "id": "b",
+          "text": "A Promise that resolves to a Response"
+        },
+        {
+          "id": "c",
+          "text": "An XMLHttpRequest"
+        },
+        {
+          "id": "d",
+          "text": "JSON"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "fetch returns a Promise of a Response; call response.json() or text() to read the body (also a Promise)."
+    },
+    {
+      "id": "js-class-list",
+      "section": "browser",
+      "prompt": "Which adds the class 'active' to an element without removing others?",
+      "options": [
+        {
+          "id": "a",
+          "text": "el.className = 'active'"
+        },
+        {
+          "id": "b",
+          "text": "el.classList.add('active')"
+        },
+        {
+          "id": "c",
+          "text": "el.class = 'active'"
+        },
+        {
+          "id": "d",
+          "text": "el.setClass('active')"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "classList.add adds one class; assigning className replaces all classes."
+    },
+    {
+      "id": "js-error-types",
+      "section": "debugging",
+      "prompt": "Calling a method on undefined throws which error type?",
+      "options": [
+        {
+          "id": "a",
+          "text": "SyntaxError"
+        },
+        {
+          "id": "b",
+          "text": "TypeError"
+        },
+        {
+          "id": "c",
+          "text": "RangeError"
+        },
+        {
+          "id": "d",
+          "text": "ReferenceError"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Using undefined as an object is a TypeError; an undeclared variable is a ReferenceError."
+    },
+    {
+      "id": "js-throw-error",
+      "section": "debugging",
+      "prompt": "Which is the best way to signal an invalid argument?",
+      "options": [
+        {
+          "id": "a",
+          "text": "return -1"
+        },
+        {
+          "id": "b",
+          "text": "throw new Error('Amount must be positive')"
+        },
+        {
+          "id": "c",
+          "text": "console.log('bad')"
+        },
+        {
+          "id": "d",
+          "text": "alert('bad')"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Throwing an Error with a clear message stops execution and gives a stack trace to callers."
+    },
+    {
+      "id": "js-promise-allsettled",
+      "section": "async",
+      "prompt": "You call three APIs and want every result, including failures, without stopping at the first error. Which?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Promise.all"
+        },
+        {
+          "id": "b",
+          "text": "Promise.allSettled"
+        },
+        {
+          "id": "c",
+          "text": "Promise.race"
+        },
+        {
+          "id": "d",
+          "text": "Promise.any"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "allSettled waits for all and reports each as fulfilled or rejected."
+    },
+    {
+      "id": "js-promise-race",
+      "section": "async",
+      "prompt": "Which settles as soon as the first of several promises settles, fulfilled or rejected?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Promise.all"
+        },
+        {
+          "id": "b",
+          "text": "Promise.race"
+        },
+        {
+          "id": "c",
+          "text": "Promise.allSettled"
+        },
+        {
+          "id": "d",
+          "text": "Promise.resolve"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Promise.race follows whichever promise settles first."
+    },
+    {
+      "id": "js-await-parallel",
+      "section": "async",
+      "prompt": "Two independent requests take 1 s each. Which runs them in about 1 s total?",
+      "options": [
+        {
+          "id": "a",
+          "text": "await a(); await b();"
+        },
+        {
+          "id": "b",
+          "text": "await Promise.all([a(), b()]);"
+        },
+        {
+          "id": "c",
+          "text": "a().then(b)"
+        },
+        {
+          "id": "d",
+          "text": "for (const f of [a, b]) await f();"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Starting both before awaiting runs them in parallel; sequential awaits take about 2 s."
+    },
+    {
+      "id": "js-settimeout-zero",
+      "section": "async",
+      "prompt": "Does `setTimeout(fn, 0)` run fn immediately?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Yes"
+        },
+        {
+          "id": "b",
+          "text": "No: it runs after the current code and pending microtasks finish"
+        },
+        {
+          "id": "c",
+          "text": "Only in Node.js"
+        },
+        {
+          "id": "d",
+          "text": "Only if fn is async"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A zero timeout queues a macrotask that runs after the current call stack and microtasks."
+    },
+    {
+      "id": "js-node-event-emitter",
+      "section": "server",
+      "prompt": "Which Node.js class lets objects emit named events that listeners subscribe to?",
+      "options": [
+        {
+          "id": "a",
+          "text": "EventEmitter"
+        },
+        {
+          "id": "b",
+          "text": "Promise"
+        },
+        {
+          "id": "c",
+          "text": "Buffer"
+        },
+        {
+          "id": "d",
+          "text": "Stream only"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "EventEmitter (from 'events') underlies many Node APIs."
+    },
+    {
+      "id": "js-node-fs-promises",
+      "section": "server",
+      "prompt": "Which reads a file without blocking the event loop in modern Node.js?",
+      "options": [
+        {
+          "id": "a",
+          "text": "fs.readFileSync"
+        },
+        {
+          "id": "b",
+          "text": "await fs.promises.readFile(path, 'utf8')"
+        },
+        {
+          "id": "c",
+          "text": "require(path)"
+        },
+        {
+          "id": "d",
+          "text": "process.read(path)"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The promise-based fs API reads asynchronously; the Sync variants block."
+    },
+    {
+      "id": "js-npm-install-dev",
+      "section": "server",
+      "prompt": "A test framework is needed only during development. How do you install it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "npm install jest --save-dev"
+        },
+        {
+          "id": "b",
+          "text": "npm install jest --global only"
+        },
+        {
+          "id": "c",
+          "text": "npm run jest"
+        },
+        {
+          "id": "d",
+          "text": "npm publish jest"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "--save-dev records it under devDependencies."
+    },
+    {
+      "id": "js-jest-async",
+      "section": "testing",
+      "prompt": "How do you test an async function's resolved value in Jest?",
+      "options": [
+        {
+          "id": "a",
+          "text": "test('x', async () => { expect(await getValue()).toBe(5); })"
+        },
+        {
+          "id": "b",
+          "text": "Call it without await"
+        },
+        {
+          "id": "c",
+          "text": "Use setTimeout"
+        },
+        {
+          "id": "d",
+          "text": "It can't be tested"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Async tests await the promise, or return it, so Jest waits for the result."
+    },
+    {
+      "id": "js-jest-beforeeach",
+      "section": "testing",
+      "prompt": "Which Jest hook runs before every test in a file?",
+      "options": [
+        {
+          "id": "a",
+          "text": "beforeAll"
+        },
+        {
+          "id": "b",
+          "text": "beforeEach"
+        },
+        {
+          "id": "c",
+          "text": "afterEach"
+        },
+        {
+          "id": "d",
+          "text": "setup"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "beforeEach runs before each test; beforeAll once for the file."
     }
   ]
 }

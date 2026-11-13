@@ -49,8 +49,8 @@ describe("question bank", () => {
       ["admin", 60, 60],
       ["pd1", 60, 60],
       ["pd2", 60, 60],
-      ["app-builder", 30, 60],
-      ["js-dev-1", 30, 60],
+      ["app-builder", 60, 60],
+      ["js-dev-1", 60, 60],
     ]);
   });
 
