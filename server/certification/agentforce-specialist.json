@@ -1,0 +1,1127 @@
+{
+  "exam": "agentforce-specialist",
+  "title": "Agentforce Specialist",
+  "order": 8,
+  "description": "Prompt Builder, the Trust Layer, grounding with Data 360, agent topics and actions, testing and deployment. Not yet covered: Agent Script and the Spring '26 authoring model.",
+  "sections": [
+    {
+      "id": "prompts",
+      "title": "Prompt Engineering"
+    },
+    {
+      "id": "data360",
+      "title": "Data 360 Fundamentals"
+    },
+    {
+      "id": "agents",
+      "title": "AI Agents"
+    },
+    {
+      "id": "testing",
+      "title": "Testing, Deployment, and Maintenance"
+    },
+    {
+      "id": "governance",
+      "title": "Governance and Observability"
+    },
+    {
+      "id": "multiagent",
+      "title": "Multi-Agent Orchestration"
+    }
+  ],
+  "mock": {
+    "questions": 40,
+    "minutes": 70,
+    "passPercent": 72,
+    "weights": {
+      "prompts": 20,
+      "data360": 20,
+      "agents": 35,
+      "testing": 10,
+      "governance": 10,
+      "multiagent": 5
+    }
+  },
+  "questions": [
+    {
+      "id": "af-when-prompt-builder",
+      "section": "prompts",
+      "prompt": "Sales reps want a one-click, consistent summary of an account's open cases and recent activity on the account page. What fits best?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Each rep pasting the account details into a public chatbot and copying the reply"
+        },
+        {
+          "id": "b",
+          "text": "An Apex trigger that writes a summary on every account save"
+        },
+        {
+          "id": "c",
+          "text": "A report of the account's open cases and activities"
+        },
+        {
+          "id": "d",
+          "text": "A grounded prompt template in Prompt Builder"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Prompt Builder creates reusable, grounded templates that run from the record with consistent instructions. Public chatbots lack the org's data and the Trust Layer."
+    },
+    {
+      "id": "af-template-types",
+      "section": "prompts",
+      "prompt": "Which prompt template type fills a specific field on a record page, such as a case description summary?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Flex"
+        },
+        {
+          "id": "b",
+          "text": "Record Summary"
+        },
+        {
+          "id": "c",
+          "text": "Field Generation"
+        },
+        {
+          "id": "d",
+          "text": "Sales Email template"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Field Generation templates are attached to a field on a Lightning record page and write their output into that field for the user to review."
+    },
+    {
+      "id": "af-flex",
+      "section": "prompts",
+      "prompt": "A template must take an Account and a Product as inputs and isn't tied to one record page. Which type fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Flex"
+        },
+        {
+          "id": "b",
+          "text": "Field Generation"
+        },
+        {
+          "id": "c",
+          "text": "Record Summary"
+        },
+        {
+          "id": "d",
+          "text": "Sales Email"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Flex templates define their own inputs, so they can combine several objects and be invoked from flows, Apex or agent actions."
+    },
+    {
+      "id": "af-grounding-merge",
+      "section": "prompts",
+      "prompt": "A template needs the case subject, the account name and the last five case comments. Which grounding techniques fit?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Merge fields, plus a related list or flow for the comments"
+        },
+        {
+          "id": "b",
+          "text": "A retriever over the whole Knowledge base, run for every request"
+        },
+        {
+          "id": "c",
+          "text": "A retriever over the whole Knowledge base for every request"
+        },
+        {
+          "id": "d",
+          "text": "Letting the model infer the details from the case number"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Merge fields pull values from the input record; related lists or a template-triggered flow can supply related records like comments."
+    },
+    {
+      "id": "af-grounding-flow",
+      "section": "prompts",
+      "prompt": "Grounding requires data that needs filtering and logic across several objects. What is the declarative way to provide it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A template-triggered prompt flow"
+        },
+        {
+          "id": "b",
+          "text": "A list view filtered to the related records"
+        },
+        {
+          "id": "c",
+          "text": "A roll-up summary field that totals the related records"
+        },
+        {
+          "id": "d",
+          "text": "A validation rule that formats the related data before the prompt runs"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Template-triggered prompt flows run logic to gather and shape data, then pass the result into the prompt. Apex is the code-based alternative."
+    },
+    {
+      "id": "af-activate",
+      "section": "prompts",
+      "prompt": "An admin saved a new prompt template, but users can't run it. What is the likely missing step?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The template must first be approved by Salesforce"
+        },
+        {
+          "id": "b",
+          "text": "The org must be restarted after a template is saved"
+        },
+        {
+          "id": "c",
+          "text": "The template version hasn't been activated"
+        },
+        {
+          "id": "d",
+          "text": "Prompt templates only run in sandboxes until promoted"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Templates have versions, and a version must be activated before users or automations can run it."
+    },
+    {
+      "id": "af-permissions",
+      "section": "prompts",
+      "prompt": "Which permission set lets a user create and edit prompt templates, as opposed to only running them?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Prompt Template Manager"
+        },
+        {
+          "id": "b",
+          "text": "Modify All Data"
+        },
+        {
+          "id": "c",
+          "text": "Data Cloud User"
+        },
+        {
+          "id": "d",
+          "text": "Prompt Template User permission set"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Prompt Template Manager allows creating and managing templates; Prompt Template User allows running them."
+    },
+    {
+      "id": "af-prompt-practice",
+      "section": "prompts",
+      "prompt": "Which practice makes a prompt template's output more reliable?",
+      "options": [
+        {
+          "id": "a",
+          "text": "No grounding, so the model relies on its general knowledge"
+        },
+        {
+          "id": "b",
+          "text": "As few words as possible, so the model is free to decide the details itself"
+        },
+        {
+          "id": "c",
+          "text": "Clear instructions: the role, the task, the format and what to avoid"
+        },
+        {
+          "id": "d",
+          "text": "Several unrelated tasks in one prompt to save calls"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Specific instructions, a stated output format and grounded data reduce vague or invented answers."
+    },
+    {
+      "id": "af-trust-layer",
+      "section": "prompts",
+      "prompt": "Which is a feature of the Einstein Trust Layer?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Training the LLM on the org's records each night to improve its answers"
+        },
+        {
+          "id": "b",
+          "text": "Skipping user permissions when the model reads data"
+        },
+        {
+          "id": "c",
+          "text": "Storing customer data with the model provider for reuse"
+        },
+        {
+          "id": "d",
+          "text": "Masking sensitive data before the prompt is sent to the model"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "The Trust Layer includes secure data retrieval, data masking, toxicity detection, an audit trail and zero data retention with model providers."
+    },
+    {
+      "id": "af-chunking",
+      "section": "data360",
+      "prompt": "Why are long documents split into chunks before indexing?",
+      "options": [
+        {
+          "id": "a",
+          "text": "To translate the documents into the user's language"
+        },
+        {
+          "id": "b",
+          "text": "So retrieval can return the relevant passages, not whole documents"
+        },
+        {
+          "id": "c",
+          "text": "Because Salesforce can't store files longer than a few pages in one record"
+        },
+        {
+          "id": "d",
+          "text": "Because Salesforce can't store files above a few pages"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Chunking breaks text into passages that are embedded and indexed, so retrieval can find and return the most relevant parts."
+    },
+    {
+      "id": "af-index",
+      "section": "data360",
+      "prompt": "What does a search index do in Data 360 retrieval?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Creates a prompt template for each document it stores"
+        },
+        {
+          "id": "b",
+          "text": "Removes duplicate records before an agent reads them, so answers stay consistent"
+        },
+        {
+          "id": "c",
+          "text": "Runs Apex triggers when new documents are uploaded"
+        },
+        {
+          "id": "d",
+          "text": "Stores chunk embeddings so related text can be found by meaning"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "A search index holds the vectors for chunks, enabling semantic (vector) or hybrid search."
+    },
+    {
+      "id": "af-retriever",
+      "section": "data360",
+      "prompt": "What is a retriever's role when grounding a prompt or agent?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It sends the finished prompt to the LLM and returns the reply"
+        },
+        {
+          "id": "b",
+          "text": "It masks personal data in the prompt before sending"
+        },
+        {
+          "id": "c",
+          "text": "It activates the latest version of a prompt template"
+        },
+        {
+          "id": "d",
+          "text": "It queries a search index and returns the most relevant chunks"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Retrievers run a search against an index, optionally with filters, and return results that are inserted into the prompt as grounding."
+    },
+    {
+      "id": "af-data-library",
+      "section": "data360",
+      "prompt": "An admin wants an agent to answer from a set of uploaded PDFs with minimal setup. What should they use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "An Agentforce Data Library"
+        },
+        {
+          "id": "b",
+          "text": "Pasting the PDFs' contents into the agent's instructions"
+        },
+        {
+          "id": "c",
+          "text": "A report of uploaded files that the agent can read"
+        },
+        {
+          "id": "d",
+          "text": "A custom object that stores the text of each PDF so the agent can query it"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Agentforce Data Libraries handle ingestion, chunking, indexing and retriever setup for files or Knowledge, and connect to the agent."
+    },
+    {
+      "id": "af-structured-vs-unstructured",
+      "section": "data360",
+      "prompt": "Which question is best answered by retrieval over unstructured content, rather than by a record query?",
+      "options": [
+        {
+          "id": "a",
+          "text": "'What does our returns policy say about opened items?'"
+        },
+        {
+          "id": "b",
+          "text": "'How many open cases does this account have right now?'"
+        },
+        {
+          "id": "c",
+          "text": "'Who owns this opportunity?'"
+        },
+        {
+          "id": "d",
+          "text": "'What is the status of order 1234?'"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Policy text lives in documents and needs semantic retrieval. Counts, statuses and owners are precise record queries."
+    },
+    {
+      "id": "af-retriever-filter",
+      "section": "data360",
+      "prompt": "An agent must answer only from articles for the customer's product line. What helps?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Adding 'only use relevant articles' to the topic instructions"
+        },
+        {
+          "id": "b",
+          "text": "Filters on the retriever, using a field such as product line"
+        },
+        {
+          "id": "c",
+          "text": "Deleting the articles for other product lines"
+        },
+        {
+          "id": "d",
+          "text": "A separate org for each product line's content"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Retriever filters restrict results to matching content, which is more reliable than instructions alone."
+    },
+    {
+      "id": "af-stale-content",
+      "section": "data360",
+      "prompt": "Agents give outdated answers after policy documents were updated. What should be checked?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The org's default time zone"
+        },
+        {
+          "id": "b",
+          "text": "The model's temperature setting, which may be too low"
+        },
+        {
+          "id": "c",
+          "text": "That the new content was ingested and the index refreshed"
+        },
+        {
+          "id": "d",
+          "text": "Only the model's temperature setting"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Retrieval answers only as well as its indexed content. Confirm the new files were ingested and the index is up to date."
+    },
+    {
+      "id": "af-topic-classification",
+      "section": "agents",
+      "prompt": "How does an agent decide which topic handles a user's request?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It matches the request to each topic's description and scope"
+        },
+        {
+          "id": "b",
+          "text": "The most recently created topic is always tried first"
+        },
+        {
+          "id": "c",
+          "text": "The user picks a topic from a menu before chatting"
+        },
+        {
+          "id": "d",
+          "text": "Topics are tried in alphabetical order until one of them matches the request"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The reasoning engine uses topic descriptions (classification) to pick the topic, then plans which of that topic's actions to run."
+    },
+    {
+      "id": "af-topic-instructions",
+      "section": "agents",
+      "prompt": "Where should rules like 'always confirm the order number before cancelling' go?",
+      "options": [
+        {
+          "id": "a",
+          "text": "In the page layout of the Order object"
+        },
+        {
+          "id": "b",
+          "text": "In a report that the agent reads"
+        },
+        {
+          "id": "c",
+          "text": "In the agent's name and welcome message"
+        },
+        {
+          "id": "d",
+          "text": "In the topic's instructions"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Topic instructions guide how the agent behaves within that topic, including which steps to take and in what order."
+    },
+    {
+      "id": "af-action-types",
+      "section": "agents",
+      "prompt": "Which can be used as a custom agent action?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A validation rule or a duplicate rule"
+        },
+        {
+          "id": "b",
+          "text": "A dashboard, a report or a list view that the agent can open"
+        },
+        {
+          "id": "c",
+          "text": "A flow, an invocable Apex method or a prompt template"
+        },
+        {
+          "id": "d",
+          "text": "A page layout or a compact layout"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Agent actions can call autolaunched flows, invocable Apex, prompt templates and external services."
+    },
+    {
+      "id": "af-action-descriptions",
+      "section": "agents",
+      "prompt": "An agent keeps choosing the wrong action. What should be improved first?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The action's description and input and output descriptions"
+        },
+        {
+          "id": "b",
+          "text": "The total number of topics in the agent"
+        },
+        {
+          "id": "c",
+          "text": "The colour and branding of the chat window the customer sees"
+        },
+        {
+          "id": "d",
+          "text": "The org's default language setting"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The reasoning engine relies on action and input descriptions to decide when and how to call an action. Vague descriptions cause wrong choices."
+    },
+    {
+      "id": "af-deterministic",
+      "section": "agents",
+      "prompt": "A refund action must never run until the customer's identity is verified. What is the most reliable control?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A longer, more detailed description on the refund topic"
+        },
+        {
+          "id": "b",
+          "text": "An instruction in the topic telling the agent to be very careful with refunds"
+        },
+        {
+          "id": "c",
+          "text": "A verification variable plus a filter on the refund action"
+        },
+        {
+          "id": "d",
+          "text": "A lower temperature on the model the agent uses"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Variables and filters enforce conditions deterministically. Instructions alone can be ignored by the model."
+    },
+    {
+      "id": "af-employee-vs-service",
+      "section": "agents",
+      "prompt": "Internal sales reps want an assistant inside Lightning Experience that acts on records they can access. Which agent type fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "An agent for guest users of an Experience Cloud site"
+        },
+        {
+          "id": "b",
+          "text": "A service agent deployed on the public website"
+        },
+        {
+          "id": "c",
+          "text": "An email auto-response rule for the sales team"
+        },
+        {
+          "id": "d",
+          "text": "An employee agent"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Employee agents work for internal users and run with that user's permissions. Service agents serve customers on external channels."
+    },
+    {
+      "id": "af-service-agent-user",
+      "section": "agents",
+      "prompt": "Under which user context do a service agent's actions run?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The system administrator who activated the agent, so every action works"
+        },
+        {
+          "id": "b",
+          "text": "The customer's own Salesforce user record"
+        },
+        {
+          "id": "c",
+          "text": "A dedicated agent user with limited permissions"
+        },
+        {
+          "id": "d",
+          "text": "Whichever human agent is online at the time"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Service agents run as a dedicated agent user. Give it only the permissions its actions need."
+    },
+    {
+      "id": "af-employee-context",
+      "section": "agents",
+      "prompt": "An employee agent can't update an opportunity for one rep but can for another. What is the most likely reason?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The agent is broken for that rep and must be deactivated and activated again"
+        },
+        {
+          "id": "b",
+          "text": "It runs as the signed-in user, who lacks access to that record"
+        },
+        {
+          "id": "c",
+          "text": "The opportunity has too many products for the agent"
+        },
+        {
+          "id": "d",
+          "text": "Employee agents can only read data, never update it"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Employee agents respect the user's sharing and permissions, so results differ by user."
+    },
+    {
+      "id": "af-channels",
+      "section": "agents",
+      "prompt": "A service agent should talk to customers on the company website. Which channel is used?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A Lightning record page on Contact"
+        },
+        {
+          "id": "b",
+          "text": "Web-to-Lead with an assignment rule"
+        },
+        {
+          "id": "c",
+          "text": "Messaging for In-App and Web (Enhanced Chat)"
+        },
+        {
+          "id": "d",
+          "text": "Email-to-Case with an auto-response rule"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Service agents are deployed to customers through Messaging for In-App and Web, and can also be connected to other channels such as Experience Cloud."
+    },
+    {
+      "id": "af-agent-api",
+      "section": "agents",
+      "prompt": "A company's mobile app, built outside Salesforce, needs to hold conversations with an existing agent. What fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The Data Import Wizard"
+        },
+        {
+          "id": "b",
+          "text": "Agent API"
+        },
+        {
+          "id": "c",
+          "text": "Web-to-Case with a hidden form"
+        },
+        {
+          "id": "d",
+          "text": "A Lightning record page embedded in the app"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The Agent API lets external applications start sessions and exchange messages with an agent."
+    },
+    {
+      "id": "af-standard-topics",
+      "section": "agents",
+      "prompt": "When should an admin build a custom topic rather than rely on a standard one?",
+      "options": [
+        {
+          "id": "a",
+          "text": "When the job is business-specific, like warranty checks"
+        },
+        {
+          "id": "b",
+          "text": "Never, because custom topics aren't supported for agents"
+        },
+        {
+          "id": "c",
+          "text": "Always, because standard topics can't be used in production orgs"
+        },
+        {
+          "id": "d",
+          "text": "Only when building an employee agent for internal users"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Standard topics cover common jobs; custom topics are for business-specific tasks with their own instructions and actions."
+    },
+    {
+      "id": "af-hallucination",
+      "section": "agents",
+      "prompt": "An agent sometimes invents order details. What reduces this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Add more topics so it has more ways to answer"
+        },
+        {
+          "id": "b",
+          "text": "Ground answers in actions that fetch real data, and allow 'I don't know'"
+        },
+        {
+          "id": "c",
+          "text": "Ask customers to double-check the details it gives"
+        },
+        {
+          "id": "d",
+          "text": "Remove all actions so it answers from its general knowledge only"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Grounding in real data plus clear instructions for unknowns reduces invented answers."
+    },
+    {
+      "id": "af-testing-center",
+      "section": "testing",
+      "prompt": "How can an admin check that an agent picks the right topic and action across 200 sample questions?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Chat with the agent 200 times by hand and note the results in a spreadsheet"
+        },
+        {
+          "id": "b",
+          "text": "A batch test in Testing Center with expected results"
+        },
+        {
+          "id": "c",
+          "text": "Deploy to production and read through the conversation logs"
+        },
+        {
+          "id": "d",
+          "text": "Run a report on cases created by the agent"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Testing Center runs test cases in bulk and compares the agent's topic, actions and response with expected values."
+    },
+    {
+      "id": "af-test-generation",
+      "section": "testing",
+      "prompt": "Where can test cases for Testing Center come from?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Only from real production conversations exported each week"
+        },
+        {
+          "id": "b",
+          "text": "An uploaded CSV, or AI-generated test cases"
+        },
+        {
+          "id": "c",
+          "text": "Only from published Knowledge articles"
+        },
+        {
+          "id": "d",
+          "text": "Only typed in one at a time by an admin"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Test cases can be uploaded or generated, then refined. Testing in a sandbox avoids affecting customers."
+    },
+    {
+      "id": "af-sandbox-first",
+      "section": "testing",
+      "prompt": "Where should agents be built and tested before customers use them?",
+      "options": [
+        {
+          "id": "a",
+          "text": "In a sandbox, then deployed to production"
+        },
+        {
+          "id": "b",
+          "text": "On the customer website with a 'beta' label"
+        },
+        {
+          "id": "c",
+          "text": "In a Developer Edition org unrelated to the company"
+        },
+        {
+          "id": "d",
+          "text": "Directly in production, since agents can be deactivated"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Build and test in a sandbox with realistic data, then deploy the metadata to production through change sets, DevOps Center or the CLI."
+    },
+    {
+      "id": "af-deploy-dependencies",
+      "section": "testing",
+      "prompt": "After deploying an agent to production, an action fails. What should have been checked?",
+      "options": [
+        {
+          "id": "a",
+          "text": "That every flow, Apex class, template and permission it uses was deployed"
+        },
+        {
+          "id": "b",
+          "text": "That the org-wide defaults were set to Public"
+        },
+        {
+          "id": "c",
+          "text": "That the agent's name was unique across the org and every sandbox"
+        },
+        {
+          "id": "d",
+          "text": "That the sandbox was deleted after the deployment"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Agents depend on other metadata and settings. Missing or inactive dependencies break actions after deployment."
+    },
+    {
+      "id": "af-template-deploy",
+      "section": "testing",
+      "prompt": "A prompt template was deployed to production, but the field generation button doesn't appear. What is the likely cause?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The LLM isn't available in production orgs"
+        },
+        {
+          "id": "b",
+          "text": "Users need a Data Loader licence to run templates"
+        },
+        {
+          "id": "c",
+          "text": "Prompt templates can't be deployed between orgs and must be rebuilt"
+        },
+        {
+          "id": "d",
+          "text": "The template isn't activated, or the page isn't set up"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "After deployment, check activation and the record page configuration that exposes the template."
+    },
+    {
+      "id": "af-audit",
+      "section": "governance",
+      "prompt": "Compliance wants to review what was sent to the model and what came back. What supports this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Field history tracking on Case"
+        },
+        {
+          "id": "b",
+          "text": "Debug logs for the agent user"
+        },
+        {
+          "id": "c",
+          "text": "The Trust Layer's audit trail, stored in Data 360"
+        },
+        {
+          "id": "d",
+          "text": "The org's login history and setup audit trail"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "The Trust Layer records prompts, responses and safety scores in an audit trail for review."
+    },
+    {
+      "id": "af-toxicity",
+      "section": "governance",
+      "prompt": "How does the Trust Layer help with harmful outputs?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It retrains the model each night on flagged responses"
+        },
+        {
+          "id": "b",
+          "text": "It hides flagged responses from administrators"
+        },
+        {
+          "id": "c",
+          "text": "It blocks every response that contains a person's name"
+        },
+        {
+          "id": "d",
+          "text": "It scores responses for toxicity so they can be monitored"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Toxicity detection scores generated content, which is logged for monitoring and review."
+    },
+    {
+      "id": "af-analytics",
+      "section": "governance",
+      "prompt": "After launch, the team wants to know which requests the agent fails to handle. What should they review?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The page layout assigned to the agent user"
+        },
+        {
+          "id": "b",
+          "text": "Agent analytics on escalations and unhandled requests"
+        },
+        {
+          "id": "c",
+          "text": "The number of users with Agentforce licences each month"
+        },
+        {
+          "id": "d",
+          "text": "The sandbox refresh history for the org"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Agent analytics and conversation review show where the agent escalates or fails, which drives new topics or better instructions."
+    },
+    {
+      "id": "af-model-access",
+      "section": "governance",
+      "prompt": "Security wants to restrict which LLMs can be used in the org. Where is this managed?",
+      "options": [
+        {
+          "id": "a",
+          "text": "In the model settings, where available models are managed"
+        },
+        {
+          "id": "b",
+          "text": "In the Chatter settings for the org"
+        },
+        {
+          "id": "c",
+          "text": "In the case assignment rules for the service team"
+        },
+        {
+          "id": "d",
+          "text": "In each user's profile, under the personal settings for AI"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Admins manage which models are available, including standard and bring-your-own models, so templates and agents only use approved ones."
+    },
+    {
+      "id": "af-multi-agent-when",
+      "section": "multiagent",
+      "prompt": "One agent has grown to 30 topics and keeps choosing the wrong one. What should be considered?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Merge all 30 topics into one broad topic"
+        },
+        {
+          "id": "b",
+          "text": "Adding more topics to the same agent so it has more options to choose from"
+        },
+        {
+          "id": "c",
+          "text": "Remove all topic instructions so it decides freely"
+        },
+        {
+          "id": "d",
+          "text": "Splitting it into specialised agents with routing between them"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Too many overlapping topics confuse classification. Specialised agents with clear scopes scale and are easier to control."
+    },
+    {
+      "id": "af-mcp",
+      "section": "multiagent",
+      "prompt": "What is the Model Context Protocol (MCP) used for?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A standard way for agents to reach external tools and data"
+        },
+        {
+          "id": "b",
+          "text": "A data masking algorithm in the Trust Layer"
+        },
+        {
+          "id": "c",
+          "text": "A report type for agent conversations"
+        },
+        {
+          "id": "d",
+          "text": "A Salesforce record sharing model used to control what agents can see"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "MCP is an open protocol that lets AI applications discover and call tools and data sources through a common interface."
+    },
+    {
+      "id": "af-a2a",
+      "section": "multiagent",
+      "prompt": "What does the Agent-to-Agent (A2A) protocol address?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Encrypting agent conversation data at rest in Data 360"
+        },
+        {
+          "id": "b",
+          "text": "Synchronising quotes with opportunities"
+        },
+        {
+          "id": "c",
+          "text": "Routing cases to agents by skill"
+        },
+        {
+          "id": "d",
+          "text": "Communication and task hand-offs between agents"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "A2A is an open standard for agents to discover each other's capabilities and exchange tasks across platforms."
+    }
+  ]
+}
