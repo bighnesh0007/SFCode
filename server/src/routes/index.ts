@@ -500,7 +500,7 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.get("/teams/:slug", auth, validate({ params: slugP }), (async (req, res) => ok(res, await hub.team(me(req), slugOf(req)))) as RequestHandler);
     v1.post("/teams/:slug/code", auth, limiter(10), validate({ params: slugP }), (async (req, res) => ok(res, await hub.rotateCode(me(req), slugOf(req)))) as RequestHandler);
     const listedB = z.strictObject({ listed: z.boolean() });
-    v1.post("/teams/:slug/listed", auth, limiter(20), validate({ params: slugP, body: listedB }), (async (req, res) => ok(res, await hub.setListed(me(req), slugOf(req), validatedBody<z.infer<typeof listedB>>(req).listed))) as RequestHandler);
+    v1.post("/teams/:slug/listed", limiter(20), auth, validate({ params: slugP, body: listedB }), (async (req, res) => ok(res, await hub.setListed(me(req), slugOf(req), validatedBody<z.infer<typeof listedB>>(req).listed))) as RequestHandler);
     v1.get("/leaderboard/teams", limiter(60), (async (_req, res) => ok(res, await hub.teamBoard())) as RequestHandler);
     v1.post("/teams/:slug/leave", auth, limiter(10), validate({ params: slugP }), (async (req, res) => {
       await hub.leave(me(req), slugOf(req));
