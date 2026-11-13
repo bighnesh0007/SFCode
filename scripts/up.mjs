@@ -133,16 +133,21 @@ const serverEntry = join(ROOT, "server", "dist", "server.js");
 if (REBUILD || mtime(serverEntry) < newestMtime(join(ROOT, "server", "src"))) build("server", "sfcode-server");
 
 // NEXT_PUBLIC_* and the /backend rewrite target are fixed at build time, so a
-// changed .env.local also forces a client rebuild.
+// changed .env.local also forces a client rebuild. So does content the API
+// serves: cached pages (track lists, roadmaps, the sitemap) are rendered from
+// it at build time. This runs only once the new API is healthy, so the build
+// reads the new content, not whatever was running before the restart.
 const standalone = join(ROOT, "client", ".next", "standalone", "client", "server.js");
-if (REBUILD || mtime(standalone) < Math.max(newestMtime(join(ROOT, "client")), mtime(join(ROOT, "client", ".env.local")))) {
-  build("client", "sfcode-client");
-}
-// Standalone output omits static assets. Copied unconditionally because a build
-// interrupted before this step left DWCode serving pages with no CSS/JS.
-cpSync(join(ROOT, "client", ".next", "static"), join(ROOT, "client", ".next", "standalone", "client", ".next", "static"), { recursive: true });
-if (existsSync(join(ROOT, "client", "public"))) {
-  cpSync(join(ROOT, "client", "public"), join(ROOT, "client", ".next", "standalone", "client", "public"), { recursive: true });
+const CONTENT = ["problems", "certification", "roadmaps"].map((d) => join(ROOT, "server", d));
+function buildClientIfStale() {
+  const inputs = Math.max(newestMtime(join(ROOT, "client")), mtime(join(ROOT, "client", ".env.local")), ...CONTENT.map((d) => newestMtime(d)));
+  if (REBUILD || mtime(standalone) < inputs) build("client", "sfcode-client");
+  // Standalone output omits static assets. Copied unconditionally because a build
+  // interrupted before this step left DWCode serving pages with no CSS/JS.
+  cpSync(join(ROOT, "client", ".next", "static"), join(ROOT, "client", ".next", "standalone", "client", ".next", "static"), { recursive: true });
+  if (existsSync(join(ROOT, "client", "public"))) {
+    cpSync(join(ROOT, "client", "public"), join(ROOT, "client", ".next", "standalone", "client", "public"), { recursive: true });
+  }
 }
 
 // ── LWC grading sandbox ───────────────────────────────────────────────────────
@@ -271,6 +276,7 @@ process.on("SIGINT", () => void shutdown(0));
 process.on("SIGTERM", () => void shutdown(0));
 
 for (const svc of services) {
+  if (svc.name === "client") buildClientIfStale();
   start(svc);
   await waitHealthy(svc);
   say(svc.name, "\x1b[32mhealthy\x1b[0m");
