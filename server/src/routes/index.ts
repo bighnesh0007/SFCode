@@ -122,6 +122,8 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.put("/profile/me/about", signedIn, limiter(20), validate({ body: aboutBody }), c.updateAbout);
     v1.get("/profile/:handle", validate({ params: handleParams }), c.byHandle);
     v1.get("/leaderboard", validate({ query: leaderboardQuery }), c.leaderboard);
+    const community = container.community;
+    v1.get("/stats", (async (_req, res) => ok(res, await community.stats())) as RequestHandler);
   } else {
     v1.use(["/profile", "/leaderboard"], disabled("Profiles and the leaderboard"));
   }

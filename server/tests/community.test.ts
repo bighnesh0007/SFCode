@@ -10,6 +10,9 @@ const catalog = ChallengeCatalog.load(PROBLEMS_DIR);
 
 class MemoryProfiles implements ProfileRepository {
   readonly rows = new Map<string, ProfileRecord>();
+  count() {
+    return Promise.resolve(this.rows.size);
+  }
   findByUser(userId: string) {
     return Promise.resolve(this.rows.get(userId) ?? null);
   }
@@ -118,6 +121,17 @@ describe("scoring and leaderboard", () => {
     await solve("ada", "protect-closed-won", 3);
     expect((await service.leaderboard("all"))[0]?.score).toBe(6);
     expect((await service.leaderboard("30d"))[0]?.score).toBe(3);
+  });
+
+  it("site stats: problems, learners and this week's first solves", async () => {
+    const { service, solve } = setup();
+    for (const u of ["ada", "bob"]) await service.ensureProfile(u);
+    await solve("ada", "text-utils", 1);
+    await solve("ada", "text-utils", 1); // repeat: one first solve
+    await solve("bob", "protect-closed-won", 20); // older than a week
+    const s = await service.stats();
+    expect(s).toMatchObject({ learners: 2, solvesThisWeek: 1, communityProblems: 0 });
+    expect(s.problems).toBeGreaterThan(20);
   });
 
   it("404s an unknown handle", async () => {

@@ -20,10 +20,16 @@ export interface ProfileRepository {
   create(p: Omit<ProfileRecord, "createdAt">): Promise<boolean>;
   /** Returns false if the new handle is taken. */
   update(userId: string, changes: { handle?: string; displayName?: string }): Promise<boolean>;
+  count(): Promise<number>;
 }
 
 export class PgProfileRepository implements ProfileRepository {
   constructor(private readonly db: PgDatabase) {}
+
+  async count(): Promise<number> {
+    const [row] = await this.db.select({ n: sql<number>`count(*)::int` }).from(userProfiles);
+    return row?.n ?? 0;
+  }
 
   async findByUser(userId: string): Promise<ProfileRecord | null> {
     const rows = await this.db.select().from(userProfiles).where(eq(userProfiles.userId, userId)).limit(1);
