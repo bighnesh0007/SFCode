@@ -65,3 +65,18 @@ export interface QuizResult {
 export const listRoadmaps = () => apiRequest<{ id: string; title: string; description: string; nodes: number }[]>("/api/v1/roadmaps");
 export const submitQuiz = (token: Token, id: string, nodeId: string, answers: number[]) =>
   apiRequest<QuizResult>(`/api/v1/roadmaps/${encodeURIComponent(id)}/quiz`, { method: "POST", token, body: { nodeId, answers } });
+
+export type PlacementTrack = "developer" | "admin";
+export interface PlacementQuestion {
+  id: string;
+  prompt: string;
+  options: string[];
+}
+export interface PlacementResult {
+  level: Level;
+  correct: number;
+  total: number;
+}
+export const getPlacement = (track: PlacementTrack) => apiRequest<PlacementQuestion[]>(`/api/v1/placement/${track}`);
+export const gradePlacement = (track: PlacementTrack, answers: Record<string, number>) =>
+  apiRequest<PlacementResult>(`/api/v1/placement/${track}`, { method: "POST", body: { answers } });
