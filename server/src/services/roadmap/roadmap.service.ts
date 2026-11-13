@@ -70,10 +70,16 @@ export class RoadmapService {
     return this.repo.get(userId);
   }
 
-  /** Admins, consultants and Admin-cert seekers get the Admin path; everyone else the Developer path. */
+  /**
+   * An explicit goal wins (LWC, Integration, Admin cert); then the role: admins and consultants
+   * get Admin, architects get Integration; everyone else the Developer path.
+   */
   private pickRoadmap(answers: OnboardingAnswers): string {
-    const wantsAdmin = answers.role === "admin" || answers.role === "consultant" || answers.goal === "admin-cert";
-    if (wantsAdmin && this.roadmaps.has("admin")) return "admin";
+    const pick = (id: string) => (this.roadmaps.has(id) ? id : null);
+    const byGoal = answers.goal === "lwc" ? pick("lwc") : answers.goal === "integration" ? pick("integration") : answers.goal === "admin-cert" ? pick("admin") : null;
+    if (byGoal) return byGoal;
+    if ((answers.role === "admin" || answers.role === "consultant") && pick("admin")) return "admin";
+    if (answers.role === "architect" && pick("integration")) return "integration";
     return this.roadmaps.has("developer") ? "developer" : ([...this.roadmaps.keys()][0] ?? "developer");
   }
 

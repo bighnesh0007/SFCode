@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, Briefcase, Code2, Compass, GraduationCap, Rocket, Settings2, Sparkles, Sprout, Trophy, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, Briefcase, Cable, Code2, Compass, GraduationCap, LayoutTemplate, Rocket, Settings2, Sparkles, Sprout, Trophy, Users } from "lucide-react";
 import { useAuthState, SignUpButton } from "@/components/auth";
 import { LogoMark } from "@/components/Logo";
 import { SKIP_KEY } from "@/components/OnboardingGate";
@@ -34,6 +34,8 @@ const GOALS: Option<Goal>[] = [
   { value: "first-job", title: "Land my first Salesforce job", hint: "Fundamentals plus projects", icon: Briefcase },
   { value: "level-up", title: "Level up at work", hint: "Practise what I use daily", icon: Rocket },
   { value: "interviews", title: "Prepare for interviews", hint: "Timed problems and drills", icon: Trophy },
+  { value: "lwc", title: "Build Lightning Web Components", hint: "Front-end path", icon: LayoutTemplate },
+  { value: "integration", title: "Connect Salesforce to other systems", hint: "Integration path", icon: Cable },
 ];
 const HOURS: { value: Hours; title: string }[] = [
   { value: "1-2", title: "1–2 h / week" },
@@ -75,12 +77,31 @@ const START: Record<Level, string> = {
   lead: "governor limits, async Apex and the PD II checkpoint",
 };
 
+const LWC_START: Record<Level, string> = {
+  new: "modern JavaScript, then your first component",
+  basics: "templates, events and styling. The JavaScript basics are marked as known",
+  production: "the lifecycle, Lightning Data Service and calling Apex. The basics are marked as known",
+  lead: "Jest tests, accessibility and security",
+};
+
+const INTEGRATION_START: Record<Level, string> = {
+  new: "API fundamentals, OAuth and connected apps",
+  basics: "the REST API and callouts. The fundamentals are marked as known",
+  production: "custom Apex APIs, bulk data and events. The basics are marked as known",
+  lead: "integration patterns and reliability",
+};
+
+const ROADMAP_NAME: Record<string, string> = { developer: "Developer", admin: "Admin", lwc: "Lightning Web Components", integration: "Integration" };
+
 const ADMIN_START: Record<Level, string> = {
   new: "orgs and Setup, then objects, fields and users",
   basics: "relationships, validation rules and security. The first steps are marked as known",
   production: "sharing, page design and Flows. The basics are marked as known",
   lead: "reports, data tools and the Admin cert checkpoint",
 };
+
+/** What the learner starts with on each roadmap, by level. */
+const START_BY_ROADMAP: Record<string, Record<Level, string>> = { developer: START, admin: ADMIN_START, lwc: LWC_START, integration: INTEGRATION_START };
 
 function Welcome() {
   const router = useRouter();
@@ -92,6 +113,7 @@ function Welcome() {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [roadmapId, setRoadmapId] = useState<string | null>(null);
 
   const pick = <K extends keyof Answers>(k: K, v: Answers[K], advance = true) => {
     setA((cur) => ({ ...cur, [k]: v }));
@@ -103,7 +125,8 @@ function Welcome() {
     setSaving(true);
     setError(null);
     try {
-      await saveOnboarding(await getToken(), a as Answers);
+      const saved = await saveOnboarding(await getToken(), a as Answers);
+      setRoadmapId(saved.roadmapId);
       setSaved(true);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not save. Try again.");
@@ -132,21 +155,18 @@ function Welcome() {
     );
   }
 
-  const adminPath = a.role === "admin" || a.role === "consultant" || a.goal === "admin-cert";
   if (saved && a.level) {
+    // The server decides the roadmap; describe the one it chose.
+    const start = (START_BY_ROADMAP[roadmapId ?? "developer"] ?? START)[a.level];
     return (
       <div className="relative mx-auto w-full max-w-2xl overflow-hidden px-4 py-12 text-center">
         <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-24 mx-auto h-64 w-64 rounded-full bg-sky-500/20 blur-3xl" />
         <Sparkles className="mx-auto h-10 w-10 animate-bounce text-sky-700 dark:text-sky-400" />
         <h1 className="mt-4 text-3xl font-semibold tracking-tight">Your roadmap is ready</h1>
         <p className="mt-3 text-muted-foreground">
-          You&apos;re a <b className="text-foreground">{ROLES.find((r) => r.value === a.role)?.title}</b> who&apos;s <b className="text-foreground">{LEVELS.find((l) => l.value === a.level)?.title.toLowerCase()}</b>. You&apos;ll start with {adminPath ? ADMIN_START[a.level] : START[a.level]}.
+          You&apos;re a <b className="text-foreground">{ROLES.find((r) => r.value === a.role)?.title}</b> who&apos;s <b className="text-foreground">{LEVELS.find((l) => l.value === a.level)?.title.toLowerCase()}</b>. You&apos;ll start the <b className="text-foreground">{ROADMAP_NAME[roadmapId ?? "developer"] ?? "Developer"}</b> roadmap with {start}.
         </p>
-        {(a.role === "student" || a.role === "architect") && a.goal !== "admin-cert" && (
-          <p className="mx-auto mt-3 max-w-md rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
-            A dedicated {a.role} roadmap is on the way. For now you&apos;re on the Developer path; you can switch to the Admin path on the roadmap page.
-          </p>
-        )}
+        <p className="mx-auto mt-3 max-w-md text-xs text-muted-foreground">There are four roadmaps (Developer, Admin, LWC and Integration); you can switch between them any time on the roadmap page.</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/roadmap"><Button size="lg">Open my roadmap <ArrowRight className="ml-1 h-4 w-4" /></Button></Link>
           <Link href="/problems"><Button size="lg" variant="outline">Browse problems</Button></Link>
