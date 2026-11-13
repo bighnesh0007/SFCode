@@ -1,0 +1,854 @@
+{
+  "exam": "app-builder",
+  "title": "Platform App Builder",
+  "order": 4,
+  "description": "Declarative apps: data modeling, formulas and validation, Flow, Lightning App Builder and deploying changes.",
+  "sections": [
+    {
+      "id": "fundamentals",
+      "title": "Salesforce Fundamentals"
+    },
+    {
+      "id": "data",
+      "title": "Data Modeling and Management"
+    },
+    {
+      "id": "logic",
+      "title": "Business Logic and Process Automation"
+    },
+    {
+      "id": "ui",
+      "title": "User Interface"
+    },
+    {
+      "id": "deployment",
+      "title": "App Deployment"
+    }
+  ],
+  "mock": {
+    "questions": 60,
+    "minutes": 105,
+    "passPercent": 63,
+    "weights": {
+      "fundamentals": 23,
+      "data": 22,
+      "logic": 28,
+      "ui": 17,
+      "deployment": 10
+    }
+  },
+  "questions": [
+    {
+      "id": "pab-declarative-first",
+      "section": "fundamentals",
+      "prompt": "A requirement can be met with a formula field or with Apex. What should an App Builder choose?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Apex, because it's more flexible"
+        },
+        {
+          "id": "b",
+          "text": "The formula field: declarative first"
+        },
+        {
+          "id": "c",
+          "text": "Both, for safety"
+        },
+        {
+          "id": "d",
+          "text": "Neither: use a report"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Prefer declarative tools when they meet the requirement: less to maintain, no tests or deployments of code."
+    },
+    {
+      "id": "pab-appexchange",
+      "section": "fundamentals",
+      "prompt": "The business needs e-signatures and there's a well-reviewed managed package for it. What should you consider first?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Building it from scratch in Apex"
+        },
+        {
+          "id": "b",
+          "text": "An AppExchange app"
+        },
+        {
+          "id": "c",
+          "text": "A Visualforce page"
+        },
+        {
+          "id": "d",
+          "text": "A custom object only"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Before building, check AppExchange: existing solutions are usually faster and maintained by the vendor."
+    },
+    {
+      "id": "pab-schema-builder",
+      "section": "fundamentals",
+      "prompt": "Which tool shows objects and their relationships as a diagram, and can create fields?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Schema Builder"
+        },
+        {
+          "id": "b",
+          "text": "Lightning App Builder"
+        },
+        {
+          "id": "c",
+          "text": "Report Builder"
+        },
+        {
+          "id": "d",
+          "text": "Process Automation settings"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Schema Builder visualises the data model and lets you add objects, fields and relationships."
+    },
+    {
+      "id": "pab-security-layers",
+      "section": "fundamentals",
+      "prompt": "Which controls whether a user can see a specific field anywhere, including reports and the API?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Page layout"
+        },
+        {
+          "id": "b",
+          "text": "Field-level security"
+        },
+        {
+          "id": "c",
+          "text": "Record type"
+        },
+        {
+          "id": "d",
+          "text": "Compact layout"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Field-level security applies everywhere; page layouts only affect what's shown on that layout."
+    },
+    {
+      "id": "pab-owd-private",
+      "section": "fundamentals",
+      "prompt": "Users should see only their own Cases, but managers should see their team's. What combination?",
+      "options": [
+        {
+          "id": "a",
+          "text": "OWD Public Read Only"
+        },
+        {
+          "id": "b",
+          "text": "OWD Private plus the role hierarchy"
+        },
+        {
+          "id": "c",
+          "text": "Sharing rules only"
+        },
+        {
+          "id": "d",
+          "text": "A validation rule"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Private OWD limits access to owners; the role hierarchy opens it up to managers above them."
+    },
+    {
+      "id": "pab-limits-objects",
+      "section": "fundamentals",
+      "prompt": "Why is it worth checking an edition's limits before designing an app?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Limits are the same everywhere"
+        },
+        {
+          "id": "b",
+          "text": "Editions limit things like custom objects, fields per object and automation"
+        },
+        {
+          "id": "c",
+          "text": "Limits only affect Apex"
+        },
+        {
+          "id": "d",
+          "text": "Limits only apply to sandboxes"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Editions and licences cap custom objects, fields and other features, which can shape the design."
+    },
+    {
+      "id": "pab-custom-app",
+      "section": "fundamentals",
+      "prompt": "Recruiters need their own navigation bar with Positions, Candidates and Reports. What do you create?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A Lightning app with those tabs"
+        },
+        {
+          "id": "b",
+          "text": "A new profile"
+        },
+        {
+          "id": "c",
+          "text": "A record type"
+        },
+        {
+          "id": "d",
+          "text": "A report folder"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Lightning apps group tabs, utility items and branding for a set of users."
+    },
+    {
+      "id": "pab-md-vs-lookup",
+      "section": "data",
+      "prompt": "Interview records must be deleted when their Position is deleted, and Position needs a count of interviews. Which relationship?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Lookup"
+        },
+        {
+          "id": "b",
+          "text": "Master-detail from Interview to Position"
+        },
+        {
+          "id": "c",
+          "text": "Hierarchical"
+        },
+        {
+          "id": "d",
+          "text": "External lookup"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Master-detail gives cascade delete and roll-up summary fields on the master."
+    },
+    {
+      "id": "pab-junction",
+      "section": "data",
+      "prompt": "Candidates can apply for many Positions and each Position has many Candidates. How do you model this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A lookup from Candidate to Position"
+        },
+        {
+          "id": "b",
+          "text": "A junction object (Job Application) with master-detail to both"
+        },
+        {
+          "id": "c",
+          "text": "A multi-select picklist"
+        },
+        {
+          "id": "d",
+          "text": "Two lookups on Position"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Many-to-many relationships use a junction object with two master-detail relationships."
+    },
+    {
+      "id": "pab-rollup-limit",
+      "section": "data",
+      "prompt": "Which can a roll-up summary field calculate on the master? Choose 2.",
+      "options": [
+        {
+          "id": "a",
+          "text": "COUNT of detail records"
+        },
+        {
+          "id": "b",
+          "text": "SUM of a number field on details"
+        },
+        {
+          "id": "c",
+          "text": "Average of a formula that references another object"
+        },
+        {
+          "id": "d",
+          "text": "Values from a lookup child"
+        }
+      ],
+      "answer": [
+        "a",
+        "b"
+      ],
+      "explanation": "Roll-ups support COUNT, SUM, MIN and MAX over master-detail children. Lookup children need Flow or Apex."
+    },
+    {
+      "id": "pab-field-type-change",
+      "section": "data",
+      "prompt": "What risk comes with changing a field's type, for example text to number?",
+      "options": [
+        {
+          "id": "a",
+          "text": "None"
+        },
+        {
+          "id": "b",
+          "text": "Existing data can be lost or truncated"
+        },
+        {
+          "id": "c",
+          "text": "It deletes the object"
+        },
+        {
+          "id": "d",
+          "text": "It changes the record Id"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Some conversions lose data. Check the data and dependencies (formulas, reports, code) first."
+    },
+    {
+      "id": "pab-external-id-import",
+      "section": "data",
+      "prompt": "An import must match Accounts by an ERP number rather than Salesforce Id. What should the ERP number field be?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A text field marked External ID (and unique)"
+        },
+        {
+          "id": "b",
+          "text": "A formula"
+        },
+        {
+          "id": "c",
+          "text": "A picklist"
+        },
+        {
+          "id": "d",
+          "text": "A rich text field"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "External ID fields can be used to upsert, matching existing records without Salesforce Ids."
+    },
+    {
+      "id": "pab-data-loader",
+      "section": "data",
+      "prompt": "You must update 80,000 records from a CSV. Which tool?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Data Import Wizard"
+        },
+        {
+          "id": "b",
+          "text": "Data Loader"
+        },
+        {
+          "id": "c",
+          "text": "Mass Update from a list view"
+        },
+        {
+          "id": "d",
+          "text": "Schema Builder"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The Import Wizard handles up to 50,000 records; Data Loader handles far more and supports update and delete."
+    },
+    {
+      "id": "pab-hierarchical",
+      "section": "data",
+      "prompt": "Which relationship type is available only on the User object, for example a user's manager?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Hierarchical"
+        },
+        {
+          "id": "b",
+          "text": "Master-detail"
+        },
+        {
+          "id": "c",
+          "text": "Indirect lookup"
+        },
+        {
+          "id": "d",
+          "text": "External lookup"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Hierarchical relationships link a user to another user."
+    },
+    {
+      "id": "pab-validation-regex",
+      "section": "logic",
+      "prompt": "A field must hold exactly five digits. What's the simplest rule?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A validation rule using `NOT(REGEX(Zip__c, \"\\\\d{5}\"))`"
+        },
+        {
+          "id": "b",
+          "text": "A before-save flow"
+        },
+        {
+          "id": "c",
+          "text": "Field-level security"
+        },
+        {
+          "id": "d",
+          "text": "A required field"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "A validation rule with REGEX checks the format and shows an error when it doesn't match."
+    },
+    {
+      "id": "pab-ischanged",
+      "section": "logic",
+      "prompt": "A validation rule should block changing the Amount once Stage is Closed Won. Which functions help? Choose 2.",
+      "options": [
+        {
+          "id": "a",
+          "text": "ISCHANGED(Amount)"
+        },
+        {
+          "id": "b",
+          "text": "ISPICKVAL(StageName, 'Closed Won')"
+        },
+        {
+          "id": "c",
+          "text": "TODAY()"
+        },
+        {
+          "id": "d",
+          "text": "HYPERLINK()"
+        }
+      ],
+      "answer": [
+        "a",
+        "b"
+      ],
+      "explanation": "AND(ISPICKVAL(StageName, 'Closed Won'), ISCHANGED(Amount)) blocks the change."
+    },
+    {
+      "id": "pab-priorvalue",
+      "section": "logic",
+      "prompt": "Which function returns a field's value before the current edit in a validation rule?",
+      "options": [
+        {
+          "id": "a",
+          "text": "PRIORVALUE()"
+        },
+        {
+          "id": "b",
+          "text": "ISNEW()"
+        },
+        {
+          "id": "c",
+          "text": "BLANKVALUE()"
+        },
+        {
+          "id": "d",
+          "text": "VLOOKUP()"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "PRIORVALUE returns the value before the change."
+    },
+    {
+      "id": "pab-cross-object-formula",
+      "section": "logic",
+      "prompt": "A Job Application needs to show its Position's Department without storing it. What do you use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A cross-object formula field"
+        },
+        {
+          "id": "b",
+          "text": "A roll-up summary"
+        },
+        {
+          "id": "c",
+          "text": "A lookup filter"
+        },
+        {
+          "id": "d",
+          "text": "A text field updated by hand"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Formulas can read parent fields through relationships, calculated when viewed."
+    },
+    {
+      "id": "pab-before-save-flow",
+      "section": "logic",
+      "prompt": "Set a field on the record being saved, as fast as possible, with no code. Which tool?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Before-save record-triggered flow"
+        },
+        {
+          "id": "b",
+          "text": "After-save flow"
+        },
+        {
+          "id": "c",
+          "text": "Approval process"
+        },
+        {
+          "id": "d",
+          "text": "Scheduled flow"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Before-save (Fast Field Updates) flows change the triggering record with no extra DML."
+    },
+    {
+      "id": "pab-approval",
+      "section": "logic",
+      "prompt": "Discounts over 15% must be approved by the rep's manager, and the record locked meanwhile. What do you build?",
+      "options": [
+        {
+          "id": "a",
+          "text": "An approval process"
+        },
+        {
+          "id": "b",
+          "text": "A validation rule"
+        },
+        {
+          "id": "c",
+          "text": "A screen flow"
+        },
+        {
+          "id": "d",
+          "text": "A sharing rule"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Approval processes route records for sign-off and lock them while pending."
+    },
+    {
+      "id": "pab-flow-scheduled-path",
+      "section": "logic",
+      "prompt": "Create a follow-up task 7 days after an Opportunity closes. What's best?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A scheduled path on a record-triggered flow"
+        },
+        {
+          "id": "b",
+          "text": "A validation rule"
+        },
+        {
+          "id": "c",
+          "text": "A daily report"
+        },
+        {
+          "id": "d",
+          "text": "A formula"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Scheduled paths run actions relative to a date or the trigger time."
+    },
+    {
+      "id": "pab-flow-loop-dml",
+      "section": "logic",
+      "prompt": "A flow updates each contact of an account inside a Loop. What's the better design?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Collect changes in a collection variable and update once after the loop"
+        },
+        {
+          "id": "b",
+          "text": "Keep the Update inside the loop"
+        },
+        {
+          "id": "c",
+          "text": "Use a Pause element"
+        },
+        {
+          "id": "d",
+          "text": "Use a subflow per contact"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "DML inside loops wastes limits; update the whole collection once."
+    },
+    {
+      "id": "pab-dynamic-forms",
+      "section": "ui",
+      "prompt": "Some fields should appear only when Status is Escalated, on the record page. What do you use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Dynamic Forms with field visibility rules"
+        },
+        {
+          "id": "b",
+          "text": "A new page layout"
+        },
+        {
+          "id": "c",
+          "text": "A record type"
+        },
+        {
+          "id": "d",
+          "text": "Field-level security"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Dynamic Forms place fields as components with their own visibility rules."
+    },
+    {
+      "id": "pab-quick-action",
+      "section": "ui",
+      "prompt": "Users want a button on Account that creates a Contact with Account pre-filled. What do you create?",
+      "options": [
+        {
+          "id": "a",
+          "text": "An object-specific Create a Record quick action on Account"
+        },
+        {
+          "id": "b",
+          "text": "A global action"
+        },
+        {
+          "id": "c",
+          "text": "A custom tab"
+        },
+        {
+          "id": "d",
+          "text": "A list view"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Object-specific create actions set the relationship to the parent automatically."
+    },
+    {
+      "id": "pab-compact-layout",
+      "section": "ui",
+      "prompt": "Which controls the key fields shown in a record's highlights panel and in the mobile app?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Page layout"
+        },
+        {
+          "id": "b",
+          "text": "Compact layout"
+        },
+        {
+          "id": "c",
+          "text": "Search layout"
+        },
+        {
+          "id": "d",
+          "text": "List view"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Compact layouts decide the fields in the highlights panel and mobile record headers."
+    },
+    {
+      "id": "pab-app-builder-page",
+      "section": "ui",
+      "prompt": "Sales and Support should see different Account record pages. How?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Assign Lightning record pages by app, record type and profile"
+        },
+        {
+          "id": "b",
+          "text": "Use one page for all"
+        },
+        {
+          "id": "c",
+          "text": "Create two Account objects"
+        },
+        {
+          "id": "d",
+          "text": "Use list views"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Lightning App Builder pages can be assigned per app, record type and profile."
+    },
+    {
+      "id": "pab-path",
+      "section": "ui",
+      "prompt": "Reps need guidance and key fields for each Opportunity stage at the top of the record. What do you configure?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Path"
+        },
+        {
+          "id": "b",
+          "text": "Kanban"
+        },
+        {
+          "id": "c",
+          "text": "A report"
+        },
+        {
+          "id": "d",
+          "text": "A flow"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Path shows stages with key fields and guidance for success."
+    },
+    {
+      "id": "pab-sandbox-choice",
+      "section": "deployment",
+      "prompt": "You need to test a change against a realistic subset of production data, refreshed weekly. Which sandbox?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Developer"
+        },
+        {
+          "id": "b",
+          "text": "Developer Pro"
+        },
+        {
+          "id": "c",
+          "text": "Partial Copy"
+        },
+        {
+          "id": "d",
+          "text": "Full"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Partial Copy includes sample data from a template and can refresh every 5 days."
+    },
+    {
+      "id": "pab-change-set",
+      "section": "deployment",
+      "prompt": "How do you move new fields and a flow from a sandbox to production without code tools?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Outbound change set from the sandbox, deployed as an inbound change set in production"
+        },
+        {
+          "id": "b",
+          "text": "Data Loader"
+        },
+        {
+          "id": "c",
+          "text": "Copy the fields by hand"
+        },
+        {
+          "id": "d",
+          "text": "A report"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Change sets move metadata between connected orgs."
+    },
+    {
+      "id": "pab-unmanaged-package",
+      "section": "deployment",
+      "prompt": "Which is true of unmanaged packages?",
+      "options": [
+        {
+          "id": "a",
+          "text": "They can be upgraded automatically"
+        },
+        {
+          "id": "b",
+          "text": "They're mainly for sharing templates; installed components are editable and can't be upgraded"
+        },
+        {
+          "id": "c",
+          "text": "They hide their code"
+        },
+        {
+          "id": "d",
+          "text": "They're only for AppExchange partners"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Unmanaged packages distribute editable components once; they don't support upgrades."
+    }
+  ]
+}
