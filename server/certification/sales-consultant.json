@@ -1,0 +1,1662 @@
+{
+  "exam": "sales-consultant",
+  "title": "Agentforce Sales Consultant",
+  "order": 6,
+  "description": "Formerly Sales Cloud Consultant. Sales processes from lead to close, consulting and rollout, territories and forecasting, security, sales data, and predictive and generative AI.",
+  "sections": [
+    {
+      "id": "lifecycle",
+      "title": "Sales Lifecycle"
+    },
+    {
+      "id": "consulting",
+      "title": "Consulting and Implementation Strategies"
+    },
+    {
+      "id": "practical",
+      "title": "Practical Application of Agentforce Sales Expertise"
+    },
+    {
+      "id": "data",
+      "title": "Data Management"
+    },
+    {
+      "id": "ai",
+      "title": "Predictive and Generative AI"
+    }
+  ],
+  "mock": {
+    "questions": 60,
+    "minutes": 105,
+    "passPercent": 73,
+    "weights": {
+      "lifecycle": 20,
+      "consulting": 25,
+      "practical": 24,
+      "data": 18,
+      "ai": 13
+    }
+  },
+  "questions": [
+    {
+      "id": "sc-forecast-category",
+      "section": "lifecycle",
+      "prompt": "A sales VP wants deals to roll into the Commit forecast automatically once they reach the Negotiation stage. What controls this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The forecast category mapped to each opportunity stage"
+        },
+        {
+          "id": "b",
+          "text": "The opportunity's probability, which moves deals into Commit once it passes 70%"
+        },
+        {
+          "id": "c",
+          "text": "A manager adjustment applied to each rep's forecast every week"
+        },
+        {
+          "id": "d",
+          "text": "A record-triggered flow that sets the forecast category when the stage changes to Negotiation"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Each opportunity stage maps to a forecast category (Pipeline, Best Case, Commit, Closed, Omitted). Moving to a stage moves the deal into that stage's category. Probability doesn't decide the category, and adjustments change totals rather than which deals count."
+    },
+    {
+      "id": "sc-forecast-types",
+      "section": "lifecycle",
+      "prompt": "A company sells subscriptions and wants a forecast by product family in addition to the usual revenue forecast. What should the consultant recommend?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Turn on a second forecast type based on opportunity product family"
+        },
+        {
+          "id": "b",
+          "text": "Clone each opportunity once per product family so each family forecasts separately"
+        },
+        {
+          "id": "c",
+          "text": "Build a summary report grouped by product family and share it as the forecast"
+        },
+        {
+          "id": "d",
+          "text": "Use Enterprise Territory Management with one territory per product family"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Collaborative Forecasts supports several forecast types at once, including ones based on opportunity product families (amount or quantity). Reports don't give forecast rollups and adjustments, and duplicating opportunities corrupts pipeline data."
+    },
+    {
+      "id": "sc-etm-model-states",
+      "section": "lifecycle",
+      "prompt": "During a territory realignment, the operations team wants to test a new territory structure without disturbing current account access. Which approach fits Enterprise Territory Management?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Edit the territories of the active model outside business hours to limit the impact"
+        },
+        {
+          "id": "b",
+          "text": "Build the new structure in a territory model in Planning state"
+        },
+        {
+          "id": "c",
+          "text": "Copy the new structure into the role hierarchy and test access with a few users"
+        },
+        {
+          "id": "d",
+          "text": "Activate a second territory model alongside the current one and compare the results"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A territory model in Planning state can be built and its assignment rules previewed without affecting access. Only one model can be active at a time, and editing the active model changes access immediately."
+    },
+    {
+      "id": "sc-etm-why",
+      "section": "lifecycle",
+      "prompt": "Which requirement points to Enterprise Territory Management rather than relying on the role hierarchy alone?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Every user in the org needs read access to every account for collaboration"
+        },
+        {
+          "id": "b",
+          "text": "Accounts must be shared with sellers by region and industry, independent of reporting lines"
+        },
+        {
+          "id": "c",
+          "text": "Opportunities must be visible only to their owner and system administrators"
+        },
+        {
+          "id": "d",
+          "text": "Managers need to see and edit the opportunities owned by the reps who report to them"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Territories grant access based on account characteristics such as geography or industry, separately from who reports to whom. Managers seeing their reports' records is exactly what the role hierarchy already does."
+    },
+    {
+      "id": "sc-lead-to-cash",
+      "section": "lifecycle",
+      "prompt": "A start-up asks for 'the standard Salesforce way' to move a prospect from first contact to a closed deal. Which sequence should the consultant describe?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Lead → convert to account, contact and opportunity → quote → closed won"
+        },
+        {
+          "id": "b",
+          "text": "Opportunity → lead → quote → account → closed won, creating the account last"
+        },
+        {
+          "id": "c",
+          "text": "Contact → case → opportunity → order → closed won, tracked on the contact record"
+        },
+        {
+          "id": "d",
+          "text": "Campaign → account → contract → lead → closed won, with the contract driving revenue"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Leads hold unqualified prospects. Converting a qualified lead creates the account, contact and (optionally) an opportunity, which then moves through stages, gets quotes, and closes."
+    },
+    {
+      "id": "sc-big-deal",
+      "section": "lifecycle",
+      "prompt": "Leadership wants an email whenever an opportunity over $1M reaches 70% probability. What is the simplest standard feature?",
+      "options": [
+        {
+          "id": "a",
+          "text": "An approval process that notifies leadership when a rep submits the deal"
+        },
+        {
+          "id": "b",
+          "text": "Big Deal Alert"
+        },
+        {
+          "id": "c",
+          "text": "A Chatter stream that follows every opportunity above the threshold"
+        },
+        {
+          "id": "d",
+          "text": "An escalation rule on Opportunity with the amount and probability as criteria"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Big Deal Alerts send an email when an opportunity meets an amount and probability threshold, with no automation to build. Escalation rules are for cases; approvals require a submission."
+    },
+    {
+      "id": "sc-kpi-dashboard",
+      "section": "lifecycle",
+      "prompt": "The CRO wants to track win rate and average sales cycle length each quarter. What is the most direct way to provide this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Export closed opportunities weekly and calculate both figures in a spreadsheet"
+        },
+        {
+          "id": "b",
+          "text": "Opportunity reports with summary formulas, shown on a dashboard"
+        },
+        {
+          "id": "c",
+          "text": "A custom object that each manager updates with the numbers every Friday"
+        },
+        {
+          "id": "d",
+          "text": "A list view of closed opportunities sorted by close date"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Win rate (won ÷ closed) and cycle length come straight from opportunity data, so summary formulas and dashboard components give a live view. Manual exports and data entry go stale and add work."
+    },
+    {
+      "id": "sc-trend-history",
+      "section": "lifecycle",
+      "prompt": "Managers need to compare how the pipeline in each stage changed week over week. Which feature fits best?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Field history tracking on the Stage field of every opportunity"
+        },
+        {
+          "id": "b",
+          "text": "A dashboard with a close date filter that managers change each week"
+        },
+        {
+          "id": "c",
+          "text": "Historical trend reporting on opportunities"
+        },
+        {
+          "id": "d",
+          "text": "A matrix report of opportunities grouped by owner and stage"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Historical trend reporting captures values at points in time so you can compare pipeline across dates. Field history tracking shows changes per record but isn't designed for pipeline-wide comparisons."
+    },
+    {
+      "id": "sc-sales-engagement",
+      "section": "lifecycle",
+      "prompt": "An inside sales team works hundreds of leads a day and needs a prescribed sequence of calls and emails for each one. Which product addresses this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Sales Engagement cadences"
+        },
+        {
+          "id": "b",
+          "text": "Opportunity splits that assign each step to a different rep"
+        },
+        {
+          "id": "c",
+          "text": "A campaign hierarchy with one child campaign per call and email"
+        },
+        {
+          "id": "d",
+          "text": "Collaborative Forecasts with a forecast category per prospecting step"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Sales Engagement (formerly High Velocity Sales) provides cadences: ordered steps of calls, emails and tasks with a work queue for reps. The other features don't sequence prospecting work."
+    },
+    {
+      "id": "sc-path",
+      "section": "lifecycle",
+      "prompt": "Reps keep skipping the discovery questions that should be asked in the Qualification stage. What standard feature guides them at each stage?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Path with key fields and guidance for success"
+        },
+        {
+          "id": "b",
+          "text": "A validation rule on every field that must be filled during qualification"
+        },
+        {
+          "id": "c",
+          "text": "A dashboard listing deals that skipped the qualification questions"
+        },
+        {
+          "id": "d",
+          "text": "A separate page layout for each stage, switched by a flow"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Path shows the stages across the record page and, per stage, the key fields to complete and coaching text. Validation rules block saves but don't guide; page layouts can't change by stage."
+    },
+    {
+      "id": "sc-campaign-influence",
+      "section": "lifecycle",
+      "prompt": "Marketing wants credit for opportunities that several campaigns helped create, not just the primary campaign. What should be configured?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Customizable Campaign Influence with an attribution model"
+        },
+        {
+          "id": "b",
+          "text": "A campaign hierarchy five levels deep with the deal on the top campaign"
+        },
+        {
+          "id": "c",
+          "text": "Campaign member statuses that mark which campaigns touched the deal"
+        },
+        {
+          "id": "d",
+          "text": "A second lookup from Opportunity to Campaign for the secondary campaign"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Customizable Campaign Influence relates multiple campaigns to an opportunity and assigns revenue credit through models such as first touch, last touch or even distribution. A single primary campaign field can't represent multi-touch attribution."
+    },
+    {
+      "id": "sc-campaign-hierarchy",
+      "section": "lifecycle",
+      "prompt": "Marketing runs a yearly programme with quarterly sub-campaigns and wants totals rolled up to the programme. What should they use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Opportunity contact roles that link each quarter's contacts to the programme"
+        },
+        {
+          "id": "b",
+          "text": "A separate campaign record type for each quarter, reported together"
+        },
+        {
+          "id": "c",
+          "text": "Campaign hierarchy, with sub-campaigns under a parent"
+        },
+        {
+          "id": "d",
+          "text": "A roll-up summary field on Account that totals each campaign's results"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Parent campaigns roll up statistics such as leads, contacts and opportunity values from their children. Roll-up summary fields need a master-detail relationship, which campaigns don't have with each other."
+    },
+    {
+      "id": "sc-discovery",
+      "section": "consulting",
+      "prompt": "At the start of an engagement the stakeholders disagree about which problems matter most. What should the consultant do first?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Run discovery workshops to document current processes and pain points"
+        },
+        {
+          "id": "b",
+          "text": "Build a working prototype of the most requested feature to settle the debate"
+        },
+        {
+          "id": "c",
+          "text": "Turn on every Sales feature so users can show which ones they need"
+        },
+        {
+          "id": "d",
+          "text": "Ask the IT team to write the requirements on the business's behalf"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Discovery establishes the current state, the pain points and who owns them, which is what prioritisation needs. Building before agreeing on the problem risks solving the wrong one."
+    },
+    {
+      "id": "sc-moscow",
+      "section": "consulting",
+      "prompt": "The backlog has 80 requirements and budget for about half. Which technique helps stakeholders agree on scope?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Deliver the cheapest requirements first to show quick progress"
+        },
+        {
+          "id": "b",
+          "text": "Let each department choose its own top five requirements"
+        },
+        {
+          "id": "c",
+          "text": "MoSCoW prioritisation (must, should, could, won't)"
+        },
+        {
+          "id": "d",
+          "text": "Build the requirements in the order the stakeholders raised them"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "MoSCoW forces an explicit decision about what's essential for this release and what's deferred. Order raised or cost alone ignores business value."
+    },
+    {
+      "id": "sc-success-metrics",
+      "section": "consulting",
+      "prompt": "Before go-live, the sponsor asks how the project's success will be judged. What should be agreed?",
+      "options": [
+        {
+          "id": "a",
+          "text": "That users stop raising complaints within the first month"
+        },
+        {
+          "id": "b",
+          "text": "Whether the project finished on time and under budget"
+        },
+        {
+          "id": "c",
+          "text": "The number of custom fields, flows and reports delivered by go-live"
+        },
+        {
+          "id": "d",
+          "text": "Measurable KPIs with a baseline, such as win rate and time to log an activity"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Success should be tied to business outcomes measured against a baseline taken before go-live. Output counts and anecdotes don't show whether the solution helped the business."
+    },
+    {
+      "id": "sc-low-adoption",
+      "section": "consulting",
+      "prompt": "Three months after go-live, many reps still track deals in spreadsheets. What is the best first step?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Find out why: review login and usage data and interview reps"
+        },
+        {
+          "id": "b",
+          "text": "Make every opportunity field required so reps have to enter their data"
+        },
+        {
+          "id": "c",
+          "text": "Block spreadsheet tools company-wide so reps have no alternative"
+        },
+        {
+          "id": "d",
+          "text": "Give managers more dashboards so they can chase reps for updates"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Low adoption has a cause, often extra clicks, missing fields or no visible benefit to the rep. Usage data plus conversations reveal it. Forcing compliance without fixing the cause usually produces bad data."
+    },
+    {
+      "id": "sc-change-mgmt",
+      "section": "consulting",
+      "prompt": "Which activity belongs to change management rather than configuration?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Writing validation rules that keep close dates in the future"
+        },
+        {
+          "id": "b",
+          "text": "Setting up sharing rules for the regional sales teams"
+        },
+        {
+          "id": "c",
+          "text": "Identifying sales champions and planning role-based training"
+        },
+        {
+          "id": "d",
+          "text": "Creating opportunity record types for each sales team"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Change management prepares people: communication, training, champions and reinforcement. The other options are configuration tasks."
+    },
+    {
+      "id": "sc-sandbox-uat",
+      "section": "consulting",
+      "prompt": "The client wants user acceptance testing on realistic data volumes, including a full copy of production records. Which sandbox is appropriate?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Developer Pro sandbox, which has more storage"
+        },
+        {
+          "id": "b",
+          "text": "A scratch org created from the source code"
+        },
+        {
+          "id": "c",
+          "text": "Developer sandbox, refreshed daily"
+        },
+        {
+          "id": "d",
+          "text": "Full sandbox"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "A Full sandbox copies all production data and metadata, which suits UAT and performance testing. Partial Copy takes a sample; Developer and Developer Pro copy metadata only."
+    },
+    {
+      "id": "sc-partial-copy",
+      "section": "consulting",
+      "prompt": "Testers need some real accounts and opportunities in a sandbox they can refresh every few days. Which sandbox fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Developer sandbox seeded with a data import"
+        },
+        {
+          "id": "b",
+          "text": "A trial org loaded with sample data"
+        },
+        {
+          "id": "c",
+          "text": "Partial Copy sandbox with a sandbox template"
+        },
+        {
+          "id": "d",
+          "text": "Full sandbox, refreshed as often as testers need"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Partial Copy sandboxes include a sample of data chosen by a template and can be refreshed every 5 days. Full sandboxes have a 29-day refresh interval; Developer sandboxes hold no production data."
+    },
+    {
+      "id": "sc-phased-rollout",
+      "section": "consulting",
+      "prompt": "A global company with sales teams in 12 countries wants to reduce go-live risk. What deployment approach should the consultant recommend?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A pilot with one region, then phased rollout using lessons learned"
+        },
+        {
+          "id": "b",
+          "text": "Switch every country over on the same day to keep the processes aligned"
+        },
+        {
+          "id": "c",
+          "text": "Delay go-live until every country agrees on every single process"
+        },
+        {
+          "id": "d",
+          "text": "Give each country its own org so local teams can configure it freely"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "A pilot exposes problems with a limited audience, and later phases benefit from the fixes. A big-bang launch concentrates risk; separate orgs fragment data and reporting."
+    },
+    {
+      "id": "sc-sow",
+      "section": "consulting",
+      "prompt": "Mid-project, the client asks for a CPQ integration that wasn't in the Statement of Work. What should the consultant do?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Refuse outright, since anything outside the SOW can't be discussed"
+        },
+        {
+          "id": "b",
+          "text": "Assess the impact and raise a change request for scope, cost and timeline"
+        },
+        {
+          "id": "c",
+          "text": "Quietly drop another feature to make room in the same budget"
+        },
+        {
+          "id": "d",
+          "text": "Build it without telling anyone to keep the relationship positive"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Scope changes go through change control so the sponsor can decide with the impact visible. Absorbing it silently or trading features without agreement erodes trust and budgets."
+    },
+    {
+      "id": "sc-training-roles",
+      "section": "consulting",
+      "prompt": "Sales managers and reps will use different features after go-live. How should training be planned?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Role-based sessions built around each group's daily tasks"
+        },
+        {
+          "id": "b",
+          "text": "A link to the Salesforce Help documentation for self-study"
+        },
+        {
+          "id": "c",
+          "text": "Train the managers only and let them pass it on to their reps"
+        },
+        {
+          "id": "d",
+          "text": "One long session covering every feature for both groups together"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Role-based training focuses each audience on what they'll actually do, which improves retention and adoption. Generic training covers too much that isn't relevant."
+    },
+    {
+      "id": "sc-declarative-first",
+      "section": "consulting",
+      "prompt": "A requirement can be met with a record-triggered flow or with an Apex trigger. Both work. What should guide the recommendation?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Prefer the declarative option the client's admins can maintain"
+        },
+        {
+          "id": "b",
+          "text": "Choose whichever tool the consultant personally knows best"
+        },
+        {
+          "id": "c",
+          "text": "Choose Apex, because code always runs faster than a flow"
+        },
+        {
+          "id": "d",
+          "text": "Choose Apex so admins can't change the logic by accident"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "When declarative tools meet the requirement, they're usually cheaper to maintain for an admin team. Code is justified by complexity, volume or performance needs, not by habit."
+    },
+    {
+      "id": "sc-appexchange",
+      "section": "consulting",
+      "prompt": "The client needs e-signatures on quotes. When is an AppExchange product the better choice than building it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "When a proven app meets the need and building would recreate it"
+        },
+        {
+          "id": "b",
+          "text": "Only when the AppExchange app is free of charge"
+        },
+        {
+          "id": "c",
+          "text": "Only when the app hasn't been through a security review"
+        },
+        {
+          "id": "d",
+          "text": "Never, because a custom build is always cheaper over time"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Buying makes sense when a mature product already covers the requirement, especially for specialist features like e-signature. Evaluate cost, security and fit, but don't rebuild solved problems."
+    },
+    {
+      "id": "sc-continuous-improvement",
+      "section": "consulting",
+      "prompt": "After go-live, business requirements keep changing every quarter. What should the consultant set up?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Create a new org for each new set of requirements"
+        },
+        {
+          "id": "b",
+          "text": "A full code and configuration freeze until next financial year"
+        },
+        {
+          "id": "c",
+          "text": "Let any admin change production directly when someone asks"
+        },
+        {
+          "id": "d",
+          "text": "A governance process with a prioritised backlog and regular releases"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "A governance board, backlog and release cadence let the org evolve without chaos. Unmanaged production changes create risk; freezes stop the business adapting."
+    },
+    {
+      "id": "sc-requirements-doc",
+      "section": "consulting",
+      "prompt": "Which is the best way to record a requirement from a discovery workshop?",
+      "options": [
+        {
+          "id": "a",
+          "text": "As a list of the fields and objects to create"
+        },
+        {
+          "id": "b",
+          "text": "As a verbal agreement confirmed with the sponsor"
+        },
+        {
+          "id": "c",
+          "text": "As a user story with acceptance criteria"
+        },
+        {
+          "id": "d",
+          "text": "As a screenshot of the old system's screen"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "A user story states who needs what and why, and acceptance criteria make it testable. A field list jumps to a solution before the need is understood."
+    },
+    {
+      "id": "sc-mobile-first",
+      "section": "consulting",
+      "prompt": "Field sellers spend most of the day visiting customers and rarely open a laptop. What should the design account for?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Printing reports of each customer before every visit"
+        },
+        {
+          "id": "b",
+          "text": "A desktop Sales Console with many workspace tabs for each visit"
+        },
+        {
+          "id": "c",
+          "text": "The Salesforce mobile app, with compact layouts and mobile-friendly actions"
+        },
+        {
+          "id": "d",
+          "text": "A separate org with a simplified setup for field sellers"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Designing for the mobile app (compact layouts, quick actions, offline where needed) meets sellers where they work. A console is built for desk-based agents."
+    },
+    {
+      "id": "sc-lead-convert-mapping",
+      "section": "practical",
+      "prompt": "A custom lead field 'Budget Confirmed' must carry over to the opportunity when the lead is converted. What should be configured?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Map the lead field to an opportunity field in Lead Field Mapping"
+        },
+        {
+          "id": "b",
+          "text": "Nothing, because custom lead fields carry over to the opportunity automatically"
+        },
+        {
+          "id": "c",
+          "text": "A scheduled flow that copies the value from the lead a day after conversion"
+        },
+        {
+          "id": "d",
+          "text": "A formula field on Opportunity that reads the value from the converted lead"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Custom lead fields carry over only if they're mapped to account, contact or opportunity fields in the lead field mapping. After conversion the lead is read-only, so a formula can't reference it."
+    },
+    {
+      "id": "sc-pricebook-standard",
+      "section": "practical",
+      "prompt": "An admin can't add a new product to the 'Partner Prices' price book. What is the likely cause?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Custom price books are limited to 100 products"
+        },
+        {
+          "id": "b",
+          "text": "The product's Product Family field is blank"
+        },
+        {
+          "id": "c",
+          "text": "The product has no standard price in the standard price book"
+        },
+        {
+          "id": "d",
+          "text": "The opportunity using the price book is already closed"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "A product must have an active standard price before it can be added to a custom price book. That's a frequent cause of this exact problem."
+    },
+    {
+      "id": "sc-quote-sync",
+      "section": "practical",
+      "prompt": "A rep creates three quotes for one opportunity and wants the opportunity's products to match the version the customer accepts. What should they do?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Add 'Primary' to the accepted quote's name"
+        },
+        {
+          "id": "b",
+          "text": "Start sync on the accepted quote"
+        },
+        {
+          "id": "c",
+          "text": "Delete the two quotes the customer didn't accept"
+        },
+        {
+          "id": "d",
+          "text": "Copy the accepted line items onto the opportunity by hand"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Only one quote can sync with its opportunity at a time. Syncing keeps the opportunity's products and the quote's line items in step."
+    },
+    {
+      "id": "sc-multicurrency-dated",
+      "section": "practical",
+      "prompt": "The finance team wants closed opportunities to use the exchange rate in effect on each close date. What is required?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A nightly flow that recalculates every amount"
+        },
+        {
+          "id": "b",
+          "text": "One price book per currency, updated each month"
+        },
+        {
+          "id": "c",
+          "text": "Advanced Currency Management with dated exchange rates"
+        },
+        {
+          "id": "d",
+          "text": "A currency picklist on every opportunity set by finance"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Advanced Currency Management applies dated exchange rates to opportunities and related records by close date. Standard multi-currency uses a single conversion rate per currency."
+    },
+    {
+      "id": "sc-opp-splits",
+      "section": "practical",
+      "prompt": "Two reps share credit on deals: 70% and 30% of the amount. A sales engineer also gets non-revenue credit. What should be enabled?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Opportunity Splits: a revenue split type plus an overlay split type"
+        },
+        {
+          "id": "b",
+          "text": "Create two opportunities, one per rep, at 70% and 30% of the amount"
+        },
+        {
+          "id": "c",
+          "text": "Account Teams with a percentage stored on each team member"
+        },
+        {
+          "id": "d",
+          "text": "A formula field that divides the amount between the two owners"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Revenue splits must total 100% and are used for quota; overlay splits can total any percentage for supporting roles. Splits require Opportunity Teams."
+    },
+    {
+      "id": "sc-account-teams",
+      "section": "practical",
+      "prompt": "Each key account has an account manager, a solutions engineer and a support lead who all need edit access to that account. Which feature fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A Public Read/Write org-wide default for Account"
+        },
+        {
+          "id": "b",
+          "text": "Account Teams with team roles and access levels"
+        },
+        {
+          "id": "c",
+          "text": "A public group per account added to a sharing rule"
+        },
+        {
+          "id": "d",
+          "text": "A separate sharing rule for each key account"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Account Teams grant named users specific access to individual accounts with defined roles. Opening the OWD gives everyone access, and per-account rules or groups don't scale."
+    },
+    {
+      "id": "sc-owd-private",
+      "section": "practical",
+      "prompt": "Reps must not see each other's opportunities, but managers must see their teams'. What is the right base configuration?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Public Read Only OWD for opportunities, with a validation rule blocking edits"
+        },
+        {
+          "id": "b",
+          "text": "Public Read/Write OWD for opportunities, with page layouts hiding the amount"
+        },
+        {
+          "id": "c",
+          "text": "Private OWD for opportunities, with the role hierarchy granting access upward"
+        },
+        {
+          "id": "d",
+          "text": "Private OWD for opportunities, with a sharing rule to all internal users"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Private OWD restricts records to owners, and the role hierarchy automatically grants managers access to their subordinates' records. Page layouts don't restrict record access."
+    },
+    {
+      "id": "sc-psg",
+      "section": "practical",
+      "prompt": "Sales ops wants to give 'Deal Desk' users a bundle of five permission sets and maintain it in one place. What should they use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A Deal Desk role in the role hierarchy"
+        },
+        {
+          "id": "b",
+          "text": "A new profile for each Deal Desk user"
+        },
+        {
+          "id": "c",
+          "text": "A permission set group"
+        },
+        {
+          "id": "d",
+          "text": "A public group with the five permission sets"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Permission set groups bundle permission sets so they're assigned and maintained together. Roles and public groups control record sharing, not permissions."
+    },
+    {
+      "id": "sc-contact-multiple-accounts",
+      "section": "practical",
+      "prompt": "A consultant works with several of your client companies and must appear on each of their accounts. What should be enabled?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Duplicate contacts, one on each account"
+        },
+        {
+          "id": "b",
+          "text": "Contacts to Multiple Accounts"
+        },
+        {
+          "id": "c",
+          "text": "Person Accounts for each consultant"
+        },
+        {
+          "id": "d",
+          "text": "An account hierarchy linking the accounts"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Contacts to Multiple Accounts adds indirect account relationships, so one contact can relate to several accounts without duplication."
+    },
+    {
+      "id": "sc-person-accounts",
+      "section": "practical",
+      "prompt": "A company selling to both consumers and businesses is considering Person Accounts. What must the consultant point out before enabling them?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Enabling them removes the Contact object from the org"
+        },
+        {
+          "id": "b",
+          "text": "They only work with Enterprise Territory Management"
+        },
+        {
+          "id": "c",
+          "text": "Once enabled, Person Accounts can't be disabled"
+        },
+        {
+          "id": "d",
+          "text": "Person Accounts can't be related to opportunities"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Enabling Person Accounts is permanent, so it needs a deliberate decision. Person Accounts can have opportunities, and the Contact object remains for business accounts."
+    },
+    {
+      "id": "sc-product-schedules",
+      "section": "practical",
+      "prompt": "A product is billed monthly over 12 months and the forecast must show revenue by month. What should be used?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Twelve separate opportunities, one per month"
+        },
+        {
+          "id": "b",
+          "text": "A close date spanning the full 12 months"
+        },
+        {
+          "id": "c",
+          "text": "Revenue schedules on the product"
+        },
+        {
+          "id": "d",
+          "text": "Quote line discounts spread across the year"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Product schedules (quantity, revenue or both) spread an opportunity product across dates. Separate opportunities would distort pipeline and win rate."
+    },
+    {
+      "id": "sc-web-to-lead",
+      "section": "practical",
+      "prompt": "Website enquiries must become leads and be assigned to the right regional queue. Which combination works without code?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Web-to-Lead with lead assignment rules"
+        },
+        {
+          "id": "b",
+          "text": "Email-to-Case with escalation rules by country"
+        },
+        {
+          "id": "c",
+          "text": "An hourly Data Loader job that imports the form data"
+        },
+        {
+          "id": "d",
+          "text": "Manual entry by the front desk from the website inbox"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Web-to-Lead creates leads from a web form, and assignment rules route them by criteria such as country. Email-to-Case creates cases, not leads."
+    },
+    {
+      "id": "sc-contact-roles",
+      "section": "practical",
+      "prompt": "Sales leaders want to report on who the decision maker and economic buyer were on each won deal. What should reps maintain?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A text field on the opportunity listing the names"
+        },
+        {
+          "id": "b",
+          "text": "Case contact roles on the customer's cases"
+        },
+        {
+          "id": "c",
+          "text": "Opportunity contact roles"
+        },
+        {
+          "id": "d",
+          "text": "Account Teams with a decision-maker role"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Opportunity contact roles link contacts to a deal with a role and are reportable. A text field can't be reported on reliably."
+    },
+    {
+      "id": "sc-slack-sales",
+      "section": "practical",
+      "prompt": "A team wants alerts in a Slack channel when large deals change stage, with the deal shown in the message. What should the consultant recommend?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Chatter posts copied into Slack once a day by an admin"
+        },
+        {
+          "id": "b",
+          "text": "A dashboard subscription emailed to the channel each morning"
+        },
+        {
+          "id": "c",
+          "text": "Reps forwarding the Salesforce alert emails into Slack by hand"
+        },
+        {
+          "id": "d",
+          "text": "Salesforce for Slack, with a flow that posts the alert"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "The Salesforce for Slack integration (Sales Cloud for Slack) lets flows send messages to channels and shows record previews. Manual or delayed copying defeats the purpose."
+    },
+    {
+      "id": "sc-dupe-rules",
+      "section": "data",
+      "prompt": "Reps keep creating duplicate accounts. What prevents this at the point of entry?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A weekly report of possible duplicates for reps to merge"
+        },
+        {
+          "id": "b",
+          "text": "A matching rule plus a duplicate rule that blocks or alerts"
+        },
+        {
+          "id": "c",
+          "text": "A unique formula field built from the account name"
+        },
+        {
+          "id": "d",
+          "text": "A validation rule that checks Account Name against existing accounts"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Matching rules define what counts as a duplicate (fuzzy matching on name, address and so on), and duplicate rules decide whether to alert or block. Validation rules can't compare against other records."
+    },
+    {
+      "id": "sc-import-wizard",
+      "section": "data",
+      "prompt": "An admin needs to import 20,000 leads once, with duplicate checking against existing leads. Which tool fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Data Loader from the command line"
+        },
+        {
+          "id": "b",
+          "text": "Data Import Wizard"
+        },
+        {
+          "id": "c",
+          "text": "Salesforce Connect with an external object"
+        },
+        {
+          "id": "d",
+          "text": "A change set from a sandbox"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The Data Import Wizard handles up to 50,000 records for common objects, including leads, with duplicate matching. Data Loader is for larger volumes or objects the wizard doesn't support."
+    },
+    {
+      "id": "sc-data-loader",
+      "section": "data",
+      "prompt": "Two million historical opportunities must be migrated. What should be used?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Data Loader (Bulk API)"
+        },
+        {
+          "id": "b",
+          "text": "A report with inline editing enabled"
+        },
+        {
+          "id": "c",
+          "text": "Manual entry spread across the sales team"
+        },
+        {
+          "id": "d",
+          "text": "Data Import Wizard in several batches"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Data Loader supports up to millions of records and can use the Bulk API. The Data Import Wizard is limited to 50,000 records per import."
+    },
+    {
+      "id": "sc-external-id",
+      "section": "data",
+      "prompt": "During migration, opportunities must link to accounts that were loaded earlier, using the legacy system's account number. What makes this easiest?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Creating a new account for each opportunity as it loads"
+        },
+        {
+          "id": "b",
+          "text": "Loading accounts and opportunities together in a single file"
+        },
+        {
+          "id": "c",
+          "text": "An External ID field on Account, used in an upsert"
+        },
+        {
+          "id": "d",
+          "text": "Looking up each account's Salesforce ID in a spreadsheet first"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "An External ID field lets you upsert and relate records using the legacy key, so you don't need to map Salesforce IDs by hand."
+    },
+    {
+      "id": "sc-migration-order",
+      "section": "data",
+      "prompt": "In what order should these be migrated?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Contacts, then opportunities, then users, then accounts"
+        },
+        {
+          "id": "b",
+          "text": "Users, accounts, contacts, opportunities, then opportunity products"
+        },
+        {
+          "id": "c",
+          "text": "Any order, because lookups can be repaired after the load"
+        },
+        {
+          "id": "d",
+          "text": "Opportunity products, then opportunities, then accounts, then users"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Parent records must exist before children reference them: owners (users), then accounts, then contacts and opportunities, then line items."
+    },
+    {
+      "id": "sc-data-skew",
+      "section": "data",
+      "prompt": "An integration links 300,000 contacts to a single 'Unknown' account, and record saves now fail with locking errors. What is the cause?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The Contact org-wide default is set to Private"
+        },
+        {
+          "id": "b",
+          "text": "Account data skew: too many child records under one parent"
+        },
+        {
+          "id": "c",
+          "text": "The integration user's profile is missing a permission"
+        },
+        {
+          "id": "d",
+          "text": "The org has too many contact record types"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Data skew (more than about 10,000 children on one parent) causes lock contention and slow sharing recalculation. Spread the records across several accounts or redesign the placeholder."
+    },
+    {
+      "id": "sc-data-quality",
+      "section": "data",
+      "prompt": "Which practice best keeps sales data accurate over time?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Validation rules, duplicate rules and a data steward who reviews quality reports"
+        },
+        {
+          "id": "b",
+          "text": "A large data cleanup project once a year"
+        },
+        {
+          "id": "c",
+          "text": "Making every field optional so reps aren't blocked"
+        },
+        {
+          "id": "d",
+          "text": "Deleting any record older than one year"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Prevention at entry plus ongoing ownership keeps data clean. One-off cleanups decay, and deleting history loses data you may need."
+    },
+    {
+      "id": "sc-archiving",
+      "section": "data",
+      "prompt": "Reports are slowing down because of ten years of closed opportunities. Users still need older deals occasionally. What should be considered?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Archive old records to Big Objects or an external store with access when needed"
+        },
+        {
+          "id": "b",
+          "text": "Delete every closed opportunity older than two years"
+        },
+        {
+          "id": "c",
+          "text": "Split the historical data across several orgs"
+        },
+        {
+          "id": "d",
+          "text": "Add more filters to every report to reduce rows"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Archiving moves rarely used data out of the main objects while keeping it available. Deleting removes information the business may still need."
+    },
+    {
+      "id": "sc-eac-reporting",
+      "section": "data",
+      "prompt": "After enabling Einstein Activity Capture, managers complain that synced emails don't appear in their standard activity reports. Why?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Einstein Activity Capture only syncs calendar events, not email"
+        },
+        {
+          "id": "b",
+          "text": "Synced emails take 30 days to appear in reports"
+        },
+        {
+          "id": "c",
+          "text": "Activities captured by EAC aren't stored as Salesforce activity records"
+        },
+        {
+          "id": "d",
+          "text": "The reps' profiles hide the Task and Event objects"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Einstein Activity Capture stores captured emails and events outside the standard Task/Event records, so standard activity reports don't include them. Activity Metrics and EAC dashboards cover them instead."
+    },
+    {
+      "id": "sc-integration-pattern",
+      "section": "data",
+      "prompt": "The ERP must receive each won opportunity's order details within a minute of the deal closing. What pattern fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A nightly batch export of the day's won opportunities"
+        },
+        {
+          "id": "b",
+          "text": "A rep emails the order details to the ERP team"
+        },
+        {
+          "id": "c",
+          "text": "A CSV of won deals uploaded to the ERP every week"
+        },
+        {
+          "id": "d",
+          "text": "Event-driven: publish a platform event or change event that the ERP integration subscribes to"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Near-real-time requirements suit event-driven integration (platform events or Change Data Capture). Nightly batches can't meet a one-minute requirement."
+    },
+    {
+      "id": "sc-scalability",
+      "section": "data",
+      "prompt": "A design adds a record-triggered flow that queries all opportunities on an account each time one is saved. What scalability risk should the consultant raise?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Governor limits and slow saves on accounts with many opportunities"
+        },
+        {
+          "id": "b",
+          "text": "The flow will create duplicate accounts on every save"
+        },
+        {
+          "id": "c",
+          "text": "Flows stop running on records older than 30 days"
+        },
+        {
+          "id": "d",
+          "text": "Record-triggered flows can't read related opportunities"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Logic that scales with the number of related records can hit governor limits or slow saves on large accounts. Consider aggregates, scheduled processing or roll-up approaches."
+    },
+    {
+      "id": "sc-lead-scoring",
+      "section": "ai",
+      "prompt": "Reps want to focus on the leads most likely to convert, based on the org's own conversion history. Which feature fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Einstein Lead Scoring"
+        },
+        {
+          "id": "b",
+          "text": "Campaign member status updated when a lead responds"
+        },
+        {
+          "id": "c",
+          "text": "Lead assignment rules that send hot leads to senior reps"
+        },
+        {
+          "id": "d",
+          "text": "A formula field that adds points for each completed field"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Einstein Lead Scoring is a predictive model trained on the org's past conversions and shows the factors behind each score. Assignment rules route leads; a formula only reflects rules someone wrote."
+    },
+    {
+      "id": "sc-opp-scoring",
+      "section": "ai",
+      "prompt": "Managers want a score showing each opportunity's likelihood of closing, with the main reasons. What is this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Einstein Opportunity Scoring (predictive AI)"
+        },
+        {
+          "id": "b",
+          "text": "The forecast category set by the opportunity stage"
+        },
+        {
+          "id": "c",
+          "text": "The probability value fixed for each stage"
+        },
+        {
+          "id": "d",
+          "text": "A generative AI email that describes the deal's chances"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Opportunity Scoring predicts the likelihood of winning from historical data and shows the factors. Stage probability is a fixed value per stage."
+    },
+    {
+      "id": "sc-gen-vs-pred",
+      "section": "ai",
+      "prompt": "Which is an example of generative AI rather than predictive AI in Agentforce Sales?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Scoring each lead by how likely it is to convert"
+        },
+        {
+          "id": "b",
+          "text": "Predicting next quarter's forecast from the pipeline"
+        },
+        {
+          "id": "c",
+          "text": "Drafting a follow-up email from the opportunity and recent activity"
+        },
+        {
+          "id": "d",
+          "text": "Flagging opportunities that are likely to slip"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Generative AI creates new content such as emails or call summaries. Scoring, predictions and risk flags are predictive models."
+    },
+    {
+      "id": "sc-call-summary",
+      "section": "ai",
+      "prompt": "Reps spend too long writing notes after calls. What generative capability helps most?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Opportunity Scoring after each recorded call"
+        },
+        {
+          "id": "b",
+          "text": "Forecast adjustments based on call outcomes"
+        },
+        {
+          "id": "c",
+          "text": "AI-generated call summaries with next steps from the recording"
+        },
+        {
+          "id": "d",
+          "text": "Duplicate rules that merge notes from each call"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Call summaries and next-step suggestions (from Einstein Conversation Insights recordings) remove manual note-taking. The others don't produce text."
+    },
+    {
+      "id": "sc-trusted-ai",
+      "section": "ai",
+      "prompt": "Which is one of Salesforce's guidelines for trusted generative AI?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Volume: generate as much content as users can use"
+        },
+        {
+          "id": "b",
+          "text": "Honesty: respect data provenance and be transparent when content is AI-generated"
+        },
+        {
+          "id": "c",
+          "text": "Autonomy: let the AI act without any human review"
+        },
+        {
+          "id": "d",
+          "text": "Speed: return every response as quickly as possible"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Salesforce's guidelines for trusted generative AI are accuracy, safety, honesty, empowerment and sustainability. Honesty covers consent for data and transparency that content is AI-generated."
+    },
+    {
+      "id": "sc-human-review",
+      "section": "ai",
+      "prompt": "A rep wants AI-drafted emails sent automatically to every prospect without being read. Which concern applies?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A human should review AI-generated content before it reaches customers"
+        },
+        {
+          "id": "b",
+          "text": "Emails can only be generated for leads, not contacts"
+        },
+        {
+          "id": "c",
+          "text": "Generative AI in Salesforce can't produce email content"
+        },
+        {
+          "id": "d",
+          "text": "The emails are added to the LLM provider's training data"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Keeping a human in the loop for customer-facing content is part of the empowerment and accuracy guidelines. Through the Trust Layer's zero-data-retention agreements, prompts aren't kept by the model provider."
+    },
+    {
+      "id": "sc-bias",
+      "section": "ai",
+      "prompt": "A lead-scoring model gives lower scores to leads from one region because historical reps ignored that region. What is the risk?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The model will stop scoring leads from that region"
+        },
+        {
+          "id": "b",
+          "text": "Scores for that region will turn into generated text"
+        },
+        {
+          "id": "c",
+          "text": "The region field will be removed from the lead object"
+        },
+        {
+          "id": "d",
+          "text": "The model repeats historical bias in its predictions"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Predictive models learn from history, including past neglect. Review the factors driving scores and consider excluding fields that encode unfair bias."
+    },
+    {
+      "id": "sc-ai-data",
+      "section": "ai",
+      "prompt": "Why does the quality of sales data matter for Einstein predictions?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Predictions are based only on each record's name"
+        },
+        {
+          "id": "b",
+          "text": "Einstein fixes incomplete data automatically before training"
+        },
+        {
+          "id": "c",
+          "text": "Models are trained on the org's records, so incomplete or wrong data gives poor predictions"
+        },
+        {
+          "id": "d",
+          "text": "It doesn't matter, because Einstein uses only public data"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Predictive features learn from the org's own history. Missing close reasons, stale stages and duplicates all degrade predictions."
+    }
+  ]
+}
