@@ -31,7 +31,7 @@ class MemoryStore implements StoreRepository {
 }
 
 const problem = (slug: string, extra: Partial<Challenge>): Challenge =>
-  ({ slug, title: slug, track: "apex", difficulty: "Easy", category: "x", order: 1, tags: [], statement: "", files: [], starter: {}, reference: {}, testClass: { name: "T", source: "" }, ...extra }) as Challenge;
+  ({ slug, title: slug, track: "apex", difficulty: "Easy", category: "x", order: 1, tags: [], statement: "", files: [], starter: {}, reference: {}, testClass: { name: "T", source: "" }, ...extra });
 
 function setup(coinsEarned: number) {
   const problems = new Map([
