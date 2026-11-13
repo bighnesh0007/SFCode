@@ -27,6 +27,7 @@ import { validatedBody, validatedParams, validatedQuery } from "../middleware/va
 import { z } from "zod";
 import { pointsMatrixSchema } from "../services/points/points.service.ts";
 import { problemContentSchema } from "../services/problems/problemDraft.service.ts";
+import { MENTOR_TOPICS } from "../services/hub/hub.service.ts";
 import { listQuery, slugParams, submissionParams, submitBody } from "../validation/challenge.schema.ts";
 
 function disabled(what: string): RequestHandler {
@@ -315,6 +316,52 @@ export function mountRoutes(app: Application, container: Container): void {
       await admin?.require(req.auth?.userId ?? "", "admin");
       ok(res, { result: await digest.sendTest(req.auth?.userId ?? "") });
     }) as RequestHandler);
+  }
+
+  // Teams, mentors and jobs.
+  if (container.hub && verifier) {
+    const hub = container.hub;
+    const auth = requireAuth(verifier);
+    const me = (req: { auth?: { userId: string } }) => req.auth?.userId ?? "";
+    const slugP = z.strictObject({ slug: z.string().regex(/^[a-z0-9-]{1,60}$/) });
+    const slugOf = (req: Parameters<RequestHandler>[0]) => validatedParams<z.infer<typeof slugP>>(req).slug;
+    const nameB = z.strictObject({ name: z.string().max(60) });
+    const codeB = z.strictObject({ code: z.string().min(4).max(16) });
+    const handleB = z.strictObject({ handle: z.string().min(1).max(40) });
+    v1.get("/teams", auth, (async (req, res) => ok(res, await hub.myTeams(me(req)))) as RequestHandler);
+    v1.post("/teams", auth, limiter(10), validate({ body: nameB }), (async (req, res) => ok(res, await hub.createTeam(me(req), validatedBody<z.infer<typeof nameB>>(req).name))) as RequestHandler);
+    v1.post("/teams/join", auth, limiter(20), validate({ body: codeB }), (async (req, res) => ok(res, await hub.join(me(req), validatedBody<z.infer<typeof codeB>>(req).code))) as RequestHandler);
+    v1.get("/teams/:slug", auth, validate({ params: slugP }), (async (req, res) => ok(res, await hub.team(me(req), slugOf(req)))) as RequestHandler);
+    v1.post("/teams/:slug/code", auth, limiter(10), validate({ params: slugP }), (async (req, res) => ok(res, await hub.rotateCode(me(req), slugOf(req)))) as RequestHandler);
+    v1.post("/teams/:slug/leave", auth, limiter(10), validate({ params: slugP }), (async (req, res) => {
+      await hub.leave(me(req), slugOf(req));
+      ok(res, { ok: true });
+    }) as RequestHandler);
+    v1.post("/teams/:slug/remove", auth, limiter(30), validate({ params: slugP, body: handleB }), (async (req, res) => ok(res, await hub.removeMember(me(req), slugOf(req), validatedBody<z.infer<typeof handleB>>(req).handle))) as RequestHandler);
+
+    const mentorB = z.strictObject({ topics: z.array(z.enum(MENTOR_TOPICS)).max(MENTOR_TOPICS.length), note: z.string().max(280), active: z.boolean() });
+    const askB = z.strictObject({ handle: z.string().min(1).max(40), message: z.string().max(500) });
+    v1.get("/mentors", (async (_req, res) => ok(res, await hub.mentors())) as RequestHandler);
+    v1.get("/mentors/me", auth, (async (req, res) => ok(res, await hub.myMentor(me(req)))) as RequestHandler);
+    v1.put("/mentors/me", auth, limiter(20), validate({ body: mentorB }), (async (req, res) => ok(res, await hub.setMentor(me(req), validatedBody<z.infer<typeof mentorB>>(req)))) as RequestHandler);
+    v1.post("/mentors/ask", auth, limiter(5), validate({ body: askB }), (async (req, res) => {
+      const b = validatedBody<z.infer<typeof askB>>(req);
+      await hub.ask(me(req), b.handle, b.message);
+      ok(res, { ok: true });
+    }) as RequestHandler);
+
+    const jobB = z.strictObject({
+      title: z.string().min(3).max(100),
+      company: z.string().min(2).max(80),
+      location: z.string().min(2).max(80),
+      url: z.url({ protocol: /^https$/ }).max(300),
+      tags: z.array(z.string().min(1).max(24)).max(6),
+      days: z.number().int().min(1).max(90),
+    });
+    const idP = z.strictObject({ id: z.uuid() });
+    v1.get("/jobs", (async (_req, res) => ok(res, await hub.jobs())) as RequestHandler);
+    v1.post("/jobs", auth, limiter(20), validate({ body: jobB }), (async (req, res) => ok(res, await hub.postJob(me(req), validatedBody<z.infer<typeof jobB>>(req)))) as RequestHandler);
+    v1.delete("/jobs/:id", auth, limiter(20), validate({ params: idP }), (async (req, res) => ok(res, await hub.removeJob(me(req), validatedParams<z.infer<typeof idP>>(req).id))) as RequestHandler);
   }
 
   // Daily Challenge: public; signed-in viewers also get their own status.

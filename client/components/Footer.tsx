@@ -4,7 +4,7 @@ import { LogoMark } from "@/components/Logo";
 const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
   { title: "Practice", links: [{ href: "/problems", label: "Problems" }, { href: "/playground/apex", label: "Apex playground" }, { href: "/contests", label: "Contests" }, { href: "/certification", label: "Certification prep" }] },
   { title: "Learn", links: [{ href: "/roadmap", label: "Roadmaps" }, { href: "/welcome", label: "Find your path" }, { href: "/blog", label: "Blog" }] },
-  { title: "Community", links: [{ href: "/leaderboard", label: "Leaderboard" }, { href: "/contribute", label: "Contribute" }, { href: "/store", label: "Store" }] },
+  { title: "Community", links: [{ href: "/leaderboard", label: "Leaderboard" }, { href: "/teams", label: "Teams" }, { href: "/mentors", label: "Mentors" }, { href: "/jobs", label: "Job corner" }, { href: "/contribute", label: "Contribute" }, { href: "/store", label: "Store" }] },
   {
     title: "Project",
     links: [

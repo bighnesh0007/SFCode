@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 
 function describe(n: NotificationItem): { text: string; href: string } {
   if (n.kind === "follow") return { text: `${n.data.displayName ?? n.data.handle} followed you`, href: `/u/${n.data.handle ?? ""}` };
+  if (n.kind === "mentor") return { text: `${n.data.displayName ?? n.data.handle} asked for help: "${n.data.message ?? ""}"`, href: `/u/${n.data.handle ?? ""}` };
+  if (n.kind === "team") return { text: `@${n.data.handle} joined ${n.data.team}`, href: `/teams/${n.data.slug ?? ""}` };
   if (n.kind === "buddy") return { text: n.data.approved === "yes" ? "You're a Buddy now! Start writing problems." : `Your Buddy application wasn't accepted${n.data.note ? `: ${n.data.note}` : "."}`, href: "/contribute" };
   const title = n.data.title ?? "your problem";
   if (n.data.action === "approved") return { text: `"${title}" was approved and is live 🎉`, href: n.data.slug && n.data.track ? `${trackInfo(n.data.track as Track).base}/${n.data.slug}` : "/contribute" };

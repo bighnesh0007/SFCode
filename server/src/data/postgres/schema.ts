@@ -352,7 +352,7 @@ export const follows = pgTable(
   (t) => [primaryKey({ columns: [t.followerId, t.followeeId] }), index("follows_followee_idx").on(t.followeeId)],
 );
 
-export type NotificationKind = "follow" | "review" | "buddy";
+export type NotificationKind = "follow" | "review" | "buddy" | "mentor" | "team";
 
 /** In-app notifications (the bell). `data` holds what the UI needs to render and link. */
 export const notifications = pgTable(
@@ -391,3 +391,45 @@ export const emailLog = pgTable(
   },
   (t) => [uniqueIndex("email_log_once_idx").on(t.userId, t.kind, t.period), index("email_log_sent_idx").on(t.sentAt)],
 );
+
+/** Teams / cohorts with a private leaderboard; joined with a shareable code. */
+export const teams = pgTable("teams", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: text("slug").notNull().unique(),
+  name: text("name").notNull(),
+  joinCode: text("join_code").notNull().unique(),
+  ownerId: text("owner_id").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const teamMembers = pgTable(
+  "team_members",
+  {
+    teamId: uuid("team_id").notNull().references(() => teams.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull(),
+    joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.teamId, t.userId] }), index("team_members_user_idx").on(t.userId)],
+);
+
+/** Learners (Ranger and up) who offer to help, with the topics they're good at. */
+export const mentors = pgTable("mentors", {
+  userId: text("user_id").primaryKey(),
+  topics: jsonb("topics").$type<string[]>().notNull(),
+  note: text("note").notNull().default(""),
+  active: boolean("active").notNull().default(true),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Job corner: roles posted by admins. */
+export const jobs = pgTable("jobs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  company: text("company").notNull(),
+  location: text("location").notNull(),
+  url: text("url").notNull(),
+  tags: jsonb("tags").$type<string[]>().notNull(),
+  postedBy: text("posted_by").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+});
