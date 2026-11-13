@@ -24,7 +24,7 @@
     "service:logs": "journalctl --user -u sfcode -f"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0"
+    "concurrently": "^10.0.7"
   },
   "engines": {
     "node": ">=22"
