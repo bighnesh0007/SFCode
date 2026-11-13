@@ -1,0 +1,17 @@
+{
+  "title": "Dependent Picklists",
+  "track": "lwc",
+  "difficulty": "Medium",
+  "category": "Lists & Getters",
+  "order": 413,
+  "tags": [
+    "select",
+    "getters",
+    "CustomEvent",
+    "disabled"
+  ],
+  "files": [],
+  "lwc": {
+    "component": "locationPicker"
+  }
+}

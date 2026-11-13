@@ -1,0 +1,5 @@
+[
+  "Use an @api getter and setter: the setter stores a copy, (value || []).map((i) => ({ ...i })), so changes never touch the parent's data.",
+  "A getter builds the rows with a subtotal string from (price * quantity).toFixed(2); another getter adds up the total.",
+  "In the handlers, find the item by data-id, build a new array (map or filter), assign it, then dispatch the change event with items.map(({ id, quantity }) => ({ id, quantity }))."
+]

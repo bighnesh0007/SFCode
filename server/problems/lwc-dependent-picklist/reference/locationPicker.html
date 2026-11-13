@@ -1,0 +1,14 @@
+<template>
+    <select class="country" onchange={handleCountry}>
+        <option value="">Choose a country</option>
+        <template for:each={countries} for:item="c">
+            <option key={c.name} value={c.name}>{c.name}</option>
+        </template>
+    </select>
+    <select class="city" disabled={noCountry} value={city} onchange={handleCity}>
+        <option value="">Choose a city</option>
+        <template for:each={cities} for:item="name">
+            <option key={name} value={name}>{name}</option>
+        </template>
+    </select>
+</template>

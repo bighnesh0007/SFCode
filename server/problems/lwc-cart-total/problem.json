@@ -1,0 +1,17 @@
+{
+  "title": "Cart With Totals",
+  "track": "lwc",
+  "difficulty": "Medium",
+  "category": "Lists & Events",
+  "order": 411,
+  "tags": [
+    "@api setter",
+    "getters",
+    "CustomEvent",
+    "immutability"
+  ],
+  "files": [],
+  "lwc": {
+    "component": "cartSummary"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Accessible Accordion",
+  "track": "lwc",
+  "difficulty": "Medium",
+  "category": "Accessibility",
+  "order": 410,
+  "tags": [
+    "aria-expanded",
+    "for:each",
+    "@api",
+    "state"
+  ],
+  "files": [],
+  "lwc": {
+    "component": "faqAccordion"
+  }
+}
