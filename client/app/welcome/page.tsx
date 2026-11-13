@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
 import { saveOnboarding, type Answers, type Goal, type Hours, type Level, type Role } from "@/lib/roadmapApi";
 import { cn } from "@/lib/utils";
+import { PlacementCheck } from "@/components/PlacementCheck";
 
 type Option<T> = { value: T; title: string; hint: string; icon: typeof Code2 };
 
@@ -90,6 +91,7 @@ function Welcome() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [checking, setChecking] = useState(false);
 
   const pick = <K extends keyof Answers>(k: K, v: Answers[K], advance = true) => {
     setA((cur) => ({ ...cur, [k]: v }));
@@ -155,7 +157,27 @@ function Welcome() {
 
   const steps = [
     { title: "What describes you best?", body: <Choice options={ROLES} value={a.role} onPick={(v) => pick("role", v)} /> },
-    { title: "How much Salesforce do you know?", body: <Choice options={LEVELS} value={a.level} onPick={(v) => pick("level", v)} /> },
+    {
+      title: checking ? "Quick check" : "How much Salesforce do you know?",
+      body: checking ? (
+        <PlacementCheck
+          track={a.role === "admin" || a.role === "consultant" ? "admin" : "developer"}
+          levelTitle={(l) => LEVELS.find((x) => x.value === l)?.title ?? l}
+          onDone={(l) => {
+            setChecking(false);
+            pick("level", l);
+          }}
+          onCancel={() => setChecking(false)}
+        />
+      ) : (
+        <div className="space-y-3">
+          <Choice options={LEVELS} value={a.level} onPick={(v) => pick("level", v)} />
+          <button type="button" onClick={() => setChecking(true)} className="text-sm font-medium text-sky-700 hover:underline dark:text-sky-400">
+            Not sure? Take a 2-minute check →
+          </button>
+        </div>
+      ),
+    },
     {
       title: "What are you aiming for?",
       body: (

@@ -25,6 +25,7 @@ import { adminUsersQuery, announcementBody, roleBody, suspendBody, userIdParams 
 import { aboutBody, applicationParams, buddyApplyBody, decideBody, handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
 import { validatedBody, validatedParams, validatedQuery } from "../middleware/validate.ts";
 import { z } from "zod";
+import { placementLevel, placementQuestions } from "../domain/placement.ts";
 import { pointsMatrixSchema } from "../services/points/points.service.ts";
 import { problemContentSchema } from "../services/problems/problemDraft.service.ts";
 import { MENTOR_TOPICS } from "../services/hub/hub.service.ts";
@@ -188,6 +189,16 @@ export function mountRoutes(app: Application, container: Container): void {
       v1.get("/admin/analytics", limiter(60), auth, (async (req, res) => ok(res, await t.analytics(req.auth?.userId ?? ""))) as RequestHandler);
     }
   }
+
+  // Onboarding placement check: static questions, graded here so answers never reach the browser.
+  const trackParams = z.strictObject({ track: z.enum(["developer", "admin"]) });
+  const placementBody = z.strictObject({ answers: z.record(z.string().regex(/^[a-z]\d{1,2}$/), z.number().int().min(0).max(9)).refine((a) => Object.keys(a).length <= 20) });
+  v1.get("/placement/:track", limiter(60), validate({ params: trackParams }), ((req, res) => {
+    ok(res, placementQuestions(validatedParams<z.infer<typeof trackParams>>(req).track));
+  }) as RequestHandler);
+  v1.post("/placement/:track", limiter(30), validate({ params: trackParams, body: placementBody }), ((req, res) => {
+    ok(res, placementLevel(validatedParams<z.infer<typeof trackParams>>(req).track, validatedBody<z.infer<typeof placementBody>>(req).answers));
+  }) as RequestHandler);
 
   // The site-wide banner: public, cached briefly by the browser.
   if (container.admin) {
