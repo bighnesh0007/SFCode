@@ -3,7 +3,7 @@ import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 import { hasCapability } from "../config/index.ts";
 import type { Container } from "../container.ts";
 import { salesforceController } from "../controllers/salesforce.controller.ts";
-import { NotConfiguredError, RateLimitError } from "../errors/AppError.ts";
+import { NotConfiguredError, NotFoundError, RateLimitError } from "../errors/AppError.ts";
 import { optionalAuth, requireAuth } from "../middleware/auth.ts";
 import { notFound } from "../middleware/notFound.ts";
 import { v1Cors } from "../middleware/security.ts";
@@ -25,6 +25,10 @@ import { adminUsersQuery, announcementBody, roleBody, suspendBody, userIdParams 
 import { aboutBody, applicationParams, buddyApplyBody, decideBody, handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
 import { validatedBody, validatedParams, validatedQuery } from "../middleware/validate.ts";
 import { z } from "zod";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { DIAGRAM_DIR } from "../domain/roadmap.ts";
+import { ROADMAPS_DIR } from "../container.ts";
 import { placementLevel, placementQuestions } from "../domain/placement.ts";
 import { pointsMatrixSchema } from "../services/points/points.service.ts";
 import { problemContentSchema } from "../services/problems/problemDraft.service.ts";
@@ -274,6 +278,25 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.get("/onboarding", signedIn, r.onboarding);
     v1.put("/onboarding", signedIn, limiter(20), validate({ body: onboardingBody }), r.saveOnboarding);
     v1.get("/roadmaps", r.list);
+    // Roadmap diagrams: our own SVGs, read once at startup and looked up by name (never a path).
+    const diagrams = new Map(
+      (existsSync(join(ROADMAPS_DIR, DIAGRAM_DIR)) ? readdirSync(join(ROADMAPS_DIR, DIAGRAM_DIR)) : [])
+        .filter((f) => f.endsWith(".svg"))
+        .map((f) => [f.slice(0, -4), readFileSync(join(ROADMAPS_DIR, DIAGRAM_DIR, f), "utf8")] as const),
+    );
+    const diagramParams = z.strictObject({ name: z.string().regex(/^[a-z0-9-]+\.svg$/) });
+    v1.get("/roadmaps/diagrams/:name", limiter(300), validate({ params: diagramParams }), ((req, res) => {
+      const svg = diagrams.get(validatedParams<z.infer<typeof diagramParams>>(req).name.slice(0, -4));
+      if (!svg) throw new NotFoundError("No such diagram.");
+      res.set({
+        "Content-Type": "image/svg+xml; charset=utf-8",
+        // Shown as <img>, but also safe if opened directly: no scripts, no outside loads.
+        "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+        "X-Content-Type-Options": "nosniff",
+        "Cache-Control": "public, max-age=3600",
+      });
+      res.send(svg);
+    }) as RequestHandler);
     v1.get("/roadmaps/:id", identify, validate({ params: roadmapParams }), r.view);
     v1.post("/roadmaps/:id/quiz", signedIn, limiter(60), validate({ params: roadmapParams, body: roadmapQuizBody }), r.quiz);
     v1.post("/roadmaps/:id/read", signedIn, limiter(60), validate({ params: roadmapParams, body: roadmapReadBody }), r.read);

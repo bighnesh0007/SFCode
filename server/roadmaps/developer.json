@@ -4,73 +4,308 @@
   "description": "From the data model to PD II: SOQL, Flows, Apex, triggers, limits, async and LWC, practised on real problems graded in your org.",
   "nodes": [
     {
-      "id": "data-model", "title": "Data model", "level": 1, "col": 1, "requires": [],
+      "id": "data-model",
+      "title": "Data model",
+      "level": 1,
+      "col": 1,
+      "requires": [],
       "summary": "Objects, fields, relationships and how records connect.",
       "lesson": "Everything in Salesforce is a **record** of an **object** (Account, Contact, Opportunity, or your own `Thing__c`). Objects have **fields**; custom ones end in `__c`.\n\nRelationships link objects:\n\n- **Lookup**: a loose link (a Contact *looks up* to an Account). Deleting the parent doesn't delete the child.\n- **Master-detail**: a tight link. The child inherits sharing and is deleted with the parent; the parent can have **roll-up summary** fields.\n\nYou'll query these relationships in SOQL next: child-to-parent with dots (`Account.Name`), parent-to-child with subqueries (`(SELECT Id FROM Contacts)`).",
-      "problems": [], "cert": { "exam": "pd1", "section": "fundamentals" }
+      "problems": [],
+      "cert": {
+        "exam": "pd1",
+        "section": "fundamentals"
+      }
     },
     {
-      "id": "soql-basics", "title": "SOQL basics", "level": 1, "col": 0, "requires": ["data-model"],
+      "id": "soql-basics",
+      "title": "SOQL basics",
+      "level": 1,
+      "col": 0,
+      "requires": [
+        "data-model"
+      ],
       "summary": "SELECT, WHERE, ORDER BY and parent fields.",
-      "problems": ["soql-hot-tech-accounts", "soql-contacts-in-city"]
+      "problems": [
+        "soql-hot-tech-accounts",
+        "soql-contacts-in-city"
+      ]
     },
     {
-      "id": "flow-basics", "title": "Before-save Flows", "level": 1, "col": 2, "requires": ["data-model"],
+      "id": "flow-basics",
+      "title": "Before-save Flows",
+      "level": 1,
+      "col": 2,
+      "requires": [
+        "data-model"
+      ],
       "summary": "Automate field updates without code.",
-      "problems": ["flow-account-default-rating", "flow-won-next-step"]
+      "problems": [
+        "flow-account-default-rating",
+        "flow-won-next-step"
+      ]
     },
     {
-      "id": "apex-basics", "title": "Apex basics", "level": 2, "col": 0, "requires": ["soql-basics"],
+      "id": "apex-basics",
+      "title": "Apex basics",
+      "level": 2,
+      "col": 0,
+      "requires": [
+        "soql-basics"
+      ],
       "summary": "Classes, methods, collections and null safety.",
-      "problems": ["text-utils", "contacts-by-account", "debug-null-discount", "debug-off-by-one-buckets"], "cert": { "exam": "pd1", "section": "logic" }
+      "problems": [
+        "text-utils",
+        "contacts-by-account",
+        "debug-null-discount",
+        "debug-off-by-one-buckets"
+      ],
+      "cert": {
+        "exam": "pd1",
+        "section": "logic"
+      }
     },
     {
-      "id": "soql-advanced", "title": "Aggregates & subqueries", "level": 2, "col": 1, "requires": ["soql-basics"],
+      "id": "soql-advanced",
+      "title": "Aggregates & subqueries",
+      "level": 2,
+      "col": 1,
+      "requires": [
+        "soql-basics"
+      ],
       "summary": "GROUP BY, semi-joins and anti-joins.",
-      "problems": ["soql-pipeline-by-stage", "soql-busy-accounts", "soql-accounts-without-contacts", "soql-accounts-with-won-deals"]
+      "problems": [
+        "soql-pipeline-by-stage",
+        "soql-busy-accounts",
+        "soql-accounts-without-contacts",
+        "soql-accounts-with-won-deals"
+      ]
     },
     {
-      "id": "flow-advanced", "title": "Decisions, loops & after-save", "level": 2, "col": 2, "requires": ["flow-basics"],
+      "id": "flow-advanced",
+      "title": "Decisions, loops & after-save",
+      "level": 2,
+      "col": 2,
+      "requires": [
+        "flow-basics"
+      ],
       "summary": "Branching, collections and autolaunched flows.",
-      "problems": ["flow-key-account-task", "flow-shipping-cost", "flow-revenue-tier", "flow-won-total-loop"]
+      "problems": [
+        "flow-key-account-task",
+        "flow-shipping-cost",
+        "flow-revenue-tier",
+        "flow-won-total-loop"
+      ]
     },
     {
-      "id": "triggers", "title": "Triggers", "level": 3, "col": 0, "requires": ["apex-basics"],
+      "id": "triggers",
+      "title": "Triggers",
+      "level": 3,
+      "col": 0,
+      "requires": [
+        "apex-basics"
+      ],
       "summary": "Before/after context, bulk-safe patterns, recursion.",
-      "problems": ["account-rating-default", "protect-closed-won", "won-revenue-rollup", "debug-recursive-trigger"]
+      "problems": [
+        "account-rating-default",
+        "protect-closed-won",
+        "won-revenue-rollup",
+        "debug-recursive-trigger"
+      ],
+      "lesson": "A **trigger** is Apex that runs when records are inserted, updated, deleted or undeleted. It receives the records in **context variables**: `Trigger.new` (the new versions), `Trigger.old` (the previous ones, on update and delete), and the `Trigger.newMap` / `Trigger.oldMap` versions keyed by Id.\n\n**Before** triggers run before the record is saved: change fields on `Trigger.new` directly and Salesforce saves them, with no DML. **After** triggers run once the record has an Id: use them to create or update *other* records.\n\nTriggers fire for up to **200 records at a time**, so every trigger must be **bulk-safe**: no queries or DML inside loops. Collect what you need into sets and maps, query once, then loop.\n\nWhere triggers sit among everything else that happens on save is called the **order of execution**:",
+      "diagram": "order-of-execution",
+      "diagramCaption": "Order of execution, simplified: before-save flows, before triggers, validation and duplicate rules, the save, after triggers, assignment rules, after-save flows, roll-ups, then commit and post-commit work.",
+      "concepts": [
+        "The difference between `Trigger.new`, `Trigger.old`, `Trigger.newMap` and `Trigger.oldMap`, and when each is null",
+        "Same-record field changes go in **before** triggers; changes to other records go in **after** triggers",
+        "Bulkification: one query and one DML statement per trigger run, whatever the batch size",
+        "One trigger per object, delegating to a handler class",
+        "How to stop recursion when an after trigger updates records that fire it again"
+      ],
+      "pitfalls": [
+        "Running `update` on `Trigger.new` in a before trigger: it fails. Assign the fields and let the save do it.",
+        "A SOQL query inside the loop: fine for one record in testing, a `LimitException` at 101 records.",
+        "Using `Trigger.old` in an insert trigger: it's null there.",
+        "Several triggers on one object: their order isn't guaranteed, so behaviour changes between deploys."
+      ],
+      "resources": [
+        {
+          "title": "Triggers and Order of Execution",
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_triggers_order_of_execution.htm",
+          "kind": "docs"
+        },
+        {
+          "title": "Trigger context variables",
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_triggers_context_variables.htm",
+          "kind": "docs"
+        },
+        {
+          "title": "Trigger and bulk request best practices",
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_triggers_bestpract.htm",
+          "kind": "docs"
+        },
+        {
+          "title": "Apex Triggers (Trailhead module)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/apex_triggers",
+          "kind": "trailhead"
+        }
+      ],
+      "quiz": [
+        {
+          "q": "Look at the diagram. A before-save flow and a before trigger both set the same field. Whose value is saved?",
+          "image": "order-of-execution",
+          "imageAlt": "The order of execution: before-save flows run first, then before triggers, then validation rules.",
+          "options": [
+            "The flow's",
+            "The trigger's",
+            "Whichever was deployed last",
+            "Salesforce raises an error"
+          ],
+          "answer": 1,
+          "why": "Before-save flows run first (step 1) and before triggers run after them (step 2), so the trigger's assignment is the one that's saved."
+        },
+        {
+          "q": "Using the diagram: a validation rule fails. Has the after trigger run?",
+          "image": "order-of-execution",
+          "imageAlt": "The order of execution: validation rules are step 3, after triggers are step 6.",
+          "options": [
+            "Yes, after triggers always run",
+            "No: validation fails before the save, and after triggers come after it",
+            "Only in bulk inserts",
+            "Only if the trigger is active"
+          ],
+          "answer": 1,
+          "why": "Validation runs before the record is saved (step 3). A failure stops the save, so steps 5 onwards, including after triggers, never run."
+        },
+        {
+          "q": "Where should you set a field on the same record that's being inserted?",
+          "options": [
+            "After insert trigger with an update statement",
+            "Before insert trigger, assigning on Trigger.new",
+            "A @future method",
+            "A scheduled job"
+          ],
+          "answer": 1,
+          "why": "Before triggers can change Trigger.new directly; the save writes the change with no extra DML."
+        },
+        {
+          "q": "Which context variable is null in an insert trigger?",
+          "options": [
+            "Trigger.new",
+            "Trigger.old",
+            "Trigger.isInsert",
+            "Trigger.size"
+          ],
+          "answer": 1,
+          "why": "There's no previous version of a record being inserted, so Trigger.old and Trigger.oldMap are null."
+        }
+      ]
     },
     {
-      "id": "testing", "title": "Apex testing", "level": 3, "col": 1, "requires": ["apex-basics"],
+      "id": "testing",
+      "title": "Apex testing",
+      "level": 3,
+      "col": 1,
+      "requires": [
+        "apex-basics"
+      ],
       "summary": "Test classes, test data, asserts and 75% coverage.",
       "lesson": "Every SFCode problem is graded by a hidden **test class**, the same way Salesforce gates production deploys.\n\n- Mark classes `@IsTest`; methods `@IsTest static void ...`.\n- Create your own data in the test. Never rely on org data (`SeeAllData=true`).\n- Wrap the action in `Test.startTest()` / `Test.stopTest()`: you get fresh governor limits, and async work runs at `stopTest`.\n- Assert outcomes with `Assert.areEqual(expected, actual, message)`.\n- Production deploys need **75%** coverage overall and every trigger covered.\n\nTest **bulk**: insert 200 records, not 1.",
-      "problems": [], "cert": { "exam": "pd1", "section": "testing" }
+      "problems": [],
+      "cert": {
+        "exam": "pd1",
+        "section": "testing"
+      }
     },
     {
-      "id": "lwc", "title": "Lightning Web Components", "level": 3, "col": 2, "requires": ["apex-basics"],
+      "id": "lwc",
+      "title": "Lightning Web Components",
+      "level": 3,
+      "col": 2,
+      "requires": [
+        "apex-basics"
+      ],
       "summary": "Reactivity, events and rendering lists.",
-      "problems": ["lwc-click-counter", "lwc-star-rating", "lwc-contact-filter"], "cert": { "exam": "pd1", "section": "ui" }
+      "problems": [
+        "lwc-click-counter",
+        "lwc-star-rating",
+        "lwc-contact-filter"
+      ],
+      "cert": {
+        "exam": "pd1",
+        "section": "ui"
+      }
     },
     {
-      "id": "governor-limits", "title": "Governor limits", "level": 4, "col": 0, "requires": ["triggers", "soql-advanced"],
+      "id": "governor-limits",
+      "title": "Governor limits",
+      "level": 4,
+      "col": 0,
+      "requires": [
+        "triggers",
+        "soql-advanced"
+      ],
       "summary": "No SOQL or DML in loops; work in sets and maps.",
-      "problems": ["debug-soql-in-loop", "debug-dml-in-loop"], "cert": { "exam": "pd2", "section": "performance" }
+      "problems": [
+        "debug-soql-in-loop",
+        "debug-dml-in-loop"
+      ],
+      "cert": {
+        "exam": "pd2",
+        "section": "performance"
+      }
     },
     {
-      "id": "pd1-ready", "title": "PD I checkpoint", "level": 4, "col": 1, "requires": ["triggers", "testing", "flow-advanced", "lwc"],
+      "id": "pd1-ready",
+      "title": "PD I checkpoint",
+      "level": 4,
+      "col": 1,
+      "requires": [
+        "triggers",
+        "testing",
+        "flow-advanced",
+        "lwc"
+      ],
       "summary": "You've covered the PD I syllabus. Drill the exam questions.",
       "lesson": "Time to test yourself. Do a full **PD I practice exam** in Certification Prep, then review every miss: the explanation tells you which roadmap node to revisit.",
-      "problems": [], "cert": { "exam": "pd1" }
+      "problems": [],
+      "cert": {
+        "exam": "pd1"
+      }
     },
     {
-      "id": "async", "title": "Async Apex", "level": 4, "col": 2, "requires": ["governor-limits"],
+      "id": "async",
+      "title": "Async Apex",
+      "level": 4,
+      "col": 2,
+      "requires": [
+        "governor-limits"
+      ],
       "summary": "Queueable, future and Batch Apex.",
-      "problems": ["sync-contact-city", "close-stale-opportunities"], "cert": { "exam": "pd2", "section": "advanced" }
+      "problems": [
+        "sync-contact-city",
+        "close-stale-opportunities"
+      ],
+      "cert": {
+        "exam": "pd2",
+        "section": "advanced"
+      }
     },
     {
-      "id": "pd2-ready", "title": "PD II checkpoint", "level": 4, "col": 1, "requires": ["async", "pd1-ready"],
+      "id": "pd2-ready",
+      "title": "PD II checkpoint",
+      "level": 4,
+      "col": 1,
+      "requires": [
+        "async",
+        "pd1-ready"
+      ],
       "summary": "Advanced Apex, integration and performance.",
       "lesson": "PD II leans on design judgement: which async tool, how to stay under limits at scale, and how to integrate. Do a **PD II practice exam** and revisit the nodes behind each miss.",
-      "problems": [], "cert": { "exam": "pd2" }
+      "problems": [],
+      "cert": {
+        "exam": "pd2"
+      }
     }
   ]
 }

@@ -160,3 +160,72 @@ describe("RoadmapService", () => {
     await expect(svc.submitQuiz("u", "admin", "admin-org", [0])).rejects.toThrow(/all 3/);
   });
 });
+
+import { mkdirSync } from "node:fs";
+import request from "supertest";
+import { buildApp } from "../src/app.ts";
+import { DIAGRAM_DIR } from "../src/domain/roadmap.ts";
+
+describe("roadmap diagrams, resources and optional steps", () => {
+  const withDiagram = (nodes: unknown[]) => {
+    const dir = roadmapDir(nodes);
+    mkdirSync(join(dir, DIAGRAM_DIR));
+    writeFileSync(join(dir, DIAGRAM_DIR, "flow.svg"), "<svg xmlns='http://www.w3.org/2000/svg'/>");
+    return dir;
+  };
+  const quiz = [1, 2, 3].map((i) => ({ q: `q${i}`, options: ["a", "b"], answer: 0, why: "w" }));
+
+  it("loads diagrams, picture questions and official links", () => {
+    const ok = { ...node("a"), diagram: "flow", diagramCaption: "A flow diagram for testing.", resources: [{ title: "Docs page", url: "https://developer.salesforce.com/docs/x", kind: "docs" }], quiz: [{ ...quiz[0], image: "flow", imageAlt: "The flow diagram again." }, ...quiz.slice(1)] };
+    expect(() => loadRoadmaps(withDiagram([ok]), exists)).not.toThrow();
+  });
+
+  it.each<[string, Record<string, unknown>, RegExp]>([
+    ["a missing diagram", { diagram: "nope", diagramCaption: "A caption that is long enough." }, /existing diagram/],
+    ["a diagram without a caption", { diagram: "flow" }, /diagramCaption/],
+    ["a picture question without alt text", { quiz: [{ ...quiz[0], image: "flow" }, ...quiz.slice(1)] }, /imageAlt/],
+    ["a link to an unofficial site", { resources: [{ title: "Some blog", url: "https://example.com/apex", kind: "guide" }] }, /not an official/],
+    ["a plain-http link", { resources: [{ title: "Docs page", url: "http://developer.salesforce.com/x", kind: "docs" }] }, /./],
+  ])("rejects %s", (_name, extra, error) => {
+    expect(() => loadRoadmaps(withDiagram([{ ...node("a"), ...extra }]), exists)).toThrow(error);
+  });
+
+  it("the shipped picture questions keep their image but never their answer", async () => {
+    const svc = new RoadmapService(loadRoadmaps(ROADMAPS_DIR, exists), catalog, new MemoryOnboarding(), new MemorySubmissionRepository(fixedClock()));
+    const triggers = (await svc.view("developer", null)).nodes.find((n) => n.id === "triggers");
+    const pictured = triggers?.quiz?.find((q) => q.image);
+    expect(pictured).toMatchObject({ image: "order-of-execution" });
+    expect(JSON.stringify(triggers?.quiz)).not.toMatch(/"answer"|"why"/);
+  });
+
+  it("optional steps are never 'next' and don't count toward progress", async () => {
+    const dir = roadmapDir([node("a"), { ...node("extra"), optional: true }, node("b", ["a"])]);
+    const ob = new MemoryOnboarding();
+    const svc = new RoadmapService(loadRoadmaps(dir, exists), catalog, ob, new MemorySubmissionRepository(fixedClock()));
+    await svc.saveOnboarding("u", { role: "developer", level: "new", goal: "pd1", hours: "3-5" });
+    const v = await svc.view("x", "u");
+    expect(v.total).toBe(2);
+    expect(v.next).toBe("a");
+    await svc.setRead("u", "x", "a", true);
+    expect((await svc.view("x", "u")).next).toBe("b");
+  });
+});
+
+describe("diagram route", () => {
+  // The shipped roadmaps, so the shipped diagrams are what's served.
+  const app = buildApp({ roadmaps: new RoadmapService(loadRoadmaps(ROADMAPS_DIR, exists), catalog, new MemoryOnboarding(), new MemorySubmissionRepository(fixedClock())) });
+
+  it("serves a known diagram as a locked-down SVG", async () => {
+    const res = await request(app).get("/api/v1/roadmaps/diagrams/order-of-execution.svg");
+    expect(res.status).toBe(200);
+    expect(res.headers["content-type"]).toContain("image/svg+xml");
+    expect(res.headers["content-security-policy"]).toContain("sandbox");
+    expect(res.headers["x-content-type-options"]).toBe("nosniff");
+  });
+
+  it("404s unknown names and refuses anything that isn't a plain name", async () => {
+    expect((await request(app).get("/api/v1/roadmaps/diagrams/nope.svg")).status).toBe(404);
+    expect((await request(app).get("/api/v1/roadmaps/diagrams/..%2F..%2Fpackage.json")).status).toBe(400);
+    expect((await request(app).get("/api/v1/roadmaps/diagrams/order-of-execution.txt")).status).toBe(400);
+  });
+});

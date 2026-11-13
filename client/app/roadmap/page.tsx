@@ -2,21 +2,21 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Check, CircleDashed, GraduationCap, Lock, SkipForward, TriangleAlert, X } from "lucide-react";
+import { ArrowRight, BookOpen, Check, CircleDashed, ExternalLink, GraduationCap, Library, Lightbulb, Lock, SkipForward, TriangleAlert, X } from "lucide-react";
 import { useAuthState } from "@/components/auth";
 import { WeeklyPlan } from "@/components/WeeklyPlan";
 import { Markdown } from "@/components/Markdown";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
 import type { Track } from "@/lib/challengesApi";
-import { getOnboarding, getRoadmap, listRoadmaps, markRead, submitQuiz, type Hours, type NodeState, type QuizResult, type RoadmapNode, type RoadmapView } from "@/lib/roadmapApi";
+import { diagramUrl, getOnboarding, getRoadmap, listRoadmaps, markRead, submitQuiz, type Hours, type NodeState, type QuizResult, type RoadmapNode, type RoadmapView } from "@/lib/roadmapApi";
 import { trackInfo } from "@/lib/tracks";
 import { cn } from "@/lib/utils";
 
 const COL_W = 236;
-const ROW_H = 140;
+const ROW_H = 150;
 const BOX_W = 208;
-const BOX_H = 100;
+const BOX_H = 116;
 
 const STATE_STYLE: Record<NodeState, string> = {
   done: "border-emerald-500/70 bg-emerald-500/10",
@@ -174,7 +174,7 @@ export default function RoadmapPage() {
                 type="button"
                 onClick={() => setOpen(n.id)}
                 style={{ left: x, top: y, width: BOX_W, height: BOX_H }}
-                className={cn("absolute flex flex-col rounded-xl border-2 p-3 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md", STATE_STYLE[n.state], isNext && "ring-4 ring-sky-500/30 animate-[pulse_2.5s_ease-in-out_infinite]", open === n.id && "ring-2 ring-sky-500")}
+                className={cn("absolute flex flex-col rounded-xl border-2 p-3 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md", STATE_STYLE[n.state], n.optional && "border-dashed opacity-90", isNext && "ring-4 ring-sky-500/30 animate-[pulse_2.5s_ease-in-out_infinite]", open === n.id && "ring-2 ring-sky-500")}
               >
                 <span className="flex items-center gap-1.5 text-sm font-semibold">
                   <StateIcon state={n.state} />
@@ -182,6 +182,10 @@ export default function RoadmapPage() {
                   {n.struggling && <TriangleAlert className="ml-auto h-3.5 w-3.5 text-amber-700 dark:text-amber-400" aria-label="Needs a revisit" />}
                 </span>
                 <span className="mt-1 line-clamp-2 text-xs text-muted-foreground">{n.summary}</span>
+                <span className="mt-1 flex gap-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                  {STAGE[n.level]}
+                  {n.optional && <span className="rounded bg-muted px-1">Optional</span>}
+                </span>
                 {n.problems.length > 0 && (
                   <span className="mt-auto flex gap-0.5 pt-1" aria-label={`${solved} of ${n.problems.length} solved`}>
                     {n.problems.map((p) => <span key={p.slug} className={cn("h-1 flex-1 rounded-full", p.status === "solved" ? "bg-emerald-500" : p.status === "attempted" ? "bg-amber-500" : "bg-muted-foreground/20")} />)}
@@ -225,7 +229,7 @@ function NodePanel({ node, view, onClose, onChange }: { node: RoadmapNode; view:
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/30 animate-in fade-in" onClick={onClose} aria-hidden />
-      <aside role="dialog" aria-label={node.title} className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col overflow-y-auto border-l bg-background p-6 shadow-2xl animate-in slide-in-from-right duration-300">
+      <aside role="dialog" aria-label={node.title} className="fixed inset-y-0 right-0 z-50 flex w-full max-w-xl flex-col overflow-y-auto border-l bg-background p-6 shadow-2xl animate-in slide-in-from-right duration-300">
         <div className="flex items-start gap-2">
           <div className="min-w-0 flex-1">
             <span className="inline-flex items-center gap-1 text-xs text-muted-foreground"><StateIcon state={node.state} className="h-3.5 w-3.5" />{STATE_LABEL[node.state]}</span>
@@ -242,6 +246,30 @@ function NodePanel({ node, view, onClose, onChange }: { node: RoadmapNode; view:
           <section className="mt-5">
             <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground"><BookOpen className="h-3.5 w-3.5" /> Lesson</h3>
             <Markdown source={node.lesson} className="mt-2 text-sm" />
+          </section>
+        )}
+
+        {node.diagram && <Diagram name={node.diagram} caption={node.diagramCaption ?? node.title} />}
+
+        {node.concepts && node.concepts.length > 0 && (
+          <section className="mt-5">
+            <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground"><Lightbulb className="h-3.5 w-3.5" /> Key concepts</h3>
+            <ul className="mt-2 space-y-1.5 text-sm">
+              {node.concepts.map((c, i) => (
+                <li key={i} className="flex gap-2"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-700 dark:text-emerald-400" aria-hidden="true" /><Markdown source={c} className="[&_p]:m-0" /></li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {node.pitfalls && node.pitfalls.length > 0 && (
+          <section className="mt-5 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+            <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400"><TriangleAlert className="h-3.5 w-3.5" /> Common mistakes</h3>
+            <ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm">
+              {node.pitfalls.map((p, i) => (
+                <li key={i}><Markdown source={p} className="[&_p]:m-0" /></li>
+              ))}
+            </ul>
           </section>
         )}
 
@@ -268,6 +296,23 @@ function NodePanel({ node, view, onClose, onChange }: { node: RoadmapNode; view:
           </Link>
         )}
 
+        {node.resources && node.resources.length > 0 && (
+          <section className="mt-5">
+            <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground"><Library className="h-3.5 w-3.5" /> Learn more (official)</h3>
+            <ul className="mt-2 divide-y rounded-lg border text-sm">
+              {node.resources.map((r) => (
+                <li key={r.url}>
+                  <a href={r.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2.5 hover:bg-accent/60">
+                    <span className="w-16 shrink-0 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{RESOURCE_KIND[r.kind]}</span>
+                    <span className="min-w-0 flex-1">{r.title}</span>
+                    <ExternalLink className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {node.quiz && <Quiz node={node} view={view} onChange={onChange} />}
 
         {node.completeByReading && isSignedIn && view.personalised && (
@@ -278,6 +323,24 @@ function NodePanel({ node, view, onClose, onChange }: { node: RoadmapNode; view:
         {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
       </aside>
     </>
+  );
+}
+
+/** Level 1-4 as the roadmap stage it belongs to. */
+const STAGE: Record<number, string> = { 1: "Foundations", 2: "Core", 3: "Advanced", 4: "Expert" };
+
+const RESOURCE_KIND: Record<string, string> = { docs: "Docs", trailhead: "Trailhead", guide: "Guide", video: "Video" };
+
+/** A roadmap diagram. Click to open full size; the caption doubles as alt text. */
+function Diagram({ name, caption, compact = false }: { name: string; caption: string; compact?: boolean }) {
+  return (
+    <figure className={cn(compact ? "mt-2" : "mt-5")}>
+      <a href={diagramUrl(name)} target="_blank" rel="noopener noreferrer" title="Open full size">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={diagramUrl(name)} alt={caption} loading="lazy" className="w-full rounded-lg border shadow-sm" />
+      </a>
+      {!compact && <figcaption className="mt-1.5 text-xs text-muted-foreground">{caption}</figcaption>}
+    </figure>
   );
 }
 
@@ -312,6 +375,7 @@ function Quiz({ node, view, onChange }: { node: RoadmapNode; view: RoadmapView; 
           return (
             <li key={i} className="text-sm">
               <p className="font-medium">{i + 1}. {q.q}</p>
+              {q.image && <Diagram name={q.image} caption={q.imageAlt ?? q.q} compact />}
               <div className="mt-1.5 space-y-1">
                 {q.options.map((o, j) => {
                   const picked = picks[i] === j;

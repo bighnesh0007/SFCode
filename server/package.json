@@ -19,7 +19,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "sh -c \"set -a; [ -f .env ] && . ./.env; set +a; drizzle-kit migrate\"",
     "db:check": "drizzle-kit check",
-    "verify:problems": "node --env-file-if-exists=.env --import tsx/esm scripts/verify-problems.ts"
+    "verify:problems": "node --env-file-if-exists=.env --import tsx/esm scripts/verify-problems.ts",
+    "check:roadmap-links": "node --import tsx/esm scripts/check-roadmap-links.ts"
   },
   "dependencies": {
     "@clerk/backend": "3.26.1",

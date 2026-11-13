@@ -29,7 +29,7 @@ export interface QuizResult {
 
 export interface RoadmapNodeView extends Omit<RoadmapNode, "problems" | "quiz"> {
   /** Questions only; answers and explanations come back after submitting. */
-  quiz?: { q: string; options: string[] }[];
+  quiz?: { q: string; options: string[]; image?: string; imageAlt?: string }[];
   depth: number;
   state: NodeState;
   /** Attempted a problem here without solving it: suggest the prerequisites/lesson. */
@@ -107,7 +107,7 @@ export class RoadmapService {
       const { quiz, ...rest } = n;
       base.set(n.id, {
         ...rest,
-        ...(quiz ? { quiz: quiz.map(({ q, options }) => ({ q, options })) } : {}),
+        ...(quiz ? { quiz: quiz.map(({ q, options, image, imageAlt }) => ({ q, options, ...(image ? { image } : {}), ...(imageAlt ? { imageAlt } : {}) })) } : {}),
         completeByQuiz,
         problems,
         depth: r.depth[n.id] ?? 0,
@@ -141,8 +141,10 @@ export class RoadmapService {
     });
 
     const ordered = [...nodes].sort((a, b) => a.depth - b.depth || a.col - b.col);
-    const next = (ordered.find((n) => n.state === "in_progress") ?? ordered.find((n) => n.state === "available"))?.id ?? null;
-    const counted = nodes.filter((n) => n.state !== "assumed");
+    // Optional steps are offered but never pressed on the learner: not "next", not in progress totals.
+    const main = ordered.filter((n) => !n.optional);
+    const next = (main.find((n) => n.state === "in_progress") ?? main.find((n) => n.state === "available"))?.id ?? null;
+    const counted = nodes.filter((n) => n.state !== "assumed" && !n.optional);
     return {
       id: r.id,
       title: r.title,
