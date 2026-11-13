@@ -182,6 +182,7 @@ export function Playground({ mode }: { mode: Mode }) {
 
   const editor = (
     <Editor
+      loading={<div aria-hidden="true" className="h-full w-full animate-pulse bg-muted/40" />}
       language={mode === "apex" ? "apex" : "sql"}
       theme={editorTheme}
       value={code}

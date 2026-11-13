@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { BrainCircuit, Loader2 } from "lucide-react";
+import { BrainCircuit } from "lucide-react";
 import { SignInButton, useAuthState } from "@/components/auth";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { getReview, type ReviewQueue } from "@/lib/certificationApi";
 import { PracticeSession } from "../[exam]/PracticeSession";
+import { PageSkeleton } from "@/components/ui/skeleton";
 
 export default function ReviewPage() {
   const { isLoaded, isSignedIn, getToken } = useAuthState();
@@ -34,7 +35,7 @@ export default function ReviewPage() {
         <SignInButton><Button className="mt-4">Sign in</Button></SignInButton>
       </div>
     );
-  if (!queue) return <div className="flex justify-center py-24"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>;
+  if (!queue) return <PageSkeleton blocks={3} className="max-w-3xl" />;
   if (queue.due.length === 0)
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">

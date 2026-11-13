@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Check, Loader2, Search, ShieldCheck, X } from "lucide-react";
+import { Check, Search, ShieldCheck, X } from "lucide-react";
 import { useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { getEmailUsage, sendTestDigest } from "@/lib/emailApi";
 import { AnnouncementTab, AuditTab, DashboardTab, UserDrawer } from "@/components/admin/AdminTools";
 import { STATUS_LABEL } from "@/lib/verdicts";
+import { PageSkeleton } from "@/components/ui/skeleton";
 
 type Tab = "dashboard" | "review" | "people" | "applications" | "problems" | "points" | "email" | "announcement" | "audit";
 const ROLE_LABEL: Record<StaffRole, string> = { admin: "Admin", reviewer: "Reviewer", buddy: "Buddy" };
@@ -67,9 +68,7 @@ export default function AdminPage() {
   const view = isLoaded && !isSignedIn ? "none" : standing;
   if (view === null)
     return (
-      <div className="flex flex-1 items-center justify-center py-24">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
+      <PageSkeleton blocks={3} />
     );
   if (view === "none" || !isStaff(view))
     return (

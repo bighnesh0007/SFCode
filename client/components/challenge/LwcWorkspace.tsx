@@ -208,6 +208,7 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
                 </div>
                 {activeFile && (
                   <Editor
+                    loading={<div aria-hidden="true" className="h-full w-full animate-pulse bg-muted/40" />}
                     path={`lwc/${challenge.slug}/${activeFile.fileName}`}
                     language={LANGUAGE[activeFile.name] ?? "plaintext"}
                     theme={editorTheme}

@@ -9,6 +9,7 @@ import { Markdown } from "@/components/Markdown";
 import { ApiError } from "@/lib/apiClient";
 import { getMock, gradeMock, type MockExam, type MockResult } from "@/lib/certificationApi";
 import { cn } from "@/lib/utils";
+import { PageSkeleton } from "@/components/ui/skeleton";
 
 type Phase = { kind: "intro" } | { kind: "running"; endsAt: number } | { kind: "grading" } | { kind: "done"; result: MockResult; usedMs: number };
 
@@ -90,9 +91,7 @@ export function MockExamSession({ exam }: { exam: string }) {
     );
   if (!mock)
     return (
-      <div className="flex flex-1 items-center justify-center py-24">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
+      <PageSkeleton blocks={2} className="max-w-2xl" />
     );
 
   if (phase.kind === "intro") {

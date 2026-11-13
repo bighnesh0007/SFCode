@@ -9,6 +9,7 @@ import { Markdown } from "@/components/Markdown";
 import { ApiError } from "@/lib/apiClient";
 import { getPractice, submitAnswer, type AnswerResult, type PracticeQuestion } from "@/lib/certificationApi";
 import { cn } from "@/lib/utils";
+import { PageSkeleton } from "@/components/ui/skeleton";
 
 /** `load` overrides where questions come from (spaced review uses it); default is a shuffled set for the exam/section. */
 export function PracticeSession({ exam, section, load, title }: { exam: string; section: string | null; load?: () => Promise<PracticeQuestion[]>; title?: string }) {
@@ -52,9 +53,7 @@ export function PracticeSession({ exam, section, load, title }: { exam: string; 
     );
   if (!questions)
     return (
-      <div className="flex flex-1 items-center justify-center py-24">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
+      <PageSkeleton blocks={4} className="max-w-3xl" />
     );
 
   const done = index >= questions.length;

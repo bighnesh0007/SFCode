@@ -3,7 +3,7 @@
 import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowUp, EyeOff, Loader2, Pencil, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, EyeOff, Pencil, Trash2 } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { SignInButton, useAuthState } from "@/components/auth";
 import { Markdown } from "@/components/Markdown";
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
 import { commentOn, deleteComment, deletePost, getPost, hidePost, updatePost, votePost, type PostView } from "@/lib/blogApi";
 import { cn } from "@/lib/utils";
+import { PageSkeleton } from "@/components/ui/skeleton";
 
 export default function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -49,9 +50,7 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
   if (error) return <p className="py-24 text-center text-muted-foreground">{error}</p>;
   if (!post)
     return (
-      <div className="flex flex-1 items-center justify-center py-24">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
+      <PageSkeleton blocks={3} className="max-w-3xl" />
     );
 
   const vote = (value: -1 | 1) =>

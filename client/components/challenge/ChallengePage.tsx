@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
 import { ApiError } from "@/lib/apiClient";
 import { getChallenge, type ChallengeView } from "@/lib/challengesApi";
 import { LwcWorkspace } from "./LwcWorkspace";
 import { Workspace } from "./Workspace";
+import { WorkspaceSkeleton } from "@/components/ui/skeleton";
 
 /** Loads one problem and renders the workspace. `backHref` is the list it belongs to. */
 export function ChallengePage({ slug, backHref }: { slug: string; backHref: string }) {
@@ -32,9 +32,7 @@ export function ChallengePage({ slug, backHref }: { slug: string; backHref: stri
     );
   if (!challenge)
     return (
-      <div className="flex flex-1 items-center justify-center py-24">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
+      <WorkspaceSkeleton />
     );
   return challenge.lwc ? <LwcWorkspace challenge={challenge} backHref={backHref} /> : <Workspace challenge={challenge} backHref={backHref} />;
 }

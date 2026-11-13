@@ -1,11 +1,11 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
 import { useAuthState } from "@/components/auth";
 import { ProfileView } from "@/components/ProfileView";
 import { ApiError } from "@/lib/apiClient";
 import { getMyProfile, getProfile, type ProfileView as Profile } from "@/lib/communityApi";
+import { PageSkeleton } from "@/components/ui/skeleton";
 
 export default function UserPage({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = use(params);
@@ -32,9 +32,7 @@ export default function UserPage({ params }: { params: Promise<{ handle: string 
 
   if (state === null)
     return (
-      <div className="flex flex-1 items-center justify-center py-24">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
+      <PageSkeleton blocks={3} />
     );
   if ("error" in state) return <p className="py-24 text-center text-muted-foreground">{state.error}</p>;
   return <ProfileView profile={state.profile} editable={state.mine} />;
