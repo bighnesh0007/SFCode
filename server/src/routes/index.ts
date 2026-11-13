@@ -195,6 +195,33 @@ export function mountRoutes(app: Application, container: Container): void {
     }
   }
 
+  // Problem discussions: anyone reads; signed-in learners post; staff hide.
+  if (container.discussion) {
+    const d = container.discussion;
+    const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
+    const signedIn: RequestHandler = verifier ? requireAuth(verifier) : disabled("Sign-in");
+    const slugParams = z.strictObject({ slug: z.string().regex(/^[a-z0-9-]{1,100}$/) });
+    const idParams = z.strictObject({ id: z.uuid() });
+    const postBody = z.strictObject({ body: z.string().max(5000), spoiler: z.boolean().default(false) });
+    const hiddenBody = z.strictObject({ hidden: z.boolean() });
+    v1.get("/challenges/:slug/discussion", limiter(120), identify, validate({ params: slugParams }), (async (req, res) => {
+      ok(res, await d.list(validatedParams<z.infer<typeof slugParams>>(req).slug, req.auth?.userId ?? null));
+    }) as RequestHandler);
+    v1.post("/challenges/:slug/discussion", limiter(10), signedIn, validate({ params: slugParams, body: postBody }), (async (req, res) => {
+      const b = validatedBody<z.infer<typeof postBody>>(req);
+      ok(res, await d.post(req.auth?.userId ?? "", validatedParams<z.infer<typeof slugParams>>(req).slug, b.body, b.spoiler));
+    }) as RequestHandler);
+    v1.delete("/discussion/:id", limiter(30), signedIn, validate({ params: idParams }), (async (req, res) => {
+      await d.remove(req.auth?.userId ?? "", validatedParams<z.infer<typeof idParams>>(req).id);
+      noContent(res);
+    }) as RequestHandler);
+    v1.get("/admin/discussion", limiter(60), signedIn, (async (req, res) => ok(res, await d.recent(req.auth?.userId ?? ""))) as RequestHandler);
+    v1.post("/admin/discussion/:id", limiter(60), signedIn, validate({ params: idParams, body: hiddenBody }), (async (req, res) => {
+      await d.setHidden(req.auth?.userId ?? "", validatedParams<z.infer<typeof idParams>>(req).id, validatedBody<z.infer<typeof hiddenBody>>(req).hidden);
+      noContent(res);
+    }) as RequestHandler);
+  }
+
   // Onboarding placement check: static questions, graded here so answers never reach the browser.
   const trackParams = z.strictObject({ track: z.enum(["developer", "admin"]) });
   const placementBody = z.strictObject({ answers: z.record(z.string().regex(/^[a-z]\d{1,2}$/), z.number().int().min(0).max(9)).refine((a) => Object.keys(a).length <= 20) });

@@ -17,6 +17,7 @@ import { useSubmitShortcut } from "@/components/challenge/useSubmitShortcut";
 import { useIsNarrow } from "@/lib/useIsNarrow";
 import { Markdown } from "@/components/Markdown";
 import { LearningPanel } from "@/components/challenge/LearningPanel";
+import { DiscussionPanel } from "@/components/challenge/DiscussionPanel";
 import { useOrgConnection } from "@/components/useOrgConnection";
 import { ApiError } from "@/lib/apiClient";
 import { getSubmission, listSubmissions, submitSolution, type ChallengeView, type Submission, type SubmissionSummary } from "@/lib/challengesApi";
@@ -54,7 +55,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
   // Lazy init: the editor is client-only, so this never reaches server-rendered markup.
   const [sources, setSources] = useState<Record<string, string>>(() => readDraft(challenge));
   const [active, setActive] = useState(challenge.files[0]?.name ?? "");
-  const [leftTab, setLeftTab] = useState<"description" | "submissions">("description");
+  const [leftTab, setLeftTab] = useState<"description" | "submissions" | "discussion">("description");
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [history, setHistory] = useState<SubmissionSummary[]>([]);
   const [celebrate, setCelebrate] = useState<{ first: boolean } | null>(null);
@@ -203,7 +204,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
               <Link href={backHref} className="mr-1 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label="Back to the list">
                 <ChevronLeft className="h-4 w-4" />
               </Link>
-              {(["description", "submissions"] as const).map((t) => (
+              {(["description", "submissions", "discussion"] as const).map((t) => (
                 <button key={t} type="button" onClick={() => setLeftTab(t)} className={cn("rounded-md px-2.5 py-1 text-xs font-medium capitalize", leftTab === t ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground")}>
                   {t}
                 </button>
@@ -250,8 +251,10 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
                     )}
                   </div>
                 </>
-              ) : (
+              ) : leftTab === "submissions" ? (
                 <SubmissionList history={history} signedIn={isSignedIn} onOpen={(id) => void openSubmission(id)} selected={submission?.id ?? null} />
+              ) : (
+                <DiscussionPanel slug={challenge.slug} />
               )}
             </div>
           </div>

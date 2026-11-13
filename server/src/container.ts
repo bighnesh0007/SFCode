@@ -36,6 +36,8 @@ import { ProblemDraftService } from "./services/problems/problemDraft.service.ts
 import { PgBuddyRepository } from "./repositories/buddy.repository.ts";
 import { PgSettingsRepository } from "./repositories/settings.repository.ts";
 import { PgTelemetryRepository } from "./repositories/telemetry.repository.ts";
+import { PgDiscussionRepository } from "./repositories/discussion.repository.ts";
+import { DiscussionService } from "./services/discussion/discussion.service.ts";
 import { TelemetryService } from "./services/telemetry/telemetry.service.ts";
 import { setErrorSink } from "./middleware/errorHandler.ts";
 import { BuddyService } from "./services/buddy/buddy.service.ts";
@@ -72,6 +74,7 @@ export interface Container {
   social?: SocialService;
   digest?: DigestService;
   telemetry?: TelemetryService;
+  discussion?: DiscussionService;
   hub?: HubService;
 }
 
@@ -149,6 +152,7 @@ export function buildContainer(): Container {
   }
 
   if (container.db && container.community && container.admin) {
+    container.discussion = new DiscussionService(new PgDiscussionRepository(container.db), catalog, new PgProfileRepository(container.db), container.community, container.admin, systemClock);
     container.blog = new BlogService(new PgBlogRepository(container.db), new PgProfileRepository(container.db), container.community, container.admin);
     container.contests = new ContestService(contestRepo ?? new PgContestRepository(container.db), catalog, new PgProfileRepository(container.db), container.community, container.admin, systemClock);
     container.daily = new DailyService(new PgDailyRepository(container.db), catalog, systemClock);
