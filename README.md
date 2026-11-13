@@ -1,7 +1,11 @@
 # SFCode
 
 [![CI](https://github.com/bighnesh0007/SFCode/actions/workflows/ci.yml/badge.svg)](https://github.com/bighnesh0007/SFCode/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/bighnesh0007/SFCode/actions/workflows/codeql.yml/badge.svg)](https://github.com/bighnesh0007/SFCode/actions/workflows/codeql.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/bighnesh0007/SFCode)](https://github.com/bighnesh0007/SFCode/releases)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Discussions](https://img.shields.io/github/discussions/bighnesh0007/SFCode)](https://github.com/bighnesh0007/SFCode/discussions)
 
 **Open-source, LeetCode-style practice for Salesforce developers and admins.**
 Write Apex, SOQL, Flows and Lightning Web Components, graded by hidden tests in
