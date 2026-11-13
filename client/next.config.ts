@@ -16,6 +16,19 @@ const nextConfig: NextConfig = {
   rewrites() {
     return Promise.resolve([{ source: "/backend/:path*", destination: `${backendInternalUrl}/:path*` }]);
   },
+  // From the Next.js PWA guide: the service worker must never be served stale.
+  headers() {
+    return Promise.resolve([
+      {
+        source: "/sw.js",
+        headers: [
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Content-Security-Policy", value: "default-src 'self'; script-src 'self'" },
+        ],
+      },
+    ]);
+  },
   turbopack: { root: workspaceRoot },
   outputFileTracingRoot: workspaceRoot,
 };
