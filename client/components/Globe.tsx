@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
 /** Cities with big Salesforce communities; arcs link them like a live network. */
@@ -11,7 +12,12 @@ const HUBS: [string, number, number][] = [
   ["Tokyo", 35.68, 139.69], ["Sydney", -33.87, 151.21],
 ];
 const LINKS: [number, number][] = [[0, 8], [0, 4], [1, 4], [2, 9], [4, 7], [5, 10], [6, 11], [8, 11], [9, 12], [11, 13], [3, 1], [12, 0], [10, 4], [7, 8], [13, 0]];
-const ARC_COLORS = ["#38bdf8", "#818cf8", "#22d3ee", "#a78bfa"];
+/** Two looks: a glowing night globe for dark mode, a bright porcelain one for light mode. */
+const PALETTES = {
+  dark: { globe: "#0b1b4d", emissive: "#0a1440", emissiveIntensity: 0.35, dots: "rgba(186, 230, 253, 0.85)", atmosphere: "#38bdf8", arcs: ["#38bdf8", "#818cf8", "#22d3ee", "#a78bfa"], ring: "56, 189, 248", point: "#e0f2fe", ambient: 1.6 },
+  light: { globe: "#f8fbff", emissive: "#dbeafe", emissiveIntensity: 0.25, dots: "rgba(30, 64, 175, 0.55)", atmosphere: "#93c5fd", arcs: ["#2563eb", "#7c3aed", "#0891b2", "#db2777"], ring: "37, 99, 235", point: "#1d4ed8", ambient: 2.2 },
+} as const;
+type Palette = (typeof PALETTES)[keyof typeof PALETTES];
 
 type Ring = [number, number][];
 interface Country {
@@ -48,6 +54,15 @@ function drawable(features: Country[]): Country[] {
 export function Globe({ className }: { className?: string }) {
   const host = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
+  const { resolvedTheme } = useTheme();
+  const palette = PALETTES[resolvedTheme === "light" ? "light" : "dark"];
+  /** Re-colours the live globe; set once the scene exists. */
+  const applyRef = useRef<((p: Palette) => void) | null>(null);
+  const paletteRef = useRef<Palette>(palette);
+  useEffect(() => {
+    paletteRef.current = palette;
+    applyRef.current?.(palette);
+  }, [palette]);
 
   useEffect(() => {
     const el = host.current;
@@ -74,12 +89,9 @@ export function Globe({ className }: { className?: string }) {
         .hexPolygonResolution(3)
         .hexPolygonMargin(0.65)
         .hexPolygonUseDots(true)
-        .hexPolygonColor(() => "rgba(186, 230, 253, 0.85)")
         .showAtmosphere(true)
-        .atmosphereColor("#38bdf8")
         .atmosphereAltitude(0.18)
-        .arcsData(LINKS.map(([a, b], i) => ({ startLat: HUBS[a]?.[1], startLng: HUBS[a]?.[2], endLat: HUBS[b]?.[1], endLng: HUBS[b]?.[2], color: ARC_COLORS[i % ARC_COLORS.length] })))
-        .arcColor("color")
+        .arcsData(LINKS.map(([a, b], i) => ({ startLat: HUBS[a]?.[1], startLng: HUBS[a]?.[2], endLat: HUBS[b]?.[1], endLng: HUBS[b]?.[2], i })))
         .arcAltitudeAutoScale(0.4)
         .arcStroke(0.55)
         .arcDashLength(0.5)
@@ -87,23 +99,19 @@ export function Globe({ className }: { className?: string }) {
         .arcDashInitialGap(() => Math.random() * 2)
         .arcDashAnimateTime(reduceMotion ? 0 : 2600)
         .ringsData(HUBS.map(([, lat, lng]) => ({ lat, lng })))
-        .ringColor(() => (t: number) => `rgba(56, 189, 248, ${1 - t})`)
         .ringMaxRadius(3.2)
         .ringPropagationSpeed(reduceMotion ? 0 : 2.4)
         .ringRepeatPeriod(1400)
         .pointsData(HUBS.map(([name, lat, lng]) => ({ name, lat, lng })))
-        .pointColor(() => "#e0f2fe")
         .pointAltitude(0.01)
         .pointRadius(0.45);
       const material = globe.globeMaterial() as InstanceType<typeof THREE.MeshPhongMaterial>;
-      material.color = new THREE.Color("#0b1b4d");
-      material.emissive = new THREE.Color("#0a1440");
-      material.emissiveIntensity = 0.35;
       material.shininess = 0.8;
 
       const scene = new THREE.Scene();
       scene.add(globe);
-      scene.add(new THREE.AmbientLight("#bbd4ff", 1.6));
+      const ambient = new THREE.AmbientLight("#bbd4ff", 1.6);
+      scene.add(ambient);
       const key = new THREE.DirectionalLight("#ffffff", 1.4);
       key.position.set(-400, 300, 400);
       scene.add(key);
@@ -150,10 +158,26 @@ export function Globe({ className }: { className?: string }) {
         controls.update();
         renderer.render(scene, camera);
       };
+      // Colours live here so a theme switch re-tints the running globe without rebuilding it.
+      const apply = (p: Palette) => {
+        material.color = new THREE.Color(p.globe);
+        material.emissive = new THREE.Color(p.emissive);
+        material.emissiveIntensity = p.emissiveIntensity;
+        ambient.intensity = p.ambient;
+        globe
+          .hexPolygonColor(() => p.dots)
+          .atmosphereColor(p.atmosphere)
+          .arcColor((d: object) => p.arcs[(d as { i: number }).i % p.arcs.length] ?? p.arcs[0])
+          .ringColor(() => (t: number) => `rgba(${p.ring}, ${1 - t})`)
+          .pointColor(() => p.point);
+      };
+      apply(paletteRef.current);
+      applyRef.current = apply;
       tick();
       setReady(true);
 
       cleanup = () => {
+        applyRef.current = null;
         cancelAnimationFrame(raf);
         ro.disconnect();
         io.disconnect();
@@ -178,7 +202,8 @@ export function Globe({ className }: { className?: string }) {
 
   return (
     <div className={cn("relative aspect-square", className)} aria-hidden="true">
-      <div className="absolute inset-[12%] rounded-full bg-sky-500/20 blur-3xl" />
+      {/* CSS dark: variant, not the JS theme: the server can't know the theme, so this must render the same on both. */}
+      <div className="absolute inset-[12%] rounded-full bg-indigo-400/25 blur-3xl transition-colors duration-700 dark:bg-sky-500/20" />
       <div ref={host} className={cn("absolute inset-0 transition-opacity duration-1000", ready ? "opacity-100" : "opacity-0")} />
     </div>
   );
