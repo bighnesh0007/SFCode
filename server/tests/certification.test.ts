@@ -49,8 +49,8 @@ const valid = () => ({
 describe("question bank", () => {
   it("ships eight exams, valid, each with a mock shape", () => {
     expect(bank.all().map((e) => [e.exam, e.questions.length, e.mock?.questions])).toEqual([
-      ["admin", 60, 60],
-      ["pd1", 60, 60],
+      ["admin", 80, 60],
+      ["pd1", 80, 60],
       ["pd2", 60, 60],
       ["app-builder", 60, 60],
       ["js-dev-1", 60, 60],
