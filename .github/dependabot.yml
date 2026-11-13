@@ -11,8 +11,11 @@ updates:
         patterns: ["next", "eslint-config-next"]
       react:
         patterns: ["react", "react-dom", "@types/react", "@types/react-dom"]
+      # Minor and patch only: a dev-tool major (TypeScript, ESLint, Vitest) can
+      # break the build, and bundled with others it blocks every safe bump.
       dev-dependencies:
         dependency-type: development
+        update-types: ["minor", "patch"]
         exclude-patterns: ["next", "eslint-config-next", "react*", "@types/react*"]
       production-minor-patch:
         dependency-type: production
