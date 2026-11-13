@@ -28,6 +28,8 @@ export interface ContestRepository {
   list(): Promise<ContestRecord[]>;
   findBySlug(slug: string): Promise<ContestRecord | null>;
   delete(id: string): Promise<void>;
+  /** Replaces title, times and problems in one transaction. */
+  update(id: string, c: { title: string; startsAt: Date; endsAt: Date; problems: { slug: string; points: number }[] }): Promise<void>;
   join(contestId: string, userId: string): Promise<void>;
   isEntrant(contestId: string, userId: string): Promise<boolean>;
   entrants(contestId: string): Promise<string[]>;
@@ -51,6 +53,14 @@ export class PgContestRepository implements ContestRepository {
       throw err;
     }
     return this.findBySlug(c.slug);
+  }
+
+  async update(id: string, c: { title: string; startsAt: Date; endsAt: Date; problems: { slug: string; points: number }[] }): Promise<void> {
+    await this.db.transaction(async (tx) => {
+      await tx.update(contests).set({ title: c.title, startsAt: c.startsAt, endsAt: c.endsAt }).where(eq(contests.id, id));
+      await tx.delete(contestProblems).where(eq(contestProblems.contestId, id));
+      await tx.insert(contestProblems).values(c.problems.map((p, i) => ({ contestId: id, problemSlug: p.slug, position: i + 1, points: p.points })));
+    });
   }
 
   private async hydrate(rows: (typeof contests.$inferSelect)[]): Promise<ContestRecord[]> {

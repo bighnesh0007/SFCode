@@ -169,3 +169,54 @@ export interface Analytics {
   total: number;
 }
 export const getAnalytics = (token: Token) => apiRequest<Analytics>("/api/v1/admin/analytics", { token });
+
+export interface ProblemStatRow {
+  slug: string;
+  title: string;
+  track: string;
+  difficulty: string;
+  community: boolean;
+  submissions: number;
+  accepted: number;
+  solvers: number;
+  attempters: number;
+  solveRate: number | null;
+}
+export const getProblemStats = (token: Token) => apiRequest<ProblemStatRow[]>("/api/v1/admin/problems", { token });
+
+export interface AdminStoreItem {
+  id: string;
+  slot: string;
+  name: string;
+  description: string;
+  price: number;
+  basePrice: number;
+  retired: boolean;
+  owners: number;
+}
+export const getAdminStore = (token: Token) => apiRequest<AdminStoreItem[]>("/api/v1/admin/store", { token });
+
+async function noBody(token: Token, path: string, method: string, body: unknown): Promise<void> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "/backend"}${path}`, {
+    method,
+    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const b = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+    throw new Error(b?.error?.message ?? `Request failed (HTTP ${res.status}).`);
+  }
+}
+export const setStoreItem = (token: Token, itemId: string, change: { price: number; retired: boolean }) =>
+  noBody(token, `/api/v1/admin/store/${encodeURIComponent(itemId)}`, "PUT", change);
+
+interface ModAuthor {
+  handle: string;
+  displayName: string;
+}
+export interface ModerationQueue {
+  posts: { slug: string; title: string; author: ModAuthor; hidden: boolean; score: number; comments: number; createdAt: string }[];
+  comments: { id: string; body: string; author: ModAuthor; hidden: boolean; post: { slug: string; title: string }; createdAt: string }[];
+}
+export const getModeration = (token: Token) => apiRequest<ModerationQueue>("/api/v1/admin/moderation", { token });
+export const setCommentHidden = (token: Token, id: string, hidden: boolean) => noBody(token, `/api/v1/admin/moderation/comments/${encodeURIComponent(id)}`, "POST", { hidden });

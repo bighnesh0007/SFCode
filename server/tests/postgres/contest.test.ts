@@ -77,6 +77,18 @@ describe.skipIf(!safe)("Contests and store on Postgres", () => {
     await expect(contests.remove("owner", c.slug)).rejects.toThrow();
   });
 
+  it("admins edit upcoming contests only; the slug stays; changes are validated", async () => {
+    const { c, start } = await liveContest();
+    const edit = { title: "Weekly One (rescheduled)", startsAt: new Date(start + 30 * MIN), endsAt: new Date(start + 150 * MIN), problems: [{ slug: p2, points: 80 }] };
+    await expect(contests.update("bob", c.slug, edit)).rejects.toMatchObject({ status: 403 });
+    await expect(contests.update("owner", c.slug, { ...edit, problems: [] })).rejects.toThrow(/1–6 problems/);
+    const v = await contests.update("owner", c.slug, edit);
+    expect(v).toMatchObject({ slug: c.slug, title: "Weekly One (rescheduled)" });
+    expect(v.problems.map((p) => [p.slug, p.points])).toEqual([[p2, 80]]);
+    clock.advance(100 * MIN); // now live
+    await expect(contests.update("owner", c.slug, edit)).rejects.toThrow(/haven't started/);
+  });
+
   it("ranks by score then penalty; ignores out-of-window attempts; never exposes user ids", async () => {
     const { c, start } = await liveContest();
     clock.advance(61 * MIN);

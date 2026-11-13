@@ -17,6 +17,8 @@ export interface StoreRepository {
   equipped(userIds: string[]): Promise<Map<string, Record<string, string>>>;
   equip(userId: string, slot: string, itemId: string): Promise<void>;
   unequip(userId: string, slot: string): Promise<void>;
+  /** How many people own each item. */
+  ownerCounts(): Promise<Map<string, number>>;
 }
 
 export class PgStoreRepository implements StoreRepository {
@@ -58,5 +60,10 @@ export class PgStoreRepository implements StoreRepository {
 
   async unequip(userId: string, slot: string): Promise<void> {
     await this.db.delete(userEquipped).where(and(eq(userEquipped.userId, userId), eq(userEquipped.slot, slot)));
+  }
+
+  async ownerCounts(): Promise<Map<string, number>> {
+    const rows = await this.db.select({ itemId: storePurchases.itemId, n: sql<number>`count(*)::int` }).from(storePurchases).groupBy(storePurchases.itemId);
+    return new Map(rows.map((r) => [r.itemId, r.n]));
   }
 }

@@ -1,3 +1,4 @@
+import type { PurchaseOutcome, StoreRepository } from "../src/repositories/store.repository.ts";
 import type { ChallengeSubmissionRepository, SubmissionRecord } from "../src/repositories/challengeSubmission.repository.ts";
 import type { GradeResult, SubmissionStatus } from "../src/domain/challenge.ts";
 import type { PendingHandshake, SalesforceConnectionRepository, StoredConnection } from "../src/repositories/salesforceConnection.repository.ts";
@@ -124,6 +125,37 @@ export class MemorySubmissionRepository implements ChallengeSubmissionRepository
       if (r.status === "accepted") out.set(r.problemSlug, "solved");
       else if (!out.has(r.problemSlug)) out.set(r.problemSlug, "attempted");
     }
+    return Promise.resolve(out);
+  }
+}
+
+/** In-memory purchases and equipped items. */
+export class MemoryStore implements StoreRepository {
+  rows: { userId: string; itemId: string; price: number }[] = [];
+  owned(userId: string) {
+    return Promise.resolve(this.rows.filter((r) => r.userId === userId).map((r) => r.itemId));
+  }
+  spent(userId: string) {
+    return Promise.resolve(this.rows.filter((r) => r.userId === userId).reduce((n, r) => n + r.price, 0));
+  }
+  async purchase(userId: string, itemId: string, price: number, earned: number): Promise<PurchaseOutcome> {
+    if ((await this.owned(userId)).includes(itemId)) return "owned";
+    if (earned - (await this.spent(userId)) < price) return "insufficient";
+    this.rows.push({ userId, itemId, price });
+    return "bought";
+  }
+  equipped() {
+    return Promise.resolve(new Map<string, Record<string, string>>());
+  }
+  equip() {
+    return Promise.resolve();
+  }
+  unequip() {
+    return Promise.resolve();
+  }
+  ownerCounts() {
+    const out = new Map<string, number>();
+    for (const r of this.rows) out.set(r.itemId, (out.get(r.itemId) ?? 0) + 1);
     return Promise.resolve(out);
   }
 }

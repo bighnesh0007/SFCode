@@ -155,6 +155,7 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.get("/admin/users/:userId", limiter(120), auth, validate({ params: userIdParams }), a.user);
     v1.post("/admin/users/:userId/suspension", limiter(20), auth, validate({ params: userIdParams, body: suspendBody }), a.suspend);
     v1.get("/admin/audit", limiter(60), auth, a.audit);
+    v1.get("/admin/problems", limiter(60), auth, (async (req, res) => ok(res, await container.admin?.problems(req.auth?.userId ?? ""))) as RequestHandler);
     v1.put("/admin/announcement", limiter(20), auth, validate({ body: announcementBody }), a.setAnnouncement);
   } else {
     v1.use("/admin", disabled("Admin"));
@@ -225,6 +226,13 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.delete("/blog/:slug", signedIn, limiter(20), s, b.remove);
     v1.post("/blog/:slug/hide", signedIn, limiter(30), validate({ params: blogSlugParams, body: hideBody }), b.hide);
     v1.post("/blog/:slug/vote", signedIn, limiter(60), validate({ params: blogSlugParams, body: voteBody }), b.vote);
+    const blogAdmin = container.blog;
+    const hiddenBody = z.strictObject({ hidden: z.boolean() });
+    v1.get("/admin/moderation", limiter(60), signedIn, (async (req, res) => ok(res, await blogAdmin.moderation(req.auth?.userId ?? ""))) as RequestHandler);
+    v1.post("/admin/moderation/comments/:id", limiter(60), signedIn, validate({ params: commentParams, body: hiddenBody }), (async (req, res) => {
+      await blogAdmin.setCommentHidden(req.auth?.userId ?? "", validatedParams<z.infer<typeof commentParams>>(req).id, validatedBody<z.infer<typeof hiddenBody>>(req).hidden);
+      noContent(res);
+    }) as RequestHandler);
     v1.post("/blog/:slug/comments", signedIn, limiter(10), validate({ params: blogSlugParams, body: commentBody }), b.comment);
   } else {
     v1.use("/blog", disabled("The blog"));
@@ -240,6 +248,7 @@ export function mountRoutes(app: Application, container: Container): void {
     const contestsForBoard = container.contests;
     v1.get("/leaderboard/rating", limiter(60), (async (_req, res) => ok(res, await contestsForBoard.ratingBoard())) as RequestHandler);
     v1.post("/contests", signedIn, limiter(10), validate({ body: createContestBody }), c.create);
+    v1.patch("/contests/:slug", limiter(20), signedIn, validate({ params: contestSlugParams, body: createContestBody }), c.update);
     v1.get("/contests/:slug", identify, validate({ params: contestSlugParams }), c.get);
     v1.post("/contests/:slug/join", signedIn, limiter(20), validate({ params: contestSlugParams }), c.join);
     v1.delete("/contests/:slug", signedIn, limiter(10), validate({ params: contestSlugParams }), c.remove);
@@ -255,6 +264,15 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.get("/store", identify, st.view);
     v1.post("/store/buy", signedIn, limiter(20), validate({ body: storeItemBody }), st.buy);
     v1.post("/store/equip", signedIn, limiter(40), validate({ body: equipBody }), st.equip);
+    const storeAdmin = container.store;
+    const itemParams = z.strictObject({ itemId: z.string().regex(/^[a-z0-9-]{1,60}$/) });
+    const itemBody = z.strictObject({ price: z.number().int().min(0).max(100_000), retired: z.boolean() });
+    v1.get("/admin/store", limiter(60), signedIn, (async (req, res) => ok(res, await storeAdmin.adminItems(req.auth?.userId ?? ""))) as RequestHandler);
+    v1.put("/admin/store/:itemId", limiter(30), signedIn, validate({ params: itemParams, body: itemBody }), (async (req, res) => {
+      const b = validatedBody<z.infer<typeof itemBody>>(req);
+      await storeAdmin.setItem(req.auth?.userId ?? "", validatedParams<z.infer<typeof itemParams>>(req).itemId, b);
+      noContent(res);
+    }) as RequestHandler);
     // Hints and editorials: what's unlocked depends on coins spent and solves.
     const store = container.store;
     const slugParams = z.strictObject({ slug: z.string().regex(/^[a-z0-9-]{1,100}$/) });

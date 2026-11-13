@@ -113,8 +113,8 @@ export class ContestService {
     };
   }
 
-  async create(actor: string, input: { title: string; startsAt: Date; endsAt: Date; problems: { slug: string; points: number }[] }): Promise<ContestView> {
-    await this.admin.require(actor, "admin");
+  /** The rules a contest must meet, for create and edit alike. Returns the trimmed title. */
+  private validateContest(input: { title: string; startsAt: Date; endsAt: Date; problems: { slug: string; points: number }[] }): string {
     const title = input.title.trim();
     if (title.length < 3 || title.length > 80) throw new ValidationError("The title must be 3–80 characters.");
     const minutes = (input.endsAt.getTime() - input.startsAt.getTime()) / 60_000;
@@ -128,11 +128,32 @@ export class ContestService {
       if (!ch || !SCORED_TRACKS.includes(ch.track)) throw new ValidationError(`${p.slug} isn't a graded problem.`);
       if (!Number.isInteger(p.points) || p.points < 1 || p.points > 1000) throw new ValidationError("Points are whole numbers from 1 to 1000.");
     }
+    return title;
+  }
+
+  async create(actor: string, input: { title: string; startsAt: Date; endsAt: Date; problems: { slug: string; points: number }[] }): Promise<ContestView> {
+    await this.admin.require(actor, "admin");
+    const title = this.validateContest(input);
     for (let attempt = 0; attempt < 5; attempt++) {
       const c = await this.repo.create({ slug: slugify(title), title, startsAt: input.startsAt, endsAt: input.endsAt, createdBy: actor, problems: input.problems });
-      if (c) return this.get(c.slug, actor);
+      if (c) {
+        await this.admin.record(actor, "contest.create", null, { slug: c.slug });
+        return this.get(c.slug, actor);
+      }
     }
     throw new Error("could not allocate a contest slug");
+  }
+
+  /** Edits a contest that hasn't started. The slug (its URL) stays the same. */
+  async update(actor: string, slug: string, input: { title: string; startsAt: Date; endsAt: Date; problems: { slug: string; points: number }[] }): Promise<ContestView> {
+    await this.admin.require(actor, "admin");
+    const c = await this.repo.findBySlug(slug);
+    if (!c) throw new NotFoundError("Contest not found.");
+    if (this.phase(c) !== "upcoming") throw new ConflictError("Only contests that haven't started can be edited.");
+    const title = this.validateContest(input);
+    await this.repo.update(c.id, { title, startsAt: input.startsAt, endsAt: input.endsAt, problems: input.problems });
+    await this.admin.record(actor, "contest.update", null, { slug });
+    return this.get(slug, actor);
   }
 
   async remove(actor: string, slug: string): Promise<void> {
@@ -141,6 +162,7 @@ export class ContestService {
     if (!c) throw new NotFoundError("Contest not found.");
     if (this.phase(c) !== "upcoming") throw new ConflictError("Only contests that haven't started can be deleted.");
     await this.repo.delete(c.id);
+    await this.admin.record(actor, "contest.delete", null, { slug });
   }
 
   async join(userId: string, slug: string): Promise<ContestView> {

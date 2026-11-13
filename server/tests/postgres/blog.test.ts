@@ -93,6 +93,25 @@ describe.skipIf(!safe)("BlogService on Postgres", () => {
     expect((await blog.get(p.slug, "alice")).status).toBe("published");
   });
 
+  it("the moderation queue lists hidden and visible posts and comments; comments can be restored", async () => {
+    await blog.create("mod", { title: "Seed for the mod profile", body });
+    await admin.grant("owner", "mod", "buddy");
+    const p = await blog.create("alice", { title: "Post with a comment", body });
+    const commentId = (await blog.comment("bob", p.slug, "a rude comment")).comments[0]?.id ?? "";
+    await blog.removeComment("mod", commentId);
+    await blog.remove("mod", p.slug);
+
+    await expect(blog.moderation("bob")).rejects.toMatchObject({ status: 403 });
+    const q = await blog.moderation("mod");
+    expect(q.posts.find((x) => x.slug === p.slug)).toMatchObject({ hidden: true, title: "Post with a comment" });
+    expect(q.comments.find((c) => c.id === commentId)).toMatchObject({ hidden: true, body: "a rude comment", post: { slug: p.slug } });
+
+    await expect(blog.setCommentHidden("bob", commentId, false)).rejects.toMatchObject({ status: 403 });
+    await blog.setCommentHidden("mod", commentId, false);
+    await blog.setHidden("mod", p.slug, false);
+    expect((await blog.get(p.slug, "alice")).comments.map((c) => c.body)).toEqual(["a rude comment"]);
+  });
+
   it("validates lengths and stores hostile Markdown as plain text for the sanitizer", async () => {
     await expect(blog.create("alice", { title: "Hi", body })).rejects.toThrow(/title must be 5–120/);
     const evil = '<img src=x onerror="alert(1)"> **bold** and enough text to pass.';

@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 
 const ROLE_LABEL = { admin: "Admin", reviewer: "Reviewer", buddy: "Buddy" } as const;
 
-function useLoad<T>(fetcher: (token: string | null) => Promise<T>, deps: unknown[] = []) {
+export function useLoad<T>(fetcher: (token: string | null) => Promise<T>, deps: unknown[] = []) {
   const { getToken } = useAuthState();
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);

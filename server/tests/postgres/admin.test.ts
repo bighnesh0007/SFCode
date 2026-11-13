@@ -46,8 +46,8 @@ describe.skipIf(!safe)("admin repository on Postgres", () => {
     expect(byDay["2026-11-10"]).toBeUndefined(); // before the window
     // Per problem, running submissions aren't graded yet so don't count.
     expect(d.problems.sort((a, b) => a.slug.localeCompare(b.slug))).toEqual([
-      { slug: "p1", submissions: 3, accepted: 2, solvers: 2 },
-      { slug: "p2", submissions: 1, accepted: 0, solvers: 0 },
+      { slug: "p1", submissions: 3, accepted: 2, solvers: 2, attempters: 2 },
+      { slug: "p2", submissions: 1, accepted: 0, solvers: 0, attempters: 1 },
     ]);
   });
 

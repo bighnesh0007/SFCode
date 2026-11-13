@@ -28,10 +28,11 @@ import { communityProblems, reviewQueue, setProblemActive, type CommunityProblem
 import { cn } from "@/lib/utils";
 import { getEmailUsage, sendTestDigest } from "@/lib/emailApi";
 import { AnnouncementTab, AuditTab, DashboardTab, ErrorsTab, TrafficTab, UserDrawer } from "@/components/admin/AdminTools";
+import { ContestsTab, ModerationTab, ProblemsTab, StoreTab } from "@/components/admin/ContentTools";
 import { STATUS_LABEL } from "@/lib/verdicts";
 import { PageSkeleton } from "@/components/ui/skeleton";
 
-type Tab = "dashboard" | "review" | "people" | "applications" | "problems" | "points" | "email" | "announcement" | "audit" | "errors" | "traffic";
+type Tab = "dashboard" | "review" | "people" | "applications" | "problems" | "points" | "email" | "announcement" | "audit" | "errors" | "traffic" | "contests" | "store" | "problem-stats" | "moderation";
 const ROLE_LABEL: Record<StaffRole, string> = { admin: "Admin", reviewer: "Reviewer", buddy: "Buddy" };
 
 export default function AdminPage() {
@@ -86,6 +87,10 @@ export default function AdminPage() {
     { id: "traffic", label: "Traffic", show: true },
     { id: "errors", label: "Errors", show: view === "owner" || view === "admin" },
     { id: "review", label: "Review queue", show: true },
+    { id: "moderation", label: "Moderation", show: true },
+    { id: "problem-stats", label: "Problems", show: true },
+    { id: "contests", label: "Contests", show: view === "owner" || view === "admin" },
+    { id: "store", label: "Store", show: view === "owner" || view === "admin" },
     { id: "people", label: "People", show: true },
     { id: "applications", label: "Buddy applications", show: true },
     { id: "problems", label: "Community problems", show: true },
@@ -139,6 +144,10 @@ export default function AdminPage() {
       {tab === "audit" && <AuditTab />}
       {tab === "errors" && <ErrorsTab />}
       {tab === "traffic" && <TrafficTab />}
+      {tab === "moderation" && <ModerationTab />}
+      {tab === "problem-stats" && <ProblemsTab />}
+      {tab === "contests" && <ContestsTab />}
+      {tab === "store" && <StoreTab />}
     </div>
   );
 }

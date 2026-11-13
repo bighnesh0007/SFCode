@@ -73,6 +73,25 @@ function checkLength(what: keyof typeof LIMITS, value: string): string {
   return v;
 }
 
+export interface ModerationPost {
+  slug: string;
+  title: string;
+  author: Author;
+  hidden: boolean;
+  score: number;
+  comments: number;
+  createdAt: string;
+}
+
+export interface ModerationComment {
+  id: string;
+  body: string;
+  author: Author;
+  hidden: boolean;
+  post: { slug: string; title: string };
+  createdAt: string;
+}
+
 export class BlogService {
   constructor(
     private readonly repo: BlogRepository,
@@ -169,6 +188,32 @@ export class BlogService {
     if (c.authorId === userId) return this.repo.deleteComment(c.id);
     if (!(await this.isModerator(userId))) throw new ForbiddenError("You can't remove this comment.");
     await this.repo.setCommentStatus(c.id, "hidden");
+  }
+
+  /** Restores (or hides) a comment. Buddies and up. */
+  async setCommentHidden(userId: string, commentId: string, hidden: boolean): Promise<void> {
+    await this.admin.require(userId, "buddy");
+    const c = await this.repo.findComment(commentId);
+    if (!c) throw new NotFoundError("Comment not found.");
+    await this.repo.setCommentStatus(c.id, hidden ? "hidden" : "published");
+  }
+
+  /** The newest posts and comments, hidden ones included, for the admin moderation tab. */
+  async moderation(userId: string): Promise<{ posts: ModerationPost[]; comments: ModerationComment[] }> {
+    await this.admin.require(userId, "buddy");
+    const [posts, comments] = await Promise.all([this.repo.recentPosts(50), this.repo.recentComments(100)]);
+    const authors = await this.authors([...posts.map((p) => p.authorId), ...comments.map((c) => c.authorId)]);
+    return {
+      posts: posts.map((p) => ({ slug: p.slug, title: p.title, author: this.author(authors, p.authorId), hidden: p.status === "hidden", score: p.score, comments: p.commentCount, createdAt: p.createdAt.toISOString() })),
+      comments: comments.map((c) => ({
+        id: c.id,
+        body: c.body.length > 280 ? `${c.body.slice(0, 279)}…` : c.body,
+        author: this.author(authors, c.authorId),
+        hidden: c.status === "hidden",
+        post: { slug: c.postSlug, title: c.postTitle },
+        createdAt: c.createdAt.toISOString(),
+      })),
+    };
   }
 
   /** A published post; hidden ones are treated as absent for writes. */
