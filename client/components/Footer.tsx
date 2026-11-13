@@ -41,7 +41,10 @@ export function Footer() {
       <div className="border-t">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} SFCode · MIT licensed</p>
-          <p>Not affiliated with or endorsed by Salesforce, Inc.</p>
+          <p>
+            <Link href="/privacy" className="hover:text-foreground hover:underline">Privacy</Link> ·{" "}
+            <Link href="/terms" className="hover:text-foreground hover:underline">Terms</Link> · Not affiliated with or endorsed by Salesforce, Inc.
+          </p>
         </div>
       </div>
     </footer>
