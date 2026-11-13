@@ -849,6 +849,817 @@
         "b"
       ],
       "explanation": "Unmanaged packages distribute editable components once; they don't support upgrades."
+    },
+    {
+      "id": "pab-profile-vs-permset",
+      "section": "fundamentals",
+      "prompt": "A few users on the same profile need to edit one extra object. What's the most maintainable way?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Clone the profile"
+        },
+        {
+          "id": "b",
+          "text": "Assign them a permission set"
+        },
+        {
+          "id": "c",
+          "text": "Change the organization-wide default"
+        },
+        {
+          "id": "d",
+          "text": "Add them to a queue"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Permission sets grant extra permissions to individual users without multiplying profiles."
+    },
+    {
+      "id": "pab-sharing-rule-criteria",
+      "section": "fundamentals",
+      "prompt": "Every Position in the Engineering department must be readable by the Engineering Managers group. OWD is Private. What do you create?",
+      "options": [
+        {
+          "id": "a",
+          "text": "An owner-based sharing rule"
+        },
+        {
+          "id": "b",
+          "text": "A criteria-based sharing rule on Department"
+        },
+        {
+          "id": "c",
+          "text": "A new profile"
+        },
+        {
+          "id": "d",
+          "text": "A record type"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Criteria-based sharing rules share records by field values, regardless of who owns them."
+    },
+    {
+      "id": "pab-manual-sharing",
+      "section": "fundamentals",
+      "prompt": "A recruiter wants to give one colleague access to one specific Candidate record, just this once. What's the simplest option?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A sharing rule"
+        },
+        {
+          "id": "b",
+          "text": "Manual sharing (the Sharing button)"
+        },
+        {
+          "id": "c",
+          "text": "Change the OWD"
+        },
+        {
+          "id": "d",
+          "text": "A permission set"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Manual sharing grants access to a single record, when the OWD is Private or Public Read Only."
+    },
+    {
+      "id": "pab-standard-vs-custom",
+      "section": "fundamentals",
+      "prompt": "The business tracks companies it sells to. Should you create a custom 'Company' object?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Yes, always build custom"
+        },
+        {
+          "id": "b",
+          "text": "No: use the standard Account object, which already integrates with Contacts, Opportunities and reports"
+        },
+        {
+          "id": "c",
+          "text": "Yes, standard objects can't be customised"
+        },
+        {
+          "id": "d",
+          "text": "Only with Apex"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Standard objects come with built-in features and relationships; reuse them before building custom ones."
+    },
+    {
+      "id": "pab-org-limits-fields",
+      "section": "fundamentals",
+      "prompt": "Where can an admin quickly see how many custom fields an object uses against its limit?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Object Manager, the object's Object Limits page"
+        },
+        {
+          "id": "b",
+          "text": "Setup Audit Trail"
+        },
+        {
+          "id": "c",
+          "text": "Schema Builder only"
+        },
+        {
+          "id": "d",
+          "text": "A report"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Each object's Object Limits page shows usage against limits for fields, relationships and more."
+    },
+    {
+      "id": "pab-global-search",
+      "section": "fundamentals",
+      "prompt": "Users can't find a custom object's records in global search. What's a likely cause?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The object doesn't 'Allow Search'"
+        },
+        {
+          "id": "b",
+          "text": "The object has no record types"
+        },
+        {
+          "id": "c",
+          "text": "The OWD is Private"
+        },
+        {
+          "id": "d",
+          "text": "The object has a lookup"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Custom objects need search allowed (and a tab, in some cases) to appear in global search."
+    },
+    {
+      "id": "pab-roles-vs-profiles",
+      "section": "fundamentals",
+      "prompt": "Which controls what records a user can see through the hierarchy, rather than what they can do?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Profile"
+        },
+        {
+          "id": "b",
+          "text": "Role"
+        },
+        {
+          "id": "c",
+          "text": "Permission set"
+        },
+        {
+          "id": "d",
+          "text": "Page layout"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Roles drive record visibility through the hierarchy; profiles and permission sets control what users can do."
+    },
+    {
+      "id": "pab-picklist-global",
+      "section": "data",
+      "prompt": "Several objects need the same Region picklist values. What keeps them in sync?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A global value set"
+        },
+        {
+          "id": "b",
+          "text": "Copy the values to each field"
+        },
+        {
+          "id": "c",
+          "text": "A lookup to a Region object only"
+        },
+        {
+          "id": "d",
+          "text": "A formula"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Global value sets share one list of values across picklist fields."
+    },
+    {
+      "id": "pab-lookup-delete",
+      "section": "data",
+      "prompt": "When deleting a parent record, what options exist for a custom lookup field's children? Choose 2.",
+      "options": [
+        {
+          "id": "a",
+          "text": "Clear the value of the lookup field"
+        },
+        {
+          "id": "b",
+          "text": "Don't allow deletion of the lookup record that's part of a lookup relationship"
+        },
+        {
+          "id": "c",
+          "text": "Always delete the children like master-detail"
+        },
+        {
+          "id": "d",
+          "text": "Move children to the Recycle Bin automatically"
+        }
+      ],
+      "answer": [
+        "a",
+        "b"
+      ],
+      "explanation": "Custom lookups can clear the field (default) or block the delete; cascade delete is for master-detail (and only some special cases)."
+    },
+    {
+      "id": "pab-md-reparent",
+      "section": "data",
+      "prompt": "By default, can a detail record be moved to a different master record?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Yes, always"
+        },
+        {
+          "id": "b",
+          "text": "No, unless 'Allow reparenting' is enabled on the relationship"
+        },
+        {
+          "id": "c",
+          "text": "Only by an admin"
+        },
+        {
+          "id": "d",
+          "text": "Only with Apex"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Master-detail fields can't be changed after creation unless reparenting is allowed."
+    },
+    {
+      "id": "pab-duplicate-rule",
+      "section": "data",
+      "prompt": "Users should be warned, but not blocked, when creating a Contact with an existing email. What do you configure?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A matching rule and a duplicate rule set to Allow with an alert"
+        },
+        {
+          "id": "b",
+          "text": "A validation rule"
+        },
+        {
+          "id": "c",
+          "text": "A unique email field"
+        },
+        {
+          "id": "d",
+          "text": "A sharing rule"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Duplicate rules can allow with an alert, or block; matching rules define what counts as a duplicate."
+    },
+    {
+      "id": "pab-field-history",
+      "section": "data",
+      "prompt": "Auditors want to see the old and new values of Salary changes on Position. What do you enable?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Field history tracking on Salary"
+        },
+        {
+          "id": "b",
+          "text": "Feed tracking"
+        },
+        {
+          "id": "c",
+          "text": "Setup Audit Trail"
+        },
+        {
+          "id": "d",
+          "text": "A validation rule"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Field history tracking records old and new values for chosen fields."
+    },
+    {
+      "id": "pab-rich-text-filter",
+      "section": "data",
+      "prompt": "Which field type can't be used to filter in a report or list view as flexibly as text?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Long text area"
+        },
+        {
+          "id": "b",
+          "text": "Picklist"
+        },
+        {
+          "id": "c",
+          "text": "Number"
+        },
+        {
+          "id": "d",
+          "text": "Checkbox"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Long and rich text areas have limited filtering; use other field types for values you filter on."
+    },
+    {
+      "id": "pab-formula-case",
+      "section": "logic",
+      "prompt": "A formula should return 'Low', 'Medium' or 'High' from a Priority picklist. Which function is most suitable?",
+      "options": [
+        {
+          "id": "a",
+          "text": "CASE(Priority__c, ...)"
+        },
+        {
+          "id": "b",
+          "text": "VLOOKUP"
+        },
+        {
+          "id": "c",
+          "text": "ISCHANGED"
+        },
+        {
+          "id": "d",
+          "text": "HYPERLINK"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "CASE works with picklists and returns a value for each match."
+    },
+    {
+      "id": "pab-ispickval",
+      "section": "logic",
+      "prompt": "Which is the correct way to test a picklist value in a formula?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Status__c = 'Open'"
+        },
+        {
+          "id": "b",
+          "text": "ISPICKVAL(Status__c, 'Open')"
+        },
+        {
+          "id": "c",
+          "text": "TEXT(Status__c) == 'Open' only in Apex"
+        },
+        {
+          "id": "d",
+          "text": "CONTAINS(Status__c, 'Open')"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Picklists are tested with ISPICKVAL (or TEXT(field) = 'value')."
+    },
+    {
+      "id": "pab-blankvalue",
+      "section": "logic",
+      "prompt": "A formula should use Discount__c, or 0 when it's blank. Which function?",
+      "options": [
+        {
+          "id": "a",
+          "text": "BLANKVALUE(Discount__c, 0)"
+        },
+        {
+          "id": "b",
+          "text": "ISBLANK(Discount__c)"
+        },
+        {
+          "id": "c",
+          "text": "NULLIF(Discount__c)"
+        },
+        {
+          "id": "d",
+          "text": "COALESCE(Discount__c)"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "BLANKVALUE returns a substitute when the field is blank."
+    },
+    {
+      "id": "pab-validation-isnew",
+      "section": "logic",
+      "prompt": "A validation rule should apply only when a record is created, not on edits. Which function helps?",
+      "options": [
+        {
+          "id": "a",
+          "text": "ISNEW()"
+        },
+        {
+          "id": "b",
+          "text": "PRIORVALUE()"
+        },
+        {
+          "id": "c",
+          "text": "ISCHANGED()"
+        },
+        {
+          "id": "d",
+          "text": "NOW()"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "ISNEW() is true only when the record is being created."
+    },
+    {
+      "id": "pab-screen-flow",
+      "section": "logic",
+      "prompt": "Support agents need a guided, multi-step form to log a product return. What do you build?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A screen flow"
+        },
+        {
+          "id": "b",
+          "text": "A validation rule"
+        },
+        {
+          "id": "c",
+          "text": "A record-triggered flow"
+        },
+        {
+          "id": "d",
+          "text": "A formula"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Screen flows show screens to users and collect input step by step."
+    },
+    {
+      "id": "pab-after-save-related",
+      "section": "logic",
+      "prompt": "When an Opportunity is Closed Won, create a project record. Which flow type and timing?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Record-triggered flow, after save (Actions and Related Records)"
+        },
+        {
+          "id": "b",
+          "text": "Before-save flow"
+        },
+        {
+          "id": "c",
+          "text": "Screen flow"
+        },
+        {
+          "id": "d",
+          "text": "Scheduled flow"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Creating other records needs an after-save record-triggered flow."
+    },
+    {
+      "id": "pab-approval-steps",
+      "section": "logic",
+      "prompt": "An expense needs manager approval, then Finance approval if it's over $5,000. How is this modelled?",
+      "options": [
+        {
+          "id": "a",
+          "text": "One approval process with two steps, the second with entry criteria for amount over 5,000"
+        },
+        {
+          "id": "b",
+          "text": "Two validation rules"
+        },
+        {
+          "id": "c",
+          "text": "Two record types"
+        },
+        {
+          "id": "d",
+          "text": "A screen flow only"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Approval processes can have multiple steps, each with its own criteria and approvers."
+    },
+    {
+      "id": "pab-roll-up-filter",
+      "section": "logic",
+      "prompt": "Position needs the number of open Job Applications only. What can a roll-up summary do?",
+      "options": [
+        {
+          "id": "a",
+          "text": "COUNT with filter criteria Status = Open"
+        },
+        {
+          "id": "b",
+          "text": "Nothing; roll-ups can't filter"
+        },
+        {
+          "id": "c",
+          "text": "Only SUM"
+        },
+        {
+          "id": "d",
+          "text": "Only on lookup relationships"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Roll-up summaries can filter which detail records are included."
+    },
+    {
+      "id": "pab-flow-get-records",
+      "section": "logic",
+      "prompt": "A flow needs the Account's open Cases to decide what to do. Which element fetches them?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Get Records"
+        },
+        {
+          "id": "b",
+          "text": "Create Records"
+        },
+        {
+          "id": "c",
+          "text": "Assignment"
+        },
+        {
+          "id": "d",
+          "text": "Screen"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Get Records queries records into variables for later elements."
+    },
+    {
+      "id": "pab-related-list",
+      "section": "ui",
+      "prompt": "Users want to see an Account's Job Applications directly on the Account page. Which relationship and layout element?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A lookup or master-detail to Account, and the related list on the layout or page"
+        },
+        {
+          "id": "b",
+          "text": "A formula field"
+        },
+        {
+          "id": "c",
+          "text": "A custom tab"
+        },
+        {
+          "id": "d",
+          "text": "A list view"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Related lists show child records of a relationship on the parent's page."
+    },
+    {
+      "id": "pab-utility-bar",
+      "section": "ui",
+      "prompt": "Recruiters want quick access to notes and recent items from anywhere in their app. What do you add?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Utility bar items in the Lightning app"
+        },
+        {
+          "id": "b",
+          "text": "A related list"
+        },
+        {
+          "id": "c",
+          "text": "A compact layout"
+        },
+        {
+          "id": "d",
+          "text": "A record type"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The utility bar gives persistent access to tools like Notes and Recent Items."
+    },
+    {
+      "id": "pab-component-visibility",
+      "section": "ui",
+      "prompt": "A Lightning component on the Account page should show only for users with a certain permission. How?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A component visibility filter based on the user's permission"
+        },
+        {
+          "id": "b",
+          "text": "A new profile"
+        },
+        {
+          "id": "c",
+          "text": "A validation rule"
+        },
+        {
+          "id": "d",
+          "text": "A record type"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Lightning App Builder visibility filters can check record fields, user attributes, permissions and device."
+    },
+    {
+      "id": "pab-custom-button",
+      "section": "ui",
+      "prompt": "Users need a link on Account that opens the company's website search for that account's name. What do you create?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A custom button or link with a URL using merge fields"
+        },
+        {
+          "id": "b",
+          "text": "A validation rule"
+        },
+        {
+          "id": "c",
+          "text": "A roll-up summary"
+        },
+        {
+          "id": "d",
+          "text": "A queue"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Custom buttons and links can build URLs from record fields."
+    },
+    {
+      "id": "pab-home-page",
+      "section": "ui",
+      "prompt": "Sales managers want a home page with a dashboard and their team's key list. What do you use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A custom Lightning home page in Lightning App Builder, assigned to their profile"
+        },
+        {
+          "id": "b",
+          "text": "A record page"
+        },
+        {
+          "id": "c",
+          "text": "A report folder"
+        },
+        {
+          "id": "d",
+          "text": "A list view"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Home pages are built in Lightning App Builder and assigned by app and profile."
+    },
+    {
+      "id": "pab-change-set-deps",
+      "section": "deployment",
+      "prompt": "A change set deploy fails because a page layout references a field not in production. What fixes it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Add the field (use 'View/Add Dependencies') to the change set"
+        },
+        {
+          "id": "b",
+          "text": "Delete the layout"
+        },
+        {
+          "id": "c",
+          "text": "Deploy twice"
+        },
+        {
+          "id": "d",
+          "text": "Use Data Loader"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Change sets must include dependent components that don't exist in the target org."
+    },
+    {
+      "id": "pab-deployment-connection",
+      "section": "deployment",
+      "prompt": "Before a sandbox can send a change set to production, what must be configured in production?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A deployment connection allowing inbound changes from that sandbox"
+        },
+        {
+          "id": "b",
+          "text": "A new profile"
+        },
+        {
+          "id": "c",
+          "text": "A sharing rule"
+        },
+        {
+          "id": "d",
+          "text": "Nothing"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Production must allow inbound changes from the sandbox in Deployment Settings."
+    },
+    {
+      "id": "pab-release-plan",
+      "section": "deployment",
+      "prompt": "What's a good practice before deploying a change set to production?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Validate it first, then deploy during a planned window and tell users"
+        },
+        {
+          "id": "b",
+          "text": "Deploy during business hours without notice"
+        },
+        {
+          "id": "c",
+          "text": "Skip testing in the sandbox"
+        },
+        {
+          "id": "d",
+          "text": "Delete old fields first"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Validation catches errors early; planned releases and communication reduce disruption."
     }
   ]
 }
