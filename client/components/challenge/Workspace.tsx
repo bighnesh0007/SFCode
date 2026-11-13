@@ -17,6 +17,7 @@ import { useSubmitShortcut } from "@/components/challenge/useSubmitShortcut";
 import { useIsNarrow } from "@/lib/useIsNarrow";
 import { Markdown } from "@/components/Markdown";
 import { LearningPanel } from "@/components/challenge/LearningPanel";
+import { SolutionSize } from "@/components/challenge/SolutionSize";
 import { DiscussionPanel } from "@/components/challenge/DiscussionPanel";
 import { useOrgConnection } from "@/components/useOrgConnection";
 import { ApiError } from "@/lib/apiClient";
@@ -228,6 +229,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
                   )}
                   <Markdown source={challenge.statement} className="markdown mt-5" />
                   <LearningPanel slug={challenge.slug} hintCount={challenge.hintCount ?? 0} hasEditorial={challenge.hasEditorial ?? false} />
+                  <SolutionSize slug={challenge.slug} />
                   <div className="mt-6 flex gap-2 rounded-lg border bg-muted/30 p-3 text-xs text-muted-foreground">
                     <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                     {challenge.flow ? (

@@ -10,6 +10,7 @@ import { ClerkTokenVerifier } from "./services/identity/clerkTokenVerifier.ts";
 import { SalesforceConnectionService } from "./services/salesforce/connection.service.ts";
 import { SalesforceClient } from "./services/salesforce/salesforceClient.ts";
 import { systemClock, type TokenVerifier } from "./types/ports.ts";
+import { SolutionSizeService } from "./services/size/solutionSize.service.ts";
 import { PgChallengeSubmissionRepository } from "./repositories/challengeSubmission.repository.ts";
 import { ChallengeCatalog } from "./services/challenges/catalog.ts";
 import { QuestionBank } from "./services/certification/bank.ts";
@@ -67,6 +68,7 @@ export interface Container {
   blog?: BlogService;
   contests?: ContestService;
   store?: StoreService;
+  solutionSize?: SolutionSizeService;
   roadmaps?: RoadmapService;
   daily?: DailyService;
   points?: PointsService;
@@ -160,6 +162,7 @@ export function buildContainer(): Container {
     container.contests = new ContestService(contestRepo ?? new PgContestRepository(container.db), catalog, new PgProfileRepository(container.db), container.community, container.admin, systemClock);
     container.daily = new DailyService(new PgDailyRepository(container.db), catalog, systemClock);
     container.store = new StoreService(new PgStoreRepository(container.db), new PgChallengeSubmissionRepository(container.db), catalog, container.contests, container.daily, container.points);
+    container.solutionSize = new SolutionSizeService(new PgChallengeSubmissionRepository(container.db), (slug) => catalog.get(slug) !== undefined);
     container.store.setAdminTools({ admin: container.admin, settings: new PgSettingsRepository(container.db) });
     if (config.lwcRunnerImage) {
       const sandbox = new LwcSandbox(config.lwcRunnerImage);

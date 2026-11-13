@@ -105,6 +105,17 @@ describe.skipIf(!safe)("PgChallengeSubmissionRepository", () => {
     expect(await repo.findById(r.id)).toMatchObject({ deployId: "0Af1", files: { SfcA: "class SfcA {}" }, result: { verdict: "wrong_answer" } });
   });
 
+  it("lists accepted files for one problem across users", async () => {
+    for (const [user, slug, status] of [["u1", "p1", "accepted"], ["u2", "p1", "wrong_answer"], ["u3", "p1", "accepted"], ["u1", "p2", "accepted"]] as const) {
+      const r = await repo.createRunning(input(user, slug));
+      if (!r) throw new Error("setup");
+      await repo.complete(r.id, status, result(status), new Date());
+    }
+    const rows = await repo.acceptedFiles("p1");
+    expect(rows.map((r) => r.userId).sort()).toEqual(["u1", "u3"]);
+    expect(rows[0]?.files).toEqual({ SfcA: "class SfcA {}" });
+  });
+
   it("reports progress per problem", async () => {
     for (const [slug, status] of [["p1", "wrong_answer"], ["p1", "accepted"], ["p2", "compile_error"]] as const) {
       const r = await repo.createRunning(input("u1", slug));

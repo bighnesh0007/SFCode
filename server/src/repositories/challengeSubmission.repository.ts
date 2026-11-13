@@ -33,6 +33,8 @@ export interface ChallengeSubmissionRepository {
   firstSolves(since?: Date, userId?: string): Promise<{ userId: string; slug: string; at: Date }[]>;
   /** Submissions per UTC day for one user since a date (any verdict). */
   dailyActivity(userId: string, since: Date): Promise<{ day: string; count: number }[]>;
+  /** Source of every accepted submission for one problem, all users. */
+  acceptedFiles(problemSlug: string): Promise<{ userId: string; files: Record<string, string> }[]>;
 }
 
 export class PgChallengeSubmissionRepository implements ChallengeSubmissionRepository {
@@ -62,6 +64,13 @@ export class PgChallengeSubmissionRepository implements ChallengeSubmissionRepos
       .where(and(eq(challengeSubmissions.id, id), eq(challengeSubmissions.status, "running")))
       .returning({ id: challengeSubmissions.id });
     return rows.length > 0;
+  }
+
+  async acceptedFiles(problemSlug: string): Promise<{ userId: string; files: Record<string, string> }[]> {
+    return this.db
+      .select({ userId: challengeSubmissions.userId, files: challengeSubmissions.files })
+      .from(challengeSubmissions)
+      .where(and(eq(challengeSubmissions.problemSlug, problemSlug), eq(challengeSubmissions.status, "accepted")));
   }
 
   async findById(id: string): Promise<SubmissionRecord | null> {

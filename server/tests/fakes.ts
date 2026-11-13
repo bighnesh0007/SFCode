@@ -118,6 +118,10 @@ export class MemorySubmissionRepository implements ChallengeSubmissionRepository
     }
     return Promise.resolve([...days].sort().map(([day, count]) => ({ day, count })));
   }
+
+  acceptedFiles(problemSlug: string) {
+    return Promise.resolve([...this.rows.values()].filter((r) => r.problemSlug === problemSlug && r.status === "accepted").map((r) => ({ userId: r.userId, files: r.files })));
+  }
   progress(userId: string) {
     const out = new Map<string, "solved" | "attempted">();
     for (const r of this.rows.values()) {
