@@ -1,0 +1,6 @@
+<template>
+    <p class="time">{display}</p>
+    <button class="start" disabled={running} onclick={start}>Start</button>
+    <button class="pause" disabled={notRunning} onclick={pause}>Pause</button>
+    <button class="reset" onclick={reset}>Reset</button>
+</template>

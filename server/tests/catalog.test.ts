@@ -57,6 +57,10 @@ describe("the shipped problems", () => {
       "lwc-cart-total",
       "lwc-password-strength",
       "lwc-dependent-picklist",
+      "lwc-show-more",
+      "lwc-temperature-converter",
+      "lwc-countdown",
+      "lwc-undo-redo",
     ]);
   });
 });

@@ -1,0 +1,16 @@
+{
+  "title": "Show More / Show Less",
+  "track": "lwc",
+  "difficulty": "Easy",
+  "category": "Reactivity",
+  "order": 414,
+  "tags": [
+    "lwc:if",
+    "reactive fields",
+    "aria-expanded"
+  ],
+  "files": [],
+  "lwc": {
+    "component": "showMore"
+  }
+}

@@ -1,0 +1,5 @@
+[
+  "One boolean field, expanded, starting false. Clicking the button flips it.",
+  "A getter returns the text to show: the full text when expanded or short enough, otherwise text.slice(0, limit) + '…'.",
+  "Two more getters: needsToggle (text.length > limit) for lwc:if around the button, and the label and aria-expanded string."
+]
