@@ -1,5 +1,5 @@
 /** Onboarding quiz and roadmaps. Shapes mirror server/src/services/roadmap. */
-import { apiRequest } from "./apiClient";
+import { API_BASE_URL, apiRequest } from "./apiClient";
 
 type Token = string | null;
 
@@ -24,6 +24,12 @@ export interface RoadmapNode {
   title: string;
   summary: string;
   lesson?: string;
+  concepts?: string[];
+  pitfalls?: string[];
+  resources?: { title: string; url: string; kind: "docs" | "trailhead" | "guide" | "video" }[];
+  diagram?: string;
+  diagramCaption?: string;
+  optional?: boolean;
   level: number;
   col: number;
   depth: number;
@@ -34,7 +40,7 @@ export interface RoadmapNode {
   read: boolean;
   completeByReading: boolean;
   completeByQuiz: boolean;
-  quiz?: { q: string; options: string[] }[];
+  quiz?: { q: string; options: string[]; image?: string; imageAlt?: string }[];
   problems: { slug: string; title: string; track: string; difficulty: string; status: "solved" | "attempted" | "todo" }[];
 }
 export interface RoadmapView {
@@ -80,3 +86,6 @@ export interface PlacementResult {
 export const getPlacement = (track: PlacementTrack) => apiRequest<PlacementQuestion[]>(`/api/v1/placement/${track}`);
 export const gradePlacement = (track: PlacementTrack, answers: Record<string, number>) =>
   apiRequest<PlacementResult>(`/api/v1/placement/${track}`, { method: "POST", body: { answers } });
+
+/** Where a roadmap diagram is served (an SVG; shown with <img>, so it can't run scripts). */
+export const diagramUrl = (name: string) => `${API_BASE_URL}/api/v1/roadmaps/diagrams/${encodeURIComponent(name)}.svg`;
