@@ -110,8 +110,8 @@ export function mountRoutes(app: Application, container: Container): void {
     const certService = container.certification;
     cert.get("/review", verifier ? requireAuth(verifier) : disabled("Sign-in"), (async (req, res) => ok(res, await certService.review(req.auth?.userId ?? ""))) as RequestHandler);
     cert.get("/:exam/questions", validate({ params: examParams, query: practiceQuery }), c.practice);
-    cert.get("/:exam/mock", validate({ params: examParams }), c.mock);
-    cert.post("/:exam/mock/grade", identify, limiter(20), validate({ params: examParams, body: mockGradeBody }), c.gradeMock);
+    cert.get("/:exam/mock", limiter(30), validate({ params: examParams }), c.mock);
+    cert.post("/:exam/mock/grade", limiter(20), identify, validate({ params: examParams, body: mockGradeBody }), c.gradeMock);
     cert.post("/answers", identify, limiter(60), validate({ body: answerBody }), c.answer);
   } else {
     cert.use(disabled("Certification Prep"));
