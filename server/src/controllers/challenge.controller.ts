@@ -9,8 +9,11 @@ export function challengeController(service: ChallengeService) {
     ok(res, { difficulties: service.difficulties(), challenges: await service.list(req.auth?.userId ?? null, validatedQuery<ListQuery>(req).track) });
   };
 
-  const get: RequestHandler = (req, res) => {
-    ok(res, service.get(validatedParams<SlugParams>(req).slug));
+  const get: RequestHandler = async (req, res) => {
+    const { slug } = validatedParams<SlugParams>(req);
+    const view = service.get(slug);
+    const author = await service.author(slug);
+    ok(res, author ? { ...view, author } : view);
   };
 
   const submit: RequestHandler = async (req, res) => {

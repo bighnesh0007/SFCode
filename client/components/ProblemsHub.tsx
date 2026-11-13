@@ -162,6 +162,7 @@ export function ProblemsHub() {
                     <td className="py-3 pr-3">
                       <Link href={`${info.base}/${c.slug}`} title={c.title} className="block truncate font-medium hover:text-primary">
                         {c.title}
+                        {c.community && <span className="ml-2 rounded-full bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-medium text-sky-600 dark:text-sky-400">Community</span>}
                       </Link>
                     </td>
                     <td className="hidden truncate py-3 pr-3 text-muted-foreground sm:table-cell">{c.category}</td>

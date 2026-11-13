@@ -34,6 +34,8 @@ export interface AchievementInput {
   contestsEntered: number;
   bestPlacement: number | null;
   roadmapPct: number | null;
+  /** Live community problems the user wrote. */
+  contributions?: number;
 }
 
 export interface Achievement {
@@ -64,6 +66,8 @@ export const ACHIEVEMENTS: Def[] = [
   { id: "streak-30", title: "Unstoppable", description: "Practise 30 days in a row.", icon: "flame", target: 30, measure: (i) => i.longestStreak },
   { id: "contestant", title: "Contestant", description: "Enter a contest.", icon: "swords", target: 1, measure: (i) => i.contestsEntered },
   { id: "podium", title: "Podium", description: "Finish top 3 in a contest.", icon: "medal", target: 1, measure: (i) => (i.bestPlacement !== null && i.bestPlacement <= 3 ? 1 : 0) },
+  { id: "contributor", title: "Contributor", description: "Get a problem you wrote published.", icon: "pen", target: 1, measure: (i) => i.contributions ?? 0 },
+  { id: "problem-setter", title: "Problem Setter", description: "Get 5 problems you wrote published.", icon: "pen", target: 5, measure: (i) => i.contributions ?? 0 },
   { id: "pathfinder", title: "Pathfinder", description: "Finish half of your roadmap.", icon: "map", target: 50, measure: (i) => i.roadmapPct ?? 0 },
 ];
 

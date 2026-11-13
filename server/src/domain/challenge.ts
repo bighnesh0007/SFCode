@@ -44,6 +44,8 @@ export interface Challenge {
    * browser (sandboxed iframe), so `tests` is sent to the client by design.
    */
   lwc?: { component: string; tests: string };
+  /** Community problems: the Buddy who wrote it (built-in problems have none). */
+  authorId?: string;
 }
 
 export const VERDICTS = ["accepted", "wrong_answer", "compile_error", "coverage", "error"] as const;

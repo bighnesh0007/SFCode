@@ -33,6 +33,34 @@ function setup(opts: { statusFixture?: () => string } = {}) {
   return { clock, subs, fetch, service, connect, conns };
 }
 
+describe("community problems in the catalog", () => {
+  it("are flagged in the list and credit their author; built-ins have no author", async () => {
+    const own = ChallengeCatalog.load(PROBLEMS_DIR);
+    const base = own.get("text-utils");
+    if (!base) throw new Error("fixture missing");
+    own.add({ ...base, slug: "community-one", order: own.nextCommunityOrder(), authorId: "bud", files: [{ name: "SfcCommunityOne", type: "class" }], testClass: { name: "SfcCommunityOneTest", source: base.testClass.source } });
+    const service = new ChallengeService(own, new MemorySubmissionRepository(fixedClock()), undefined, fixedClock());
+    service.setAuthorLookup((id) => Promise.resolve(id === "bud" ? { handle: "ann", displayName: "Ann" } : null));
+    const list = await service.list(null, "apex");
+    expect(list.find((c) => c.slug === "community-one")?.community).toBe(true);
+    expect(list.find((c) => c.slug === "text-utils")?.community).toBe(false);
+    expect(await service.author("community-one")).toEqual({ handle: "ann", displayName: "Ann" });
+    expect(await service.author("text-utils")).toBeNull();
+    expect(list.at(-1)?.slug).toBe("community-one"); // community problems sort after built-ins
+  });
+
+  it("the catalog refuses a community problem reusing a built-in Apex name, and removes cleanly", () => {
+    const own = ChallengeCatalog.load(PROBLEMS_DIR);
+    const base = own.get("text-utils");
+    if (!base) throw new Error("fixture missing");
+    const clash = { ...base, slug: "copycat", order: own.nextCommunityOrder() };
+    expect(own.conflict(clash)).toMatch(/SfcTextUtils is also used by text-utils/);
+    expect(() => own.add(clash)).toThrow();
+    own.remove("text-utils");
+    expect(own.conflict(clash)).toBeNull();
+  });
+});
+
 describe("ChallengeService — what clients can see", () => {
   it("never exposes hidden tests or the reference solution", async () => {
     const { service } = setup();

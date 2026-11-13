@@ -280,3 +280,63 @@ export const buddyApplications = pgTable(
   // At most one pending application per user.
   (t) => [uniqueIndex("buddy_applications_one_pending_idx").on(t.userId).where(sql`status = 'pending'`)],
 );
+
+export type DraftStatus = "draft" | "submitted" | "changes_requested" | "approved" | "rejected";
+
+/** The content of a community problem (no slug or order: assigned on approval). */
+export interface ProblemContent {
+  title: string;
+  track: "apex" | "debug" | "soql";
+  difficulty: "Easy" | "Medium" | "Hard";
+  category: string;
+  tags: string[];
+  statement: string;
+  files: { name: string; type: "class" | "trigger" | "soql" }[];
+  starter: Record<string, string>;
+  reference: Record<string, string>;
+  testClass: string;
+  testSource: string;
+}
+
+/** Last "run in my org" result for a draft: reference must pass, starter must fail. */
+export interface DraftCheck {
+  status: "running" | "passed" | "failed" | "error";
+  by: string;
+  at: string;
+  reference?: { verdict: string; passed: number; run: number; message: string | null };
+  starter?: { verdict: string };
+  message?: string;
+  /** Hash of the content that was checked: any edit invalidates the result. */
+  contentHash: string;
+}
+
+/** Staging: Buddies write here; reviewers decide. Never graded for learners. */
+export const problemDrafts = pgTable(
+  "problem_drafts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    authorId: text("author_id").notNull(),
+    status: text("status").$type<DraftStatus>().notNull().default("draft"),
+    slug: text("slug").notNull(),
+    content: jsonb("content").$type<ProblemContent>().notNull(),
+    check: jsonb("check").$type<DraftCheck>(),
+    reviewNote: text("review_note"),
+    reviewedBy: text("reviewed_by"),
+    publishedSlug: text("published_slug"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("problem_drafts_author_idx").on(t.authorId), index("problem_drafts_status_idx").on(t.status)],
+);
+
+/** Live community problems, merged into the catalog next to the built-in ones. */
+export const problems = pgTable("problems", {
+  slug: text("slug").primaryKey(),
+  ord: integer("ord").notNull().unique(),
+  authorId: text("author_id").notNull(),
+  approvedBy: text("approved_by").notNull(),
+  draftId: uuid("draft_id").notNull(),
+  content: jsonb("content").$type<ProblemContent>().notNull(),
+  active: boolean("active").notNull().default(true),
+  publishedAt: timestamp("published_at", { withTimezone: true }).notNull().defaultNow(),
+});

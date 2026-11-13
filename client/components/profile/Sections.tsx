@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Award, Briefcase, Bug, Check, Coins, Copy, Database, Flame, Code2, Gauge, Link2, Map as MapIcon, MapPin, Medal, Mountain, Share2, Sparkles, Swords, Timer, Trophy, Workflow, Zap } from "lucide-react";
+import { Award, Briefcase, Bug, Check, Coins, Copy, Database, Flame, Code2, Gauge, Link2, Map as MapIcon, MapPin, Medal, PenLine, Mountain, Share2, Sparkles, Swords, Timer, Trophy, Workflow, Zap } from "lucide-react";
 import { useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
@@ -10,7 +10,7 @@ import { CERTIFICATIONS, updateMyAbout, type ProfileView as Profile } from "@/li
 import { trackInfo } from "@/lib/tracks";
 import { cn } from "@/lib/utils";
 
-const ICONS: Record<string, typeof Award> = { sparkles: Sparkles, database: Database, zap: Zap, bug: Bug, workflow: Workflow, gauge: Gauge, timer: Timer, mountain: Mountain, trophy: Trophy, flame: Flame, swords: Swords, medal: Medal, map: MapIcon };
+const ICONS: Record<string, typeof Award> = { sparkles: Sparkles, database: Database, zap: Zap, bug: Bug, workflow: Workflow, gauge: Gauge, timer: Timer, mountain: Mountain, trophy: Trophy, flame: Flame, swords: Swords, medal: Medal, map: MapIcon, pen: PenLine };
 
 /** Headline numbers. */
 export function StatsStrip({ p }: { p: Profile }) {

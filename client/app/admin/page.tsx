@@ -24,17 +24,18 @@ import {
   type Standing,
   type StaffRole,
 } from "@/lib/adminApi";
+import { communityProblems, reviewQueue, setProblemActive, type CommunityProblemRow, type DraftRow } from "@/lib/draftsApi";
 import { cn } from "@/lib/utils";
 import { STATUS_LABEL } from "@/lib/verdicts";
 
-type Tab = "people" | "applications" | "points";
+type Tab = "review" | "people" | "applications" | "problems" | "points";
 const ROLE_LABEL: Record<StaffRole, string> = { admin: "Admin", reviewer: "Reviewer", buddy: "Buddy" };
 
 export default function AdminPage() {
   const { isLoaded, isSignedIn, getToken } = useAuthState();
   const [standing, setStanding] = useState<Standing | "none" | null>(null);
   const [overview, setOverview] = useState<AdminOverview | null>(null);
-  const [tab, setTab] = useState<Tab>("people");
+  const [tab, setTab] = useState<Tab>("review");
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
@@ -80,8 +81,10 @@ export default function AdminPage() {
     ? [["Learners", overview.learners], ["Connected orgs", overview.connectedOrgs], ["Submissions", overview.submissions], ["Last 24 hours", overview.submissions24h]]
     : [];
   const tabs: { id: Tab; label: string; show: boolean }[] = [
+    { id: "review", label: "Review queue", show: true },
     { id: "people", label: "People", show: true },
     { id: "applications", label: "Buddy applications", show: true },
+    { id: "problems", label: "Community problems", show: true },
     { id: "points", label: "Points", show: view === "owner" || view === "admin" },
   ];
 
@@ -118,10 +121,82 @@ export default function AdminPage() {
         ))}
       </div>
 
+      {tab === "review" && <ReviewQueue />}
+      {tab === "problems" && <CommunityProblems canToggle={view === "owner" || view === "admin"} />}
       {tab === "people" && <People view={view} />}
       {tab === "applications" && <Applications />}
       {tab === "points" && <Points />}
     </div>
+  );
+}
+
+function ReviewQueue() {
+  const { getToken } = useAuthState();
+  const [rows, setRows] = useState<DraftRow[] | null>(null);
+  useEffect(() => {
+    getToken()
+      .then((t) => reviewQueue(t))
+      .then(setRows)
+      .catch(() => setRows([]));
+  }, [getToken]);
+  return (
+    <section className="mt-5">
+      <p className="text-xs text-muted-foreground">Open a draft, run it in your own org (it must pass), then approve, request changes or reject. You can&apos;t review your own problems.</p>
+      {rows === null && <div className="mt-3 h-20 animate-pulse rounded-lg bg-muted/50" />}
+      {rows?.length === 0 && <p className="py-10 text-center text-sm text-muted-foreground">Nothing waiting for review.</p>}
+      {rows && rows.length > 0 && (
+        <ul className="mt-3 divide-y rounded-lg border text-sm">
+          {rows.map((r) => (
+            <li key={r.id}>
+              <Link href={`/contribute/drafts/${r.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-accent/60">
+                <span className="min-w-0 flex-1 truncate font-medium">{r.title}</span>
+                <span className="text-xs text-muted-foreground">{r.track} · {r.difficulty}</span>
+                <span className="text-xs text-muted-foreground">@{r.author ?? "?"} · {new Date(r.updatedAt).toLocaleDateString()}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function CommunityProblems({ canToggle }: { canToggle: boolean }) {
+  const { getToken } = useAuthState();
+  const [rows, setRows] = useState<CommunityProblemRow[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const load = useCallback(() => {
+    getToken()
+      .then((t) => communityProblems(t))
+      .then(setRows)
+      .catch(() => setRows([]));
+  }, [getToken]);
+  useEffect(load, [load]);
+  async function toggle(r: CommunityProblemRow) {
+    setError(null);
+    try {
+      await setProblemActive(await getToken(), r.slug, !r.active);
+      load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not change it.");
+    }
+  }
+  return (
+    <section className="mt-5">
+      {error && <p className="mb-2 text-sm text-destructive">{error}</p>}
+      {rows?.length === 0 && <p className="py-10 text-center text-sm text-muted-foreground">No community problems published yet.</p>}
+      {rows && rows.length > 0 && (
+        <ul className="divide-y rounded-lg border text-sm">
+          {rows.map((r) => (
+            <li key={r.slug} className="flex items-center gap-3 px-4 py-2.5">
+              <span className={cn("min-w-0 flex-1 truncate font-medium", !r.active && "text-muted-foreground line-through")}>{r.title}</span>
+              <span className="text-xs text-muted-foreground">{r.track} · {r.difficulty} · @{r.author ?? "?"}</span>
+              {canToggle && <Button size="sm" variant="ghost" onClick={() => void toggle(r)}>{r.active ? "Unpublish" : "Republish"}</Button>}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 

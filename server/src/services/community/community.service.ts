@@ -34,6 +34,8 @@ export interface ProfileExtras {
   coins(userId: string): Promise<number>;
   contestHistory(userId: string): Promise<ContestResult[]>;
   roadmapProgress(userId: string): Promise<{ title: string; done: number; total: number } | null>;
+  /** Live community problems this user wrote. */
+  contributions(userId: string): Promise<number>;
 }
 
 export interface ContestResult {
@@ -52,6 +54,8 @@ export interface ProfileStats {
   contests: number;
   bestPlacement: number | null;
   activeDays: number;
+  /** Community problems they wrote that are live. */
+  contributions: number;
 }
 
 export interface ProfileView {
@@ -202,11 +206,12 @@ export class CommunityService {
     const since = new Date(this.clock.nowMs() - ACTIVITY_DAYS * 86_400_000);
     const activity = await this.submissions.dailyActivity(p.userId, since);
     const streak = streaks(activity.filter((d) => d.count > 0).map((d) => d.day), this.clock.now().toISOString().slice(0, 10));
-    const [coins, contests, roadmap, about] = await Promise.all([
+    const [coins, contests, roadmap, about, contributions] = await Promise.all([
       this.extras ? this.extras.coins(p.userId) : Promise.resolve(null),
       this.extras ? this.extras.contestHistory(p.userId) : Promise.resolve([]),
       this.extras ? this.extras.roadmapProgress(p.userId) : Promise.resolve(null),
       this.about ? this.about.get(p.userId) : Promise.resolve(null),
+      this.extras ? this.extras.contributions(p.userId) : Promise.resolve(0),
     ]);
     const bestPlacement = contests.length ? Math.min(...contests.map((c) => c.rank)) : null;
     const table = await this.points.table();
@@ -214,7 +219,7 @@ export class CommunityService {
 
     return {
       about: about ?? EMPTY_ABOUT,
-      stats: { streak: streak.current, longestStreak: streak.longest, coins, contests: contests.length, bestPlacement, activeDays: activity.filter((d) => d.count > 0).length },
+      stats: { streak: streak.current, longestStreak: streak.longest, coins, contests: contests.length, bestPlacement, activeDays: activity.filter((d) => d.count > 0).length, contributions },
       achievements: achievements({
         solved: solvedScored.map((c) => ({ slug: c.slug, track: c.track, difficulty: c.difficulty, category: c.category })),
         score,
@@ -222,6 +227,7 @@ export class CommunityService {
         contestsEntered: contests.length,
         bestPlacement,
         roadmapPct: roadmap && roadmap.total > 0 ? (100 * roadmap.done) / roadmap.total : null,
+        contributions,
       }),
       contests: contests.slice(0, 10),
       roadmap,

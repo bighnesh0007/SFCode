@@ -26,6 +26,7 @@ import { aboutBody, applicationParams, buddyApplyBody, decideBody, handleParams,
 import { validatedBody, validatedParams } from "../middleware/validate.ts";
 import { z } from "zod";
 import { pointsMatrixSchema } from "../services/points/points.service.ts";
+import { problemContentSchema } from "../services/problems/problemDraft.service.ts";
 import { listQuery, slugParams, submissionParams, submitBody } from "../validation/challenge.schema.ts";
 
 function disabled(what: string): RequestHandler {
@@ -230,6 +231,36 @@ export function mountRoutes(app: Application, container: Container): void {
       await buddies.decide(user(req), validatedParams<z.infer<typeof applicationParams>>(req).id, b.approve, b.note);
       ok(res, { ok: true });
     }) as RequestHandler);
+    // Problem drafts (Buddies and up write; reviewers review; admins unpublish).
+    if (container.drafts) {
+      const drafts = container.drafts;
+      const id = z.strictObject({ id: z.uuid() });
+      const contentBody = z.strictObject({ content: problemContentSchema });
+      const reviewBody = z.strictObject({ action: z.enum(["approve", "changes", "reject"]), note: z.string().max(2000).default("") });
+      const slugP = z.strictObject({ slug: z.string().regex(/^[a-z0-9-]{1,80}$/) });
+      const activeBody = z.strictObject({ active: z.boolean() });
+      const pid = (req: Parameters<RequestHandler>[0]) => validatedParams<z.infer<typeof id>>(req).id;
+      v1.get("/contribute/drafts", auth, (async (req, res) => ok(res, await drafts.mine(user(req)))) as RequestHandler);
+      v1.post("/contribute/drafts", auth, limiter(10), validate({ body: contentBody }), (async (req, res) => {
+        ok(res, await drafts.create(user(req), validatedBody<z.infer<typeof contentBody>>(req).content));
+      }) as RequestHandler);
+      v1.get("/contribute/drafts/:id", auth, validate({ params: id }), (async (req, res) => ok(res, await drafts.get(user(req), pid(req)))) as RequestHandler);
+      v1.put("/contribute/drafts/:id", auth, limiter(60), validate({ params: id, body: contentBody }), (async (req, res) => {
+        ok(res, await drafts.update(user(req), pid(req), validatedBody<z.infer<typeof contentBody>>(req).content));
+      }) as RequestHandler);
+      v1.post("/contribute/drafts/:id/check", auth, limiter(10), validate({ params: id }), (async (req, res) => ok(res, await drafts.check(user(req), pid(req)))) as RequestHandler);
+      v1.post("/contribute/drafts/:id/submit", auth, limiter(10), validate({ params: id }), (async (req, res) => ok(res, await drafts.submit(user(req), pid(req)))) as RequestHandler);
+      v1.get("/admin/review", auth, (async (req, res) => ok(res, await drafts.queue(user(req)))) as RequestHandler);
+      v1.post("/admin/review/:id", auth, limiter(60), validate({ params: id, body: reviewBody }), (async (req, res) => {
+        const b = validatedBody<z.infer<typeof reviewBody>>(req);
+        ok(res, await drafts.decide(user(req), pid(req), b.action, b.note));
+      }) as RequestHandler);
+      v1.get("/admin/community-problems", auth, (async (req, res) => ok(res, await drafts.listPublished(user(req)))) as RequestHandler);
+      v1.post("/admin/community-problems/:slug", auth, limiter(30), validate({ params: slugP, body: activeBody }), (async (req, res) => {
+        await drafts.setActive(user(req), validatedParams<z.infer<typeof slugP>>(req).slug, validatedBody<z.infer<typeof activeBody>>(req).active);
+        ok(res, { ok: true });
+      }) as RequestHandler);
+    }
   } else {
     v1.use("/contribute", disabled("Contributing"));
   }
