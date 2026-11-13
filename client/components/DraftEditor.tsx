@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, Loader2, Plus, Send, ShieldCheck, Trash2, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Eye, Loader2, Plus, Send, ShieldCheck, Trash2, XCircle } from "lucide-react";
 import { useAuthState } from "@/components/auth";
+import { CodeField } from "@/components/CodeField";
 import { Markdown } from "@/components/Markdown";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
@@ -24,6 +25,7 @@ export function DraftEditor({ id }: { id: string }) {
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [preview, setPreview] = useState(false);
+  const [learnerView, setLearnerView] = useState(false);
 
   const load = useCallback(() => {
     getToken()
@@ -36,6 +38,14 @@ export function DraftEditor({ id }: { id: string }) {
       .catch((err: unknown) => setError(err instanceof ApiError ? err.message : "Could not load the draft."));
   }, [getToken, id]);
   useEffect(load, [load, isSignedIn]);
+
+  // Don't lose work: warn before leaving with unsaved edits.
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
 
   // While a check runs in the background, poll for its result.
   const running = draft?.check?.status === "running";
@@ -50,6 +60,7 @@ export function DraftEditor({ id }: { id: string }) {
 
   const editable = draft.canEdit;
   const reviewing = draft.canReview;
+  const lang = content.track === "soql" ? ("sql" as const) : ("apex" as const);
 
   const set = (patch: Partial<ProblemContent>) => {
     setContent({ ...content, ...patch });
@@ -76,10 +87,16 @@ export function DraftEditor({ id }: { id: string }) {
     }
   }
   const save = () => act("save", (t) => saveDraft(t, id, content));
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s" && editable) {
+      e.preventDefault();
+      if (dirty && busy === null) void save();
+    }
+  };
 
   const check = draft.check;
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-8">
+    <div className="mx-auto w-full max-w-5xl px-4 py-8" onKeyDown={onKeyDown}>
       <Link href={reviewing ? "/admin" : "/contribute"} className="text-sm text-muted-foreground hover:text-foreground">← {reviewing ? "Review queue" : "My problems"}</Link>
       <div className="mt-2 flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-semibold tracking-tight">{content.title || "Untitled problem"}</h1>
@@ -126,6 +143,33 @@ export function DraftEditor({ id }: { id: string }) {
         </div>
       </div>
 
+      <div className="mt-6 flex justify-end">
+        <Button size="sm" variant="ghost" onClick={() => setLearnerView((v) => !v)}>
+          <Eye className="mr-1 h-4 w-4" /> {learnerView ? "Back to editing" : "Preview as learner"}
+        </Button>
+      </div>
+      {learnerView ? (
+        <div className="mt-2 grid gap-4 rounded-xl border p-4 md:grid-cols-2">
+          <div>
+            <h2 className="text-xl font-semibold">{content.title}</h2>
+            <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
+              <span className="rounded-full border px-2 py-0.5">{content.difficulty}</span>
+              <span className="rounded-full bg-muted px-2 py-0.5">{content.category}</span>
+              {content.tags.map((t) => <span key={t} className="rounded-full border px-2 py-0.5">{t}</span>)}
+            </div>
+            <Markdown source={content.statement || "_No statement yet._"} className="markdown mt-4" />
+          </div>
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">What the learner starts with. Hidden tests and your solution stay hidden.</p>
+            {content.files.map((f) => (
+              <div key={f.name}>
+                <p className="mb-1 font-mono text-xs">{f.type === "soql" ? "query.soql" : `${f.name}.${f.type === "trigger" ? "trigger" : "cls"}`}</p>
+                <CodeField label={`Learner view ${f.name}`} language={lang} readOnly value={content.starter[f.name] ?? ""} onChange={() => undefined} />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
       <fieldset disabled={!editable} className="mt-6 space-y-4 disabled:opacity-90">
         <div className="grid gap-3 sm:grid-cols-4">
           <label className="text-xs sm:col-span-2">Title<input className={input} value={content.title} maxLength={80} onChange={(e) => set({ title: e.target.value })} /></label>
@@ -163,8 +207,14 @@ export function DraftEditor({ id }: { id: string }) {
               )}
             </div>
             <div className="mt-2 grid gap-3 md:grid-cols-2">
-              <label className="text-xs">{content.track === "debug" ? "Starter (with the bug)" : "Starter (what learners begin with)"}<textarea className={code} value={content.starter[f.name] ?? ""} onChange={(e) => set({ starter: { ...content.starter, [f.name]: e.target.value } })} /></label>
-              <label className="text-xs">Solution (hidden)<textarea className={code} value={content.reference[f.name] ?? ""} onChange={(e) => set({ reference: { ...content.reference, [f.name]: e.target.value } })} /></label>
+              <div className="text-xs">
+                <p className="mb-1">{content.track === "debug" ? "Starter (with the bug)" : "Starter (what learners begin with)"}</p>
+                <CodeField label={`Starter ${f.name}`} language={lang} readOnly={!editable} value={content.starter[f.name] ?? ""} onChange={(v) => set({ starter: { ...content.starter, [f.name]: v } })} />
+              </div>
+              <div className="text-xs">
+                <p className="mb-1">Solution (hidden)</p>
+                <CodeField label={`Solution ${f.name}`} language={lang} readOnly={!editable} value={content.reference[f.name] ?? ""} onChange={(v) => set({ reference: { ...content.reference, [f.name]: v } })} />
+              </div>
             </div>
           </div>
         ))}
@@ -176,12 +226,13 @@ export function DraftEditor({ id }: { id: string }) {
 
         <div className="rounded-lg border p-3">
           <label className="text-xs">Hidden test class name<input className="h-8 w-64 rounded-md border bg-background px-2 font-mono text-sm" value={content.testClass} onChange={(e) => set({ testClass: e.target.value })} /></label>
-          <label className="mt-2 block text-xs">
-            Hidden tests (Apex). Create your own data, no SeeAllData. {content.track === "soql" && "Keep {{REFERENCE_QUERY}} and {{SOQL_COMPARE}}."}
-            <textarea className={cn(code, "min-h-56")} value={content.testSource} onChange={(e) => set({ testSource: e.target.value })} />
-          </label>
+          <div className="mt-2 text-xs">
+            <p className="mb-1">Hidden tests (Apex). Create your own data, no SeeAllData. {content.track === "soql" && "Keep {{REFERENCE_QUERY}} and {{SOQL_COMPARE}}."}</p>
+            <CodeField label="Hidden tests" height={320} readOnly={!editable} value={content.testSource} onChange={(v) => set({ testSource: v })} />
+          </div>
         </div>
       </fieldset>
+      )}
 
       {error && <p className="mt-4 text-sm text-destructive" role="alert">{error}</p>}
 
