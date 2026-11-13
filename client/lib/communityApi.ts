@@ -82,6 +82,8 @@ export interface ProfileView {
   achievements: Achievement[];
   contests: ContestResult[];
   roadmap: { title: string; done: number; total: number } | null;
+  /** Readiness for exams practised; absent from older servers. */
+  certifications?: { exam: string; title: string; readiness: number; answered: number; total: number }[];
   handle: string;
   displayName: string;
   imageUrl: string | null;

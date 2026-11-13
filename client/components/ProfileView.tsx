@@ -8,7 +8,7 @@ import { Avatar } from "@/components/Avatar";
 import { RankBadge } from "@/components/RankBadge";
 import { FollowButton } from "@/components/FollowButton";
 import { EmailPrefs } from "@/components/profile/EmailPrefs";
-import { AboutCard, AchievementsWall, ContestHistory, RoadmapProgress, ShareButtons, SkillRadar, StatsStrip } from "@/components/profile/Sections";
+import { AboutCard, AchievementsWall, CertReadiness, ContestHistory, RoadmapProgress, ShareButtons, SkillRadar, StatsStrip } from "@/components/profile/Sections";
 import { Flair, accentClass, frameClass } from "@/components/Cosmetics";
 import { useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
@@ -148,6 +148,7 @@ export function ProfileView({ profile: initial, editable }: { profile: Profile; 
         </section>
         <div className="space-y-6">
           <RoadmapProgress p={profile} editable={editable} />
+          <CertReadiness p={profile} editable={editable} />
           <ContestHistory p={profile} />
         </div>
       </div>

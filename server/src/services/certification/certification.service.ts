@@ -121,6 +121,14 @@ export class CertificationService {
     );
   }
 
+  /** Readiness for each exam the user has answered at least one question of, best first. */
+  async readiness(userId: string): Promise<{ exam: string; title: string; readiness: number; answered: number; total: number }[]> {
+    return (await this.list(userId))
+      .map((e) => ({ exam: e.exam, title: e.title, readiness: e.readiness ?? 0, answered: e.sections.reduce((n, s) => n + (s.answered ?? 0), 0), total: e.questionCount }))
+      .filter((e) => e.answered > 0)
+      .sort((a, b) => b.readiness - a.readiness);
+  }
+
   /** A shuffled set of questions, answers stripped. */
   practice(examId: string, section: string | undefined, count: number): PracticeQuestion[] {
     const exam = this.bank.exam(examId);
