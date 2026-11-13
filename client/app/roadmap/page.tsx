@@ -135,7 +135,7 @@ export default function RoadmapPage() {
       </div>
 
       {roadmaps.length > 1 && (
-        <div role="tablist" aria-label="Roadmap" className="mt-5 inline-flex rounded-lg border p-0.5 text-sm">
+        <div role="tablist" aria-label="Roadmap" className="mt-5 inline-flex flex-wrap rounded-lg border p-0.5 text-sm">
           {roadmaps.map((r) => (
             <button key={r.id} role="tab" type="button" aria-selected={r.id === view.id} onClick={() => { setOpen(null); setRoadmapId(r.id); }} className={cn("rounded-md px-3 py-1", r.id === view.id ? "bg-accent font-medium" : "text-muted-foreground hover:text-foreground")}>
               {r.title}

@@ -1,0 +1,657 @@
+{
+  "id": "integration",
+  "title": "Integration",
+  "description": "Connecting Salesforce with other systems: APIs, OAuth, callouts, custom endpoints, bulk data, events and the patterns that tie them together.",
+  "nodes": [
+    {
+      "id": "int-fundamentals",
+      "title": "API fundamentals",
+      "level": 1,
+      "col": 1,
+      "requires": [],
+      "summary": "REST, SOAP, JSON, HTTP methods and status codes.",
+      "lesson": "Integration is systems talking over **APIs**:\n\n- **REST** uses HTTP verbs on URLs: `GET` reads, `POST` creates, `PATCH` updates, `DELETE` removes, with JSON bodies.\n- **SOAP** sends XML envelopes described by a WSDL; older but still common in enterprises.\n- **Status codes** say what happened: `200` OK, `201` created, `400` bad request, `401` not authenticated, `403` not allowed, `404` not found, `429` too many requests, `5xx` the server failed.\n- Salesforce offers many APIs: REST, SOAP, Bulk, Metadata, Tooling, Streaming and Pub/Sub, each for a different job.",
+      "concepts": [
+        "HTTP methods and what they mean",
+        "JSON versus XML",
+        "Status codes, especially 401, 403, 429 and 5xx",
+        "Salesforce's API family"
+      ],
+      "pitfalls": [
+        "Treating every non-200 the same: retrying a 400 never helps, retrying a 503 often does."
+      ],
+      "resources": [
+        {
+          "title": "API Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/api_basics",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Which HTTP method updates part of a record in Salesforce's REST API?",
+          "options": [
+            "GET",
+            "POST",
+            "PATCH",
+            "PUT"
+          ],
+          "answer": 2,
+          "why": "PATCH updates the fields you send."
+        },
+        {
+          "q": "What does a 429 status mean?",
+          "options": [
+            "Not found",
+            "Too many requests: slow down",
+            "Server error",
+            "Created"
+          ],
+          "answer": 1,
+          "why": "429 is rate limiting; back off and retry later."
+        },
+        {
+          "q": "Which Salesforce API is built for loading millions of records?",
+          "options": [
+            "SOAP API",
+            "Bulk API",
+            "Tooling API",
+            "Metadata API"
+          ],
+          "answer": 1,
+          "why": "Bulk API processes large data sets asynchronously."
+        }
+      ]
+    },
+    {
+      "id": "int-auth",
+      "title": "Connected apps and OAuth",
+      "level": 1,
+      "col": 2,
+      "requires": [
+        "int-fundamentals"
+      ],
+      "summary": "How other systems log in to Salesforce.",
+      "lesson": "External systems authenticate with **OAuth 2.0** through a **Connected App** (or External Client App) in Salesforce:\n\n- **Web server flow** (with PKCE): a user logs in and approves; your server exchanges a one-time code for tokens. SFCode connects your org this way.\n- **JWT bearer flow**: server-to-server, signed with a certificate; no user interaction.\n- **Client credentials flow**: server-to-server with a client secret, running as a set integration user.\n- **Scopes** limit what the token can do (`api`, `refresh_token`…). Use the narrowest set.\n- Run integrations as a dedicated **integration user** with only the permissions it needs.",
+      "concepts": [
+        "Connected/External Client Apps",
+        "Web server flow with PKCE",
+        "JWT bearer and client credentials for server-to-server",
+        "Scopes and integration users"
+      ],
+      "pitfalls": [
+        "Integrations running as an admin's personal account.",
+        "Storing refresh tokens or secrets in plain text."
+      ],
+      "diagram": "oauth-web-server",
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Look at the diagram. What does Salesforce send back to your callback in step 3?",
+          "options": [
+            "An access token",
+            "A one-time authorization code",
+            "The user's password",
+            "A refresh token"
+          ],
+          "answer": 1,
+          "why": "The code is exchanged server-side for tokens in step 4.",
+          "image": "oauth-web-server",
+          "imageAlt": "OAuth diagram, step 3: Salesforce redirects back with a one-time code."
+        },
+        {
+          "q": "Using the diagram, what does the app send to /token with the code?",
+          "options": [
+            "Nothing else",
+            "Its client secret and the PKCE verifier",
+            "The user's password",
+            "The access token"
+          ],
+          "answer": 1,
+          "why": "The secret and verifier prove the app is the one that started the flow.",
+          "image": "oauth-web-server",
+          "imageAlt": "OAuth diagram, step 4: app posts code, secret and PKCE verifier to /token."
+        },
+        {
+          "q": "A nightly server job must call Salesforce with no user present. Which flow fits?",
+          "options": [
+            "Web server flow",
+            "JWT bearer or client credentials",
+            "Username-password typed by a user",
+            "Device flow"
+          ],
+          "answer": 1,
+          "why": "Server-to-server flows need no user interaction."
+        }
+      ],
+      "diagramCaption": "OAuth web server flow: redirect to authorize, user approves, callback with a code, code exchanged with secret and PKCE verifier for tokens."
+    },
+    {
+      "id": "int-rest-api",
+      "title": "Salesforce REST API",
+      "level": 2,
+      "col": 1,
+      "requires": [
+        "int-fundamentals",
+        "int-auth"
+      ],
+      "summary": "Reading and writing records from outside.",
+      "lesson": "With a token, an external system calls `https://<instance>/services/data/vXX.X/...`:\n\n- `GET /sobjects/Account/<id>` reads a record; `POST /sobjects/Account` creates; `PATCH` updates; `DELETE` deletes.\n- `GET /query?q=SELECT+...` runs SOQL; large results come back in pages with `nextRecordsUrl`.\n- **Composite** requests bundle several calls into one round trip, optionally all-or-none.\n- Upsert by **external Id**: `PATCH /sobjects/Account/External_Id__c/12345`: create or update without knowing the Salesforce Id.\n- Every call counts toward the org's daily API request limit.",
+      "concepts": [
+        "sObject endpoints and HTTP verbs",
+        "Query and paging with nextRecordsUrl",
+        "Composite requests",
+        "Upsert by external Id",
+        "Daily API limits"
+      ],
+      "pitfalls": [
+        "One call per record for thousands of records: use composite or Bulk API.",
+        "Ignoring nextRecordsUrl and silently missing records."
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "How do you create-or-update by another system's key?",
+          "options": [
+            "POST then PATCH",
+            "PATCH to /sobjects/Object/ExternalIdField/value (upsert)",
+            "DELETE then POST",
+            "A SOQL query"
+          ],
+          "answer": 1,
+          "why": "Upsert by external Id matches on that field."
+        },
+        {
+          "q": "A query returns 'done: false'. What next?",
+          "options": [
+            "It failed",
+            "Follow nextRecordsUrl to get the next page",
+            "Add LIMIT",
+            "Retry"
+          ],
+          "answer": 1,
+          "why": "Results come in batches; follow nextRecordsUrl until done is true."
+        },
+        {
+          "q": "What bundles several REST calls into one request?",
+          "options": [
+            "Bulk API",
+            "Composite API",
+            "Streaming API",
+            "Metadata API"
+          ],
+          "answer": 1,
+          "why": "Composite reduces round trips."
+        }
+      ]
+    },
+    {
+      "id": "int-callouts",
+      "title": "Callouts from Apex",
+      "level": 2,
+      "col": 0,
+      "requires": [
+        "int-fundamentals"
+      ],
+      "summary": "Calling other systems, safely, from Salesforce.",
+      "lesson": "Outbound calls from Apex use `HttpRequest` and `Http.send()`:\n\n- Point them at a **Named Credential** (`callout:Payments/charges`); the credential stores the URL and authentication (via an **External Credential**), so code holds no secrets.\n- Callouts can't happen after uncommitted DML in the same transaction, and not synchronously from triggers: use **Queueable** with `Database.AllowsCallouts`.\n- Set timeouts; check status codes; parse JSON into typed classes.\n- In tests, `Test.setMock(HttpCalloutMock.class, mock)` returns fake responses.\n- **External Services** can generate invocable actions from an OpenAPI spec, so Flow can call an API with no code.",
+      "concepts": [
+        "Named and External Credentials",
+        "Callouts from async Apex",
+        "Timeouts, status codes and JSON",
+        "HttpCalloutMock",
+        "External Services for Flow"
+      ],
+      "pitfalls": [
+        "Secrets in code or custom settings.",
+        "Callout after DML: 'You have uncommitted work pending'."
+      ],
+      "resources": [
+        {
+          "title": "Apex Integration Services (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/apex_integration_services",
+          "kind": "trailhead"
+        },
+        {
+          "title": "External Services (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/external-services",
+          "kind": "trailhead"
+        }
+      ],
+      "diagram": "callout-flow",
+      "problems": [
+        "weather-callout"
+      ],
+      "quiz": [
+        {
+          "q": "Look at the diagram. What should the Apex code reference instead of a URL and password?",
+          "options": [
+            "A custom label",
+            "A Named Credential (callout:Name)",
+            "A static resource",
+            "A remote site setting with the password"
+          ],
+          "answer": 1,
+          "why": "Named Credentials keep endpoints and auth out of code.",
+          "image": "callout-flow",
+          "imageAlt": "Callout diagram: Apex calls a Named Credential that holds URL and auth."
+        },
+        {
+          "q": "A trigger needs to call an API. What do you do?",
+          "options": [
+            "Call it from the trigger",
+            "Enqueue a Queueable that implements Database.AllowsCallouts",
+            "Use a validation rule",
+            "Use SOQL"
+          ],
+          "answer": 1,
+          "why": "Callouts from triggers must be asynchronous."
+        },
+        {
+          "q": "What lets Flow call a REST API from an OpenAPI spec without code?",
+          "options": [
+            "External Services",
+            "Platform events",
+            "Change Data Capture",
+            "Bulk API"
+          ],
+          "answer": 0,
+          "why": "External Services turn an API spec into invocable actions."
+        }
+      ],
+      "diagramCaption": "Callouts: Apex sends an HttpRequest to a Named Credential, which holds the URL and authentication and calls the external API."
+    },
+    {
+      "id": "int-apex-rest",
+      "title": "Custom Apex APIs",
+      "level": 3,
+      "col": 1,
+      "requires": [
+        "int-rest-api"
+      ],
+      "summary": "Building your own REST endpoints in Apex.",
+      "lesson": "When the standard REST API isn't enough, expose your own:\n\n```apex\n@RestResource(urlMapping='/orders/*')\nglobal with sharing class OrderApi {\n  @HttpPost global static Id create(OrderRequest body) { … }\n}\n```\n\n- Endpoints live at `/services/apexrest/...` and need an authenticated caller.\n- Validate input, return clear errors with the right status (`RestContext.response.statusCode = 400`).\n- Make operations **idempotent** where possible: retries shouldn't create duplicates (use an external Id).\n- Version your URL mappings (`/v1/orders`) so you can change them later.",
+      "concepts": [
+        "@RestResource and the HTTP annotations",
+        "RestContext request and response",
+        "Idempotency with external Ids",
+        "Versioning endpoints"
+      ],
+      "pitfalls": [
+        "Exposing a class `without sharing` to an integration user that has broad access.",
+        "Returning 200 with an error message in the body."
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Where are custom Apex REST endpoints served?",
+          "options": [
+            "/services/data/",
+            "/services/apexrest/",
+            "/apex/",
+            "/api/"
+          ],
+          "answer": 1,
+          "why": "Apex REST lives under /services/apexrest/."
+        },
+        {
+          "q": "A client retries a POST after a timeout and two orders appear. What prevents this?",
+          "options": [
+            "Longer timeouts",
+            "Idempotency: match on an external Id and upsert",
+            "A validation rule",
+            "Without sharing"
+          ],
+          "answer": 1,
+          "why": "Idempotent operations give the same result however often they run."
+        },
+        {
+          "q": "How should a custom endpoint report invalid input?",
+          "options": [
+            "200 with an error in the body",
+            "Set a 4xx status code with a clear message",
+            "Throw an uncaught exception",
+            "Return null"
+          ],
+          "answer": 1,
+          "why": "Clients rely on status codes to know what happened."
+        }
+      ]
+    },
+    {
+      "id": "int-bulk",
+      "title": "Bulk data",
+      "level": 3,
+      "col": 0,
+      "requires": [
+        "int-rest-api"
+      ],
+      "summary": "Loading and extracting millions of records.",
+      "lesson": "- **Bulk API 2.0** loads or queries large data sets asynchronously: create a job, upload CSV, close it, then poll for results and failed rows.\n- It processes in batches on the server and counts far fewer API requests than one call per record.\n- Turn off or bypass non-essential automation during big loads; sort data by parent to reduce lock contention.\n- **Data Loader** uses the Bulk API under the hood when you switch it on.",
+      "concepts": [
+        "Bulk API 2.0 jobs: create, upload, close, poll",
+        "Reading successful and failed results",
+        "Lock contention and parent ordering",
+        "Pausing automation for loads"
+      ],
+      "pitfalls": [
+        "Using the REST API one record at a time for a migration.",
+        "Not downloading the failed-rows file after a job."
+      ],
+      "resources": [
+        {
+          "title": "Large Data Volumes (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/large-data-volumes",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Which API suits loading 2 million records?",
+          "options": [
+            "REST, one call per record",
+            "Bulk API 2.0",
+            "SOAP, one call per record",
+            "Streaming API"
+          ],
+          "answer": 1,
+          "why": "Bulk API processes large volumes asynchronously."
+        },
+        {
+          "q": "After a Bulk job finishes, how do you find rows that failed?",
+          "options": [
+            "They're emailed to the user",
+            "Download the job's failed results",
+            "Run a report",
+            "They're retried forever"
+          ],
+          "answer": 1,
+          "why": "Each job provides successful and failed result files."
+        },
+        {
+          "q": "Why sort child records by parent before loading?",
+          "options": [
+            "Faster CSV parsing",
+            "To reduce record-lock contention on the same parents",
+            "It's required",
+            "To skip validation"
+          ],
+          "answer": 1,
+          "why": "Children of one parent in different batches can fight over the parent's lock."
+        }
+      ]
+    },
+    {
+      "id": "int-events",
+      "title": "Events and change data capture",
+      "level": 3,
+      "col": 2,
+      "requires": [
+        "int-callouts"
+      ],
+      "summary": "Telling other systems what changed, as it happens.",
+      "lesson": "- **Platform events** are custom messages you publish (`Order_Shipped__e`) from Apex, Flow or external systems; subscribers react.\n- **Change Data Capture (CDC)** publishes events automatically when records are created, updated, deleted or undeleted, for the objects you select.\n- External systems subscribe through the **Pub/Sub API** (or CometD streaming) and can replay recent events after a disconnect.\n- Events decouple systems: the publisher doesn't wait for, or even know about, the subscribers.",
+      "concepts": [
+        "Platform events: define, publish, subscribe",
+        "Change Data Capture for record changes",
+        "Pub/Sub API and replay",
+        "Decoupling with events"
+      ],
+      "pitfalls": [
+        "Polling an API every minute for changes when CDC would push them.",
+        "Assuming events are delivered exactly once: design subscribers to handle duplicates."
+      ],
+      "resources": [
+        {
+          "title": "Platform Events Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/platform_events_basics",
+          "kind": "trailhead"
+        },
+        {
+          "title": "Change Data Capture Basics (Trailhead)",
+          "url": "https://trailhead.salesforce.com/content/learn/modules/change-data-capture",
+          "kind": "trailhead"
+        }
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "An external warehouse must learn about every Order update without polling. What fits?",
+          "options": [
+            "A scheduled report",
+            "Change Data Capture on Order",
+            "A validation rule",
+            "Bulk API export every minute"
+          ],
+          "answer": 1,
+          "why": "CDC pushes record changes to subscribers."
+        },
+        {
+          "q": "What lets an external system catch up on events it missed while offline?",
+          "options": [
+            "Nothing",
+            "Replay from a stored replay Id",
+            "A sandbox refresh",
+            "Data Loader"
+          ],
+          "answer": 1,
+          "why": "Subscribers can replay events retained by the event bus."
+        },
+        {
+          "q": "Why design subscribers to handle duplicates?",
+          "options": [
+            "They're never sent twice",
+            "Delivery is at least once, so the same event may arrive again",
+            "To save storage",
+            "It's not needed"
+          ],
+          "answer": 1,
+          "why": "At-least-once delivery means idempotent handling."
+        }
+      ]
+    },
+    {
+      "id": "int-patterns",
+      "title": "Integration patterns",
+      "level": 4,
+      "col": 1,
+      "requires": [
+        "int-apex-rest",
+        "int-bulk",
+        "int-events"
+      ],
+      "summary": "Choosing the right approach for each integration.",
+      "lesson": "Most integrations fit a known pattern:\n\n- **Request and reply**: Salesforce calls and waits (callout). Simple, but the user waits too.\n- **Fire and forget**: send and move on (platform event, outbound message). Resilient, eventually consistent.\n- **Batch data sync**: scheduled bulk moves of many records.\n- **Remote call-in**: another system calls Salesforce's APIs.\n- **UI update from data change**: push changes to listeners (CDC, streaming).\n- **Data virtualisation**: show external data without copying it (Salesforce Connect, external objects).\n\nChoose by who starts it, whether the caller must wait, how much data moves, and how fresh it must be.",
+      "concepts": [
+        "The six common patterns",
+        "Synchronous versus asynchronous trade-offs",
+        "Choosing by volume, timeliness and who initiates"
+      ],
+      "pitfalls": [
+        "Synchronous callouts for slow systems: users wait and transactions time out.",
+        "Copying huge external tables into Salesforce when they only need to be viewed."
+      ],
+      "diagram": "integration-patterns",
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Look at the diagram. A large product catalogue lives in an ERP; users only need to view it in Salesforce. Which pattern?",
+          "options": [
+            "Batch data sync",
+            "Data virtualisation",
+            "Fire and forget",
+            "Request and reply"
+          ],
+          "answer": 1,
+          "why": "Virtualisation shows external data without copying it.",
+          "image": "integration-patterns",
+          "imageAlt": "Integration patterns diagram: Data virtualisation, 'External data shown, not copied'."
+        },
+        {
+          "q": "Using the diagram, which pattern sends a message and doesn't wait for an answer?",
+          "options": [
+            "Request and reply",
+            "Fire and forget",
+            "Remote call-in",
+            "Batch data sync"
+          ],
+          "answer": 1,
+          "why": "Fire and forget publishes and moves on.",
+          "image": "integration-patterns",
+          "imageAlt": "Integration patterns diagram: Fire and forget, 'Send and move on (platform events)'."
+        },
+        {
+          "q": "Nightly, 500,000 records must move from Salesforce to a data warehouse. Which pattern?",
+          "options": [
+            "Request and reply",
+            "Batch data sync",
+            "UI update from data change",
+            "Remote call-in"
+          ],
+          "answer": 1,
+          "why": "Scheduled bulk movement is batch data sync."
+        }
+      ],
+      "diagramCaption": "Six integration patterns: request and reply, fire and forget, batch data sync, remote call-in, UI update from data change, and data virtualisation."
+    },
+    {
+      "id": "int-reliability",
+      "title": "Errors, retries and monitoring",
+      "level": 4,
+      "col": 0,
+      "requires": [
+        "int-patterns"
+      ],
+      "summary": "Keeping integrations working when things fail.",
+      "lesson": "Networks fail; design for it:\n\n- **Retry** only what can succeed later (timeouts, `429`, `5xx`), with increasing delays; never retry `4xx` validation errors.\n- Make writes **idempotent** so retries don't duplicate data.\n- **Log** each exchange (without secrets) with a correlation Id that both systems record.\n- Watch **limits**: daily API requests, concurrent long-running requests, callout timeouts.\n- Alert on repeated failures instead of finding out from users.",
+      "concepts": [
+        "Retry with backoff, only for retryable errors",
+        "Idempotency",
+        "Correlation Ids and logging",
+        "API limits and monitoring"
+      ],
+      "pitfalls": [
+        "Retrying in a tight loop and hitting rate limits harder.",
+        "Logging full request bodies that contain personal data or tokens."
+      ],
+      "problems": [],
+      "quiz": [
+        {
+          "q": "Which response should be retried?",
+          "options": [
+            "400 Bad Request",
+            "503 Service Unavailable",
+            "403 Forbidden",
+            "404 Not Found"
+          ],
+          "answer": 1,
+          "why": "503 is temporary; 4xx errors won't fix themselves."
+        },
+        {
+          "q": "What makes retries safe?",
+          "options": [
+            "Shorter timeouts",
+            "Idempotent operations",
+            "More API calls",
+            "Without sharing"
+          ],
+          "answer": 1,
+          "why": "Idempotent operations can run twice with the same result."
+        },
+        {
+          "q": "What should integration logs never contain?",
+          "options": [
+            "Timestamps",
+            "Correlation Ids",
+            "Tokens and secrets",
+            "Status codes"
+          ],
+          "answer": 2,
+          "why": "Logs are widely readable; credentials must stay out."
+        }
+      ]
+    },
+    {
+      "id": "int-external-objects",
+      "title": "Salesforce Connect",
+      "level": 4,
+      "col": 2,
+      "requires": [
+        "int-patterns"
+      ],
+      "summary": "External objects: viewing data that stays outside.",
+      "lesson": "**Salesforce Connect** maps tables in another system to **external objects** (`Invoice__x`):\n\n- Records are fetched live when users view them, not stored in Salesforce.\n- Adapters: OData 2.0/4.0, cross-org, or a custom adapter written in Apex.\n- External objects support lookups to and from Salesforce objects, SOQL (with some limits) and appear in list views and related lists.\n- Good for large or rarely viewed data; not for data that needs heavy reporting or automation.",
+      "concepts": [
+        "External objects and the __x suffix",
+        "OData and cross-org adapters",
+        "External and indirect lookups",
+        "When virtualisation fits"
+      ],
+      "pitfalls": [
+        "Expecting triggers and full reporting on external objects."
+      ],
+      "optional": true,
+      "problems": [],
+      "quiz": [
+        {
+          "q": "What suffix do external objects use?",
+          "options": [
+            "__c",
+            "__x",
+            "__e",
+            "__mdt"
+          ],
+          "answer": 1,
+          "why": "External objects end in __x."
+        },
+        {
+          "q": "Where does an external object's data live?",
+          "options": [
+            "Copied into Salesforce nightly",
+            "In the external system, fetched when viewed",
+            "In a static resource",
+            "In platform events"
+          ],
+          "answer": 1,
+          "why": "Salesforce Connect reads it live."
+        },
+        {
+          "q": "Which is a poor fit for external objects?",
+          "options": [
+            "Viewing a huge archive occasionally",
+            "Data that needs heavy reporting and automation in Salesforce",
+            "Read-only reference data",
+            "Cross-org lookups"
+          ],
+          "answer": 1,
+          "why": "Reporting and automation are limited on external objects."
+        }
+      ]
+    },
+    {
+      "id": "int-ready",
+      "title": "Integration checkpoint",
+      "level": 4,
+      "col": 3,
+      "requires": [
+        "int-reliability",
+        "int-patterns"
+      ],
+      "summary": "Practise the PD II integration questions.",
+      "lesson": "You can now authenticate systems, call out and be called, move bulk data, publish and subscribe to events, and choose a pattern. Practise the **integration** section of the PD II questions; for the full picture, the **Integration Architect** certification goes deeper into these designs.",
+      "concepts": [
+        "Choosing and defending an integration design"
+      ],
+      "pitfalls": [
+        "Picking a tool before the pattern."
+      ],
+      "problems": [],
+      "cert": {
+        "exam": "pd2",
+        "section": "integration"
+      }
+    }
+  ]
+}
