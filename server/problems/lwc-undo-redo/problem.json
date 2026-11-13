@@ -1,0 +1,17 @@
+{
+  "title": "Undo and Redo",
+  "track": "lwc",
+  "difficulty": "Hard",
+  "category": "State",
+  "order": 417,
+  "tags": [
+    "immutable state",
+    "history stacks",
+    "keyboard",
+    "getters"
+  ],
+  "files": [],
+  "lwc": {
+    "component": "undoList"
+  }
+}

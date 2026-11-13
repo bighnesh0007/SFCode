@@ -1,0 +1,5 @@
+[
+  "Keep remaining (a number) and a timer id. Start with setInterval(() => this.tick(), this.tickMs) and store the id; pause and reset call clearInterval.",
+  "Format with Math.floor(n / 60) and String(n % 60).padStart(2, '0'). Getters give the disabled states from whether a timer id is set.",
+  "In tick, subtract one; at 0, clear the interval and dispatch new CustomEvent('done'). Clear it in disconnectedCallback too."
+]

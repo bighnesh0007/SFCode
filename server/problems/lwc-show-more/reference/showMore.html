@@ -1,0 +1,6 @@
+<template>
+    <p class="text">{shown}</p>
+    <template lwc:if={needsToggle}>
+        <button class="toggle" aria-expanded={ariaExpanded} onclick={toggle}>{label}</button>
+    </template>
+</template>

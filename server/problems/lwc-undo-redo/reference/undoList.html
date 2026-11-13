@@ -1,0 +1,16 @@
+<template>
+    <div class="wrapper" tabindex="0" onkeydown={handleKey}>
+        <input class="new" value={draft} oninput={handleInput} />
+        <button class="add" onclick={add}>Add</button>
+        <button class="undo" disabled={cannotUndo} onclick={undo}>Undo</button>
+        <button class="redo" disabled={cannotRedo} onclick={redo}>Redo</button>
+        <ul>
+            <template for:each={notes} for:item="note">
+                <li key={note.id} class="note">
+                    <span class="label">{note.text}</span>
+                    <button class="remove" data-id={note.id} onclick={remove}>Remove</button>
+                </li>
+            </template>
+        </ul>
+    </div>
+</template>

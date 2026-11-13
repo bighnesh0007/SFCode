@@ -1,0 +1,17 @@
+{
+  "title": "Countdown Timer",
+  "track": "lwc",
+  "difficulty": "Medium",
+  "category": "Lifecycle",
+  "order": 416,
+  "tags": [
+    "setInterval",
+    "disconnectedCallback",
+    "CustomEvent",
+    "formatting"
+  ],
+  "files": [],
+  "lwc": {
+    "component": "countdownTimer"
+  }
+}

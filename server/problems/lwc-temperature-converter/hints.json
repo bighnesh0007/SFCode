@@ -1,0 +1,5 @@
+[
+  "Keep both values as strings in fields, celsius and fahrenheit, and bind them with value={celsius} and value={fahrenheit}.",
+  "On input in one box, store what was typed, convert, and set the other field. Number('') is 0, so check for an empty string first.",
+  "Round with Math.round(n * 10) / 10 and convert with String(), which drops a trailing .0 for you."
+]

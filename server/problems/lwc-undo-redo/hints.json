@@ -1,0 +1,5 @@
+[
+  "Store the list as an array and treat it as immutable: every change creates a new array. Keep past (an array of earlier arrays) and future (undone arrays).",
+  "commit(next): push the current list onto past, set the list to next, and empty future. Undo: push the current onto future and pop past. Redo is the mirror.",
+  "Give each note a unique key (a counter) so removing one doesn't confuse the rendering. For keys, listen to keydown on a wrapper element and check event.ctrlKey with event.key 'z' or 'y'."
+]
