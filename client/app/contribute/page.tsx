@@ -126,6 +126,7 @@ export default function ContributePage() {
               <p className="mt-1 text-sm text-muted-foreground">Write a problem, test it in your org, and submit it for review.{role !== "buddy" && " Review tools are in the Admin area."}</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Link href="/contribute/new"><Button size="sm">New problem</Button></Link>
+                <Link href="/contribute/questions"><Button size="sm" variant="outline">Write certification questions</Button></Link>
                 {role !== "buddy" && <Link href="/admin"><Button size="sm" variant="outline">Open Admin</Button></Link>}
               </div>
               <MyDrafts />

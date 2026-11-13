@@ -21,6 +21,13 @@ if (container.drafts) {
   });
   logger.info({ count: n }, "community problems loaded");
 }
+if (container.certQuestions) {
+  const n = await container.certQuestions.loadApproved().catch((err: unknown) => {
+    logger.error({ err }, "loading community certification questions failed; serving the bank only");
+    return 0;
+  });
+  logger.info({ count: n }, "community certification questions loaded");
+}
 const app = buildApp(container);
 
 // Weekly digest: check hourly (it only sends on Mondays from 09:00 UTC, once per user per week).

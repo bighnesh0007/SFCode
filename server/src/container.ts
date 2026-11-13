@@ -15,6 +15,8 @@ import { PgChallengeSubmissionRepository } from "./repositories/challengeSubmiss
 import { ChallengeCatalog } from "./services/challenges/catalog.ts";
 import { QuestionBank } from "./services/certification/bank.ts";
 import { CertificationService } from "./services/certification/certification.service.ts";
+import { CertQuestionService } from "./services/certification/certQuestion.service.ts";
+import { PgCertQuestionRepository } from "./repositories/certQuestion.repository.ts";
 import { PgCertAttemptRepository } from "./repositories/certAttempt.repository.ts";
 import { PgProfileRepository } from "./repositories/profile.repository.ts";
 import { CommunityService } from "./services/community/community.service.ts";
@@ -63,6 +65,7 @@ export interface Container {
   salesforce?: SalesforceConnectionService;
   challenges?: ChallengeService;
   certification?: CertificationService;
+  certQuestions?: CertQuestionService;
   community?: CommunityService;
   admin?: AdminService;
   blog?: BlogService;
@@ -249,9 +252,12 @@ export function buildContainer(): Container {
   }
 
   // No database needed to practise; attempts are saved only when there is one.
-  container.certification = new CertificationService(
-    QuestionBank.load(CERTIFICATION_DIR),
-    container.db ? new PgCertAttemptRepository(container.db) : undefined,
-  );
+  const bank = QuestionBank.load(CERTIFICATION_DIR);
+  container.certification = new CertificationService(bank, container.db ? new PgCertAttemptRepository(container.db) : undefined);
+  if (container.db && container.admin) {
+    container.certQuestions = new CertQuestionService(new PgCertQuestionRepository(container.db), bank, container.admin, new PgProfileRepository(container.db));
+    const social = container.social;
+    if (social) container.certQuestions.setNotifier((userId, kind, data) => social.notify(userId, kind, data));
+  }
   return container;
 }

@@ -336,6 +336,38 @@ export const problemDrafts = pgTable(
   (t) => [index("problem_drafts_author_idx").on(t.authorId), index("problem_drafts_status_idx").on(t.status)],
 );
 
+/** A contributor's certification question, as stored. Ids are a..h like the bank files. */
+export interface CertQuestionContent {
+  exam: string;
+  section: string;
+  prompt: string;
+  options: { id: string; text: string }[];
+  answer: string[];
+  explanation: string;
+}
+export type CertQuestionStatus = "submitted" | "changes_requested" | "approved" | "rejected";
+
+/**
+ * Buddies submit questions here; a reviewer (not the author) approves them into
+ * the practice pool. Approved rows are loaded into the question bank at startup;
+ * `active` lets an admin take one back out without losing it.
+ */
+export const certQuestionDrafts = pgTable(
+  "cert_question_drafts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    authorId: text("author_id").notNull(),
+    status: text("status").$type<CertQuestionStatus>().notNull().default("submitted"),
+    content: jsonb("content").$type<CertQuestionContent>().notNull(),
+    reviewNote: text("review_note"),
+    reviewedBy: text("reviewed_by"),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("cert_question_drafts_author_idx").on(t.authorId), index("cert_question_drafts_status_idx").on(t.status)],
+);
+
 /** Live community problems, merged into the catalog next to the built-in ones. */
 export const problems = pgTable("problems", {
   slug: text("slug").primaryKey(),

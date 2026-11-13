@@ -31,6 +31,7 @@ import { DIAGRAM_DIR } from "../domain/roadmap.ts";
 import { ROADMAPS_DIR } from "../container.ts";
 import { placementLevel, placementQuestions } from "../domain/placement.ts";
 import { COUNTRY_CODES } from "../domain/countries.ts";
+import { certQuestionSchema } from "../services/certification/certQuestion.service.ts";
 import { pointsMatrixSchema } from "../services/points/points.service.ts";
 import { problemContentSchema } from "../services/problems/problemDraft.service.ts";
 import { MENTOR_TOPICS } from "../services/hub/hub.service.ts";
@@ -438,6 +439,31 @@ export function mountRoutes(app: Application, container: Container): void {
       v1.get("/admin/community-problems", auth, (async (req, res) => ok(res, await drafts.listPublished(user(req)))) as RequestHandler);
       v1.post("/admin/community-problems/:slug", auth, limiter(30), validate({ params: slugP, body: activeBody }), (async (req, res) => {
         await drafts.setActive(user(req), validatedParams<z.infer<typeof slugP>>(req).slug, validatedBody<z.infer<typeof activeBody>>(req).active);
+        ok(res, { ok: true });
+      }) as RequestHandler);
+    }
+    // Certification questions (Buddies submit; reviewers approve into the practice pool).
+    if (container.certQuestions) {
+      const cq = container.certQuestions;
+      const qid = z.strictObject({ id: z.uuid() });
+      const qBody = z.strictObject({ content: certQuestionSchema });
+      const qReview = z.strictObject({ action: z.enum(["approve", "changes", "reject"]), note: z.string().max(2000).default("") });
+      const qActive = z.strictObject({ active: z.boolean() });
+      const idOf = (req: Parameters<RequestHandler>[0]) => validatedParams<z.infer<typeof qid>>(req).id;
+      v1.get("/contribute/cert-questions", limiter(60), auth, (async (req, res) => ok(res, await cq.mine(user(req)))) as RequestHandler);
+      v1.post("/contribute/cert-questions", limiter(20), auth, validate({ body: qBody }), (async (req, res) => {
+        ok(res, await cq.submit(user(req), validatedBody<z.infer<typeof qBody>>(req).content));
+      }) as RequestHandler);
+      v1.put("/contribute/cert-questions/:id", limiter(60), auth, validate({ params: qid, body: qBody }), (async (req, res) => {
+        ok(res, await cq.edit(user(req), idOf(req), validatedBody<z.infer<typeof qBody>>(req).content));
+      }) as RequestHandler);
+      v1.get("/admin/cert-review", limiter(60), auth, (async (req, res) => ok(res, await cq.queue(user(req)))) as RequestHandler);
+      v1.post("/admin/cert-review/:id", limiter(60), auth, validate({ params: qid, body: qReview }), (async (req, res) => {
+        const b = validatedBody<z.infer<typeof qReview>>(req);
+        ok(res, await cq.decide(user(req), idOf(req), b.action, b.note));
+      }) as RequestHandler);
+      v1.post("/admin/cert-questions/:id/active", limiter(30), auth, validate({ params: qid, body: qActive }), (async (req, res) => {
+        await cq.setActive(user(req), idOf(req), validatedBody<z.infer<typeof qActive>>(req).active);
         ok(res, { ok: true });
       }) as RequestHandler);
     }

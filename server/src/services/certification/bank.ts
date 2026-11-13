@@ -42,6 +42,21 @@ const examFile = z.strictObject({
 export type Exam = z.infer<typeof examFile>;
 export type Question = Exam["questions"][number];
 
+/** Rules every question must meet, whether it ships in a bank file or comes from a contributor. */
+export function validateQuestion(q: Question, sections: Set<string>, at: string): void {
+  if (!sections.has(q.section)) throw new Error(`${at}: unknown section ${q.section}`);
+  const options = q.options.map((o) => o.id);
+  if (new Set(options).size !== options.length) throw new Error(`${at}: duplicate option ids`);
+  if (new Set(q.answer).size !== q.answer.length || q.answer.some((a) => !options.includes(a))) {
+    throw new Error(`${at}: answer must be distinct ids from its options`);
+  }
+  if (q.answer.length >= options.length) throw new Error(`${at}: every option is correct`);
+  // A multi-answer question must say how many to pick, or it is a trick question.
+  if (q.answer.length > 1 && !new RegExp(`Choose ${q.answer.length}`).test(q.prompt)) {
+    throw new Error(`${at}: multi-answer prompt must say "Choose ${q.answer.length}"`);
+  }
+}
+
 export function validateExam(raw: unknown, where: string): Exam {
   const parsed = examFile.safeParse(raw);
   if (!parsed.success) throw new Error(`${where}: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`);
@@ -49,20 +64,9 @@ export function validateExam(raw: unknown, where: string): Exam {
   const sections = new Set(exam.sections.map((s) => s.id));
   const seen = new Set<string>();
   for (const q of exam.questions) {
-    const at = `${where} ${q.id}`;
-    if (seen.has(q.id)) throw new Error(`${at}: duplicate question id`);
+    if (seen.has(q.id)) throw new Error(`${where} ${q.id}: duplicate question id`);
     seen.add(q.id);
-    if (!sections.has(q.section)) throw new Error(`${at}: unknown section ${q.section}`);
-    const options = q.options.map((o) => o.id);
-    if (new Set(options).size !== options.length) throw new Error(`${at}: duplicate option ids`);
-    if (new Set(q.answer).size !== q.answer.length || q.answer.some((a) => !options.includes(a))) {
-      throw new Error(`${at}: answer must be distinct ids from its options`);
-    }
-    if (q.answer.length >= options.length) throw new Error(`${at}: every option is correct`);
-    // A multi-answer question must say how many to pick, or it is a trick question.
-    if (q.answer.length > 1 && !new RegExp(`Choose ${q.answer.length}`).test(q.prompt)) {
-      throw new Error(`${at}: multi-answer prompt must say "Choose ${q.answer.length}"`);
-    }
+    validateQuestion(q, sections, `${where} ${q.id}`);
   }
   if (exam.mock) {
     const keys = Object.keys(exam.mock.weights);
@@ -106,5 +110,32 @@ export class QuestionBank {
 
   question(questionId: string): { exam: Exam; question: Question } | undefined {
     return this.byId.get(questionId);
+  }
+
+  private readonly community = new Set<string>();
+
+  /** True for questions written by contributors; they're practised but kept out of mock exams. */
+  isCommunity(questionId: string): boolean {
+    return this.community.has(questionId);
+  }
+
+  /** Adds an approved contributor question to its exam. Validates like a bank file does. */
+  addCommunity(examId: string, q: Question): void {
+    const exam = this.exams.get(examId);
+    if (!exam) throw new Error(`unknown exam ${examId}`);
+    if (this.byId.has(q.id)) throw new Error(`question id ${q.id} already exists`);
+    validateQuestion(q, new Set(exam.sections.map((s) => s.id)), `community ${q.id}`);
+    exam.questions.push(q);
+    this.byId.set(q.id, { exam, question: q });
+    this.community.add(q.id);
+  }
+
+  /** Takes a contributor question back out (an admin unpublished it). */
+  removeCommunity(questionId: string): void {
+    const found = this.byId.get(questionId);
+    if (!found || !this.community.has(questionId)) return;
+    found.exam.questions.splice(found.exam.questions.indexOf(found.question), 1);
+    this.byId.delete(questionId);
+    this.community.delete(questionId);
   }
 }

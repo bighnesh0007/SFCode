@@ -36,6 +36,8 @@ export interface PracticeQuestion {
   options: { id: string; text: string }[];
   /** How many options to pick. */
   choose: number;
+  /** Written by a contributor rather than shipped in the bank. */
+  community?: boolean;
 }
 
 export interface AnswerResult {
@@ -129,13 +131,17 @@ export class CertificationService {
       .sort((a, b) => b.readiness - a.readiness);
   }
 
+  private forLearner(q: Parameters<typeof toPractice>[0]): PracticeQuestion {
+    return this.bank.isCommunity(q.id) ? { ...toPractice(q), community: true } : toPractice(q);
+  }
+
   /** A shuffled set of questions, answers stripped. */
   practice(examId: string, section: string | undefined, count: number): PracticeQuestion[] {
     const exam = this.bank.exam(examId);
     if (!exam) throw new NotFoundError("Exam not found.");
     if (section !== undefined && !exam.sections.some((s) => s.id === section)) throw new NotFoundError("Section not found.");
     const pool = this.shuffle(exam.questions.filter((q) => section === undefined || q.section === section));
-    return pool.slice(0, Math.min(count, MAX_SESSION_QUESTIONS)).map(toPractice);
+    return pool.slice(0, Math.min(count, MAX_SESSION_QUESTIONS)).map((q) => this.forLearner(q));
   }
 
   /** Fisher–Yates on a copy; `random` is injectable so tests are deterministic. */
@@ -158,10 +164,12 @@ export class CertificationService {
     const exam = this.bank.exam(examId);
     if (!exam?.mock) throw new NotFoundError("This exam has no mock mode.");
     const { mock } = exam;
-    const available = Object.fromEntries(exam.sections.map((s) => [s.id, exam.questions.filter((q) => q.section === s.id).length]));
+    // Mocks use only the reviewed bank, never contributor questions.
+    const vetted = exam.questions.filter((q) => !this.bank.isCommunity(q.id));
+    const available = Object.fromEntries(exam.sections.map((s) => [s.id, vetted.filter((q) => q.section === s.id).length]));
     const counts = allocate(mock.weights, available, mock.questions);
     // Section order follows the shuffle, as on the real exam.
-    const picked = this.shuffle(exam.sections.flatMap((s) => this.shuffle(exam.questions.filter((q) => q.section === s.id)).slice(0, counts[s.id] ?? 0)));
+    const picked = this.shuffle(exam.sections.flatMap((s) => this.shuffle(vetted.filter((q) => q.section === s.id)).slice(0, counts[s.id] ?? 0)));
     return {
       exam: exam.exam,
       title: exam.title,
@@ -217,7 +225,7 @@ export class CertificationService {
     const questions = due.slice(0, MAX_SESSION_QUESTIONS).flatMap((s) => {
       const found = this.bank.question(s.questionId);
       if (!found) return []; // a question removed from the bank
-      return [toPractice(found.question)];
+      return [this.forLearner(found.question)];
     });
     return { due: questions, upcoming: later.length, nextDueAt: later[0]?.dueAt.toISOString() ?? null, mastered: schedule.mastered };
   }
