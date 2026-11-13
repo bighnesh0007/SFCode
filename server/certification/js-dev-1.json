@@ -63,7 +63,7 @@
         },
         {
           "id": "c",
-          "text": "It's hoisted and initialised to undefined"
+          "text": "It's hoisted and initialised to undefined, so it can be read before its declaration"
         },
         {
           "id": "d",
@@ -254,7 +254,7 @@
         },
         {
           "id": "b",
-          "text": "Always the global object"
+          "text": "Always the global object, even in strict mode"
         },
         {
           "id": "c",
@@ -412,7 +412,7 @@
       "options": [
         {
           "id": "a",
-          "text": "full: function() {}"
+          "text": "full: function() { return this.first + ' ' + this.last; }"
         },
         {
           "id": "b",
@@ -478,7 +478,7 @@
         },
         {
           "id": "d",
-          "text": "The div's, then the button's"
+          "text": "The div's listener, then the button's (capturing order)"
         }
       ],
       "answer": [
@@ -547,7 +547,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Data expires when the tab closes"
+          "text": "Data is cleared when the tab that created it is closed"
         },
         {
           "id": "b",
@@ -578,7 +578,7 @@
         },
         {
           "id": "b",
-          "text": "new Event('saved', id)"
+          "text": "new Event('saved', { detail: { id } })"
         },
         {
           "id": "c",
@@ -655,7 +655,7 @@
       "options": [
         {
           "id": "a",
-          "text": "An array of all results"
+          "text": "An array of results, with undefined where a promise failed"
         },
         {
           "id": "b",
@@ -717,7 +717,7 @@
         },
         {
           "id": "c",
-          "text": "Use finally only"
+          "text": "Use a finally block, which receives the rejection reason"
         },
         {
           "id": "d",
@@ -817,7 +817,7 @@
       "options": [
         {
           "id": "a",
-          "text": "expect(a).toBe(b)"
+          "text": "expect(a).toBe(b), which compares objects field by field"
         },
         {
           "id": "b",
@@ -848,7 +848,7 @@
         },
         {
           "id": "b",
-          "text": "console.log in the callback"
+          "text": "Add console.log in the callback and check the test output for 'ok'"
         },
         {
           "id": "c",
@@ -933,7 +933,7 @@
         },
         {
           "id": "c",
-          "text": "Only strings can be keys"
+          "text": "Only strings can be keys, which keeps lookups fast"
         },
         {
           "id": "d",
@@ -1014,7 +1014,7 @@
         },
         {
           "id": "c",
-          "text": "obj.toJSON()"
+          "text": "obj.toJSON(), available on every object"
         },
         {
           "id": "d",
@@ -1253,7 +1253,7 @@
         },
         {
           "id": "b",
-          "text": "An inline onclick per item"
+          "text": "An inline onclick attribute on each item's markup"
         },
         {
           "id": "c",
@@ -1311,7 +1311,7 @@
         },
         {
           "id": "c",
-          "text": "load"
+          "text": "load, which fires once the HTML has been parsed"
         },
         {
           "id": "d",
@@ -1357,7 +1357,7 @@
       "options": [
         {
           "id": "a",
-          "text": "el.className = 'active'"
+          "text": "el.className += 'active' to append the new class"
         },
         {
           "id": "b",
@@ -1423,7 +1423,7 @@
         },
         {
           "id": "d",
-          "text": "return -1"
+          "text": "return -1 so the caller can check for an invalid value"
         }
       ],
       "answer": [
@@ -1531,7 +1531,7 @@
         },
         {
           "id": "d",
-          "text": "Yes"
+          "text": "Yes, a zero delay runs fn synchronously right away"
         }
       ],
       "answer": [
@@ -1546,7 +1546,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Stream only"
+          "text": "Stream, which every event-emitting class must extend"
         },
         {
           "id": "b",
@@ -1627,7 +1627,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Call it without await"
+          "text": "test('x', () => { expect(getValue()).toBe(5); })"
         },
         {
           "id": "b",
@@ -1666,7 +1666,7 @@
         },
         {
           "id": "d",
-          "text": "beforeAll"
+          "text": "beforeAll, which runs before each test"
         }
       ],
       "answer": [

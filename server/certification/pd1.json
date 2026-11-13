@@ -133,7 +133,7 @@
         },
         {
           "id": "d",
-          "text": "A custom validation rule"
+          "text": "Custom validation rules, which run before any automation"
         }
       ],
       "answer": [
@@ -202,7 +202,7 @@
       "options": [
         {
           "id": "a",
-          "text": "It runs asynchronously"
+          "text": "It queues the insert to run asynchronously after the transaction commits"
         },
         {
           "id": "b",
@@ -323,7 +323,7 @@
         },
         {
           "id": "d",
-          "text": "`@InvocableMethod`"
+          "text": "`@InvocableMethod(label='LWC')`"
         }
       ],
       "answer": [
@@ -373,7 +373,7 @@
         },
         {
           "id": "c",
-          "text": "Governor limits are reset to their original values"
+          "text": "Governor limits are reset to their original values for the rest of the test"
         },
         {
           "id": "d",
@@ -536,7 +536,7 @@
         },
         {
           "id": "c",
-          "text": "Call `@api` methods on the parent"
+          "text": "Call an `@api` method on the parent through `this.template.host`"
         },
         {
           "id": "d",
@@ -617,7 +617,7 @@
         },
         {
           "id": "c",
-          "text": "SELECT Name FROM Account JOIN Contact"
+          "text": "SELECT Name, Contact.LastName FROM Account JOIN Contact ON AccountId"
         },
         {
           "id": "d",
@@ -783,7 +783,7 @@
         },
         {
           "id": "d",
-          "text": "They count toward the org's Apex code size limit"
+          "text": "They count toward the org's Apex code size limit like other classes"
         }
       ],
       "answer": [
@@ -829,7 +829,7 @@
         },
         {
           "id": "b",
-          "text": "UserInfo.canRead('Account.Industry')"
+          "text": "UserInfo.getUserAccess('Account', 'Industry').canRead()"
         },
         {
           "id": "c",
@@ -910,7 +910,7 @@
         },
         {
           "id": "b",
-          "text": "An Apex trigger"
+          "text": "An Apex before-insert trigger on Account"
         },
         {
           "id": "c",
@@ -933,7 +933,7 @@
       "options": [
         {
           "id": "a",
-          "text": "SObject s = new SObject('Account');"
+          "text": "SObject s = (SObject) Type.forName('Account').newInstance(true);"
         },
         {
           "id": "b",
@@ -995,7 +995,7 @@
         },
         {
           "id": "c",
-          "text": "update contacts by Legacy_Id__c;"
+          "text": "update contacts using Contact.Legacy_Id__c;"
         },
         {
           "id": "d",
@@ -1026,7 +1026,7 @@
         },
         {
           "id": "d",
-          "text": "It avoids the SOQL query limit"
+          "text": "It doesn't count toward the 100-query SOQL limit"
         }
       ],
       "answer": [
@@ -1126,7 +1126,7 @@
         },
         {
           "id": "b",
-          "text": "@AuraEnabled"
+          "text": "@AuraEnabled(cacheable=false)"
         },
         {
           "id": "c",
@@ -1149,7 +1149,7 @@
       "options": [
         {
           "id": "a",
-          "text": "ar.getDecimal(1)"
+          "text": "ar.getDecimal('Amount')"
         },
         {
           "id": "b",
@@ -1211,7 +1211,7 @@
         },
         {
           "id": "c",
-          "text": "Use @track recordId"
+          "text": "Use @track recordId and set it in connectedCallback"
         },
         {
           "id": "d",
@@ -1238,7 +1238,7 @@
         },
         {
           "id": "c",
-          "text": "With @wire"
+          "text": "With @wire, which refreshes after each update"
         },
         {
           "id": "d",
@@ -1323,7 +1323,7 @@
         },
         {
           "id": "d",
-          "text": "controller=\"Account\""
+          "text": "controller=\"AccountController\""
         }
       ],
       "answer": [
@@ -1373,7 +1373,7 @@
         },
         {
           "id": "c",
-          "text": "alert()"
+          "text": "alert() with the success message"
         },
         {
           "id": "d",
@@ -1419,7 +1419,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Using escape=\"false\" on outputText"
+          "text": "Setting escape=\"false\" on outputText so HTML renders safely"
         },
         {
           "id": "b",
@@ -1446,7 +1446,7 @@
       "options": [
         {
           "id": "a",
-          "text": "System.check(expected, actual)"
+          "text": "System.check(expected, actual, 'message')"
         },
         {
           "id": "b",
@@ -1531,7 +1531,7 @@
         },
         {
           "id": "b",
-          "text": "Coverage needs 200 records"
+          "text": "Code coverage only counts when 200 records are inserted"
         },
         {
           "id": "c",
@@ -1608,7 +1608,7 @@
       "options": [
         {
           "id": "a",
-          "text": "It can be called many times per test"
+          "text": "It can be called many times per test, each time resetting limits"
         },
         {
           "id": "b",

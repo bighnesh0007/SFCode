@@ -10,7 +10,7 @@ const read = (dir: string) =>
     .filter((f) => f.endsWith(".json"))
     .map((f) => ({ name: `${dir}/${f}`, data: JSON.parse(readFileSync(new URL(`../${dir}/${f}`, import.meta.url), "utf8")) as unknown }));
 
-interface Cert { questions: { options: { id: string }[]; answer: string[] }[] }
+interface Cert { questions: { options: { id: string; text: string }[]; answer: string[] }[] }
 interface Map_ { nodes: { quiz?: { options: string[]; answer: number; why: string }[] }[] }
 
 /** Position of the answer for each single-answer question. */
@@ -24,6 +24,18 @@ describe("answer positions", () => {
     expect(positions.length).toBeGreaterThan(20);
     const counts = [0, 1, 2, 3].map((i) => positions.filter((p) => p === i).length);
     expect(Math.max(...counts) / positions.length).toBeLessThanOrEqual(0.4);
+  });
+
+  // The other classic tell: the right answer is the one the author spelled out in full.
+  it.each(read("certification"))("$name: the right answer isn't usually the longest option", ({ data }) => {
+    const single = (data as Cert).questions.filter((q) => q.answer.length === 1);
+    const longest = single.filter((q) => {
+      const len = (t: string) => t.length;
+      const right = len(q.options.find((o) => o.id === q.answer[0])?.text ?? "");
+      return q.options.every((o) => o.id === q.answer[0] || len(o.text) < right);
+    });
+    // Chance is 25% with four options; 40% leaves room without letting the tell back in.
+    expect(longest.length / single.length).toBeLessThanOrEqual(0.4);
   });
 
   it("every roadmap quiz explains its answer", () => {

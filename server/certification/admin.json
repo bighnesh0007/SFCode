@@ -82,7 +82,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Role hierarchy"
+          "text": "The role hierarchy, starting from the lowest role"
         },
         {
           "id": "b",
@@ -109,7 +109,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Clone the profile and grant Delete"
+          "text": "Clone the profile, grant Delete on Lead, and switch the rep back after two weeks"
         },
         {
           "id": "b",
@@ -252,7 +252,7 @@
         },
         {
           "id": "c",
-          "text": "Expense has a lookup to Project"
+          "text": "Expense has a lookup relationship to Project"
         },
         {
           "id": "d",
@@ -326,7 +326,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Remove it from their page layout"
+          "text": "Remove the field from their page layouts and compact layouts"
         },
         {
           "id": "b",
@@ -434,7 +434,7 @@
       "options": [
         {
           "id": "a",
-          "text": "A multi-select picklist of courses on Student"
+          "text": "A multi-select picklist of course names on the Student object"
         },
         {
           "id": "b",
@@ -498,7 +498,7 @@
         },
         {
           "id": "b",
-          "text": "A territory model"
+          "text": "A territory model with one territory per country"
         },
         {
           "id": "c",
@@ -579,7 +579,7 @@
         },
         {
           "id": "b",
-          "text": "It isn't marked as a Family"
+          "text": "It isn't assigned to a Product Family that the price book allows"
         },
         {
           "id": "c",
@@ -687,7 +687,7 @@
         },
         {
           "id": "b",
-          "text": "Case escalation rules"
+          "text": "Case escalation rules based on each customer's contract"
         },
         {
           "id": "c",
@@ -764,7 +764,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Field history tracking"
+          "text": "Field history tracking on the Rating field of Account"
         },
         {
           "id": "b",
@@ -822,7 +822,7 @@
         },
         {
           "id": "b",
-          "text": "A new Lightning app"
+          "text": "A new Lightning app containing only the Account and Event tabs for field reps"
         },
         {
           "id": "c",
@@ -989,7 +989,7 @@
         },
         {
           "id": "c",
-          "text": "A report filter of My Opportunities"
+          "text": "A 'My Opportunities' filter on every source report"
         },
         {
           "id": "d",
@@ -1070,7 +1070,7 @@
         },
         {
           "id": "c",
-          "text": "Validation rule"
+          "text": "A validation rule that blocks edits while Discount is over 20%"
         },
         {
           "id": "d",
@@ -1170,7 +1170,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Single sign-on"
+          "text": "Single sign-on through the company's identity provider"
         },
         {
           "id": "b",
@@ -1201,7 +1201,7 @@
         },
         {
           "id": "b",
-          "text": "Clone their profile five times"
+          "text": "Clone their profile once for each of the five permission sets"
         },
         {
           "id": "c",
@@ -1259,7 +1259,7 @@
         },
         {
           "id": "c",
-          "text": "Formulas can't be reported on"
+          "text": "Formula fields can't be used as columns or filters in reports"
         },
         {
           "id": "d",
@@ -1286,7 +1286,7 @@
         },
         {
           "id": "c",
-          "text": "A validation rule on Account"
+          "text": "A validation rule on Account that blocks inactive partners"
         },
         {
           "id": "d",
@@ -1426,7 +1426,7 @@
         },
         {
           "id": "d",
-          "text": "Make it private"
+          "text": "Make it private and give the team the list view's URL"
         }
       ],
       "answer": [
@@ -1549,7 +1549,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Run every time a record is updated and meets the conditions"
+          "text": "Every time a record is updated and meets the condition requirements"
         },
         {
           "id": "b",
@@ -1615,7 +1615,7 @@
         },
         {
           "id": "d",
-          "text": "Copy and paste"
+          "text": "Copy and paste the steps into each flow and keep them aligned by hand"
         }
       ],
       "answer": [
@@ -1642,7 +1642,7 @@
         },
         {
           "id": "d",
-          "text": "Create Records"
+          "text": "Create Records, adding an EmailMessage record for the owner"
         }
       ],
       "answer": [
