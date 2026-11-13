@@ -132,6 +132,18 @@ describe("RoadmapService", () => {
     expect((await svc.saveOnboarding("c", { role: "developer", level: "new", goal: "pd1", hours: "1-2" })).roadmapId).toBe("developer");
   });
 
+  it("LWC and Integration goals, and architects, get those roadmaps; a goal beats the role", async () => {
+    const { svc } = setup();
+    const path = async (role: "developer" | "admin" | "consultant" | "student" | "architect", goal: "pd1" | "admin-cert" | "lwc" | "integration" | "level-up") =>
+      (await svc.saveOnboarding(`${role}-${goal}`, { role, level: "new", goal, hours: "1-2" })).roadmapId;
+    expect(await path("developer", "lwc")).toBe("lwc");
+    expect(await path("developer", "integration")).toBe("integration");
+    expect(await path("admin", "lwc")).toBe("lwc");
+    expect(await path("architect", "level-up")).toBe("integration");
+    expect(await path("architect", "admin-cert")).toBe("admin");
+    expect(await path("student", "pd1")).toBe("developer");
+  });
+
   it("quiz answers never reach the client; passing completes the step, failing doesn't", async () => {
     const { svc } = setup();
     await svc.saveOnboarding("u", { role: "admin", level: "new", goal: "admin-cert", hours: "3-5" });

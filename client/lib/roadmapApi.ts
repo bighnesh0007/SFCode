@@ -5,7 +5,7 @@ type Token = string | null;
 
 export type Role = "developer" | "admin" | "consultant" | "student" | "architect";
 export type Level = "new" | "basics" | "production" | "lead";
-export type Goal = "pd1" | "admin-cert" | "first-job" | "level-up" | "interviews";
+export type Goal = "pd1" | "admin-cert" | "first-job" | "level-up" | "interviews" | "lwc" | "integration";
 export type Hours = "1-2" | "3-5" | "5+";
 export interface Answers {
   role: Role;

@@ -9,7 +9,7 @@ import { z } from "zod";
 
 export const ROLES = ["developer", "admin", "consultant", "student", "architect"] as const;
 export const LEVELS = ["new", "basics", "production", "lead"] as const;
-export const GOALS = ["pd1", "admin-cert", "first-job", "level-up", "interviews"] as const;
+export const GOALS = ["pd1", "admin-cert", "first-job", "level-up", "interviews", "lwc", "integration"] as const;
 export const HOURS = ["1-2", "3-5", "5+"] as const;
 export type Level = (typeof LEVELS)[number];
 
