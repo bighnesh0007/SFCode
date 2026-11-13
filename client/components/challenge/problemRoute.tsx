@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/JsonLd";
 import type { ChallengeView, Track } from "@/lib/challengesApi";
 import { clip, pageMeta } from "@/lib/seo";
 import { serverFetch } from "@/lib/serverApi";
+import { lessonsFor } from "@/lib/roadmapSeo";
 import { absoluteUrl } from "@/lib/site";
 import { trackInfo } from "@/lib/tracks";
 import { ChallengePage } from "./ChallengePage";
@@ -30,7 +31,7 @@ export async function problemMetadata(slug: string): Promise<Metadata> {
 
 /** Server-rendered problem page: the statement is in the HTML, the workspace hydrates on top. */
 export async function ProblemRoute({ slug, track }: { slug: string; track: Track }) {
-  const { data: c, missing } = await load(slug);
+  const [{ data: c, missing }, lessons] = await Promise.all([load(slug), lessonsFor(slug)]);
   if (missing) notFound();
   // A problem reached under another track's URL moves to its own, so each has one address.
   if (c && c.track !== track) permanentRedirect(`${trackInfo(c.track).base}/${c.slug}`);
@@ -38,6 +39,22 @@ export async function ProblemRoute({ slug, track }: { slug: string; track: Track
   const info = trackInfo(track);
   return (
     <>
+      {c && (
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "LearningResource",
+            name: c.title,
+            description: clip(c.statement),
+            url: absoluteUrl(`${info.base}/${c.slug}`),
+            learningResourceType: "practice problem",
+            educationalLevel: c.difficulty,
+            teaches: [c.category, ...c.tags],
+            isAccessibleForFree: true,
+            inLanguage: "en",
+          }}
+        />
+      )}
       {c && (
         <JsonLd
           data={{
@@ -51,7 +68,7 @@ export async function ProblemRoute({ slug, track }: { slug: string; track: Track
           }}
         />
       )}
-      <ChallengePage slug={slug} backHref={backHref} initial={c ?? undefined} />
+      <ChallengePage slug={slug} backHref={backHref} initial={c ?? undefined} lessons={lessons} />
     </>
   );
 }

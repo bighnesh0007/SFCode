@@ -22,7 +22,6 @@ const SECTIONS: { path: string; priority: number; changeFrequency: "daily" | "we
   { path: "/playground/soql", priority: 0.6, changeFrequency: "monthly" },
   { path: "/playground/lwc", priority: 0.6, changeFrequency: "monthly" },
   { path: "/contests", priority: 0.6, changeFrequency: "daily" },
-  { path: "/blog", priority: 0.6, changeFrequency: "daily" },
   { path: "/leaderboard", priority: 0.4, changeFrequency: "daily" },
   { path: "/jobs", priority: 0.4, changeFrequency: "daily" },
   { path: "/mentors", priority: 0.3, changeFrequency: "weekly" },
@@ -51,6 +50,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...(catalog?.challenges ?? []).filter((c) => !c.community).map((c) => entry(`${trackInfo(c.track).base}/${c.slug}`, 0.8, "monthly")),
     ...(exams ?? []).flatMap((e) => [entry(`/certification/${e.exam}`, 0.8, "weekly"), entry(`/certification/${e.exam}/mock`, 0.6, "monthly")]),
     ...roadmaps.flatMap((r) => (r ? [entry(`/roadmap/${r.id}`, 0.9, "weekly"), ...r.nodes.map((n) => entry(`/roadmap/${r.id}/${n.id}`, 0.7, "monthly"))] : [])),
+    ...(posts?.length ? [entry("/blog", 0.6, "daily")] : []),
     ...(posts ?? []).map((p) => entry(`/blog/${p.slug}`, 0.5, "weekly", p.updatedAt ?? p.createdAt)),
     ...(contests ?? []).map((c) => entry(`/contests/${c.slug}`, 0.4, "weekly")),
   ];
