@@ -1,0 +1,18 @@
+{
+  "title": "Weather Callout",
+  "difficulty": "Medium",
+  "category": "Integration",
+  "order": 9,
+  "tags": [
+    "HTTP callout",
+    "JSON",
+    "HttpCalloutMock"
+  ],
+  "files": [
+    {
+      "name": "SfcWeatherClient",
+      "type": "class"
+    }
+  ],
+  "testClass": "SfcWeatherClientTest"
+}

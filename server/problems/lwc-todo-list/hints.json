@@ -1,0 +1,5 @@
+[
+  "Keep an array of objects { id, text, done }. Every item needs a stable id for the key in for:each.",
+  "Replace the array instead of mutating it: this.todos = [...this.todos, item] to add, filter to remove, map to toggle. Reassigning re-renders.",
+  "Put data-id on the text and the remove button, and read event.currentTarget.dataset.id in the handlers. Build each row's className ('item' or 'item done') in a getter."
+]

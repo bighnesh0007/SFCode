@@ -1,0 +1,13 @@
+<template>
+    <input class="new-item" />
+    <button class="add" onclick={add}>Add</button>
+    <ul>
+        <template for:each={rows} for:item="row">
+            <li key={row.id} class={row.className}>
+                <span class="text" data-id={row.id} onclick={toggle}>{row.text}</span>
+                <button class="remove" data-id={row.id} onclick={remove}>×</button>
+            </li>
+        </template>
+    </ul>
+    <p class="summary">{doneCount} of {todos.length} done</p>
+</template>

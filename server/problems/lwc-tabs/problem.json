@@ -1,0 +1,16 @@
+{
+  "title": "Accessible Tabs",
+  "track": "lwc",
+  "difficulty": "Medium",
+  "category": "Accessibility",
+  "order": 406,
+  "tags": [
+    "@api",
+    "aria",
+    "keyboard"
+  ],
+  "files": [],
+  "lwc": {
+    "component": "simpleTabs"
+  }
+}

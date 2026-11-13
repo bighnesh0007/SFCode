@@ -1,0 +1,16 @@
+{
+  "title": "To-Do List",
+  "track": "lwc",
+  "difficulty": "Medium",
+  "category": "Lists & Events",
+  "order": 405,
+  "tags": [
+    "for:each",
+    "state",
+    "keys"
+  ],
+  "files": [],
+  "lwc": {
+    "component": "todoList"
+  }
+}

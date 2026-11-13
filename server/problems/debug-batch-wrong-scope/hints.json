@@ -1,0 +1,5 @@
+[
+  "Look at which records get changed and which get saved. Are they the same objects?",
+  "There's also a query inside the loop: 200 leads in a chunk means 200 queries, over the limit of 100.",
+  "The scope already holds the records. Set l.Rating = 'Cold' on each one in scope and keep the single update scope."
+]

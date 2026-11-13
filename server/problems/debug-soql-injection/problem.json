@@ -1,0 +1,18 @@
+{
+  "title": "The Search That Leaks",
+  "track": "debug",
+  "difficulty": "Medium",
+  "category": "Security",
+  "order": 206,
+  "tags": [
+    "SOQL injection",
+    "bind variables"
+  ],
+  "files": [
+    {
+      "name": "SfcAccountSearch",
+      "type": "class"
+    }
+  ],
+  "testClass": "SfcAccountSearchTest"
+}

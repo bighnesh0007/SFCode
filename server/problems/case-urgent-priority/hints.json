@@ -1,0 +1,5 @@
+[
+  "In a before insert trigger you can set fields on Trigger.new directly; no DML needed.",
+  "String has a method that ignores capitalisation: containsIgnoreCase('urgent').",
+  "Check c.Subject != null before calling a method on it, then set c.Priority = 'High'."
+]

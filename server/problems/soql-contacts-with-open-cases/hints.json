@@ -1,0 +1,5 @@
+[
+  "Querying Case and returning the contact would repeat a contact once per case. Query Contact instead.",
+  "A semi-join keeps rows whose Id appears in a subquery: WHERE Id IN (SELECT ContactId FROM Case WHERE ...).",
+  "SELECT Id, FirstName, LastName FROM Contact WHERE Id IN (SELECT ContactId FROM Case WHERE IsClosed = false)."
+]
