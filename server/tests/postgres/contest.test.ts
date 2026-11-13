@@ -102,6 +102,9 @@ describe.skipIf(!safe)("Contests and store on Postgres", () => {
     clock.advance(200 * MIN);
     expect(await contests.history("bob")).toEqual([expect.objectContaining({ slug: c.slug, rank: 2, entrants: 2, score: 100 })]);
     expect(await contests.history("carol")).toEqual([]);
+    expect(await contests.ratingHistory("alice")).toEqual([expect.objectContaining({ rank: 1, entrants: 2, rating: 1520, delta: 20 })]);
+    expect((await contests.ratingHistory("bob"))[0]).toMatchObject({ rating: 1480, delta: -20 });
+    expect(await contests.ratingHistory("carol")).toEqual([]);
   });
 
   it("the purchase lock stops parallel buys from overspending", async () => {

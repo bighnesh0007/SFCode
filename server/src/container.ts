@@ -164,6 +164,7 @@ export function buildContainer(): Container {
     container.community.setExtras({
       coins: async (userId) => (await store.wallet(userId)).balance,
       contestHistory: (userId) => contests.history(userId),
+      ratingHistory: (userId) => contests.ratingHistory(userId),
       contributions: (userId) => (container.drafts ? container.drafts.countPublishedBy(userId) : Promise.resolve(0)),
       roadmapProgress: async (userId) => {
         const ob = roadmapSvc ? await roadmapSvc.onboarding(userId) : null;

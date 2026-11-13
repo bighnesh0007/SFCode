@@ -83,11 +83,44 @@ export function AchievementsWall({ p }: { p: Profile }) {
   );
 }
 
+/** Rating over contests: a line from 1500 with each contest as a point (hover for details). */
+function RatingChart({ history }: { history: { title: string; rating: number; delta: number; rank: number; entrants: number }[] }) {
+  const W = 320;
+  const H = 110;
+  const pad = 10;
+  const values = [1500, ...history.map((h) => h.rating)];
+  const lo = Math.min(...values) - 15;
+  const hi = Math.max(...values) + 15;
+  const x = (i: number) => pad + (i * (W - 2 * pad)) / Math.max(1, values.length - 1);
+  const y = (v: number) => H - pad - ((v - lo) * (H - 2 * pad)) / Math.max(1, hi - lo);
+  const line = values.map((v, i) => `${x(i)},${y(v)}`).join(" ");
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={`Rating over ${history.length} contests, now ${values.at(-1)}`}>
+      <line x1={pad} x2={W - pad} y1={y(1500)} y2={y(1500)} className="stroke-border" strokeDasharray="4 4" />
+      <polyline points={line} className="fill-none stroke-sky-500" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
+      {history.map((h, i) => (
+        <circle key={i} cx={x(i + 1)} cy={y(h.rating)} r={4} className={h.delta >= 0 ? "fill-emerald-500" : "fill-rose-500"}>
+          <title>{`${h.title}: #${h.rank} of ${h.entrants} · ${h.rating} (${h.delta >= 0 ? "+" : ""}${h.delta})`}</title>
+        </circle>
+      ))}
+    </svg>
+  );
+}
+
 export function ContestHistory({ p }: { p: Profile }) {
-  if (p.contests.length === 0) return null;
+  if (p.contests.length === 0 && !p.rating) return null;
   return (
     <section className="rounded-xl border p-5">
       <h2 className="mb-3 text-sm font-semibold">Contests</h2>
+      {p.rating && (
+        <div className="mb-4">
+          <div className="flex items-baseline gap-4">
+            <span className="text-2xl font-semibold tabular-nums">{p.rating.current}</span>
+            <span className="text-xs text-muted-foreground">rating · peak {p.rating.peak} · {p.rating.history.length} rated contest{p.rating.history.length === 1 ? "" : "s"}</span>
+          </div>
+          <RatingChart history={p.rating.history} />
+        </div>
+      )}
       <ul className="divide-y text-sm">
         {p.contests.map((c) => (
           <li key={c.slug} className="flex items-center gap-3 py-2">
