@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Award, Briefcase, Bug, Check, Coins, Copy, Database, Flame, Code2, Gauge, Link2, Map as MapIcon, MapPin, Medal, PenLine, Mountain, Share2, Sparkles, Swords, Timer, Trophy, Workflow, Zap } from "lucide-react";
 import { useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
+import { countryFlag, countryName, getCountryCodes } from "@/lib/countries";
 import { CERTIFICATIONS, updateMyAbout, type ProfileView as Profile } from "@/lib/communityApi";
 import { trackInfo } from "@/lib/tracks";
 import { cn } from "@/lib/utils";
@@ -199,10 +200,11 @@ export function AboutCard({ p, editable, onChange }: { p: Profile; editable: boo
   const { getToken } = useAuthState();
   const a = p.about;
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({ bio: a.bio, company: a.company, location: a.location, trailheadUrl: a.trailheadUrl ?? "", linkedinUrl: a.linkedinUrl ?? "", githubUrl: a.githubUrl ?? "", certifications: a.certifications, openToWork: a.openToWork });
+  const [form, setForm] = useState({ bio: a.bio, company: a.company, location: a.location, trailheadUrl: a.trailheadUrl ?? "", linkedinUrl: a.linkedinUrl ?? "", githubUrl: a.githubUrl ?? "", certifications: a.certifications, openToWork: a.openToWork, country: a.country ?? null });
+  const [codes, setCodes] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const empty = !a.bio && !a.company && !a.location && !a.trailheadUrl && !a.linkedinUrl && !a.githubUrl && a.certifications.length === 0 && !a.openToWork;
+  const empty = !a.bio && !a.company && !a.location && !a.trailheadUrl && !a.linkedinUrl && !a.githubUrl && a.certifications.length === 0 && !a.openToWork && !a.country;
 
   async function save() {
     setBusy(true);
@@ -217,6 +219,13 @@ export function AboutCard({ p, editable, onChange }: { p: Profile; editable: boo
     }
   }
 
+  useEffect(() => {
+    if (!editing || codes.length) return;
+    getCountryCodes()
+      .then((c) => setCodes([...c].sort((x, y) => countryName(x).localeCompare(countryName(y)))))
+      .catch(() => setCodes(a.country ? [a.country] : []));
+  }, [editing, codes.length, a.country]);
+
   if (editing) {
     const input = "h-9 w-full rounded-md border bg-background px-2 text-sm";
     return (
@@ -227,6 +236,10 @@ export function AboutCard({ p, editable, onChange }: { p: Profile; editable: boo
           <input aria-label="Company" placeholder="Company" maxLength={80} value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className={input} />
           <input aria-label="Location" placeholder="Location" maxLength={80} value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className={input} />
         </div>
+        <select aria-label="Country" value={form.country ?? ""} onChange={(e) => setForm({ ...form, country: e.target.value || null })} className={input}>
+          <option value="">Country (optional, for the country leaderboard)</option>
+          {codes.map((c) => <option key={c} value={c}>{countryName(c)}</option>)}
+        </select>
         <input aria-label="Trailblazer profile URL" placeholder="https://www.salesforce.com/trailblazer/you" value={form.trailheadUrl} onChange={(e) => setForm({ ...form, trailheadUrl: e.target.value })} className={input} />
         <input aria-label="LinkedIn URL" placeholder="https://www.linkedin.com/in/you" value={form.linkedinUrl} onChange={(e) => setForm({ ...form, linkedinUrl: e.target.value })} className={input} />
         <input aria-label="GitHub URL" placeholder="https://github.com/you" value={form.githubUrl} onChange={(e) => setForm({ ...form, githubUrl: e.target.value })} className={input} />
@@ -258,10 +271,11 @@ export function AboutCard({ p, editable, onChange }: { p: Profile; editable: boo
         <div className="mt-3 space-y-3 text-sm">
           {a.openToWork && <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300"><Briefcase className="h-3 w-3" /> Open to work</span>}
           {a.bio && <p className="whitespace-pre-line">{a.bio}</p>}
-          {(a.company || a.location) && (
+          {(a.company || a.location || a.country) && (
             <p className="flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground">
               {a.company && <span className="inline-flex items-center gap-1"><Briefcase className="h-3.5 w-3.5" />{a.company}</span>}
               {a.location && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{a.location}</span>}
+              {a.country && <span>{countryFlag(a.country)} {countryName(a.country)}</span>}
             </p>
           )}
           {a.certifications.length > 0 && (

@@ -22,6 +22,9 @@ export { MENTOR_TOPICS };
 const code = () => randomBytes(6).toString("base64url").replace(/[-_]/g, "x").slice(0, 8).toUpperCase();
 const slugify = (name: string) => `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "team"}-${randomBytes(2).toString("hex")}`;
 
+/** How many of a team's best members count on the public board. */
+export const TEAM_BOARD_TOP = 10;
+
 export class HubService {
   constructor(
     private readonly repo: PgHubRepository,
@@ -78,7 +81,7 @@ export class HubService {
     );
     rows.sort((a, b) => b.points - a.points || a.displayName.localeCompare(b.displayName));
     const isOwner = t.ownerId === actor;
-    return { slug: t.slug, name: t.name, owner: isOwner, joinCode: isOwner ? t.joinCode : null, members: rows.map((r, i) => ({ ...r, place: i + 1 })) };
+    return { slug: t.slug, name: t.name, owner: isOwner, listed: t.listed, joinCode: isOwner ? t.joinCode : null, members: rows.map((r, i) => ({ ...r, place: i + 1 })) };
   }
 
   private async owned(actor: string, slug: string) {
@@ -86,6 +89,28 @@ export class HubService {
     if (!t) throw new NotFoundError("No such team.");
     if (t.ownerId !== actor) throw new ForbiddenError("Only the team owner can do that.");
     return t;
+  }
+
+  /** The owner chooses whether the team appears on the public Teams leaderboard. */
+  async setListed(actor: string, slug: string, listed: boolean) {
+    const t = await this.owned(actor, slug);
+    await this.repo.setListed(t.id, listed);
+    return this.team(actor, slug);
+  }
+
+  /**
+   * Listed teams ranked by the points of their top TEAM_BOARD_TOP members, so a
+   * huge team can't win on headcount alone. Member ids never leave the server.
+   */
+  async teamBoard(): Promise<{ rank: number; slug: string; name: string; members: number; score: number; solved: number }[]> {
+    const [listed, totals] = await Promise.all([this.repo.listedTeams(), this.community.totals("all")]);
+    return listed
+      .map((t) => {
+        const scores = t.memberIds.map((id) => totals.get(id) ?? { score: 0, solved: 0, last: 0 }).sort((a, b) => b.score - a.score).slice(0, TEAM_BOARD_TOP);
+        return { slug: t.slug, name: t.name, members: t.memberIds.length, score: scores.reduce((n, x) => n + x.score, 0), solved: scores.reduce((n, x) => n + x.solved, 0) };
+      })
+      .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
+      .map((t, i) => ({ rank: i + 1, ...t }));
   }
 
   async rotateCode(actor: string, slug: string) {

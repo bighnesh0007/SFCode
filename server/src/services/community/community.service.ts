@@ -140,9 +140,11 @@ export class CommunityService {
     this.extras = extras;
   }
 
-  async updateAbout(userId: string, about: AboutRecord): Promise<ProfileView> {
+  async updateAbout(userId: string, input: Omit<AboutRecord, "country"> & { country?: string | null | undefined }): Promise<ProfileView> {
     if (!this.about) throw new NotConfiguredError("Profile details");
     const p = await this.ensureProfile(userId);
+    const country = input.country === undefined ? ((await this.about.get(userId))?.country ?? null) : input.country;
+    const about: AboutRecord = { ...input, country };
     // Empty links are stored as null so the profile shows nothing rather than a dead link.
     await this.about.save(userId, { ...about, bio: about.bio.trim(), company: about.company.trim(), location: about.location.trim(), trailheadUrl: about.trailheadUrl || null, linkedinUrl: about.linkedinUrl || null, githubUrl: about.githubUrl || null, certifications: [...new Set(about.certifications)] });
     return this.view(p);
@@ -237,15 +239,10 @@ export class CommunityService {
     return rankFor(points);
   }
 
-  /** `track` narrows the board to one track's solves; omitted, every scored track counts. */
-  async leaderboard(window: LeaderboardWindow, limit = 100, track?: Track): Promise<LeaderboardRow[]> {
-    const now = this.clock.nowMs();
-    const key = `${window}:${track ?? "*"}`;
-    const hit = this.cached.get(key);
-    if (hit !== undefined && now - hit.at < LEADERBOARD_TTL_MS) return hit.rows.slice(0, limit);
-
+  /** Points and solves per learner: the numbers every board is built from. */
+  async totals(window: LeaderboardWindow, track?: Track): Promise<Map<string, { score: number; solved: number; last: number }>> {
     const days = WINDOW_DAYS[window];
-    const since = days === null ? undefined : new Date(now - days * 86_400_000);
+    const since = days === null ? undefined : new Date(this.clock.nowMs() - days * 86_400_000);
     const table = await this.points.table();
     const totals = new Map<string, { score: number; solved: number; last: number }>();
     for (const s of await this.submissions.firstSolves(since)) {
@@ -256,6 +253,48 @@ export class CommunityService {
       t.solved += 1;
       t.last = Math.max(t.last, s.at.getTime());
       totals.set(s.userId, t);
+    }
+    return totals;
+  }
+
+  /** Countries ranked by their learners' total points (learners who set a country on their profile). */
+  async countryBoard(window: LeaderboardWindow = "all"): Promise<{ rank: number; country: string; learners: number; score: number; solved: number; top: { handle: string; displayName: string; score: number } }[]> {
+    if (!this.about) return [];
+    const [countries, totals] = await Promise.all([this.about.countries(), this.totals(window)]);
+    const groups = new Map<string, { learners: number; score: number; solved: number; top: { userId: string; score: number } }>();
+    for (const [userId, t] of totals) {
+      const country = countries.get(userId);
+      if (!country) continue;
+      const g = groups.get(country) ?? { learners: 0, score: 0, solved: 0, top: { userId, score: -1 } };
+      g.learners++;
+      g.score += t.score;
+      g.solved += t.solved;
+      if (t.score > g.top.score) g.top = { userId, score: t.score };
+      groups.set(country, g);
+    }
+    const profiles = new Map((await this.profiles.findByUsers([...groups.values()].map((g) => g.top.userId))).map((p) => [p.userId, p]));
+    return [...groups]
+      .sort((a, b) => b[1].score - a[1].score || b[1].learners - a[1].learners)
+      .map(([country, g], i) => {
+        const p = profiles.get(g.top.userId);
+        return { rank: i + 1, country, learners: g.learners, score: g.score, solved: g.solved, top: { handle: p?.handle ?? "", displayName: p?.displayName ?? "", score: g.top.score } };
+      });
+  }
+
+  /**
+   * `track` narrows the board to one track's solves; `country` to learners who
+   * chose that country on their profile. Omitted, everyone and every scored track count.
+   */
+  async leaderboard(window: LeaderboardWindow, limit = 100, track?: Track, country?: string): Promise<LeaderboardRow[]> {
+    const now = this.clock.nowMs();
+    const key = `${window}:${track ?? "*"}:${country ?? "*"}`;
+    const hit = this.cached.get(key);
+    if (hit !== undefined && now - hit.at < LEADERBOARD_TTL_MS) return hit.rows.slice(0, limit);
+
+    const totals = await this.totals(window, track);
+    if (country) {
+      const countries = this.about ? await this.about.countries() : new Map<string, string>();
+      for (const userId of [...totals.keys()]) if (countries.get(userId) !== country) totals.delete(userId);
     }
     const profiles = new Map((await this.profiles.findByUsers([...totals.keys()])).map((p) => [p.userId, p]));
     // Higher score first; on a tie, whoever reached it earlier.

@@ -247,6 +247,8 @@ export const userAbout = pgTable("user_about", {
   githubUrl: text("github_url"),
   certifications: jsonb("certifications").$type<string[]>().notNull().default([]),
   openToWork: boolean("open_to_work").notNull().default(false),
+  /** ISO 3166-1 alpha-2 (e.g. IN), chosen by the learner; drives the country leaderboard. */
+  country: text("country"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -404,6 +406,8 @@ export const teams = pgTable("teams", {
   name: text("name").notNull(),
   joinCode: text("join_code").notNull().unique(),
   ownerId: text("owner_id").notNull(),
+  /** The owner opted in to the public Teams leaderboard. */
+  listed: boolean("listed").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

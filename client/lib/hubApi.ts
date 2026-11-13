@@ -8,6 +8,7 @@ export interface TeamView {
   slug: string;
   name: string;
   owner: boolean;
+  listed: boolean;
   joinCode: string | null;
   members: { handle: string; displayName: string; imageUrl: string | null; points: number; tier: { id: TierId; title: string }; owner: boolean; me: boolean; place: number }[];
 }
@@ -25,6 +26,7 @@ export const createTeam = (t: Token, name: string) => apiRequest<TeamView>("/api
 export const joinTeam = (t: Token, code: string) => apiRequest<TeamView>("/api/v1/teams/join", { method: "POST", token: t, body: { code } });
 export const getTeam = (t: Token, slug: string) => apiRequest<TeamView>(`/api/v1/teams/${enc(slug)}`, { token: t });
 export const rotateCode = (t: Token, slug: string) => apiRequest<TeamView>(`/api/v1/teams/${enc(slug)}/code`, { method: "POST", token: t });
+export const setTeamListed = (t: Token, slug: string, listed: boolean) => apiRequest<TeamView>(`/api/v1/teams/${enc(slug)}/listed`, { method: "POST", token: t, body: { listed } });
 export const leaveTeam = (t: Token, slug: string) => apiRequest<{ ok: true }>(`/api/v1/teams/${enc(slug)}/leave`, { method: "POST", token: t });
 export const removeMember = (t: Token, slug: string, handle: string) => apiRequest<TeamView>(`/api/v1/teams/${enc(slug)}/remove`, { method: "POST", token: t, body: { handle } });
 export const listMentors = () => apiRequest<Mentor[]>("/api/v1/mentors");

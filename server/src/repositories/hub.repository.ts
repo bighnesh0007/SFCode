@@ -10,6 +10,7 @@ export interface TeamRecord {
   name: string;
   joinCode: string;
   ownerId: string;
+  listed: boolean;
   createdAt: Date;
 }
 export interface MentorRecord {
@@ -75,6 +76,18 @@ export class PgHubRepository {
   async removeMember(teamId: string, userId: string): Promise<boolean> {
     return (await this.db.delete(teamMembers).where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId))).returning({ id: teamMembers.userId })).length > 0;
   }
+  async setListed(teamId: string, listed: boolean): Promise<void> {
+    await this.db.update(teams).set({ listed }).where(eq(teams.id, teamId));
+  }
+
+  /** Teams whose owners chose to appear publicly, with their member ids. */
+  async listedTeams(): Promise<(TeamRecord & { memberIds: string[] })[]> {
+    const rows = await this.db.select().from(teams).where(eq(teams.listed, true));
+    if (rows.length === 0) return [];
+    const members = await this.db.select().from(teamMembers).where(inArray(teamMembers.teamId, rows.map((r) => r.id)));
+    return rows.map((t) => ({ ...t, memberIds: members.filter((m) => m.teamId === t.id).map((m) => m.userId) }));
+  }
+
   async setJoinCode(teamId: string, code: string): Promise<void> {
     await this.db.update(teams).set({ joinCode: code }).where(eq(teams.id, teamId));
   }
