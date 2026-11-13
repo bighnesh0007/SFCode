@@ -1,0 +1,5 @@
+[
+  "Store the timer id from setTimeout in a field. On every input, clearTimeout(this.timer) and start a new one: that's the whole debounce.",
+  "Read event.target.value inside the handler, not inside the timeout callback; by then the event is gone. Save the text in a field first.",
+  "Keep lastTerm. In the timeout callback, trim the text and skip the dispatch if it's empty or equal to lastTerm. Implement disconnectedCallback() { clearTimeout(this.timer); } so a removed component can't fire late. Salesforce's linter also asks you to justify setTimeout in LWC; debouncing is the accepted reason."
+]

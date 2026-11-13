@@ -1,0 +1,24 @@
+<template>
+    <p class="step">Step {step} of 3</p>
+    <template lwc:if={isStep1}>
+        <label>Name <input class="name" value={name} oninput={handleName} /></label>
+    </template>
+    <template lwc:if={isStep2}>
+        <label>Email <input class="email" type="email" value={email} oninput={handleEmail} /></label>
+    </template>
+    <template lwc:if={isStep3}>
+        <p class="review">Name: {trimmedName}, Email: {trimmedEmail}</p>
+    </template>
+    <template lwc:if={error}>
+        <p class="error">{error}</p>
+    </template>
+    <template lwc:if={showBack}>
+        <button class="back" onclick={handleBack}>Back</button>
+    </template>
+    <template lwc:if={isStep3}>
+        <button class="submit" onclick={handleSubmit}>Submit</button>
+    </template>
+    <template lwc:else>
+        <button class="next" onclick={handleNext}>Next</button>
+    </template>
+</template>

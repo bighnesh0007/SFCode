@@ -1,0 +1,21 @@
+<template>
+    <table>
+        <thead>
+            <tr>
+                <th><button class="sort" data-field="name" onclick={handleSort}>Name</button></th>
+                <th><button class="sort" data-field="amount" onclick={handleSort}>Amount</button></th>
+            </tr>
+        </thead>
+        <tbody>
+            <template for:each={visibleRows} for:item="row">
+                <tr key={row.id} class="row">
+                    <td class="name">{row.name}</td>
+                    <td class="amount">{row.amount}</td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+    <button class="prev" disabled={isFirst} onclick={handlePrev}>Prev</button>
+    <p class="page">Page {page} of {totalPages}</p>
+    <button class="next" disabled={isLast} onclick={handleNext}>Next</button>
+</template>

@@ -50,6 +50,9 @@ describe("the shipped problems", () => {
       "lwc-character-counter",
       "lwc-todo-list",
       "lwc-tabs",
+      "lwc-sortable-table",
+      "lwc-debounced-search",
+      "lwc-multi-step-form",
     ]);
   });
 });

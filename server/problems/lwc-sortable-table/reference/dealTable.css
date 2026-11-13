@@ -1,0 +1,3 @@
+table { border-collapse: collapse; width: 100%; }
+td, th { padding: 0.25rem 0.5rem; text-align: left; }
+.amount { text-align: right; }
