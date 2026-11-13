@@ -1,0 +1,18 @@
+{
+  "title": "Block Duplicate Contacts",
+  "difficulty": "Hard",
+  "category": "Triggers",
+  "order": 11,
+  "tags": [
+    "before insert",
+    "bulkification",
+    "sets"
+  ],
+  "files": [
+    {
+      "name": "SfcContactDedupe",
+      "type": "trigger"
+    }
+  ],
+  "testClass": "SfcContactDedupeTest"
+}

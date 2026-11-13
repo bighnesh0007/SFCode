@@ -1,0 +1,18 @@
+{
+  "title": "The Region That Isn't There",
+  "track": "debug",
+  "difficulty": "Easy",
+  "category": "Null Safety",
+  "order": 207,
+  "tags": [
+    "Map",
+    "NullPointerException"
+  ],
+  "files": [
+    {
+      "name": "SfcRegionTagger",
+      "type": "class"
+    }
+  ],
+  "testClass": "SfcRegionTaggerTest"
+}

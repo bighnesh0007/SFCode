@@ -1,0 +1,5 @@
+[
+  "SOQL has literals for relative date ranges: TODAY, LAST_N_DAYS:30, THIS_MONTH, THIS_QUARTER and more.",
+  "Compare with =: CloseDate = THIS_QUARTER is true for any date in the range.",
+  "WHERE IsClosed = false AND CloseDate = THIS_QUARTER."
+]

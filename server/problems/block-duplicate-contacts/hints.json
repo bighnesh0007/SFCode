@@ -1,0 +1,5 @@
+[
+  "Collect every incoming email, lower-cased, into a Set<String> first. Skip nulls.",
+  "One query: [SELECT Email FROM Contact WHERE Email IN :incoming]. Put the results, lower-cased, into a 'taken' set.",
+  "Loop over Trigger.new again: if the lower-cased email is in 'taken', call addError; otherwise add it to 'taken', so later duplicates in the same batch are refused too."
+]

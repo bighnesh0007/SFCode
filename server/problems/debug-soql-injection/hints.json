@@ -1,0 +1,5 @@
+[
+  "The bug is string concatenation: the input's quote characters end the string literal and the rest becomes SOQL.",
+  "Static SOQL with a bind variable (:industry) sends the input as a value, never as query text.",
+  "Replace Database.query with [SELECT Name FROM Account WHERE Industry = :industry ORDER BY Name], and return an empty list for String.isBlank(industry)."
+]

@@ -1,0 +1,18 @@
+{
+  "title": "Contacts With Open Cases",
+  "track": "soql",
+  "difficulty": "Medium",
+  "category": "Subqueries",
+  "order": 108,
+  "tags": [
+    "semi-join",
+    "IN subquery"
+  ],
+  "files": [
+    {
+      "name": "query",
+      "type": "soql"
+    }
+  ],
+  "testClass": "SfcSoqlContactsOpenCasesTest"
+}

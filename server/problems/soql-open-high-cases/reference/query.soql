@@ -1,0 +1,1 @@
+SELECT Id, Subject, Priority FROM Case WHERE IsClosed = false AND Priority = 'High' ORDER BY Subject ASC

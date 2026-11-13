@@ -1,0 +1,5 @@
+[
+  "Two conditions joined with AND: open, and High priority.",
+  "Case has an IsClosed checkbox. It's safer than listing every closed status by name.",
+  "WHERE IsClosed = false AND Priority = 'High' ORDER BY Subject ASC."
+]

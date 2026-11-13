@@ -1,0 +1,5 @@
+[
+  "Map.get returns null for a key that isn't there. Calling .toUpperCase() on that null crashes.",
+  "Map keys are case-sensitive. Normalise both the keys and the input, for example with trim().toLowerCase().",
+  "Return 'Other' for a blank input or a null lookup result. The values are already upper-case, so drop the toUpperCase() call."
+]

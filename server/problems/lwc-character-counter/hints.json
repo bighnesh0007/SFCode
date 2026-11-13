@@ -1,0 +1,5 @@
+[
+  "Store the text in a field and update it from an oninput handler: this.text = event.target.value.",
+  "Getters compute what the template shows: used (text length), counterClass ('counter' or 'counter over') and remainingText.",
+  "remainingText: left = max - used. Use Math.abs(left) for the number, 'character' when it's 1, and 'left' or 'over' depending on the sign."
+]

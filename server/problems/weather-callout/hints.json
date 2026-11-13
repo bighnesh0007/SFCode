@@ -1,0 +1,5 @@
+[
+  "Build an HttpRequest: setMethod('GET') and setEndpoint(...), then send it with new Http().send(req).",
+  "Encode the city with EncodingUtil.urlEncode(city, 'UTF-8'). Check String.isBlank(city) before anything else.",
+  "JSON.deserializeUntyped(res.getBody()) gives a Map<String, Object>; cast body.get('tempC') to Decimal. Throw WeatherException when getStatusCode() != 200."
+]

@@ -1,0 +1,18 @@
+{
+  "title": "Open High-Priority Cases",
+  "track": "soql",
+  "difficulty": "Easy",
+  "category": "Filtering",
+  "order": 107,
+  "tags": [
+    "WHERE",
+    "ORDER BY"
+  ],
+  "files": [
+    {
+      "name": "query",
+      "type": "soql"
+    }
+  ],
+  "testClass": "SfcSoqlHighCasesTest"
+}

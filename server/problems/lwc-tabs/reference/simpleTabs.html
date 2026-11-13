@@ -1,0 +1,12 @@
+<template>
+    <div role="tablist" onkeydown={handleKey}>
+        <template for:each={items} for:item="tab">
+            <button key={tab.index} class={tab.className} role="tab" aria-selected={tab.selected} data-index={tab.index} onclick={select}>
+                {tab.label}
+            </button>
+        </template>
+    </div>
+    <template lwc:if={current}>
+        <div class="panel" role="tabpanel">{current.content}</div>
+    </template>
+</template>

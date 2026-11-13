@@ -1,0 +1,18 @@
+{
+  "title": "Deals Closing This Quarter",
+  "track": "soql",
+  "difficulty": "Medium",
+  "category": "Date Literals",
+  "order": 109,
+  "tags": [
+    "date literals",
+    "THIS_QUARTER"
+  ],
+  "files": [
+    {
+      "name": "query",
+      "type": "soql"
+    }
+  ],
+  "testClass": "SfcSoqlThisQuarterTest"
+}

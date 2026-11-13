@@ -1,0 +1,5 @@
+[
+  "A Schedulable class has one method, execute(SchedulableContext context). Do the work there.",
+  "Query open overdue tasks in one go: [SELECT Id FROM Task WHERE IsClosed = false AND ActivityDate < TODAY]. Set Priority in a loop, then one update.",
+  "scheduleNightly returns System.schedule('SFCode overdue tasks', '0 0 2 * * ?', new SfcOverdueTaskJob())."
+]

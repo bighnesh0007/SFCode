@@ -1,0 +1,17 @@
+{
+  "title": "Urgent Cases First",
+  "difficulty": "Easy",
+  "category": "Triggers",
+  "order": 8,
+  "tags": [
+    "before insert",
+    "strings"
+  ],
+  "files": [
+    {
+      "name": "SfcCaseUrgency",
+      "type": "trigger"
+    }
+  ],
+  "testClass": "SfcCaseUrgencyTest"
+}

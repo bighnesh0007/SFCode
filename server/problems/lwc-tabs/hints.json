@@ -1,0 +1,5 @@
+[
+  "Keep the selected index as a field (start at 0). A getter maps tabs to objects with index, label, className and aria-selected.",
+  "aria-selected must be the strings 'true' or 'false'. Compute them in the getter. data-index on each button tells the click handler which tab it was.",
+  "Handle keydown on the tablist: ArrowRight is (i + 1) % n, ArrowLeft is (i - 1 + n) % n. Show the panel with lwc:if on the current tab."
+]
