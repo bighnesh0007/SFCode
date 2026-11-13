@@ -15,6 +15,16 @@ const examFile = z.strictObject({
   order: z.number().int().positive(),
   description: z.string().min(10).max(300),
   sections: z.array(z.strictObject({ id, title: z.string().min(3).max(80) })).min(1),
+  /** The real exam's shape, from Salesforce's public exam guide. Drives mock-exam mode. */
+  mock: z
+    .strictObject({
+      questions: z.number().int().min(5).max(100),
+      minutes: z.number().int().min(5).max(240),
+      passPercent: z.number().int().min(1).max(100),
+      /** Section id → share of the exam, in percent. */
+      weights: z.record(id, z.number().positive().max(100)),
+    })
+    .optional(),
   questions: z
     .array(
       z.strictObject({
@@ -53,6 +63,12 @@ export function validateExam(raw: unknown, where: string): Exam {
     if (q.answer.length > 1 && !new RegExp(`Choose ${q.answer.length}`).test(q.prompt)) {
       throw new Error(`${at}: multi-answer prompt must say "Choose ${q.answer.length}"`);
     }
+  }
+  if (exam.mock) {
+    const keys = Object.keys(exam.mock.weights);
+    if (keys.some((k) => !sections.has(k)) || keys.length !== sections.size) throw new Error(`${where}: mock.weights must name every section exactly once`);
+    const total = Object.values(exam.mock.weights).reduce((a, b) => a + b, 0);
+    if (Math.abs(total - 100) > 0.5) throw new Error(`${where}: mock.weights must add up to 100 (got ${total})`);
   }
   for (const s of exam.sections) {
     if (!exam.questions.some((q) => q.section === s.id)) throw new Error(`${where}: section ${s.id} has no questions`);

@@ -12,7 +12,7 @@ import { ok } from "../utils/respond.ts";
 import { callbackQuery, connectBody, executeBody, queryBody } from "../validation/salesforce.schema.ts";
 import { challengeController } from "../controllers/challenge.controller.ts";
 import { certificationController } from "../controllers/certification.controller.ts";
-import { answerBody, examParams, practiceQuery } from "../validation/certification.schema.ts";
+import { answerBody, examParams, mockGradeBody, practiceQuery } from "../validation/certification.schema.ts";
 import { lwcCompileBody, type LwcCompileBody } from "../validation/lwc.schema.ts";
 import { compileLwc } from "../services/lwc/compiler.ts";
 import { communityController } from "../controllers/community.controller.ts";
@@ -110,6 +110,8 @@ export function mountRoutes(app: Application, container: Container): void {
     const certService = container.certification;
     cert.get("/review", verifier ? requireAuth(verifier) : disabled("Sign-in"), (async (req, res) => ok(res, await certService.review(req.auth?.userId ?? ""))) as RequestHandler);
     cert.get("/:exam/questions", validate({ params: examParams, query: practiceQuery }), c.practice);
+    cert.get("/:exam/mock", validate({ params: examParams }), c.mock);
+    cert.post("/:exam/mock/grade", identify, limiter(20), validate({ params: examParams, body: mockGradeBody }), c.gradeMock);
     cert.post("/answers", identify, limiter(60), validate({ body: answerBody }), c.answer);
   } else {
     cert.use(disabled("Certification Prep"));

@@ -17,3 +17,9 @@ export const answerBody = z.strictObject({
   selected: z.array(z.string().regex(/^[a-h]$/)).min(1).max(8),
 });
 export type AnswerBody = z.infer<typeof answerBody>;
+
+export const mockGradeBody = z.strictObject({
+  // An empty array is an unanswered question; it still counts toward the score.
+  answers: z.record(id, z.array(z.string().regex(/^[a-h]$/)).max(8)).refine((a) => Object.keys(a).length <= 100, "Too many questions."),
+});
+export type MockGradeBody = z.infer<typeof mockGradeBody>;

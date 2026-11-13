@@ -1,7 +1,7 @@
 {
   "exam": "pd1",
   "title": "Platform Developer I",
-  "order": 1,
+  "order": 2,
   "description": "Apex, SOQL, triggers, testing and Lightning Web Components fundamentals.",
   "sections": [
     {
@@ -21,6 +21,17 @@
       "title": "Testing, Debugging and Deployment"
     }
   ],
+  "mock": {
+    "questions": 60,
+    "minutes": 105,
+    "passPercent": 68,
+    "weights": {
+      "fundamentals": 23,
+      "logic": 30,
+      "ui": 25,
+      "testing": 22
+    }
+  },
   "questions": [
     {
       "id": "pd1-limits-soql",
@@ -563,6 +574,222 @@
         "b"
       ],
       "explanation": "A `@TestSetup` method runs once before the class's test methods. Each test method gets the records it created (rolled back between methods), which saves both time and code."
+    },
+    {
+      "id": "pd1-trigger-old-insert",
+      "section": "logic",
+      "prompt": "In a **before insert** trigger, which context variable is null?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Trigger.new"
+        },
+        {
+          "id": "b",
+          "text": "Trigger.old"
+        },
+        {
+          "id": "c",
+          "text": "Trigger.isBefore"
+        },
+        {
+          "id": "d",
+          "text": "Trigger.size"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Insert has no previous version, so Trigger.old and Trigger.oldMap are null. Trigger.newMap is also null in before insert, because records don't have Ids yet."
+    },
+    {
+      "id": "pd1-child-subquery",
+      "section": "fundamentals",
+      "prompt": "Which query returns Accounts with their Contacts?",
+      "options": [
+        {
+          "id": "a",
+          "text": "SELECT Name, (SELECT LastName FROM Contacts) FROM Account"
+        },
+        {
+          "id": "b",
+          "text": "SELECT Name, (SELECT LastName FROM Contact) FROM Account"
+        },
+        {
+          "id": "c",
+          "text": "SELECT Name, Contact.LastName FROM Account"
+        },
+        {
+          "id": "d",
+          "text": "SELECT Name FROM Account JOIN Contact"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Parent-to-child subqueries use the child relationship name, which is plural for standard objects (Contacts) and ends in __r for custom ones."
+    },
+    {
+      "id": "pd1-custom-exception-name",
+      "section": "fundamentals",
+      "prompt": "Which is a valid custom exception class declaration?",
+      "options": [
+        {
+          "id": "a",
+          "text": "public class BudgetError extends Exception {}"
+        },
+        {
+          "id": "b",
+          "text": "public class BudgetException extends Exception {}"
+        },
+        {
+          "id": "c",
+          "text": "public class BudgetException implements Exception {}"
+        },
+        {
+          "id": "d",
+          "text": "public exception BudgetException {}"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Custom exceptions extend Exception and their name must end with \"Exception\"."
+    },
+    {
+      "id": "pd1-static-transaction",
+      "section": "fundamentals",
+      "prompt": "How long does the value of a **static** Apex variable last?",
+      "options": [
+        {
+          "id": "a",
+          "text": "For the user's session"
+        },
+        {
+          "id": "b",
+          "text": "For the current transaction"
+        },
+        {
+          "id": "c",
+          "text": "Until the class is redeployed"
+        },
+        {
+          "id": "d",
+          "text": "For 24 hours"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Static variables are reset for each transaction. That's why they work as recursion guards inside one save, but can't cache data between requests."
+    },
+    {
+      "id": "pd1-heap",
+      "section": "logic",
+      "prompt": "What is the synchronous Apex heap size limit?",
+      "options": [
+        {
+          "id": "a",
+          "text": "3 MB"
+        },
+        {
+          "id": "b",
+          "text": "6 MB"
+        },
+        {
+          "id": "c",
+          "text": "12 MB"
+        },
+        {
+          "id": "d",
+          "text": "36 MB"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "6 MB synchronous, 12 MB asynchronous."
+    },
+    {
+      "id": "pd1-lwc-track",
+      "section": "ui",
+      "prompt": "In LWC, when is `@track` still needed?",
+      "options": [
+        {
+          "id": "a",
+          "text": "For every field shown in the template"
+        },
+        {
+          "id": "b",
+          "text": "To re-render when a property inside an object or an element of an array changes"
+        },
+        {
+          "id": "c",
+          "text": "To make a property public"
+        },
+        {
+          "id": "d",
+          "text": "To call Apex"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "All fields are reactive when reassigned. `@track` is only needed to observe changes inside an object or array without reassigning it."
+    },
+    {
+      "id": "pd1-user-mode",
+      "section": "fundamentals",
+      "prompt": "Which SOQL clause enforces object permissions, field-level security and sharing for the running user?",
+      "options": [
+        {
+          "id": "a",
+          "text": "WITH SECURITY_ENFORCED"
+        },
+        {
+          "id": "b",
+          "text": "WITH USER_MODE"
+        },
+        {
+          "id": "c",
+          "text": "WITH SYSTEM_MODE"
+        },
+        {
+          "id": "d",
+          "text": "FOR VIEW"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "WITH USER_MODE runs the query as the user, enforcing CRUD, FLS and sharing. WITH SECURITY_ENFORCED checks only CRUD and FLS on the queried fields."
+    },
+    {
+      "id": "pd1-test-code-size",
+      "section": "testing",
+      "prompt": "Which is true about classes annotated `@isTest`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "They count toward the org's Apex code size limit"
+        },
+        {
+          "id": "b",
+          "text": "They don't count toward the org's Apex code size limit"
+        },
+        {
+          "id": "c",
+          "text": "They can be called from production code"
+        },
+        {
+          "id": "d",
+          "text": "They run with SeeAllData=true by default"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Test classes don't count toward the 6 MB Apex code limit. They can't be called from non-test code, and since API 24.0 they don't see org data by default."
     }
   ]
 }

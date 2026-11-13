@@ -1,0 +1,1167 @@
+{
+  "exam": "admin",
+  "title": "Administrator",
+  "order": 1,
+  "description": "Users and security, objects and Lightning App Builder, Sales and Service apps, data, reports and Flow automation.",
+  "sections": [
+    {
+      "id": "setup",
+      "title": "Configuration and Setup"
+    },
+    {
+      "id": "objects",
+      "title": "Object Manager and Lightning App Builder"
+    },
+    {
+      "id": "sales",
+      "title": "Sales and Marketing Applications"
+    },
+    {
+      "id": "service",
+      "title": "Service and Support Applications"
+    },
+    {
+      "id": "productivity",
+      "title": "Productivity and Collaboration"
+    },
+    {
+      "id": "data",
+      "title": "Data and Analytics Management"
+    },
+    {
+      "id": "automation",
+      "title": "Automation"
+    }
+  ],
+  "mock": {
+    "questions": 60,
+    "minutes": 105,
+    "passPercent": 65,
+    "weights": {
+      "setup": 15,
+      "objects": 20,
+      "sales": 12,
+      "service": 11,
+      "productivity": 8,
+      "data": 17,
+      "automation": 17
+    }
+  },
+  "questions": [
+    {
+      "id": "adm-login-ip-ranges",
+      "section": "setup",
+      "prompt": "Support agents must only be able to log in from the office network. What should the administrator configure?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Trusted IP ranges under Network Access"
+        },
+        {
+          "id": "b",
+          "text": "Login IP ranges on the agents' profile"
+        },
+        {
+          "id": "c",
+          "text": "A sharing rule restricted by IP"
+        },
+        {
+          "id": "d",
+          "text": "Session timeout of 15 minutes"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Login IP ranges on a profile block logins from anywhere else. Trusted IP ranges under Network Access only skip the identity-verification challenge; users outside them can still log in after verifying."
+    },
+    {
+      "id": "adm-owd-baseline",
+      "section": "setup",
+      "prompt": "Which setting defines the most restrictive baseline access users have to records they don't own?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Role hierarchy"
+        },
+        {
+          "id": "b",
+          "text": "Organization-wide defaults"
+        },
+        {
+          "id": "c",
+          "text": "Profiles"
+        },
+        {
+          "id": "d",
+          "text": "Sharing rules"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Organization-wide defaults set the baseline. Roles, sharing rules and manual sharing can only open access up from there, never restrict it below the default."
+    },
+    {
+      "id": "adm-permset-extra",
+      "section": "setup",
+      "prompt": "One sales rep needs to delete Leads for a two-week project. Other users on the same profile must not get this permission. What is the best approach?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Clone the profile and grant Delete"
+        },
+        {
+          "id": "b",
+          "text": "Assign a permission set with Delete on Lead, with an expiration date"
+        },
+        {
+          "id": "c",
+          "text": "Give the rep the System Administrator profile"
+        },
+        {
+          "id": "d",
+          "text": "Create a sharing rule granting Full Access"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Permission sets add permissions to individual users without changing their profile, and a permission set assignment can carry an expiration date. Sharing rules grant record access, not object permissions like Delete."
+    },
+    {
+      "id": "adm-freeze-user",
+      "section": "setup",
+      "prompt": "A user who left the company is the default owner of web-to-lead leads, so they can't be deactivated right away. How do you stop them logging in immediately?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Freeze the user"
+        },
+        {
+          "id": "b",
+          "text": "Reset their password"
+        },
+        {
+          "id": "c",
+          "text": "Remove their role"
+        },
+        {
+          "id": "d",
+          "text": "Change their profile to Read Only"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Freezing a user blocks login at once while you reassign the settings (default lead owner, workflow recipients) that prevent deactivation. A password reset still lets someone with access to their email log in."
+    },
+    {
+      "id": "adm-company-info",
+      "section": "setup",
+      "prompt": "Where does an administrator see how many user licenses are used and set the org's default time zone and currency locale?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Company Information"
+        },
+        {
+          "id": "b",
+          "text": "My Domain"
+        },
+        {
+          "id": "c",
+          "text": "Session Settings"
+        },
+        {
+          "id": "d",
+          "text": "User Management Settings"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Company Information holds the org-wide defaults (locale, time zone, currency) and lists licenses with how many are used and remaining."
+    },
+    {
+      "id": "adm-delegated-admin",
+      "section": "setup",
+      "prompt": "Regional managers should be able to reset passwords and unlock users in their own region only, without any other admin rights. What should you use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Delegated administration"
+        },
+        {
+          "id": "b",
+          "text": "The Manage Users permission on their profile"
+        },
+        {
+          "id": "c",
+          "text": "A permission set group"
+        },
+        {
+          "id": "d",
+          "text": "Manager groups"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Delegated administration lets chosen users manage users in specified roles (and their subordinates). The Manage Users permission would apply to every user in the org."
+    },
+    {
+      "id": "adm-criteria-sharing",
+      "section": "setup",
+      "prompt": "Finance must see every Opportunity over $1M, whoever owns it. Opportunity is Private. What should the administrator create?",
+      "options": [
+        {
+          "id": "a",
+          "text": "An owner-based sharing rule"
+        },
+        {
+          "id": "b",
+          "text": "A criteria-based sharing rule on Amount"
+        },
+        {
+          "id": "c",
+          "text": "A public list view"
+        },
+        {
+          "id": "d",
+          "text": "A new role above Sales"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Criteria-based sharing rules share records by field values, such as Amount greater than 1,000,000, with a group or role. Owner-based rules share by who owns the record."
+    },
+    {
+      "id": "adm-md-rollup",
+      "section": "objects",
+      "prompt": "A Project object needs a roll-up summary field that totals its Expense records. What must be true?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Expense has a lookup to Project"
+        },
+        {
+          "id": "b",
+          "text": "Expense has a master-detail relationship to Project"
+        },
+        {
+          "id": "c",
+          "text": "Project has a lookup to Expense"
+        },
+        {
+          "id": "d",
+          "text": "Both objects are standard objects"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Roll-up summary fields are created on the master side of a master-detail relationship. A lookup relationship needs a flow or Apex to total child records."
+    },
+    {
+      "id": "adm-lookup-to-md",
+      "section": "objects",
+      "prompt": "What must be true before a lookup field can be converted to master-detail?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The object has no records"
+        },
+        {
+          "id": "b",
+          "text": "Every existing record has a value in the lookup field"
+        },
+        {
+          "id": "c",
+          "text": "The object has fewer than two master-detail fields and no record types"
+        },
+        {
+          "id": "d",
+          "text": "Field history tracking is off"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Detail records can't exist without a master, so every existing record must already have a value in the lookup before the conversion is allowed."
+    },
+    {
+      "id": "adm-record-types",
+      "section": "objects",
+      "prompt": "What do record types control? Choose 2.",
+      "options": [
+        {
+          "id": "a",
+          "text": "Which picklist values are available"
+        },
+        {
+          "id": "b",
+          "text": "Which page layout a profile sees"
+        },
+        {
+          "id": "c",
+          "text": "Which users can see a record"
+        },
+        {
+          "id": "d",
+          "text": "Field-level security"
+        }
+      ],
+      "answer": [
+        "a",
+        "b"
+      ],
+      "explanation": "A record type limits picklist values, and page layout assignment is done per profile and record type. Visibility comes from sharing, and field access comes from field-level security."
+    },
+    {
+      "id": "adm-fls-vs-layout",
+      "section": "objects",
+      "prompt": "A Salary field must be hidden from support users everywhere: page layouts, list views, reports and the API. What should you use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Remove it from their page layout"
+        },
+        {
+          "id": "b",
+          "text": "Field-level security on their profile or permission sets"
+        },
+        {
+          "id": "c",
+          "text": "A validation rule"
+        },
+        {
+          "id": "d",
+          "text": "A record type without the field"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Field-level security applies everywhere, including reports, search, list views and the API. Removing a field from a page layout only hides it on that layout."
+    },
+    {
+      "id": "adm-component-visibility",
+      "section": "objects",
+      "prompt": "On an Opportunity record page, a warning component should show only when Amount is over $1M. How?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Create a second record type"
+        },
+        {
+          "id": "b",
+          "text": "Add a component visibility filter in Lightning App Builder"
+        },
+        {
+          "id": "c",
+          "text": "Use a validation rule"
+        },
+        {
+          "id": "d",
+          "text": "Create a new page layout"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Lightning App Builder components (and Dynamic Forms fields) can have visibility filters based on record fields, the user, device and more."
+    },
+    {
+      "id": "adm-cross-object-formula",
+      "section": "objects",
+      "prompt": "Contact needs to show its Account's Industry without storing a copy that can go stale. Which field type?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Roll-up summary"
+        },
+        {
+          "id": "b",
+          "text": "Cross-object formula field"
+        },
+        {
+          "id": "c",
+          "text": "Lookup filter"
+        },
+        {
+          "id": "d",
+          "text": "Text field updated by a flow"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A formula can reference parent fields (Account.Industry) and is calculated when read, so it never goes stale. A copied text field must be kept in sync."
+    },
+    {
+      "id": "adm-validation-true",
+      "section": "objects",
+      "prompt": "A validation rule shows its error message when its formula evaluates to:",
+      "options": [
+        {
+          "id": "a",
+          "text": "TRUE"
+        },
+        {
+          "id": "b",
+          "text": "FALSE"
+        },
+        {
+          "id": "c",
+          "text": "NULL"
+        },
+        {
+          "id": "d",
+          "text": "A non-blank text value"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "A validation rule describes the invalid condition: when the formula is TRUE, the save is blocked and the error is shown."
+    },
+    {
+      "id": "adm-junction",
+      "section": "objects",
+      "prompt": "Students take many Courses and each Course has many Students. How is this modelled?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A lookup from Student to Course"
+        },
+        {
+          "id": "b",
+          "text": "A junction object with two master-detail relationships"
+        },
+        {
+          "id": "c",
+          "text": "A multi-select picklist of courses on Student"
+        },
+        {
+          "id": "d",
+          "text": "A hierarchical relationship"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Many-to-many relationships use a junction object (Enrollment) with a master-detail relationship to each side, so each enrollment links one student to one course."
+    },
+    {
+      "id": "adm-lead-convert",
+      "section": "sales",
+      "prompt": "Which records can lead conversion create? Choose 3.",
+      "options": [
+        {
+          "id": "a",
+          "text": "Account"
+        },
+        {
+          "id": "b",
+          "text": "Contact"
+        },
+        {
+          "id": "c",
+          "text": "Opportunity"
+        },
+        {
+          "id": "d",
+          "text": "Case"
+        },
+        {
+          "id": "e",
+          "text": "Campaign"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanation": "Converting a lead creates (or merges into) an Account and a Contact and can optionally create an Opportunity. It never creates Cases or Campaigns."
+    },
+    {
+      "id": "adm-lead-assignment",
+      "section": "sales",
+      "prompt": "Leads from the website must go to a regional queue based on Country. What should be configured?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A lead assignment rule"
+        },
+        {
+          "id": "b",
+          "text": "An escalation rule"
+        },
+        {
+          "id": "c",
+          "text": "A sharing rule"
+        },
+        {
+          "id": "d",
+          "text": "A territory model"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Lead assignment rules route new leads (including web-to-lead) to users or queues based on criteria. Escalation rules are for Cases."
+    },
+    {
+      "id": "adm-stage-probability",
+      "section": "sales",
+      "prompt": "Where is the default Probability of each Opportunity stage defined?",
+      "options": [
+        {
+          "id": "a",
+          "text": "On the Stage picklist values"
+        },
+        {
+          "id": "b",
+          "text": "In a validation rule"
+        },
+        {
+          "id": "c",
+          "text": "On the forecast settings"
+        },
+        {
+          "id": "d",
+          "text": "On the sales process"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Each Stage picklist value carries a default Probability and Forecast Category. Sales processes choose which stages each record type can use."
+    },
+    {
+      "id": "adm-path",
+      "section": "sales",
+      "prompt": "Sales managers want reps to see key fields and guidance for each Opportunity stage at the top of the record. What should you set up?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Path"
+        },
+        {
+          "id": "b",
+          "text": "Kanban list view"
+        },
+        {
+          "id": "c",
+          "text": "Sales process"
+        },
+        {
+          "id": "d",
+          "text": "Big Deal Alerts"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Path shows the stages across the top of the record with key fields and guidance for success for each step."
+    },
+    {
+      "id": "adm-standard-pricebook",
+      "section": "sales",
+      "prompt": "Why can't a new product be added to a custom price book?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It has no standard price in the standard price book"
+        },
+        {
+          "id": "b",
+          "text": "It isn't marked as a Family"
+        },
+        {
+          "id": "c",
+          "text": "Quotes are disabled"
+        },
+        {
+          "id": "d",
+          "text": "Opportunity products are disabled"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "A product needs a standard price in the standard price book before it can be given a list price in a custom price book."
+    },
+    {
+      "id": "adm-campaign-hierarchy",
+      "section": "sales",
+      "prompt": "Marketing wants the results of several webinars rolled up under one annual event. What should they use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Campaign hierarchy"
+        },
+        {
+          "id": "b",
+          "text": "Campaign member statuses"
+        },
+        {
+          "id": "c",
+          "text": "A lookup from Lead to Campaign"
+        },
+        {
+          "id": "d",
+          "text": "Opportunity contact roles"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Campaign hierarchies group child campaigns under a parent, and the parent shows the aggregated statistics of its children."
+    },
+    {
+      "id": "adm-escalation",
+      "section": "service",
+      "prompt": "High-priority cases not closed within 8 hours must be reassigned to a supervisor. What should you use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Case assignment rule"
+        },
+        {
+          "id": "b",
+          "text": "Case escalation rule"
+        },
+        {
+          "id": "c",
+          "text": "Auto-response rule"
+        },
+        {
+          "id": "d",
+          "text": "Support process"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Escalation rules act on cases that meet criteria for a period of time, reassigning and notifying. Assignment rules run only when the case is created or edited."
+    },
+    {
+      "id": "adm-email-to-case",
+      "section": "service",
+      "prompt": "Customers email support@company.com and each email should become a Case automatically. What should you enable?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Web-to-Case"
+        },
+        {
+          "id": "b",
+          "text": "Email-to-Case"
+        },
+        {
+          "id": "c",
+          "text": "Email templates"
+        },
+        {
+          "id": "d",
+          "text": "Case auto-response rules"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Email-to-Case turns incoming email to a routing address into Cases. Web-to-Case captures cases from a web form."
+    },
+    {
+      "id": "adm-entitlements",
+      "section": "service",
+      "prompt": "Support must track whether first response happens within the time promised in each customer's contract. What should be used?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Entitlements and milestones"
+        },
+        {
+          "id": "b",
+          "text": "Case escalation rules"
+        },
+        {
+          "id": "c",
+          "text": "Business hours only"
+        },
+        {
+          "id": "d",
+          "text": "Case teams"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Entitlements define the support a customer gets, and entitlement processes with milestones track required steps such as first response against a time limit."
+    },
+    {
+      "id": "adm-omni",
+      "section": "service",
+      "prompt": "Cases should be pushed to the next available agent based on how much work each agent already has. What should you use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Omni-Channel"
+        },
+        {
+          "id": "b",
+          "text": "Queues with list views"
+        },
+        {
+          "id": "c",
+          "text": "Case assignment rules"
+        },
+        {
+          "id": "d",
+          "text": "Macros"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Omni-Channel routes work items to agents based on availability, capacity and skills. Queues alone wait for agents to pick work up."
+    },
+    {
+      "id": "adm-support-process",
+      "section": "service",
+      "prompt": "Hardware and Software cases need different lists of Status values. What do you set up?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Two support processes, each used by a Case record type"
+        },
+        {
+          "id": "b",
+          "text": "Two page layouts"
+        },
+        {
+          "id": "c",
+          "text": "A dependent picklist"
+        },
+        {
+          "id": "d",
+          "text": "Two queues"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Support processes choose which Case Status values are available, and each Case record type uses a support process."
+    },
+    {
+      "id": "adm-feed-tracking",
+      "section": "productivity",
+      "prompt": "Users following an Account want a feed post whenever its Rating changes. What should you enable?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Feed tracking on the Rating field"
+        },
+        {
+          "id": "b",
+          "text": "Field history tracking"
+        },
+        {
+          "id": "c",
+          "text": "Chatter email digests"
+        },
+        {
+          "id": "d",
+          "text": "A list view"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Feed tracking posts changes to tracked fields in the record's feed, which followers see. Field history tracking records changes in a related list, not the feed."
+    },
+    {
+      "id": "adm-events-calendar",
+      "section": "productivity",
+      "prompt": "Which activity records appear on a user's calendar?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Tasks"
+        },
+        {
+          "id": "b",
+          "text": "Events"
+        },
+        {
+          "id": "c",
+          "text": "Emails"
+        },
+        {
+          "id": "d",
+          "text": "Chatter posts"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Events have a start and end time and appear on the calendar. Tasks are to-do items with a due date."
+    },
+    {
+      "id": "adm-mobile-actions",
+      "section": "productivity",
+      "prompt": "Field reps want a one-tap action in the mobile app to log a visit on an Account. What should you configure?",
+      "options": [
+        {
+          "id": "a",
+          "text": "An object-specific quick action added to the Account page layout"
+        },
+        {
+          "id": "b",
+          "text": "A new Lightning app"
+        },
+        {
+          "id": "c",
+          "text": "A custom report"
+        },
+        {
+          "id": "d",
+          "text": "A list view"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Object-specific quick actions on the page layout's mobile and Lightning actions section show up in the Salesforce mobile app."
+    },
+    {
+      "id": "adm-import-limit",
+      "section": "data",
+      "prompt": "You need to import 120,000 Contacts from a CSV file. Which tool?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Data Import Wizard"
+        },
+        {
+          "id": "b",
+          "text": "Data Loader"
+        },
+        {
+          "id": "c",
+          "text": "Mass Transfer Records"
+        },
+        {
+          "id": "d",
+          "text": "Mass Update Addresses"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The Data Import Wizard handles up to 50,000 records. Data Loader handles up to 5 million and also supports delete and export."
+    },
+    {
+      "id": "adm-mass-delete",
+      "section": "data",
+      "prompt": "Which tool can delete 200,000 records listed in a CSV file?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Data Import Wizard"
+        },
+        {
+          "id": "b",
+          "text": "Data Loader"
+        },
+        {
+          "id": "c",
+          "text": "Mass Delete Records"
+        },
+        {
+          "id": "d",
+          "text": "The Recycle Bin"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Data Loader can delete (and hard delete) records by Id. The Import Wizard can't delete, and Mass Delete Records works only on certain objects and in batches of 250."
+    },
+    {
+      "id": "adm-duplicates",
+      "section": "data",
+      "prompt": "Users must be blocked from creating a Lead whose email matches an existing Lead. What should you configure? Choose 2.",
+      "options": [
+        {
+          "id": "a",
+          "text": "A matching rule on Email"
+        },
+        {
+          "id": "b",
+          "text": "A duplicate rule set to Block"
+        },
+        {
+          "id": "c",
+          "text": "A validation rule using VLOOKUP"
+        },
+        {
+          "id": "d",
+          "text": "A unique external Id field on Lead Email"
+        }
+      ],
+      "answer": [
+        "a",
+        "b"
+      ],
+      "explanation": "Matching rules decide what counts as a duplicate, and duplicate rules decide what happens (alert or block). VLOOKUP only works on custom objects."
+    },
+    {
+      "id": "adm-report-type-without",
+      "section": "data",
+      "prompt": "Managers need a report of Accounts, including Accounts with no Opportunities. What do you need?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A custom report type where Accounts may or may not have related Opportunities"
+        },
+        {
+          "id": "b",
+          "text": "A matrix report"
+        },
+        {
+          "id": "c",
+          "text": "A joined report with Cases"
+        },
+        {
+          "id": "d",
+          "text": "A cross filter \"with Opportunities\""
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The standard Accounts with Opportunities report type only includes Accounts that have at least one. A custom report type can include records with or without related records."
+    },
+    {
+      "id": "adm-matrix",
+      "section": "data",
+      "prompt": "Which report format groups by both rows and columns?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Tabular"
+        },
+        {
+          "id": "b",
+          "text": "Summary"
+        },
+        {
+          "id": "c",
+          "text": "Matrix"
+        },
+        {
+          "id": "d",
+          "text": "Joined"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Matrix reports group by rows and columns, like a pivot table. Summary reports group by rows only."
+    },
+    {
+      "id": "adm-dynamic-dashboard",
+      "section": "data",
+      "prompt": "Each sales rep should see the dashboard with only the data they have access to. What should you set?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Running user: the dashboard viewer (dynamic dashboard)"
+        },
+        {
+          "id": "b",
+          "text": "A different dashboard per rep"
+        },
+        {
+          "id": "c",
+          "text": "A report filter of My Opportunities"
+        },
+        {
+          "id": "d",
+          "text": "A sharing rule"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "A dynamic dashboard runs as whoever views it, so each viewer sees data according to their own access."
+    },
+    {
+      "id": "adm-snapshot",
+      "section": "data",
+      "prompt": "Leadership wants to see how the pipeline changed week by week. What captures the data over time?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Reporting snapshot"
+        },
+        {
+          "id": "b",
+          "text": "Historical trend report on Accounts"
+        },
+        {
+          "id": "c",
+          "text": "Field history tracking on Amount"
+        },
+        {
+          "id": "d",
+          "text": "A dashboard filter"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Reporting snapshots copy a source report's results into a custom object on a schedule, building a history for trend reporting."
+    },
+    {
+      "id": "adm-before-save",
+      "section": "automation",
+      "prompt": "When an Opportunity is saved, a field on the same record must be set as fast as possible. Which flow?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Record-triggered flow optimized for Fast Field Updates (before save)"
+        },
+        {
+          "id": "b",
+          "text": "Record-triggered flow optimized for Actions and Related Records (after save)"
+        },
+        {
+          "id": "c",
+          "text": "Screen flow"
+        },
+        {
+          "id": "d",
+          "text": "Scheduled flow"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Before-save flows update the triggering record without an extra DML statement, so they're much faster than after-save flows for same-record updates."
+    },
+    {
+      "id": "adm-approval-lock",
+      "section": "automation",
+      "prompt": "Discounts over 20% need a manager's approval, and the Opportunity must not be edited while it's pending. What should you use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Approval process"
+        },
+        {
+          "id": "b",
+          "text": "Validation rule"
+        },
+        {
+          "id": "c",
+          "text": "Screen flow"
+        },
+        {
+          "id": "d",
+          "text": "Escalation rule"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Approval processes route records to approvers and lock the record while it's pending approval."
+    },
+    {
+      "id": "adm-scheduled-path",
+      "section": "automation",
+      "prompt": "Owners should get an email 3 days before an Opportunity's Close Date. What's the best approach?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A record-triggered flow with a scheduled path based on Close Date"
+        },
+        {
+          "id": "b",
+          "text": "A scheduled report"
+        },
+        {
+          "id": "c",
+          "text": "A validation rule"
+        },
+        {
+          "id": "d",
+          "text": "A time-based workflow rule"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Scheduled paths run actions a set time before or after a date field on the record. Workflow rules are retired for new automation in favour of Flow."
+    },
+    {
+      "id": "adm-screen-flow",
+      "section": "automation",
+      "prompt": "Agents need a guided, step-by-step wizard to collect warranty details and create a Case. What should you build?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Screen flow"
+        },
+        {
+          "id": "b",
+          "text": "Autolaunched flow"
+        },
+        {
+          "id": "c",
+          "text": "Approval process"
+        },
+        {
+          "id": "d",
+          "text": "Quick text"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Screen flows show screens to users, collect input and can create or update records along the way."
+    },
+    {
+      "id": "adm-automation-tool",
+      "section": "automation",
+      "prompt": "Salesforce recommends which tool for new declarative automation?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Workflow rules"
+        },
+        {
+          "id": "b",
+          "text": "Process Builder"
+        },
+        {
+          "id": "c",
+          "text": "Flow Builder"
+        },
+        {
+          "id": "d",
+          "text": "Apex triggers"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Workflow Rules and Process Builder are retired for new automation. Flow is the recommended declarative tool, and Apex is for when declarative tools can't do the job."
+    }
+  ]
+}
