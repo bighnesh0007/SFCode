@@ -73,6 +73,7 @@ export class PointsService {
     await this.repo.set("points", next, actor);
     this.cache = new PointsTable(next);
     logEvent("admin.points_updated", { by: actor });
+    await this.admin.record(actor, "points.update", null, { coinsPerPoint: next.coinsPerPoint });
     return next;
   }
 }

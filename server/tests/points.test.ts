@@ -13,7 +13,7 @@ class MemorySettings implements SettingsRepository {
     return Promise.resolve();
   }
 }
-const admins = (who: string[]) => ({ require: (actor: string) => (who.includes(actor) ? Promise.resolve("admin") : Promise.reject(Object.assign(new Error("no"), { status: 403 }))) }) as unknown as AdminService;
+const admins = (who: string[]) => ({ record: () => Promise.resolve(), require: (actor: string) => (who.includes(actor) ? Promise.resolve("admin") : Promise.reject(Object.assign(new Error("no"), { status: 403 }))) }) as unknown as AdminService;
 
 describe("points table", () => {
   it("defaults follow the agreed priority: LWC > Apex > Debugging > Flow > SOQL, scaled by difficulty", () => {

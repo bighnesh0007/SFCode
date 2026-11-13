@@ -27,16 +27,17 @@ import {
 import { communityProblems, reviewQueue, setProblemActive, type CommunityProblemRow, type DraftRow } from "@/lib/draftsApi";
 import { cn } from "@/lib/utils";
 import { getEmailUsage, sendTestDigest } from "@/lib/emailApi";
+import { AnnouncementTab, AuditTab, DashboardTab, UserDrawer } from "@/components/admin/AdminTools";
 import { STATUS_LABEL } from "@/lib/verdicts";
 
-type Tab = "review" | "people" | "applications" | "problems" | "points" | "email";
+type Tab = "dashboard" | "review" | "people" | "applications" | "problems" | "points" | "email" | "announcement" | "audit";
 const ROLE_LABEL: Record<StaffRole, string> = { admin: "Admin", reviewer: "Reviewer", buddy: "Buddy" };
 
 export default function AdminPage() {
   const { isLoaded, isSignedIn, getToken } = useAuthState();
   const [standing, setStanding] = useState<Standing | "none" | null>(null);
   const [overview, setOverview] = useState<AdminOverview | null>(null);
-  const [tab, setTab] = useState<Tab>("review");
+  const [tab, setTab] = useState<Tab>("dashboard");
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
@@ -82,12 +83,15 @@ export default function AdminPage() {
     ? [["Learners", overview.learners], ["Connected orgs", overview.connectedOrgs], ["Submissions", overview.submissions], ["Last 24 hours", overview.submissions24h]]
     : [];
   const tabs: { id: Tab; label: string; show: boolean }[] = [
+    { id: "dashboard", label: "Dashboard", show: true },
     { id: "review", label: "Review queue", show: true },
     { id: "people", label: "People", show: true },
     { id: "applications", label: "Buddy applications", show: true },
     { id: "problems", label: "Community problems", show: true },
     { id: "points", label: "Points", show: view === "owner" || view === "admin" },
     { id: "email", label: "Email", show: view === "owner" || view === "admin" },
+    { id: "announcement", label: "Announcement", show: view === "owner" || view === "admin" },
+    { id: "audit", label: "Audit log", show: view === "owner" || view === "admin" },
   ];
 
   return (
@@ -115,9 +119,9 @@ export default function AdminPage() {
         </p>
       )}
 
-      <div role="tablist" className="mt-8 flex gap-1 border-b text-sm">
+      <div role="tablist" className="mt-8 flex gap-1 overflow-x-auto border-b text-sm">
         {tabs.filter((t) => t.show).map((t) => (
-          <button key={t.id} role="tab" type="button" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={cn("-mb-px border-b-2 px-3 py-2", tab === t.id ? "border-foreground font-medium" : "border-transparent text-muted-foreground hover:text-foreground")}>
+          <button key={t.id} role="tab" type="button" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={cn("-mb-px shrink-0 whitespace-nowrap border-b-2 px-3 py-2", tab === t.id ? "border-foreground font-medium" : "border-transparent text-muted-foreground hover:text-foreground")}>
             {t.label}
           </button>
         ))}
@@ -129,6 +133,9 @@ export default function AdminPage() {
       {tab === "applications" && <Applications />}
       {tab === "points" && <Points />}
       {tab === "email" && <EmailTab />}
+      {tab === "dashboard" && <DashboardTab />}
+      {tab === "announcement" && <AnnouncementTab />}
+      {tab === "audit" && <AuditTab />}
     </div>
   );
 }
@@ -208,6 +215,7 @@ function People({ view }: { view: Standing }) {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [open, setOpen] = useState<string | null>(null);
 
   const load = useCallback(
     (q: string) => {
@@ -253,6 +261,7 @@ function People({ view }: { view: Standing }) {
         <Button type="submit" size="sm" variant="outline">Search</Button>
       </form>
       {message && <p className="mt-2 text-sm text-muted-foreground">{message}</p>}
+      {open && <UserDrawer userId={open} view={view} onClose={() => setOpen(null)} />}
 
       <div className="mt-3 overflow-x-auto rounded-lg border">
         <table className="w-full text-sm">
@@ -267,7 +276,7 @@ function People({ view }: { view: Standing }) {
             {users.map((u) => (
               <tr key={u.userId} className="border-t">
                 <td className="py-2.5 pl-4">
-                  <Link href={`/u/${u.handle}`} className="font-medium hover:text-primary">{u.displayName}</Link>
+                  <button type="button" onClick={() => setOpen(u.userId)} className="font-medium hover:text-primary hover:underline">{u.displayName}</button>
                   <span className="ml-2 text-xs text-muted-foreground">@{u.handle}</span>
                 </td>
                 <td className="py-2.5 text-xs text-muted-foreground">{u.owner ? "Owner" : u.roles.map((r) => ROLE_LABEL[r]).join(", ") || "—"}</td>

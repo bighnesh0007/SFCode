@@ -42,4 +42,21 @@ export class ClerkIdentityLookup implements IdentityLookup {
       return null;
     }
   }
+
+  async ban(userId: string): Promise<void> {
+    await this.clerk.users.banUser(userId);
+  }
+
+  async unban(userId: string): Promise<void> {
+    await this.clerk.users.unbanUser(userId);
+  }
+
+  /** null when Clerk can't be reached: the admin page shows "unknown" rather than a guess. */
+  async isBanned(userId: string): Promise<boolean | null> {
+    try {
+      return (await this.clerk.users.getUser(userId)).banned;
+    } catch {
+      return null;
+    }
+  }
 }

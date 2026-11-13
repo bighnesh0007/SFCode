@@ -21,7 +21,7 @@ import { blogController } from "../controllers/blog.controller.ts";
 import { contestController, roadmapController, storeController } from "../controllers/contest.controller.ts";
 import { contestSlugParams, createContestBody, equipBody, onboardingBody, roadmapParams, roadmapQuizBody, roadmapReadBody, storeItemBody } from "../validation/contest.schema.ts";
 import { blogListQuery, blogSlugParams, commentBody, commentParams, hideBody, postBody, postPatchBody, voteBody } from "../validation/blog.schema.ts";
-import { adminUsersQuery, roleBody } from "../validation/admin.schema.ts";
+import { adminUsersQuery, announcementBody, roleBody, suspendBody, userIdParams } from "../validation/admin.schema.ts";
 import { aboutBody, applicationParams, buddyApplyBody, decideBody, handleParams, leaderboardQuery, profileUpdateBody } from "../validation/community.schema.ts";
 import { validatedBody, validatedParams, validatedQuery } from "../middleware/validate.ts";
 import { z } from "zod";
@@ -146,8 +146,18 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.get("/admin/users", auth, validate({ query: adminUsersQuery }), a.users);
     v1.post("/admin/roles", auth, limiter(30), validate({ body: roleBody }), a.grant);
     v1.delete("/admin/roles", auth, limiter(30), validate({ body: roleBody }), a.revoke);
+    v1.get("/admin/dashboard", limiter(60), auth, a.dashboard);
+    v1.get("/admin/users/:userId", limiter(120), auth, validate({ params: userIdParams }), a.user);
+    v1.post("/admin/users/:userId/suspension", limiter(20), auth, validate({ params: userIdParams, body: suspendBody }), a.suspend);
+    v1.get("/admin/audit", limiter(60), auth, a.audit);
+    v1.put("/admin/announcement", limiter(20), auth, validate({ body: announcementBody }), a.setAnnouncement);
   } else {
     v1.use("/admin", disabled("Admin"));
+  }
+  // The site-wide banner: public, cached briefly by the browser.
+  if (container.admin) {
+    const a = adminController(container.admin);
+    v1.get("/announcement", limiter(120), a.announcement);
   }
 
   // Blog: public reads (a moderator viewing also sees hidden comments);

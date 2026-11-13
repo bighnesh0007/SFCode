@@ -115,7 +115,16 @@ export function buildContainer(): Container {
     contestRepo,
   );
   // Built before the services that score or check roles.
-  if (container.db) container.admin = new AdminService(new PgAdminRepository(container.db), config.superAdminUserId, systemClock);
+  if (container.db) {
+    container.admin = new AdminService(
+      new PgAdminRepository(container.db),
+      config.superAdminUserId,
+      systemClock,
+      new PgSettingsRepository(container.db),
+      config.clerk.secretKey ? new ClerkIdentityLookup(config.clerk.secretKey) : undefined,
+    );
+    container.admin.setProblemTitles((slug) => catalog.get(slug)?.title);
+  }
   container.points = new PointsService(container.db ? new PgSettingsRepository(container.db) : undefined, container.admin);
 
   // Profiles need the database; the Clerk lookup only seeds names/avatars.
