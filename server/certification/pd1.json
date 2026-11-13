@@ -40,23 +40,23 @@
       "options": [
         {
           "id": "a",
-          "text": "50"
+          "text": "200"
         },
         {
           "id": "b",
-          "text": "100"
-        },
-        {
-          "id": "c",
           "text": "150"
         },
         {
+          "id": "c",
+          "text": "100"
+        },
+        {
           "id": "d",
-          "text": "200"
+          "text": "50"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "The synchronous limit is 100 SOQL queries per transaction (asynchronous Apex gets 200). Hitting it throws an uncatchable `System.LimitException`, which is why queries belong outside loops."
     },
@@ -71,7 +71,7 @@
         },
         {
           "id": "b",
-          "text": "150"
+          "text": "10,000"
         },
         {
           "id": "c",
@@ -79,11 +79,11 @@
         },
         {
           "id": "d",
-          "text": "10,000"
+          "text": "150"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "150 DML statements per transaction. 10,000 is the limit on the number of *records* processed by DML, a different limit."
     },
@@ -125,19 +125,19 @@
         },
         {
           "id": "b",
-          "text": "A before-save (fast field update) record-triggered flow"
+          "text": "An after trigger"
         },
         {
           "id": "c",
-          "text": "A custom validation rule"
+          "text": "A before-save (fast field update) record-triggered flow"
         },
         {
           "id": "d",
-          "text": "An after trigger"
+          "text": "A custom validation rule"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Before-save record-triggered flows run before Apex before triggers. Custom validation rules run after before triggers, and after triggers run once the record is saved to the database (not yet committed)."
     },
@@ -148,11 +148,11 @@
       "options": [
         {
           "id": "a",
-          "text": "1"
+          "text": "1,000"
         },
         {
           "id": "b",
-          "text": "5"
+          "text": "1"
         },
         {
           "id": "c",
@@ -160,11 +160,11 @@
         },
         {
           "id": "d",
-          "text": "1,000"
+          "text": "5"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Triggers process records in chunks of 200, so 1,000 records invoke the trigger 5 times. Governor limits are shared across those chunks within the transaction — another reason to bulkify."
     },
@@ -175,11 +175,11 @@
       "options": [
         {
           "id": "a",
-          "text": "`System.DmlException`"
+          "text": "`System.NullPointerException`"
         },
         {
           "id": "b",
-          "text": "`System.QueryException`"
+          "text": "`System.DmlException`"
         },
         {
           "id": "c",
@@ -187,7 +187,7 @@
         },
         {
           "id": "d",
-          "text": "`System.NullPointerException`"
+          "text": "`System.QueryException`"
         }
       ],
       "answer": [
@@ -202,7 +202,7 @@
       "options": [
         {
           "id": "a",
-          "text": "It runs without enforcing validation rules"
+          "text": "It runs asynchronously"
         },
         {
           "id": "b",
@@ -210,11 +210,11 @@
         },
         {
           "id": "c",
-          "text": "It skips triggers"
+          "text": "It runs without enforcing validation rules"
         },
         {
           "id": "d",
-          "text": "It runs asynchronously"
+          "text": "It skips triggers"
         }
       ],
       "answer": [
@@ -229,11 +229,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Always `without sharing`"
+          "text": "The sharing mode of the calling class (`with sharing` here)"
         },
         {
           "id": "b",
-          "text": "The sharing mode of the calling class (`with sharing` here)"
+          "text": "Always `without sharing`"
         },
         {
           "id": "c",
@@ -245,7 +245,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "A class with no sharing declaration runs in the sharing mode of whatever called it. Declaring `inherited sharing` makes that explicit — the recommended practice for utility classes."
     },
@@ -256,19 +256,19 @@
       "options": [
         {
           "id": "a",
-          "text": "Using bind variables such as `:name` in `Database.query`"
-        },
-        {
-          "id": "b",
           "text": "Using `String.escapeSingleQuotes()` on the input"
         },
         {
+          "id": "b",
+          "text": "Using bind variables such as `:name` in `Database.query`"
+        },
+        {
           "id": "c",
-          "text": "Wrapping the query in `try/catch`"
+          "text": "Running the class `without sharing`"
         },
         {
           "id": "d",
-          "text": "Running the class `without sharing`"
+          "text": "Wrapping the query in `try/catch`"
         }
       ],
       "answer": [
@@ -292,15 +292,15 @@
         },
         {
           "id": "c",
-          "text": "`@api`"
+          "text": "`@public`"
         },
         {
           "id": "d",
-          "text": "`@public`"
+          "text": "`@api`"
         }
       ],
       "answer": [
-        "c"
+        "d"
       ],
       "explanation": "`@api` marks a public property or method. `@wire` binds data from an adapter or Apex; `@track` is only needed for deep reactivity of objects and arrays."
     },
@@ -315,11 +315,11 @@
         },
         {
           "id": "b",
-          "text": "`@AuraEnabled(cacheable=true)`"
+          "text": "`@RemoteAction`"
         },
         {
           "id": "c",
-          "text": "`@RemoteAction`"
+          "text": "`@AuraEnabled(cacheable=true)`"
         },
         {
           "id": "d",
@@ -327,7 +327,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Wired Apex methods must be `@AuraEnabled(cacheable=true)`, which also means they cannot perform DML. Methods that change data are called imperatively instead."
     },
@@ -338,23 +338,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Accounts"
+          "text": "Contacts"
         },
         {
           "id": "b",
-          "text": "Opportunities"
-        },
-        {
-          "id": "c",
           "text": "Users"
         },
         {
+          "id": "c",
+          "text": "Opportunities"
+        },
+        {
           "id": "d",
-          "text": "Contacts"
+          "text": "Accounts"
         }
       ],
       "answer": [
-        "c"
+        "b"
       ],
       "explanation": "Tests are isolated from org data by default, but some setup data stays visible — including User and Profile records. Business data such as Accounts must be created by the test."
     },
@@ -365,7 +365,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Governor limits are reset to their original values"
+          "text": "All test data is rolled back"
         },
         {
           "id": "b",
@@ -373,7 +373,7 @@
         },
         {
           "id": "c",
-          "text": "All test data is rolled back"
+          "text": "Governor limits are reset to their original values"
         },
         {
           "id": "d",
@@ -392,7 +392,7 @@
       "options": [
         {
           "id": "a",
-          "text": "At least 75% of all Apex code is covered by tests"
+          "text": "Every class has 100% coverage"
         },
         {
           "id": "b",
@@ -400,16 +400,16 @@
         },
         {
           "id": "c",
-          "text": "Every class has 100% coverage"
+          "text": "Every test method contains at least one assertion"
         },
         {
           "id": "d",
-          "text": "Every test method contains at least one assertion"
+          "text": "At least 75% of all Apex code is covered by tests"
         }
       ],
       "answer": [
-        "a",
-        "b"
+        "b",
+        "d"
       ],
       "explanation": "Production deploys need 75% overall coverage and some coverage for every trigger. Assertions are best practice — coverage without assertions proves very little — but the platform doesn't enforce them."
     },
@@ -420,23 +420,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Lookup"
-        },
-        {
-          "id": "b",
-          "text": "Master-detail"
-        },
-        {
-          "id": "c",
           "text": "Hierarchical"
         },
         {
-          "id": "d",
+          "id": "b",
+          "text": "Lookup"
+        },
+        {
+          "id": "c",
           "text": "External lookup"
+        },
+        {
+          "id": "d",
+          "text": "Master-detail"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Deleting a master record deletes its detail records. A lookup can be configured to clear the field or block the delete, but a master-detail relationship always cascades."
     },
@@ -447,7 +447,7 @@
       "options": [
         {
           "id": "a",
-          "text": "On the child of a lookup relationship"
+          "text": "Only on standard objects"
         },
         {
           "id": "b",
@@ -455,11 +455,11 @@
         },
         {
           "id": "c",
-          "text": "On any object with a formula field"
+          "text": "On the child of a lookup relationship"
         },
         {
           "id": "d",
-          "text": "Only on standard objects"
+          "text": "On any object with a formula field"
         }
       ],
       "answer": [
@@ -478,19 +478,19 @@
         },
         {
           "id": "b",
-          "text": "`Set`"
+          "text": "Arrays declared with `[]`"
         },
         {
           "id": "c",
-          "text": "`Map` values"
+          "text": "`Set`"
         },
         {
           "id": "d",
-          "text": "Arrays declared with `[]`"
+          "text": "`Map` values"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "A `Set` holds unique elements, which is why it's the usual way to gather record Ids before a bulk query. Lists (and array syntax, which is a List) keep duplicates; Map keys are unique but values aren't."
     },
@@ -509,11 +509,11 @@
         },
         {
           "id": "c",
-          "text": "A `data-index` attribute"
+          "text": "Nothing extra"
         },
         {
           "id": "d",
-          "text": "Nothing extra"
+          "text": "A `data-index` attribute"
         }
       ],
       "answer": [
@@ -528,11 +528,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Set a property on the parent directly"
+          "text": "Write to a shared global variable"
         },
         {
           "id": "b",
-          "text": "Dispatch a `CustomEvent` that the parent handles"
+          "text": "Set a property on the parent directly"
         },
         {
           "id": "c",
@@ -540,11 +540,11 @@
         },
         {
           "id": "d",
-          "text": "Write to a shared global variable"
+          "text": "Dispatch a `CustomEvent` that the parent handles"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Data flows down through `@api` properties and up through events: the child dispatches a `CustomEvent` (often with a `detail` payload) and the parent listens with `on<eventname>`."
     },
@@ -555,7 +555,7 @@
       "options": [
         {
           "id": "a",
-          "text": "`@isTest(SeeAllData=true)`"
+          "text": "`@TestVisible`"
         },
         {
           "id": "b",
@@ -563,7 +563,7 @@
         },
         {
           "id": "c",
-          "text": "`@TestVisible`"
+          "text": "`@isTest(SeeAllData=true)`"
         },
         {
           "id": "d",
@@ -582,23 +582,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Trigger.new"
-        },
-        {
-          "id": "b",
-          "text": "Trigger.old"
-        },
-        {
-          "id": "c",
           "text": "Trigger.isBefore"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "Trigger.size"
+        },
+        {
+          "id": "c",
+          "text": "Trigger.new"
+        },
+        {
+          "id": "d",
+          "text": "Trigger.old"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Insert has no previous version, so Trigger.old and Trigger.oldMap are null. Trigger.newMap is also null in before insert, because records don't have Ids yet."
     },
@@ -609,7 +609,7 @@
       "options": [
         {
           "id": "a",
-          "text": "SELECT Name, (SELECT LastName FROM Contacts) FROM Account"
+          "text": "SELECT Name, Contact.LastName FROM Account"
         },
         {
           "id": "b",
@@ -617,15 +617,15 @@
         },
         {
           "id": "c",
-          "text": "SELECT Name, Contact.LastName FROM Account"
+          "text": "SELECT Name FROM Account JOIN Contact"
         },
         {
           "id": "d",
-          "text": "SELECT Name FROM Account JOIN Contact"
+          "text": "SELECT Name, (SELECT LastName FROM Contacts) FROM Account"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Parent-to-child subqueries use the child relationship name, which is plural for standard objects (Contacts) and ends in __r for custom ones."
     },
@@ -636,7 +636,7 @@
       "options": [
         {
           "id": "a",
-          "text": "public class BudgetError extends Exception {}"
+          "text": "public exception BudgetException {}"
         },
         {
           "id": "b",
@@ -648,7 +648,7 @@
         },
         {
           "id": "d",
-          "text": "public exception BudgetException {}"
+          "text": "public class BudgetError extends Exception {}"
         }
       ],
       "answer": [
@@ -663,15 +663,15 @@
       "options": [
         {
           "id": "a",
-          "text": "For the user's session"
-        },
-        {
-          "id": "b",
           "text": "For the current transaction"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "Until the class is redeployed"
+        },
+        {
+          "id": "c",
+          "text": "For the user's session"
         },
         {
           "id": "d",
@@ -679,7 +679,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Static variables are reset for each transaction. That's why they work as recursion guards inside one save, but can't cache data between requests."
     },
@@ -690,7 +690,7 @@
       "options": [
         {
           "id": "a",
-          "text": "3 MB"
+          "text": "36 MB"
         },
         {
           "id": "b",
@@ -702,7 +702,7 @@
         },
         {
           "id": "d",
-          "text": "36 MB"
+          "text": "3 MB"
         }
       ],
       "answer": [
@@ -721,19 +721,19 @@
         },
         {
           "id": "b",
-          "text": "To re-render when a property inside an object or an element of an array changes"
+          "text": "To call Apex"
         },
         {
           "id": "c",
-          "text": "To make a property public"
+          "text": "To re-render when a property inside an object or an element of an array changes"
         },
         {
           "id": "d",
-          "text": "To call Apex"
+          "text": "To make a property public"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "All fields are reactive when reassigned. `@track` is only needed to observe changes inside an object or array without reassigning it."
     },
@@ -748,7 +748,7 @@
         },
         {
           "id": "b",
-          "text": "WITH USER_MODE"
+          "text": "FOR VIEW"
         },
         {
           "id": "c",
@@ -756,11 +756,11 @@
         },
         {
           "id": "d",
-          "text": "FOR VIEW"
+          "text": "WITH USER_MODE"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "WITH USER_MODE runs the query as the user, enforcing CRUD, FLS and sharing. WITH SECURITY_ENFORCED checks only CRUD and FLS on the queried fields."
     },
@@ -771,7 +771,7 @@
       "options": [
         {
           "id": "a",
-          "text": "They count toward the org's Apex code size limit"
+          "text": "They run with SeeAllData=true by default"
         },
         {
           "id": "b",
@@ -783,7 +783,7 @@
         },
         {
           "id": "d",
-          "text": "They run with SeeAllData=true by default"
+          "text": "They count toward the org's Apex code size limit"
         }
       ],
       "answer": [
@@ -798,15 +798,15 @@
       "options": [
         {
           "id": "a",
-          "text": "Visualforce pages and Lightning components"
-        },
-        {
-          "id": "b",
           "text": "Objects, fields and relationships"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "Apex controllers"
+        },
+        {
+          "id": "c",
+          "text": "Visualforce pages and Lightning components"
         },
         {
           "id": "d",
@@ -814,7 +814,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "The model is the data: objects, fields and relationships. Pages and components are the view; controllers are the controller."
     },
@@ -829,15 +829,15 @@
         },
         {
           "id": "b",
-          "text": "Account.Industry.canRead()"
-        },
-        {
-          "id": "c",
           "text": "UserInfo.canRead('Account.Industry')"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "Security.read(Account.Industry)"
+        },
+        {
+          "id": "d",
+          "text": "Account.Industry.canRead()"
         }
       ],
       "answer": [
@@ -856,7 +856,7 @@
         },
         {
           "id": "b",
-          "text": "Custom metadata types"
+          "text": "Custom labels"
         },
         {
           "id": "c",
@@ -864,11 +864,11 @@
         },
         {
           "id": "d",
-          "text": "Custom labels"
+          "text": "Custom metadata types"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Custom metadata type records are metadata, so they deploy with change sets and packages; custom setting data does not."
     },
@@ -879,7 +879,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Account.ParentId"
+          "text": "Opportunity.AccountId"
         },
         {
           "id": "b",
@@ -887,11 +887,11 @@
         },
         {
           "id": "c",
-          "text": "Contact.AccountId"
+          "text": "Account.ParentId"
         },
         {
           "id": "d",
-          "text": "Opportunity.AccountId"
+          "text": "Contact.AccountId"
         }
       ],
       "answer": [
@@ -906,11 +906,11 @@
       "options": [
         {
           "id": "a",
-          "text": "An Apex trigger"
+          "text": "A Visualforce page"
         },
         {
           "id": "b",
-          "text": "A before-save record-triggered flow"
+          "text": "An Apex trigger"
         },
         {
           "id": "c",
@@ -918,11 +918,11 @@
         },
         {
           "id": "d",
-          "text": "A Visualforce page"
+          "text": "A before-save record-triggered flow"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Use declarative tools when they can do the job; a before-save flow sets same-record fields efficiently with no code."
     },
@@ -933,11 +933,11 @@
       "options": [
         {
           "id": "a",
-          "text": "SObject s = Schema.getGlobalDescribe().get('Account').newSObject();"
+          "text": "SObject s = new SObject('Account');"
         },
         {
           "id": "b",
-          "text": "SObject s = new SObject('Account');"
+          "text": "SObject s = Schema.getGlobalDescribe().get('Account').newSObject();"
         },
         {
           "id": "c",
@@ -949,7 +949,7 @@
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "The global describe map gives each object's token, and newSObject() creates a record of that type."
     },
@@ -964,15 +964,15 @@
         },
         {
           "id": "b",
-          "text": "Map<Id, Account> m = [SELECT Id, Name FROM Account];"
-        },
-        {
-          "id": "c",
           "text": "Map<Id, Account> m = Map.of(Account);"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "Map<Id, Account> m = new Map<Id, Account>(Account.class);"
+        },
+        {
+          "id": "d",
+          "text": "Map<Id, Account> m = [SELECT Id, Name FROM Account];"
         }
       ],
       "answer": [
@@ -987,23 +987,23 @@
       "options": [
         {
           "id": "a",
-          "text": "upsert contacts Contact.Legacy_Id__c;"
-        },
-        {
-          "id": "b",
           "text": "merge contacts Legacy_Id__c;"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "insert contacts Legacy_Id__c;"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "update contacts by Legacy_Id__c;"
+        },
+        {
+          "id": "d",
+          "text": "upsert contacts Contact.Legacy_Id__c;"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "upsert takes an optional field token naming the External ID to match on."
     },
@@ -1014,23 +1014,23 @@
       "options": [
         {
           "id": "a",
-          "text": "It avoids the SOQL query limit"
-        },
-        {
-          "id": "b",
           "text": "It retrieves records in batches of 200, reducing heap use"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "It's the only way to query in a loop"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "It runs asynchronously"
+        },
+        {
+          "id": "d",
+          "text": "It avoids the SOQL query limit"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "SOQL for loops fetch records in chunks, so large results don't have to fit in the heap at once."
     },
@@ -1049,11 +1049,11 @@
         },
         {
           "id": "c",
-          "text": "select season { SUMMER => ... }"
+          "text": "case season of SUMMER: ..."
         },
         {
           "id": "d",
-          "text": "case season of SUMMER: ..."
+          "text": "select season { SUMMER => ... }"
         }
       ],
       "answer": [
@@ -1068,23 +1068,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Throws NullPointerException"
-        },
-        {
-          "id": "b",
           "text": "Sets city to null"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "Sets city to an empty string"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "Doesn't compile"
+        },
+        {
+          "id": "d",
+          "text": "Throws NullPointerException"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "The safe navigation operator ?. returns null instead of dereferencing a null value."
     },
@@ -1095,7 +1095,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Trigger.isInsert"
+          "text": "Trigger.isExecuting"
         },
         {
           "id": "b",
@@ -1103,11 +1103,11 @@
         },
         {
           "id": "c",
-          "text": "Trigger.isBefore"
+          "text": "Trigger.isInsert"
         },
         {
           "id": "d",
-          "text": "Trigger.isExecuting"
+          "text": "Trigger.isBefore"
         }
       ],
       "answer": [
@@ -1122,15 +1122,15 @@
       "options": [
         {
           "id": "a",
-          "text": "@AuraEnabled"
+          "text": "@future"
         },
         {
           "id": "b",
-          "text": "@InvocableMethod"
+          "text": "@AuraEnabled"
         },
         {
           "id": "c",
-          "text": "@future"
+          "text": "@InvocableMethod"
         },
         {
           "id": "d",
@@ -1138,7 +1138,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "@InvocableMethod makes a static method available as an action in Flow."
     },
@@ -1149,23 +1149,23 @@
       "options": [
         {
           "id": "a",
-          "text": "ar.total"
-        },
-        {
-          "id": "b",
-          "text": "(Decimal) ar.get('total')"
-        },
-        {
-          "id": "c",
           "text": "ar.getDecimal(1)"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "ar.Amount"
+        },
+        {
+          "id": "c",
+          "text": "(Decimal) ar.get('total')"
+        },
+        {
+          "id": "d",
+          "text": "ar.total"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "AggregateResult values are read with get() using the alias, then cast."
     },
@@ -1176,7 +1176,7 @@
       "options": [
         {
           "id": "a",
-          "text": "In the template: {items.length === 0}"
+          "text": "In the js-meta.xml"
         },
         {
           "id": "b",
@@ -1188,7 +1188,7 @@
         },
         {
           "id": "d",
-          "text": "In the js-meta.xml"
+          "text": "In the template: {items.length === 0}"
         }
       ],
       "answer": [
@@ -1203,23 +1203,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Query it with SOQL"
-        },
-        {
-          "id": "b",
           "text": "Declare @api recordId"
         },
         {
+          "id": "b",
+          "text": "Query it with SOQL"
+        },
+        {
           "id": "c",
-          "text": "Read window.location"
+          "text": "Use @track recordId"
         },
         {
           "id": "d",
-          "text": "Use @track recordId"
+          "text": "Read window.location"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Lightning record pages set a public recordId property on components that declare @api recordId."
     },
@@ -1230,7 +1230,7 @@
       "options": [
         {
           "id": "a",
-          "text": "With @wire"
+          "text": "With refreshApex"
         },
         {
           "id": "b",
@@ -1238,11 +1238,11 @@
         },
         {
           "id": "c",
-          "text": "Through a Visualforce page"
+          "text": "With @wire"
         },
         {
           "id": "d",
-          "text": "With refreshApex"
+          "text": "Through a Visualforce page"
         }
       ],
       "answer": [
@@ -1257,11 +1257,11 @@
       "options": [
         {
           "id": "a",
-          "text": "component.html"
+          "text": "sfdx-project.json"
         },
         {
           "id": "b",
-          "text": "component.js-meta.xml with isExposed and a lightning__RecordPage target"
+          "text": "component.html"
         },
         {
           "id": "c",
@@ -1269,11 +1269,11 @@
         },
         {
           "id": "d",
-          "text": "sfdx-project.json"
+          "text": "component.js-meta.xml with isExposed and a lightning__RecordPage target"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "The js-meta.xml file declares isExposed and the targets where the component can be placed."
     },
@@ -1284,15 +1284,15 @@
       "options": [
         {
           "id": "a",
-          "text": "lightning-record-form"
-        },
-        {
-          "id": "b",
           "text": "A custom Apex controller and inputs"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "lightning-datatable"
+        },
+        {
+          "id": "c",
+          "text": "lightning-record-form"
         },
         {
           "id": "d",
@@ -1300,7 +1300,7 @@
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "lightning-record-form uses Lightning Data Service, which applies sharing and field-level security."
     },
@@ -1315,7 +1315,7 @@
         },
         {
           "id": "b",
-          "text": "controller=\"Account\""
+          "text": "extensions=\"Account\""
         },
         {
           "id": "c",
@@ -1323,7 +1323,7 @@
         },
         {
           "id": "d",
-          "text": "extensions=\"Account\""
+          "text": "controller=\"Account\""
         }
       ],
       "answer": [
@@ -1338,7 +1338,7 @@
       "options": [
         {
           "id": "a",
-          "text": "A controller extension"
+          "text": "A static resource"
         },
         {
           "id": "b",
@@ -1350,11 +1350,11 @@
         },
         {
           "id": "d",
-          "text": "A static resource"
+          "text": "A controller extension"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Extensions add behaviour to a standard or custom controller."
     },
@@ -1365,23 +1365,23 @@
       "options": [
         {
           "id": "a",
-          "text": "alert()"
-        },
-        {
-          "id": "b",
-          "text": "Dispatching a ShowToastEvent"
-        },
-        {
-          "id": "c",
           "text": "console.log"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "A validation rule"
+        },
+        {
+          "id": "c",
+          "text": "alert()"
+        },
+        {
+          "id": "d",
+          "text": "Dispatching a ShowToastEvent"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "ShowToastEvent from lightning/platformShowToastEvent displays a toast in Lightning Experience."
     },
@@ -1392,15 +1392,15 @@
       "options": [
         {
           "id": "a",
-          "text": "window.open with the Id"
-        },
-        {
-          "id": "b",
           "text": "NavigationMixin with a standard__recordPage reference"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "A toast"
+        },
+        {
+          "id": "c",
+          "text": "window.open with the Id"
         },
         {
           "id": "d",
@@ -1408,7 +1408,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "NavigationMixin builds the correct URL for the current context (desktop, mobile, Experience site)."
     },
@@ -1423,19 +1423,19 @@
         },
         {
           "id": "b",
-          "text": "Leaving output escaping on (the default) and encoding user data"
+          "text": "Using with sharing"
         },
         {
           "id": "c",
-          "text": "Storing data in custom settings"
+          "text": "Leaving output escaping on (the default) and encoding user data"
         },
         {
           "id": "d",
-          "text": "Using with sharing"
+          "text": "Storing data in custom settings"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Visualforce escapes merge fields by default; turning escaping off on user data creates XSS risks."
     },
@@ -1446,23 +1446,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Assert.areEqual(expected, actual, 'message')"
-        },
-        {
-          "id": "b",
           "text": "System.check(expected, actual)"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "Test.assert(actual)"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "Assert.equals(actual)"
+        },
+        {
+          "id": "d",
+          "text": "Assert.areEqual(expected, actual, 'message')"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Assert.areEqual (or System.assertEquals) fails the test with the message if the values differ."
     },
@@ -1473,23 +1473,23 @@
       "options": [
         {
           "id": "a",
-          "text": "All test methods in the class"
-        },
-        {
-          "id": "b",
           "text": "Only that test method"
         },
         {
+          "id": "b",
+          "text": "All test methods in the class"
+        },
+        {
           "id": "c",
-          "text": "The whole org afterwards"
+          "text": "Other test classes"
         },
         {
           "id": "d",
-          "text": "Other test classes"
+          "text": "The whole org afterwards"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Each test method runs in its own transaction, rolled back at the end. @TestSetup data is recreated for each method."
     },
@@ -1500,23 +1500,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Call it in try/catch, fail if no exception, and assert in the catch"
-        },
-        {
-          "id": "b",
-          "text": "Use @ExpectedException"
-        },
-        {
-          "id": "c",
           "text": "Use Test.throws()"
         },
         {
-          "id": "d",
+          "id": "b",
+          "text": "Call it in try/catch, fail if no exception, and assert in the catch"
+        },
+        {
+          "id": "c",
           "text": "Exceptions can't be tested"
+        },
+        {
+          "id": "d",
+          "text": "Use @ExpectedException"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Apex has no expected-exception annotation; the try/catch with a failing assertion after the call is the standard pattern."
     },
@@ -1527,11 +1527,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Coverage needs 200 records"
+          "text": "To prove the code stays within governor limits in bulk"
         },
         {
           "id": "b",
-          "text": "To prove the code stays within governor limits in bulk"
+          "text": "Coverage needs 200 records"
         },
         {
           "id": "c",
@@ -1543,7 +1543,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Triggers receive up to 200 records per call; testing with one record hides limit problems."
     },
@@ -1558,11 +1558,11 @@
         },
         {
           "id": "b",
-          "text": "@isTest"
+          "text": "@AuraEnabled"
         },
         {
           "id": "c",
-          "text": "@AuraEnabled"
+          "text": "@isTest"
         },
         {
           "id": "d",
@@ -1581,11 +1581,11 @@
       "options": [
         {
           "id": "a",
-          "text": "In the debug log"
+          "text": "In the Setup Audit Trail"
         },
         {
           "id": "b",
-          "text": "In the Setup Audit Trail"
+          "text": "In field history"
         },
         {
           "id": "c",
@@ -1593,11 +1593,11 @@
         },
         {
           "id": "d",
-          "text": "In field history"
+          "text": "In the debug log"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "System.debug output appears as USER_DEBUG lines in debug logs."
     },
@@ -1612,11 +1612,11 @@
         },
         {
           "id": "b",
-          "text": "It gives the code after it a fresh set of governor limits"
+          "text": "It deletes test data"
         },
         {
           "id": "c",
-          "text": "It deletes test data"
+          "text": "It gives the code after it a fresh set of governor limits"
         },
         {
           "id": "d",
@@ -1624,7 +1624,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "startTest resets limits for the code under test, once per test method, until stopTest."
     },
@@ -1635,23 +1635,23 @@
       "options": [
         {
           "id": "a",
-          "text": "RunSpecifiedTests"
+          "text": "NoTestRun"
         },
         {
           "id": "b",
-          "text": "RunLocalTests"
-        },
-        {
-          "id": "c",
           "text": "RunAllTestsInOrg"
         },
         {
+          "id": "c",
+          "text": "RunLocalTests"
+        },
+        {
           "id": "d",
-          "text": "NoTestRun"
+          "text": "RunSpecifiedTests"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "RunLocalTests runs every local test; RunAllTestsInOrg also includes managed package tests."
     }

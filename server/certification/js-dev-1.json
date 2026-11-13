@@ -55,7 +55,7 @@
       "options": [
         {
           "id": "a",
-          "text": "The value can never change"
+          "text": "It's function-scoped"
         },
         {
           "id": "b",
@@ -63,11 +63,11 @@
         },
         {
           "id": "c",
-          "text": "It's function-scoped"
+          "text": "It's hoisted and initialised to undefined"
         },
         {
           "id": "d",
-          "text": "It's hoisted and initialised to undefined"
+          "text": "The value can never change"
         }
       ],
       "answer": [
@@ -86,11 +86,11 @@
         },
         {
           "id": "b",
-          "text": "false, false"
+          "text": "true, true"
         },
         {
           "id": "c",
-          "text": "true, true"
+          "text": "false, false"
         },
         {
           "id": "d",
@@ -113,19 +113,19 @@
         },
         {
           "id": "b",
-          "text": "\"object\""
-        },
-        {
-          "id": "c",
           "text": "\"undefined\""
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "\"number\""
+        },
+        {
+          "id": "d",
+          "text": "\"object\""
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "A long-standing quirk: typeof null is 'object'."
     },
@@ -136,29 +136,29 @@
       "options": [
         {
           "id": "a",
-          "text": "0"
-        },
-        {
-          "id": "b",
-          "text": "\"\""
-        },
-        {
-          "id": "c",
-          "text": "null"
-        },
-        {
-          "id": "d",
           "text": "\"0\""
         },
         {
-          "id": "e",
+          "id": "b",
           "text": "[]"
+        },
+        {
+          "id": "c",
+          "text": "0"
+        },
+        {
+          "id": "d",
+          "text": "null"
+        },
+        {
+          "id": "e",
+          "text": "\"\""
         }
       ],
       "answer": [
-        "a",
-        "b",
-        "c"
+        "c",
+        "d",
+        "e"
       ],
       "explanation": "0, empty string, null, undefined, NaN and false are falsy; '0' and [] are truthy."
     },
@@ -173,7 +173,7 @@
         },
         {
           "id": "b",
-          "text": "const b = [...a];"
+          "text": "const b = &a;"
         },
         {
           "id": "c",
@@ -181,11 +181,11 @@
         },
         {
           "id": "d",
-          "text": "const b = &a;"
+          "text": "const b = [...a];"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Spread copies elements into a new array; assignment just shares the reference."
     },
@@ -200,15 +200,15 @@
         },
         {
           "id": "b",
-          "text": "[20, 40]"
+          "text": "[1, 3]"
         },
         {
           "id": "c",
-          "text": "[10, 20, 30, 40]"
+          "text": "[20, 40]"
         },
         {
           "id": "d",
-          "text": "[1, 3]"
+          "text": "[10, 20, 30, 40]"
         }
       ],
       "answer": [
@@ -223,23 +223,23 @@
       "options": [
         {
           "id": "a",
-          "text": "'52' and 3"
-        },
-        {
-          "id": "b",
           "text": "7 and 3"
         },
         {
+          "id": "b",
+          "text": "'52' and 3"
+        },
+        {
           "id": "c",
-          "text": "'52' and '3'"
+          "text": "7 and '3'"
         },
         {
           "id": "d",
-          "text": "7 and '3'"
+          "text": "'52' and '3'"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "+ with a string concatenates; - converts both to numbers."
     },
@@ -254,11 +254,11 @@
         },
         {
           "id": "b",
-          "text": "The `this` of the enclosing scope"
+          "text": "Always the global object"
         },
         {
           "id": "c",
-          "text": "Always the global object"
+          "text": "The `this` of the enclosing scope"
         },
         {
           "id": "d",
@@ -266,7 +266,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Arrow functions don't bind their own this; they use the surrounding one."
     },
@@ -277,7 +277,7 @@
       "options": [
         {
           "id": "a",
-          "text": "new Order().create()"
+          "text": "this.create()"
         },
         {
           "id": "b",
@@ -285,11 +285,11 @@
         },
         {
           "id": "c",
-          "text": "Order.prototype.create()"
+          "text": "new Order().create()"
         },
         {
           "id": "d",
-          "text": "this.create()"
+          "text": "Order.prototype.create()"
         }
       ],
       "answer": [
@@ -304,15 +304,15 @@
       "options": [
         {
           "id": "a",
-          "text": "undefined"
-        },
-        {
-          "id": "b",
           "text": "2"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "1"
+        },
+        {
+          "id": "c",
+          "text": "undefined"
         },
         {
           "id": "d",
@@ -320,7 +320,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Destructuring defaults apply when the property is undefined."
     },
@@ -331,11 +331,11 @@
       "options": [
         {
           "id": "a",
-          "text": "1 then 1"
+          "text": "1 then 2"
         },
         {
           "id": "b",
-          "text": "1 then 2"
+          "text": "1 then 1"
         },
         {
           "id": "c",
@@ -347,7 +347,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "The returned function closes over n, which persists between calls."
     },
@@ -358,7 +358,7 @@
       "options": [
         {
           "id": "a",
-          "text": "The object itself"
+          "text": "A global function"
         },
         {
           "id": "b",
@@ -370,7 +370,7 @@
         },
         {
           "id": "d",
-          "text": "A global function"
+          "text": "The object itself"
         }
       ],
       "answer": [
@@ -389,7 +389,7 @@
         },
         {
           "id": "b",
-          "text": "1"
+          "text": "It throws"
         },
         {
           "id": "c",
@@ -397,11 +397,11 @@
         },
         {
           "id": "d",
-          "text": "It throws"
+          "text": "1"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Frozen objects can't be changed; the assignment is ignored (it throws only in strict mode)."
     },
@@ -412,23 +412,23 @@
       "options": [
         {
           "id": "a",
-          "text": "get full() { return this.first + ' ' + this.last; }"
-        },
-        {
-          "id": "b",
           "text": "full: function() {}"
         },
         {
+          "id": "b",
+          "text": "@full"
+        },
+        {
           "id": "c",
-          "text": "computed full()"
+          "text": "get full() { return this.first + ' ' + this.last; }"
         },
         {
           "id": "d",
-          "text": "@full"
+          "text": "computed full()"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "get defines a getter, read like a property: person.full."
     },
@@ -439,15 +439,15 @@
       "options": [
         {
           "id": "a",
-          "text": "Nothing"
+          "text": "Call this.init()"
         },
         {
           "id": "b",
-          "text": "Call super(...)"
+          "text": "Nothing"
         },
         {
           "id": "c",
-          "text": "Call this.init()"
+          "text": "Call super(...)"
         },
         {
           "id": "d",
@@ -455,7 +455,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Derived class constructors must call super() before accessing this."
     },
@@ -470,19 +470,19 @@
         },
         {
           "id": "b",
-          "text": "The button's, then the div's (bubbling)"
+          "text": "Neither"
         },
         {
           "id": "c",
-          "text": "The div's, then the button's"
+          "text": "The button's, then the div's (bubbling)"
         },
         {
           "id": "d",
-          "text": "Neither"
+          "text": "The div's, then the button's"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Events bubble from the target up through its ancestors."
     },
@@ -493,23 +493,23 @@
       "options": [
         {
           "id": "a",
-          "text": "event.preventDefault()"
-        },
-        {
-          "id": "b",
-          "text": "event.stopPropagation()"
-        },
-        {
-          "id": "c",
           "text": "return false in addEventListener"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "event.cancel()"
+        },
+        {
+          "id": "c",
+          "text": "event.stopPropagation()"
+        },
+        {
+          "id": "d",
+          "text": "event.preventDefault()"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "stopPropagation stops bubbling; preventDefault stops the default action (like following a link)."
     },
@@ -524,7 +524,7 @@
         },
         {
           "id": "b",
-          "text": "document.querySelectorAll('.item')"
+          "text": "document.item"
         },
         {
           "id": "c",
@@ -532,11 +532,11 @@
         },
         {
           "id": "d",
-          "text": "document.item"
+          "text": "document.querySelectorAll('.item')"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "querySelectorAll returns a NodeList of every match; querySelector returns the first."
     },
@@ -551,11 +551,11 @@
         },
         {
           "id": "b",
-          "text": "It stores strings per origin and persists across sessions"
+          "text": "It's shared across all sites"
         },
         {
           "id": "c",
-          "text": "It's shared across all sites"
+          "text": "It stores strings per origin and persists across sessions"
         },
         {
           "id": "d",
@@ -563,7 +563,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "localStorage keeps string values per origin until cleared; sessionStorage lasts for the tab."
     },
@@ -574,7 +574,7 @@
       "options": [
         {
           "id": "a",
-          "text": "new CustomEvent('saved', { detail: { id } })"
+          "text": "dispatch('saved', id)"
         },
         {
           "id": "b",
@@ -582,15 +582,15 @@
         },
         {
           "id": "c",
-          "text": "dispatch('saved', id)"
+          "text": "window.saved = id"
         },
         {
           "id": "d",
-          "text": "window.saved = id"
+          "text": "new CustomEvent('saved', { detail: { id } })"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "CustomEvent's detail carries data to listeners."
     },
@@ -605,19 +605,19 @@
         },
         {
           "id": "b",
-          "text": "Only when an error occurs"
+          "text": "Never with return"
         },
         {
           "id": "c",
-          "text": "Always, after try (and catch if one ran)"
+          "text": "Only when an error occurs"
         },
         {
           "id": "d",
-          "text": "Never with return"
+          "text": "Always, after try (and catch if one ran)"
         }
       ],
       "answer": [
-        "c"
+        "d"
       ],
       "explanation": "finally runs whether or not an error was thrown or caught."
     },
@@ -632,11 +632,11 @@
         },
         {
           "id": "b",
-          "text": "console.table"
+          "text": "console.dir"
         },
         {
           "id": "c",
-          "text": "console.dir"
+          "text": "console.table"
         },
         {
           "id": "d",
@@ -644,7 +644,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "console.table shows rows and columns, handy for arrays of objects."
     },
@@ -655,23 +655,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Nothing; it waits for all"
-        },
-        {
-          "id": "b",
-          "text": "The first rejection reason"
-        },
-        {
-          "id": "c",
           "text": "An array of all results"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "undefined"
+        },
+        {
+          "id": "c",
+          "text": "The first rejection reason"
+        },
+        {
+          "id": "d",
+          "text": "Nothing; it waits for all"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Promise.all rejects as soon as one input rejects. Promise.allSettled waits for all."
     },
@@ -682,23 +682,23 @@
       "options": [
         {
           "id": "a",
-          "text": "1 2 3 4"
-        },
-        {
-          "id": "b",
-          "text": "1 4 3 2"
-        },
-        {
-          "id": "c",
           "text": "1 4 2 3"
         },
         {
-          "id": "d",
+          "id": "b",
+          "text": "1 2 3 4"
+        },
+        {
+          "id": "c",
           "text": "1 3 4 2"
+        },
+        {
+          "id": "d",
+          "text": "1 4 3 2"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Synchronous code first (1, 4), then microtasks (promise: 3), then macrotasks (timeout: 2)."
     },
@@ -713,15 +713,15 @@
         },
         {
           "id": "b",
-          "text": "Use if/else"
-        },
-        {
-          "id": "c",
           "text": "It can't be handled"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "Use finally only"
+        },
+        {
+          "id": "d",
+          "text": "Use if/else"
         }
       ],
       "answer": [
@@ -736,7 +736,7 @@
       "options": [
         {
           "id": "a",
-          "text": "The raw value"
+          "text": "A callback"
         },
         {
           "id": "b",
@@ -748,7 +748,7 @@
         },
         {
           "id": "d",
-          "text": "A callback"
+          "text": "The raw value"
         }
       ],
       "answer": [
@@ -794,7 +794,7 @@
         },
         {
           "id": "b",
-          "text": "Any 1.x.x from 1.4.2, but not 2.0.0"
+          "text": "Only 1.4.x"
         },
         {
           "id": "c",
@@ -802,11 +802,11 @@
         },
         {
           "id": "d",
-          "text": "Only 1.4.x"
+          "text": "Any 1.x.x from 1.4.2, but not 2.0.0"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "The caret allows minor and patch updates within the same major version."
     },
@@ -821,19 +821,19 @@
         },
         {
           "id": "b",
-          "text": "expect(a).toEqual(b)"
+          "text": "assert(a == b)"
         },
         {
           "id": "c",
-          "text": "expect(a).same(b)"
+          "text": "expect(a).toEqual(b)"
         },
         {
           "id": "d",
-          "text": "assert(a == b)"
+          "text": "expect(a).same(b)"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "toEqual compares structure; toBe checks identity (===)."
     },
@@ -844,7 +844,7 @@
       "options": [
         {
           "id": "a",
-          "text": "const cb = jest.fn(); ... expect(cb).toHaveBeenCalledWith('ok') and toHaveBeenCalledTimes(1)"
+          "text": "expect(cb).toBe('ok')"
         },
         {
           "id": "b",
@@ -852,7 +852,7 @@
         },
         {
           "id": "c",
-          "text": "expect(cb).toBe('ok')"
+          "text": "const cb = jest.fn(); ... expect(cb).toHaveBeenCalledWith('ok') and toHaveBeenCalledTimes(1)"
         },
         {
           "id": "d",
@@ -860,7 +860,7 @@
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "jest.fn() records calls so you can assert on arguments and counts."
     },
@@ -871,11 +871,11 @@
       "options": [
         {
           "id": "a",
-          "text": "tags.includes('apex')"
+          "text": "'apex' in tags"
         },
         {
           "id": "b",
-          "text": "tags.has('apex')"
+          "text": "tags.includes('apex')"
         },
         {
           "id": "c",
@@ -883,11 +883,11 @@
         },
         {
           "id": "d",
-          "text": "'apex' in tags"
+          "text": "tags.has('apex')"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Array.prototype.includes checks for a value; `in` checks keys (indexes), not values."
     },
@@ -898,23 +898,23 @@
       "options": [
         {
           "id": "a",
-          "text": "[...new Set(ids)]"
-        },
-        {
-          "id": "b",
           "text": "ids.unique()"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "new Map(ids)"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "ids.filter(Set)"
+        },
+        {
+          "id": "d",
+          "text": "[...new Set(ids)]"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "A Set keeps unique values; spreading it gives an array back."
     },
@@ -929,15 +929,15 @@
         },
         {
           "id": "b",
-          "text": "Maps are faster to type"
-        },
-        {
-          "id": "c",
           "text": "Maps can't be iterated"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "Only strings can be keys"
+        },
+        {
+          "id": "d",
+          "text": "Maps are faster to type"
         }
       ],
       "answer": [
@@ -952,23 +952,23 @@
       "options": [
         {
           "id": "a",
-          "text": "'Total: ${2 + 3}'"
+          "text": "An error"
         },
         {
           "id": "b",
-          "text": "'Total: 5'"
+          "text": "'Total: ${2 + 3}'"
         },
         {
           "id": "c",
-          "text": "'Total: 23'"
+          "text": "'Total: 5'"
         },
         {
           "id": "d",
-          "text": "An error"
+          "text": "'Total: 23'"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Template literals evaluate expressions inside ${}."
     },
@@ -979,7 +979,7 @@
       "options": [
         {
           "id": "a",
-          "text": "x === NaN"
+          "text": "typeof x === 'NaN'"
         },
         {
           "id": "b",
@@ -991,7 +991,7 @@
         },
         {
           "id": "d",
-          "text": "typeof x === 'NaN'"
+          "text": "x === NaN"
         }
       ],
       "answer": [
@@ -1010,7 +1010,7 @@
         },
         {
           "id": "b",
-          "text": "JSON.stringify(obj)"
+          "text": "String(obj)"
         },
         {
           "id": "c",
@@ -1018,11 +1018,11 @@
         },
         {
           "id": "d",
-          "text": "String(obj)"
+          "text": "JSON.stringify(obj)"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "JSON.stringify serialises; JSON.parse goes the other way."
     },
@@ -1041,11 +1041,11 @@
         },
         {
           "id": "c",
-          "text": "10"
+          "text": "[11, 12, 13]"
         },
         {
           "id": "d",
-          "text": "[11, 12, 13]"
+          "text": "10"
         }
       ],
       "answer": [
@@ -1064,19 +1064,19 @@
         },
         {
           "id": "b",
-          "text": "undefined"
-        },
-        {
-          "id": "c",
           "text": "null"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "''"
+        },
+        {
+          "id": "d",
+          "text": "undefined"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Optional chaining short-circuits to undefined instead of throwing."
     },
@@ -1091,7 +1091,7 @@
         },
         {
           "id": "b",
-          "text": "Object.keys(obj)"
+          "text": "Array.from(obj)"
         },
         {
           "id": "c",
@@ -1099,7 +1099,7 @@
         },
         {
           "id": "d",
-          "text": "Array.from(obj)"
+          "text": "Object.keys(obj)"
         }
       ],
       "answer": [
@@ -1114,23 +1114,23 @@
       "options": [
         {
           "id": "a",
-          "text": "'Hi undefined'"
-        },
-        {
-          "id": "b",
-          "text": "'Hi there'"
-        },
-        {
-          "id": "c",
           "text": "'Hi '"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "An error"
+        },
+        {
+          "id": "c",
+          "text": "'Hi there'"
+        },
+        {
+          "id": "d",
+          "text": "'Hi undefined'"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Default parameters apply when the argument is undefined."
     },
@@ -1145,11 +1145,11 @@
         },
         {
           "id": "b",
-          "text": "[1, 2, 3]"
+          "text": "{0: 1, 1: 2, 2: 3}"
         },
         {
           "id": "c",
-          "text": "{0: 1, 1: 2, 2: 3}"
+          "text": "[1, 2, 3]"
         },
         {
           "id": "d",
@@ -1157,7 +1157,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Rest parameters collect the remaining arguments into an array."
     },
@@ -1168,23 +1168,23 @@
       "options": [
         {
           "id": "a",
-          "text": "fn.call(obj)"
-        },
-        {
-          "id": "b",
           "text": "fn.apply(obj)"
         },
         {
+          "id": "b",
+          "text": "fn.this(obj)"
+        },
+        {
           "id": "c",
-          "text": "fn.bind(obj)"
+          "text": "fn.call(obj)"
         },
         {
           "id": "d",
-          "text": "fn.this(obj)"
+          "text": "fn.bind(obj)"
         }
       ],
       "answer": [
-        "c"
+        "d"
       ],
       "explanation": "bind returns a new function; call and apply invoke immediately."
     },
@@ -1195,11 +1195,11 @@
       "options": [
         {
           "id": "a",
-          "text": "_balance = 0;"
+          "text": "#balance = 0;"
         },
         {
           "id": "b",
-          "text": "#balance = 0;"
+          "text": "static balance = 0;"
         },
         {
           "id": "c",
@@ -1207,11 +1207,11 @@
         },
         {
           "id": "d",
-          "text": "static balance = 0;"
+          "text": "_balance = 0;"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "The # prefix creates a private field, inaccessible outside the class body."
     },
@@ -1222,23 +1222,23 @@
       "options": [
         {
           "id": "a",
-          "text": "import utils, { format } from './utils.js';"
+          "text": "require('./utils.js').format"
         },
         {
           "id": "b",
-          "text": "import { utils, format } from './utils.js';"
+          "text": "import utils, { format } from './utils.js';"
         },
         {
           "id": "c",
-          "text": "import * as utils, format from './utils.js';"
+          "text": "import { utils, format } from './utils.js';"
         },
         {
           "id": "d",
-          "text": "require('./utils.js').format"
+          "text": "import * as utils, format from './utils.js';"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Default imports come first, named imports in braces."
     },
@@ -1249,23 +1249,23 @@
       "options": [
         {
           "id": "a",
-          "text": "One listener on the list that checks event.target (delegation)"
-        },
-        {
-          "id": "b",
           "text": "A listener on each item"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "An inline onclick per item"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "setInterval polling"
+        },
+        {
+          "id": "d",
+          "text": "One listener on the list that checks event.target (delegation)"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Event delegation uses bubbling so one listener handles clicks on all children."
     },
@@ -1276,11 +1276,11 @@
       "options": [
         {
           "id": "a",
-          "text": "event.stopPropagation()"
+          "text": "event.preventDefault()"
         },
         {
           "id": "b",
-          "text": "event.preventDefault()"
+          "text": "form.reset()"
         },
         {
           "id": "c",
@@ -1288,11 +1288,11 @@
         },
         {
           "id": "d",
-          "text": "form.reset()"
+          "text": "event.stopPropagation()"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "preventDefault stops the browser's default submit action."
     },
@@ -1303,15 +1303,15 @@
       "options": [
         {
           "id": "a",
-          "text": "load"
-        },
-        {
-          "id": "b",
           "text": "DOMContentLoaded"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "ready"
+        },
+        {
+          "id": "c",
+          "text": "load"
         },
         {
           "id": "d",
@@ -1319,7 +1319,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "DOMContentLoaded fires after parsing; load waits for images and other resources."
     },
@@ -1330,23 +1330,23 @@
       "options": [
         {
           "id": "a",
-          "text": "The response body as text"
-        },
-        {
-          "id": "b",
-          "text": "A Promise that resolves to a Response"
-        },
-        {
-          "id": "c",
           "text": "An XMLHttpRequest"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "JSON"
+        },
+        {
+          "id": "c",
+          "text": "The response body as text"
+        },
+        {
+          "id": "d",
+          "text": "A Promise that resolves to a Response"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "fetch returns a Promise of a Response; call response.json() or text() to read the body (also a Promise)."
     },
@@ -1361,11 +1361,11 @@
         },
         {
           "id": "b",
-          "text": "el.classList.add('active')"
+          "text": "el.class = 'active'"
         },
         {
           "id": "c",
-          "text": "el.class = 'active'"
+          "text": "el.classList.add('active')"
         },
         {
           "id": "d",
@@ -1373,7 +1373,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "classList.add adds one class; assigning className replaces all classes."
     },
@@ -1384,23 +1384,23 @@
       "options": [
         {
           "id": "a",
-          "text": "SyntaxError"
-        },
-        {
-          "id": "b",
           "text": "TypeError"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "RangeError"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "ReferenceError"
+        },
+        {
+          "id": "d",
+          "text": "SyntaxError"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Using undefined as an object is a TypeError; an undeclared variable is a ReferenceError."
     },
@@ -1411,23 +1411,23 @@
       "options": [
         {
           "id": "a",
-          "text": "return -1"
-        },
-        {
-          "id": "b",
-          "text": "throw new Error('Amount must be positive')"
-        },
-        {
-          "id": "c",
           "text": "console.log('bad')"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "alert('bad')"
+        },
+        {
+          "id": "c",
+          "text": "throw new Error('Amount must be positive')"
+        },
+        {
+          "id": "d",
+          "text": "return -1"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Throwing an Error with a clear message stops execution and gives a stack trace to callers."
     },
@@ -1438,23 +1438,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Promise.all"
-        },
-        {
-          "id": "b",
-          "text": "Promise.allSettled"
-        },
-        {
-          "id": "c",
           "text": "Promise.race"
         },
         {
-          "id": "d",
+          "id": "b",
+          "text": "Promise.all"
+        },
+        {
+          "id": "c",
           "text": "Promise.any"
+        },
+        {
+          "id": "d",
+          "text": "Promise.allSettled"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "allSettled waits for all and reports each as fulfilled or rejected."
     },
@@ -1465,7 +1465,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Promise.all"
+          "text": "Promise.allSettled"
         },
         {
           "id": "b",
@@ -1473,11 +1473,11 @@
         },
         {
           "id": "c",
-          "text": "Promise.allSettled"
+          "text": "Promise.resolve"
         },
         {
           "id": "d",
-          "text": "Promise.resolve"
+          "text": "Promise.all"
         }
       ],
       "answer": [
@@ -1492,11 +1492,11 @@
       "options": [
         {
           "id": "a",
-          "text": "await a(); await b();"
+          "text": "await Promise.all([a(), b()]);"
         },
         {
           "id": "b",
-          "text": "await Promise.all([a(), b()]);"
+          "text": "await a(); await b();"
         },
         {
           "id": "c",
@@ -1508,7 +1508,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Starting both before awaiting runs them in parallel; sequential awaits take about 2 s."
     },
@@ -1519,23 +1519,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Yes"
+          "text": "Only if fn is async"
         },
         {
           "id": "b",
-          "text": "No: it runs after the current code and pending microtasks finish"
-        },
-        {
-          "id": "c",
           "text": "Only in Node.js"
         },
         {
+          "id": "c",
+          "text": "No: it runs after the current code and pending microtasks finish"
+        },
+        {
           "id": "d",
-          "text": "Only if fn is async"
+          "text": "Yes"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "A zero timeout queues a macrotask that runs after the current call stack and microtasks."
     },
@@ -1546,11 +1546,11 @@
       "options": [
         {
           "id": "a",
-          "text": "EventEmitter"
+          "text": "Stream only"
         },
         {
           "id": "b",
-          "text": "Promise"
+          "text": "EventEmitter"
         },
         {
           "id": "c",
@@ -1558,11 +1558,11 @@
         },
         {
           "id": "d",
-          "text": "Stream only"
+          "text": "Promise"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "EventEmitter (from 'events') underlies many Node APIs."
     },
@@ -1573,7 +1573,7 @@
       "options": [
         {
           "id": "a",
-          "text": "fs.readFileSync"
+          "text": "process.read(path)"
         },
         {
           "id": "b",
@@ -1585,7 +1585,7 @@
         },
         {
           "id": "d",
-          "text": "process.read(path)"
+          "text": "fs.readFileSync"
         }
       ],
       "answer": [
@@ -1600,15 +1600,15 @@
       "options": [
         {
           "id": "a",
-          "text": "npm install jest --save-dev"
+          "text": "npm run jest"
         },
         {
           "id": "b",
-          "text": "npm install jest --global only"
+          "text": "npm install jest --save-dev"
         },
         {
           "id": "c",
-          "text": "npm run jest"
+          "text": "npm install jest --global only"
         },
         {
           "id": "d",
@@ -1616,7 +1616,7 @@
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "--save-dev records it under devDependencies."
     },
@@ -1627,23 +1627,23 @@
       "options": [
         {
           "id": "a",
-          "text": "test('x', async () => { expect(await getValue()).toBe(5); })"
-        },
-        {
-          "id": "b",
           "text": "Call it without await"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "Use setTimeout"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "It can't be tested"
+        },
+        {
+          "id": "d",
+          "text": "test('x', async () => { expect(await getValue()).toBe(5); })"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Async tests await the promise, or return it, so Jest waits for the result."
     },
@@ -1654,23 +1654,23 @@
       "options": [
         {
           "id": "a",
-          "text": "beforeAll"
+          "text": "setup"
         },
         {
           "id": "b",
-          "text": "beforeEach"
-        },
-        {
-          "id": "c",
           "text": "afterEach"
         },
         {
+          "id": "c",
+          "text": "beforeEach"
+        },
+        {
           "id": "d",
-          "text": "setup"
+          "text": "beforeAll"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "beforeEach runs before each test; beforeAll once for the file."
     }

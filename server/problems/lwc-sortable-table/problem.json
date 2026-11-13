@@ -1,0 +1,17 @@
+{
+  "title": "Sortable, Paginated Deal Table",
+  "category": "Lists & Getters",
+  "order": 407,
+  "tags": [
+    "getters",
+    "sorting",
+    "pagination",
+    "immutability"
+  ],
+  "track": "lwc",
+  "difficulty": "Hard",
+  "files": [],
+  "lwc": {
+    "component": "dealTable"
+  }
+}

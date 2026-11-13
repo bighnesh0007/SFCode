@@ -17,10 +17,10 @@
         {
           "q": "What is a Salesforce \"app\"?",
           "options": [
-            "A separate database with its own records",
+            "A type of user license",
             "A named set of tabs and items users open from the App Launcher",
             "A managed package you must install",
-            "A type of user license"
+            "A separate database with its own records"
           ],
           "answer": 1,
           "why": "Apps are navigation: groups of tabs over the same shared data."
@@ -28,23 +28,23 @@
         {
           "q": "Which org is free, doesn't expire, and is meant for learning and building?",
           "options": [
-            "Production",
-            "Full sandbox",
             "Developer Edition",
-            "Partial Copy sandbox"
+            "Partial Copy sandbox",
+            "Production",
+            "Full sandbox"
           ],
-          "answer": 2,
+          "answer": 0,
           "why": "Developer Edition orgs are free and permanent. Sandboxes are copies of a paid production org."
         },
         {
           "q": "Where do admins configure objects, users and automation?",
           "options": [
-            "The App Launcher",
-            "Setup",
             "The Reports tab",
-            "Chatter"
+            "The App Launcher",
+            "Chatter",
+            "Setup"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Setup (gear icon) is the admin's home; Quick Find gets you anywhere fast."
         }
       ],
@@ -79,34 +79,34 @@
         {
           "q": "Custom object and custom field API names end in…",
           "options": [
+            "__x",
             "__r",
-            "__c",
             "_obj",
-            "__x"
+            "__c"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "__c marks custom objects and fields. __r is a relationship name, __x an external object."
         },
         {
           "q": "Which field type calculates a read-only value from other fields?",
           "options": [
+            "Lookup",
             "Picklist",
-            "Formula",
             "Text Area",
-            "Lookup"
+            "Formula"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Formula fields are computed when read and can't be edited."
         },
         {
           "q": "Which of these is a standard object?",
           "options": [
-            "Invoice__c",
             "Account",
             "Project__c",
-            "Shipment__c"
+            "Shipment__c",
+            "Invoice__c"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Account ships with Salesforce; the others end in __c, so they're custom."
         }
       ],
@@ -147,34 +147,34 @@
         {
           "q": "An employee leaves. What do you do with their user?",
           "options": [
-            "Delete the user",
-            "Deactivate it (freeze first if you need to block login right away)",
             "Change their profile to read-only and leave it active",
-            "Delete their records, then the user"
+            "Delete their records, then the user",
+            "Deactivate it (freeze first if you need to block login right away)",
+            "Delete the user"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Users can't be deleted; deactivation frees the license and keeps data and history."
         },
         {
           "q": "How many profiles does each user have?",
           "options": [
-            "Zero or more",
             "Exactly one",
             "One per app",
-            "As many as their role allows"
+            "As many as their role allows",
+            "Zero or more"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "One profile per user; extra access is added with permission sets."
         },
         {
           "q": "A Salesforce username must be…",
           "options": [
-            "The user's real email address",
-            "Unique across all Salesforce orgs, in email format",
             "Unique only within your org",
-            "The same as their nickname"
+            "The same as their nickname",
+            "Unique across all Salesforce orgs, in email format",
+            "The user's real email address"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Usernames are globally unique and email-shaped, but don't have to be a real mailbox."
         }
       ],
@@ -211,44 +211,44 @@
           "q": "In a master-detail relationship, what happens to detail records when the master is deleted?",
           "options": [
             "Nothing; they keep a blank parent",
+            "The delete is always blocked",
             "They are deleted too",
-            "They move to the default owner",
-            "The delete is always blocked"
+            "They move to the default owner"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Details can't exist without a master, so they're deleted with it."
         },
         {
           "q": "Where can you create a roll-up summary field?",
           "options": [
-            "On either side of a lookup",
             "On the master object of a master-detail relationship",
+            "On either side of a lookup",
             "On the detail object",
             "On any object"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Roll-ups summarise detail records onto their master."
         },
         {
           "q": "How do you model many-to-many (students ↔ courses)?",
           "options": [
-            "A multi-select picklist",
-            "Two lookups on Student",
+            "A formula field",
             "A junction object with two master-detail relationships",
-            "A formula field"
+            "Two lookups on Student",
+            "A multi-select picklist"
           ],
-          "answer": 2,
+          "answer": 1,
           "why": "Each junction record links one student to one course."
         },
         {
           "q": "Look at the diagram. Which relationship would let Project__c show the total of its Expense__c amounts?",
           "options": [
-            "The lookup from Contact",
             "The master-detail from Expense__c to Project__c",
             "The junction object",
+            "The lookup from Contact",
             "None of them"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Roll-up summary fields need a master-detail relationship, which Expense__c has to Project__c.",
           "image": "relationships",
           "imageAlt": "Relationships diagram: Expense__c is the detail side of a master-detail to Project__c."
@@ -287,10 +287,10 @@
         {
           "q": "A validation rule blocks the save when its formula returns…",
           "options": [
-            "FALSE",
+            "Null",
             "TRUE",
-            "An error code",
-            "Null"
+            "FALSE",
+            "An error code"
           ],
           "answer": 1,
           "why": "Write the formula to describe invalid data; TRUE means \"block\"."
@@ -298,23 +298,23 @@
         {
           "q": "Which function checks whether a text field is empty?",
           "options": [
-            "ISNULL only",
-            "ISBLANK",
+            "LEN = null",
             "ISEMPTY",
-            "LEN = null"
+            "ISNULL only",
+            "ISBLANK"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "ISBLANK is the recommended check for empty values."
         },
         {
           "q": "Do validation rules apply to records saved through the API or Data Loader?",
           "options": [
-            "No, UI only",
-            "Yes, every save",
+            "Only if the field is on the page layout",
             "Only for admins",
-            "Only if the field is on the page layout"
+            "Yes, every save",
+            "No, UI only"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "They run on every save regardless of where it comes from."
         }
       ],
@@ -356,10 +356,10 @@
         {
           "q": "A few users need to edit one extra field their profile can't. Best approach?",
           "options": [
-            "Clone their profile",
+            "Change the org-wide default",
             "Assign a permission set",
             "Make the field required",
-            "Change the org-wide default"
+            "Clone their profile"
           ],
           "answer": 1,
           "why": "Permission sets add access to specific users without new profiles."
@@ -367,23 +367,23 @@
         {
           "q": "Field-level security controls…",
           "options": [
-            "Which records a user sees",
             "Whether a user can see or edit a field",
-            "The order of fields on a page",
-            "Which picklist values appear"
+            "Which records a user sees",
+            "Which picklist values appear",
+            "The order of fields on a page"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "FLS is per field: hidden, read-only or editable."
         },
         {
           "q": "What do object permissions NOT control?",
           "options": [
-            "Whether you can create records",
             "Whether you can delete records",
-            "Which specific records you can see",
-            "Whether you can read the object"
+            "Whether you can create records",
+            "Whether you can read the object",
+            "Which specific records you can see"
           ],
-          "answer": 2,
+          "answer": 3,
           "why": "Which records is decided by sharing, not object permissions."
         }
       ],
@@ -419,10 +419,10 @@
         {
           "q": "What do record types let you vary for different processes on one object?",
           "options": [
-            "The object's API name",
+            "The user license",
             "Picklist values and page layouts",
             "The org-wide default",
-            "The user license"
+            "The object's API name"
           ],
           "answer": 1,
           "why": "Record types drive picklist values and which layout users see."
@@ -430,23 +430,23 @@
         {
           "q": "A field is required on the page layout only. Is it required for Data Loader imports?",
           "options": [
+            "Only for admins",
             "Yes, always",
-            "No, layout-required is UI-only",
             "Only for new records",
-            "Only for admins"
+            "No, layout-required is UI-only"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Use field-level required or a validation rule to enforce everywhere."
         },
         {
           "q": "Which tool designs Lightning record pages with components?",
           "options": [
-            "Schema Builder",
-            "Lightning App Builder",
+            "Process Builder",
             "Data Loader",
-            "Process Builder"
+            "Schema Builder",
+            "Lightning App Builder"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "App Builder lays out components; Dynamic Forms add field visibility rules."
         }
       ],
@@ -529,8 +529,8 @@
           "options": [
             "Profiles",
             "Organization-wide defaults",
-            "Sharing rules",
-            "Page layouts"
+            "Page layouts",
+            "Sharing rules"
           ],
           "answer": 1,
           "why": "OWD is the floor; everything else opens access from there."
@@ -538,9 +538,9 @@
         {
           "q": "Can a sharing rule restrict access below the org-wide default?",
           "options": [
-            "Yes",
-            "No, sharing rules only grant extra access",
             "Only for custom objects",
+            "No, sharing rules only grant extra access",
+            "Yes",
             "Only with a permission set"
           ],
           "answer": 1,
@@ -549,23 +549,23 @@
         {
           "q": "OWD for Opportunity is Private. How does a sales manager see their team's deals?",
           "options": [
+            "A record type",
             "Field-level security",
             "The role hierarchy",
-            "A validation rule",
-            "A record type"
+            "A validation rule"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Users above in the role hierarchy get access to records owned below them."
         },
         {
           "q": "Look at the diagram. A user can't see a record. Which layer would you check first?",
           "options": [
-            "Apex managed sharing",
-            "Organization-wide defaults, then whether a higher layer grants access",
+            "The report type",
             "The page layout",
-            "The report type"
+            "Apex managed sharing",
+            "Organization-wide defaults, then whether a higher layer grants access"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Start from the baseline and work up: the defaults, then role hierarchy, rules, manual shares.",
           "image": "sharing-layers",
           "imageAlt": "Diagram of access layers with organization-wide defaults at the top."
@@ -607,41 +607,41 @@
           "q": "You need totals grouped by Stage (rows) and Close Month (columns). Which format?",
           "options": [
             "Tabular",
-            "Summary",
             "Matrix",
+            "Summary",
             "Joined"
           ],
-          "answer": 2,
+          "answer": 1,
           "why": "Matrix groups by rows and columns."
         },
         {
           "q": "What decides which objects and fields a report can include?",
           "options": [
-            "The dashboard",
             "The report type",
+            "The user's role",
             "The page layout",
-            "The user's role"
+            "The dashboard"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Report types define the available objects, relationships and fields."
         },
         {
           "q": "Whose access determines what a standard (non-dynamic) dashboard shows?",
           "options": [
-            "Each viewer",
-            "The running user",
             "The system administrator",
-            "The report owner's manager"
+            "Each viewer",
+            "The report owner's manager",
+            "The running user"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Dynamic dashboards are the ones that use each viewer's access."
         },
         {
           "q": "Look at the diagram. Which format shows several different report blocks side by side?",
           "options": [
             "Tabular",
-            "Summary",
             "Matrix",
+            "Summary",
             "Joined"
           ],
           "answer": 3,
@@ -728,22 +728,22 @@
           "q": "Which feature warns about or blocks duplicate records?",
           "options": [
             "Validation rules only",
+            "Record types",
             "Duplicate rules with matching rules",
-            "Sharing rules",
-            "Record types"
+            "Sharing rules"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Matching rules find duplicates; duplicate rules decide what to do."
         },
         {
           "q": "Built-in way to schedule regular CSV backups of your data?",
           "options": [
-            "Data Export Service",
-            "Dashboards",
             "Change sets",
-            "Sandbox refresh"
+            "Sandbox refresh",
+            "Dashboards",
+            "Data Export Service"
           ],
-          "answer": 0,
+          "answer": 3,
           "why": "Data Export runs weekly or monthly exports."
         }
       ],
@@ -794,34 +794,34 @@
         {
           "q": "Where do you configure an object's fields, layouts and record types?",
           "options": [
-            "App Launcher",
-            "Object Manager",
+            "Home page",
             "Global search",
-            "Home page"
+            "Object Manager",
+            "App Launcher"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Object Manager is the home of object configuration."
         },
         {
           "q": "What shows Opportunities as cards grouped by stage?",
           "options": [
-            "A tabular report",
             "A Kanban list view",
+            "A compact layout",
             "A matrix report",
-            "A compact layout"
+            "A tabular report"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Kanban views group records by a picklist such as Stage."
         },
         {
           "q": "What groups tabs and pages for one kind of work?",
           "options": [
             "A profile",
-            "An app",
             "A record type",
+            "An app",
             "A queue"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Apps bundle the tabs and pages a role needs."
         }
       ]
@@ -852,20 +852,20 @@
           "q": "Where do you set the org's default time zone and see licences in use?",
           "options": [
             "My Domain",
-            "Company Information",
             "Session Settings",
+            "Company Information",
             "User Management Settings"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Company Information holds org defaults and licence counts."
         },
         {
           "q": "Escalations should only count working time. What must be set up?",
           "options": [
-            "Fiscal year",
+            "Login hours",
             "Business hours and holidays",
             "Multiple currencies",
-            "Login hours"
+            "Fiscal year"
           ],
           "answer": 1,
           "why": "Escalation rules and entitlements count time against business hours."
@@ -873,12 +873,12 @@
         {
           "q": "What is true about enabling multiple currencies?",
           "options": [
-            "It can be turned off any time",
             "It can't be turned off once enabled",
+            "It needs a sandbox refresh",
             "It only affects reports",
-            "It needs a sandbox refresh"
+            "It can be turned off any time"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Multi-currency is permanent, so plan before enabling it."
         }
       ]
@@ -908,32 +908,32 @@
         {
           "q": "Hardware and Software cases need different Status values. What do you configure?",
           "options": [
-            "Two page layouts",
-            "Two support processes used by two Case record types",
             "A validation rule",
-            "Two queues"
+            "Two queues",
+            "Two support processes used by two Case record types",
+            "Two page layouts"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Support processes define the Status values; each record type uses one."
         },
         {
           "q": "What decides which page layout a user sees?",
           "options": [
             "The record owner",
-            "The user's profile and the record's record type",
             "The app",
+            "The user's profile and the record's record type",
             "The role"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Layouts are assigned per profile and record type."
         },
         {
           "q": "You added a picklist value but users can't choose it on some records. Why?",
           "options": [
-            "It needs a sandbox refresh",
-            "It isn't enabled for those records' record type",
             "The field is read-only",
-            "The value is too long"
+            "It isn't enabled for those records' record type",
+            "The value is too long",
+            "It needs a sandbox refresh"
           ],
           "answer": 1,
           "why": "Each record type has its own selection of picklist values."
@@ -981,12 +981,12 @@
         {
           "q": "Look at the diagram. Which record is optional when converting a lead?",
           "options": [
-            "Account",
             "Contact",
             "Opportunity",
-            "None: all three are always created"
+            "None: all three are always created",
+            "Account"
           ],
-          "answer": 2,
+          "answer": 1,
           "why": "Conversion always creates or merges an Account and a Contact; the Opportunity is optional.",
           "image": "lead-to-cash",
           "imageAlt": "Diagram: a Lead converts to Account, Contact and an Opportunity marked optional."
@@ -995,11 +995,11 @@
           "q": "Using the diagram, where do the products on a Quote come from?",
           "options": [
             "The Lead",
-            "Price books",
             "The Contact",
+            "Price books",
             "Campaigns"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Products are priced through price books, then added to opportunities and quotes.",
           "image": "lead-to-cash",
           "imageAlt": "Diagram note: products come from price books."
@@ -1007,20 +1007,20 @@
         {
           "q": "Where is an opportunity stage's default probability set?",
           "options": [
-            "On the Stage picklist values",
+            "On the page layout",
             "In a validation rule",
             "On the forecast settings",
-            "On the page layout"
+            "On the Stage picklist values"
           ],
-          "answer": 0,
+          "answer": 3,
           "why": "Each Stage value carries a default probability and forecast category."
         },
         {
           "q": "Why can't a new product be added to a custom price book?",
           "options": [
             "It has no standard price yet",
-            "Quotes are disabled",
             "It isn't active in a campaign",
+            "Quotes are disabled",
             "It has no record type"
           ],
           "answer": 0,
@@ -1057,11 +1057,11 @@
           "q": "Look at the diagram. A case is still open after 8 hours. Which rule acts?",
           "options": [
             "Assignment rule",
-            "Escalation rule",
+            "Validation rule",
             "Auto-response rule",
-            "Validation rule"
+            "Escalation rule"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Escalation rules act on cases that meet criteria for a period of time.",
           "image": "case-lifecycle",
           "imageAlt": "Diagram: an Escalation rule box labelled 'still open after X hours', reached by a 'too slow' arrow."
@@ -1069,12 +1069,12 @@
         {
           "q": "Using the diagram, what routes a new case to a queue?",
           "options": [
+            "Knowledge",
             "Escalation rule",
-            "Assignment rule",
             "Omni-Channel presence",
-            "Knowledge"
+            "Assignment rule"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Case assignment rules route new cases to users or queues.",
           "image": "case-lifecycle",
           "imageAlt": "Diagram: Email-to-Case leads to an Assignment rule, then to a Queue / Omni-Channel."
@@ -1083,9 +1083,9 @@
           "q": "What tracks whether first response happened within the contracted time?",
           "options": [
             "Entitlements with milestones",
-            "Queues",
             "Macros",
-            "Case teams"
+            "Case teams",
+            "Queues"
           ],
           "answer": 0,
           "why": "Entitlement processes with milestones measure required steps against time."
@@ -1126,12 +1126,12 @@
         {
           "q": "Look at the diagram. Agents need a guided wizard to log a warranty claim. Which tool?",
           "options": [
+            "Scheduled flow",
             "Before-save flow",
-            "Screen flow",
             "Approval process",
-            "Scheduled flow"
+            "Screen flow"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Screen flows show screens to users and collect input.",
           "image": "automation-choice",
           "imageAlt": "Diagram: 'Guide a user through steps' points to Screen flow."
@@ -1139,12 +1139,12 @@
         {
           "q": "Using the diagram, a manager must approve big discounts and the record must be locked meanwhile. Which tool?",
           "options": [
-            "After-save flow",
-            "Approval process",
             "Screen flow",
-            "Apex"
+            "Apex",
+            "Approval process",
+            "After-save flow"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Approval processes route for sign-off and lock the record.",
           "image": "automation-choice",
           "imageAlt": "Diagram: 'Someone must sign off, record locked' points to Approval process."
@@ -1152,23 +1152,23 @@
         {
           "q": "Send a reminder 3 days before an Opportunity's Close Date. What's best?",
           "options": [
-            "A scheduled path on a record-triggered flow",
             "A validation rule",
+            "A scheduled path on a record-triggered flow",
             "A report subscription",
             "A screen flow"
           ],
-          "answer": 0,
+          "answer": 1,
           "why": "Scheduled paths run actions relative to a date field on the record."
         },
         {
           "q": "What shows users a friendly message when a flow element fails?",
           "options": [
+            "A loop",
             "A subflow",
             "A fault path",
-            "A decision",
-            "A loop"
+            "A decision"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Fault paths catch errors and let you handle them."
         }
       ]
@@ -1206,34 +1206,34 @@
         {
           "q": "What happens to a record while it's pending approval?",
           "options": [
-            "Nothing",
             "It's locked against editing",
             "It's deleted",
+            "Nothing",
             "It's shared with everyone"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Pending records are locked; admins and approvers can still edit."
         },
         {
           "q": "Which decides whether a record can be submitted at all?",
           "options": [
-            "Approval steps",
             "Entry criteria",
-            "Final approval actions",
-            "Page layout"
+            "Approval steps",
+            "Page layout",
+            "Final approval actions"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Entry criteria filter which records qualify."
         },
         {
           "q": "Where do you set a field to 'Approved' when the last approver approves?",
           "options": [
             "Initial submission actions",
+            "Entry criteria",
             "Final approval actions",
-            "Rejection actions",
-            "Entry criteria"
+            "Rejection actions"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Final approval actions run once the whole process is approved."
         }
       ]
@@ -1281,23 +1281,23 @@
         {
           "q": "Leadership wants to see how the pipeline changed week by week. What captures history?",
           "options": [
-            "A reporting snapshot",
             "A dashboard filter",
             "A joined report",
+            "A reporting snapshot",
             "Field history"
           ],
-          "answer": 0,
+          "answer": 2,
           "why": "Reporting snapshots store report results on a schedule for trending."
         },
         {
           "q": "What is a dashboard component's data source?",
           "options": [
             "A list view",
-            "A report",
+            "A record page",
             "A flow",
-            "A record page"
+            "A report"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Every component is backed by a report."
         }
       ]
@@ -1334,21 +1334,21 @@
         {
           "q": "Field reps need a one-tap 'Log visit' on Accounts in the mobile app. What do you build?",
           "options": [
+            "A list view",
             "A report",
-            "An object-specific quick action on the Account layout",
             "A new app",
-            "A list view"
+            "An object-specific quick action on the Account layout"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Quick actions show in the mobile action bar."
         },
         {
           "q": "Followers of an Account should see a post when its Rating changes. What do you enable?",
           "options": [
-            "Field history tracking",
+            "An email alert",
             "Feed tracking on Rating",
-            "A dashboard",
-            "An email alert"
+            "Field history tracking",
+            "A dashboard"
           ],
           "answer": 1,
           "why": "Feed tracking posts tracked field changes to the record feed."
@@ -1356,12 +1356,12 @@
         {
           "q": "Which fields does the mobile app highlight at the top of a record?",
           "options": [
+            "Formula fields",
             "Page layout fields",
             "Compact layout fields",
-            "All required fields",
-            "Formula fields"
+            "All required fields"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Compact layouts decide the key fields shown in the highlights."
         }
       ]
@@ -1393,12 +1393,12 @@
         {
           "q": "Look at the diagram. You need to test with a realistic subset of production data, refreshed weekly. Which sandbox?",
           "options": [
+            "Full",
             "Developer",
             "Developer Pro",
-            "Partial Copy",
-            "Full"
+            "Partial Copy"
           ],
-          "answer": 2,
+          "answer": 3,
           "why": "Partial Copy includes sample data chosen by a template and refreshes every 5 days.",
           "image": "sandbox-types",
           "imageAlt": "Diagram: Partial Copy has metadata plus sample data, 5 GB, refresh every 5 days."
@@ -1407,11 +1407,11 @@
           "q": "Using the diagram, how often can a Full sandbox be refreshed?",
           "options": [
             "Every day",
+            "Never",
             "Every 5 days",
-            "Every 29 days",
-            "Never"
+            "Every 29 days"
           ],
-          "answer": 2,
+          "answer": 3,
           "why": "Full sandboxes copy everything and can be refreshed every 29 days.",
           "image": "sandbox-types",
           "imageAlt": "Diagram: Full sandbox, refresh every 29 days."
@@ -1419,10 +1419,10 @@
         {
           "q": "What does a change set move?",
           "options": [
-            "Records",
+            "Reports' data",
             "Metadata between connected orgs",
-            "Users",
-            "Reports' data"
+            "Records",
+            "Users"
           ],
           "answer": 1,
           "why": "Change sets carry configuration and code, never records."
@@ -1455,21 +1455,21 @@
         {
           "q": "Who changed the Opportunity sharing setting last week?",
           "options": [
-            "Field history",
             "Setup Audit Trail",
-            "Login History",
-            "Debug logs"
+            "Field history",
+            "Debug logs",
+            "Login History"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Setup Audit Trail records configuration changes."
         },
         {
           "q": "You need old and new values of an Account's Rating over time. What do you enable?",
           "options": [
-            "Feed tracking",
-            "Field history tracking on Rating",
             "Setup Audit Trail",
-            "A validation rule"
+            "Field history tracking on Rating",
+            "A validation rule",
+            "Feed tracking"
           ],
           "answer": 1,
           "why": "Field history tracking stores before and after values."
@@ -1477,12 +1477,12 @@
         {
           "q": "Which tool scores your org's security settings against a baseline?",
           "options": [
-            "Optimizer",
-            "Health Check",
             "Login History",
-            "Schema Builder"
+            "Schema Builder",
+            "Optimizer",
+            "Health Check"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Health Check compares settings with Salesforce's recommended baseline."
         }
       ]
@@ -1509,11 +1509,11 @@
           "q": "Phone must be filled in only when Status is Closed. What do you build?",
           "options": [
             "Make Phone required on the field",
-            "A validation rule",
+            "A sharing rule",
             "A page layout",
-            "A sharing rule"
+            "A validation rule"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Conditional requirements are validation rules: AND(ISPICKVAL(Status, 'Closed'), ISBLANK(Phone))."
         },
         {
@@ -1521,8 +1521,8 @@
           "options": [
             "New profile",
             "Permission set for the agents",
-            "Change OWD to Public Read/Write",
-            "Give them the System Administrator profile"
+            "Give them the System Administrator profile",
+            "Change OWD to Public Read/Write"
           ],
           "answer": 1,
           "why": "Permission sets add access to specific users without side effects."
@@ -1532,8 +1532,8 @@
           "options": [
             "Criteria-based sharing rule",
             "Field-level security",
-            "Role hierarchy change",
-            "Record type"
+            "Record type",
+            "Role hierarchy change"
           ],
           "answer": 0,
           "why": "Criteria-based sharing rules open access by field values to a group or role."
@@ -1541,10 +1541,10 @@
         {
           "q": "Each Course has many Students and each Student many Courses, and you need a count of students per course. What do you build?",
           "options": [
-            "A lookup on Course and a formula",
+            "Two reports",
             "A junction object with two master-detail relationships, plus a roll-up summary on Course",
-            "A multi-select picklist",
-            "Two reports"
+            "A lookup on Course and a formula",
+            "A multi-select picklist"
           ],
           "answer": 1,
           "why": "A junction object gives many-to-many; master-detail enables the roll-up count."

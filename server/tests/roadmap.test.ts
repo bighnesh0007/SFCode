@@ -83,7 +83,8 @@ describe("RoadmapService", () => {
   it("solves complete nodes; failures flag struggling; reading completes lessons", async () => {
     const { svc, solve } = setup();
     await svc.saveOnboarding("u", { role: "developer", level: "new", goal: "pd1", hours: "3-5" });
-    await svc.submitQuiz("u", "developer", "data-model", [1, 1, 1, 1]); // data-model now completes by its quiz
+    const dataModelKey = loadRoadmaps(ROADMAPS_DIR, exists).get("developer")?.nodes.find((n) => n.id === "data-model")?.quiz?.map((q) => q.answer) ?? [];
+    await svc.submitQuiz("u", "developer", "data-model", dataModelKey); // data-model now completes by its quiz
     await solve("u", "soql-hot-tech-accounts");
     let v = await svc.view("developer", "u");
     expect(v.nodes.find((n) => n.id === "data-model")?.state).toBe("done");

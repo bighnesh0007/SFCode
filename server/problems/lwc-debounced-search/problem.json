@@ -1,0 +1,17 @@
+{
+  "title": "Debounced Search Box",
+  "category": "Events",
+  "order": 408,
+  "tags": [
+    "debounce",
+    "setTimeout",
+    "CustomEvent",
+    "disconnectedCallback"
+  ],
+  "track": "lwc",
+  "difficulty": "Hard",
+  "files": [],
+  "lwc": {
+    "component": "debouncedSearch"
+  }
+}

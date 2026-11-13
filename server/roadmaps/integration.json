@@ -35,32 +35,32 @@
           "options": [
             "GET",
             "POST",
-            "PATCH",
-            "PUT"
+            "PUT",
+            "PATCH"
           ],
-          "answer": 2,
+          "answer": 3,
           "why": "PATCH updates the fields you send."
         },
         {
           "q": "What does a 429 status mean?",
           "options": [
-            "Not found",
             "Too many requests: slow down",
+            "Not found",
             "Server error",
             "Created"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "429 is rate limiting; back off and retry later."
         },
         {
           "q": "Which Salesforce API is built for loading millions of records?",
           "options": [
             "SOAP API",
-            "Bulk API",
             "Tooling API",
+            "Bulk API",
             "Metadata API"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Bulk API processes large data sets asynchronously."
         }
       ]
@@ -91,12 +91,12 @@
         {
           "q": "Look at the diagram. What does Salesforce send back to your callback in step 3?",
           "options": [
-            "An access token",
             "A one-time authorization code",
+            "A refresh token",
             "The user's password",
-            "A refresh token"
+            "An access token"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "The code is exchanged server-side for tokens in step 4.",
           "image": "oauth-web-server",
           "imageAlt": "OAuth diagram, step 3: Salesforce redirects back with a one-time code."
@@ -106,8 +106,8 @@
           "options": [
             "Nothing else",
             "Its client secret and the PKCE verifier",
-            "The user's password",
-            "The access token"
+            "The access token",
+            "The user's password"
           ],
           "answer": 1,
           "why": "The secret and verifier prove the app is the one that started the flow.",
@@ -117,12 +117,12 @@
         {
           "q": "A nightly server job must call Salesforce with no user present. Which flow fits?",
           "options": [
+            "Device flow",
             "Web server flow",
-            "JWT bearer or client credentials",
             "Username-password typed by a user",
-            "Device flow"
+            "JWT bearer or client credentials"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Server-to-server flows need no user interaction."
         }
       ],
@@ -155,34 +155,34 @@
         {
           "q": "How do you create-or-update by another system's key?",
           "options": [
-            "POST then PATCH",
-            "PATCH to /sobjects/Object/ExternalIdField/value (upsert)",
             "DELETE then POST",
-            "A SOQL query"
+            "POST then PATCH",
+            "A SOQL query",
+            "PATCH to /sobjects/Object/ExternalIdField/value (upsert)"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Upsert by external Id matches on that field."
         },
         {
           "q": "A query returns 'done: false'. What next?",
           "options": [
+            "Retry",
             "It failed",
             "Follow nextRecordsUrl to get the next page",
-            "Add LIMIT",
-            "Retry"
+            "Add LIMIT"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Results come in batches; follow nextRecordsUrl until done is true."
         },
         {
           "q": "What bundles several REST calls into one request?",
           "options": [
-            "Bulk API",
             "Composite API",
             "Streaming API",
+            "Bulk API",
             "Metadata API"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Composite reduces round trips."
         }
       ]
@@ -241,9 +241,9 @@
         {
           "q": "A trigger needs to call an API. What do you do?",
           "options": [
-            "Call it from the trigger",
-            "Enqueue a Queueable that implements Database.AllowsCallouts",
             "Use a validation rule",
+            "Enqueue a Queueable that implements Database.AllowsCallouts",
+            "Call it from the trigger",
             "Use SOQL"
           ],
           "answer": 1,
@@ -288,34 +288,34 @@
         {
           "q": "Where are custom Apex REST endpoints served?",
           "options": [
-            "/services/data/",
-            "/services/apexrest/",
             "/apex/",
-            "/api/"
+            "/api/",
+            "/services/apexrest/",
+            "/services/data/"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Apex REST lives under /services/apexrest/."
         },
         {
           "q": "A client retries a POST after a timeout and two orders appear. What prevents this?",
           "options": [
+            "Without sharing",
             "Longer timeouts",
             "Idempotency: match on an external Id and upsert",
-            "A validation rule",
-            "Without sharing"
+            "A validation rule"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Idempotent operations give the same result however often they run."
         },
         {
           "q": "How should a custom endpoint report invalid input?",
           "options": [
-            "200 with an error in the body",
             "Set a 4xx status code with a clear message",
             "Throw an uncaught exception",
+            "200 with an error in the body",
             "Return null"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Clients rely on status codes to know what happened."
         }
       ]
@@ -353,33 +353,33 @@
           "q": "Which API suits loading 2 million records?",
           "options": [
             "REST, one call per record",
+            "Streaming API",
             "Bulk API 2.0",
-            "SOAP, one call per record",
-            "Streaming API"
+            "SOAP, one call per record"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Bulk API processes large volumes asynchronously."
         },
         {
           "q": "After a Bulk job finishes, how do you find rows that failed?",
           "options": [
             "They're emailed to the user",
+            "They're retried forever",
             "Download the job's failed results",
-            "Run a report",
-            "They're retried forever"
+            "Run a report"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Each job provides successful and failed result files."
         },
         {
           "q": "Why sort child records by parent before loading?",
           "options": [
-            "Faster CSV parsing",
             "To reduce record-lock contention on the same parents",
-            "It's required",
-            "To skip validation"
+            "To skip validation",
+            "Faster CSV parsing",
+            "It's required"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Children of one parent in different batches can fight over the parent's lock."
         }
       ]
@@ -421,34 +421,34 @@
         {
           "q": "An external warehouse must learn about every Order update without polling. What fits?",
           "options": [
-            "A scheduled report",
             "Change Data Capture on Order",
             "A validation rule",
-            "Bulk API export every minute"
+            "Bulk API export every minute",
+            "A scheduled report"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "CDC pushes record changes to subscribers."
         },
         {
           "q": "What lets an external system catch up on events it missed while offline?",
           "options": [
-            "Nothing",
-            "Replay from a stored replay Id",
             "A sandbox refresh",
-            "Data Loader"
+            "Nothing",
+            "Data Loader",
+            "Replay from a stored replay Id"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Subscribers can replay events retained by the event bus."
         },
         {
           "q": "Why design subscribers to handle duplicates?",
           "options": [
-            "They're never sent twice",
-            "Delivery is at least once, so the same event may arrive again",
             "To save storage",
-            "It's not needed"
+            "It's not needed",
+            "Delivery is at least once, so the same event may arrive again",
+            "They're never sent twice"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "At-least-once delivery means idempotent handling."
         }
       ]
@@ -480,12 +480,12 @@
         {
           "q": "Look at the diagram. A large product catalogue lives in an ERP; users only need to view it in Salesforce. Which pattern?",
           "options": [
-            "Batch data sync",
-            "Data virtualisation",
             "Fire and forget",
-            "Request and reply"
+            "Batch data sync",
+            "Request and reply",
+            "Data virtualisation"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Virtualisation shows external data without copying it.",
           "image": "integration-patterns",
           "imageAlt": "Integration patterns diagram: Data virtualisation, 'External data shown, not copied'."
@@ -493,12 +493,12 @@
         {
           "q": "Using the diagram, which pattern sends a message and doesn't wait for an answer?",
           "options": [
-            "Request and reply",
             "Fire and forget",
             "Remote call-in",
-            "Batch data sync"
+            "Batch data sync",
+            "Request and reply"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Fire and forget publishes and moves on.",
           "image": "integration-patterns",
           "imageAlt": "Integration patterns diagram: Fire and forget, 'Send and move on (platform events)'."
@@ -506,12 +506,12 @@
         {
           "q": "Nightly, 500,000 records must move from Salesforce to a data warehouse. Which pattern?",
           "options": [
-            "Request and reply",
-            "Batch data sync",
             "UI update from data change",
-            "Remote call-in"
+            "Request and reply",
+            "Remote call-in",
+            "Batch data sync"
           ],
-          "answer": 1,
+          "answer": 3,
           "why": "Scheduled bulk movement is batch data sync."
         }
       ],
@@ -544,8 +544,8 @@
           "options": [
             "400 Bad Request",
             "503 Service Unavailable",
-            "403 Forbidden",
-            "404 Not Found"
+            "404 Not Found",
+            "403 Forbidden"
           ],
           "answer": 1,
           "why": "503 is temporary; 4xx errors won't fix themselves."
@@ -553,23 +553,23 @@
         {
           "q": "What makes retries safe?",
           "options": [
-            "Shorter timeouts",
             "Idempotent operations",
+            "Without sharing",
             "More API calls",
-            "Without sharing"
+            "Shorter timeouts"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Idempotent operations can run twice with the same result."
         },
         {
           "q": "What should integration logs never contain?",
           "options": [
-            "Timestamps",
-            "Correlation Ids",
+            "Status codes",
             "Tokens and secrets",
-            "Status codes"
+            "Correlation Ids",
+            "Timestamps"
           ],
-          "answer": 2,
+          "answer": 1,
           "why": "Logs are widely readable; credentials must stay out."
         }
       ]
@@ -599,34 +599,34 @@
         {
           "q": "What suffix do external objects use?",
           "options": [
-            "__c",
             "__x",
-            "__e",
-            "__mdt"
+            "__c",
+            "__mdt",
+            "__e"
           ],
-          "answer": 1,
-          "why": "External objects end in __x."
+          "answer": 0,
+          "why": "External objects (Salesforce Connect) end in __x. __c is a custom object, __mdt custom metadata and __e a platform event."
         },
         {
           "q": "Where does an external object's data live?",
           "options": [
-            "Copied into Salesforce nightly",
             "In the external system, fetched when viewed",
             "In a static resource",
+            "Copied into Salesforce nightly",
             "In platform events"
           ],
-          "answer": 1,
+          "answer": 0,
           "why": "Salesforce Connect reads it live."
         },
         {
           "q": "Which is a poor fit for external objects?",
           "options": [
             "Viewing a huge archive occasionally",
+            "Cross-org lookups",
             "Data that needs heavy reporting and automation in Salesforce",
-            "Read-only reference data",
-            "Cross-org lookups"
+            "Read-only reference data"
           ],
-          "answer": 1,
+          "answer": 2,
           "why": "Reporting and automation are limited on external objects."
         }
       ]

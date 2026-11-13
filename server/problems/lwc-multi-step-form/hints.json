@@ -1,0 +1,5 @@
+[
+  "One field, step, decides what's shown. Getters isStep1, isStep2, isStep3 feed lwc:if, since templates can't compare.",
+  "Bind each input's value to a field (value={name}) and update the field on input. When a step's markup is re-created after Back, value={name} restores what was typed.",
+  "Validate in the Next handler: compute an error string for the current step; if it's non-empty, set this.error and return without changing step. An email check that's good enough here: /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email.trim())."
+]

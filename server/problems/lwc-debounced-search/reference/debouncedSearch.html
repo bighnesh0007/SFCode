@@ -1,0 +1,6 @@
+<template>
+    <input class="search" type="search" placeholder="Search" oninput={handleInput} />
+    <template lwc:if={pending}>
+        <span class="pending">Searching…</span>
+    </template>
+</template>

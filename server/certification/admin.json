@@ -63,11 +63,11 @@
         },
         {
           "id": "c",
-          "text": "A sharing rule restricted by IP"
+          "text": "Session timeout of 15 minutes"
         },
         {
           "id": "d",
-          "text": "Session timeout of 15 minutes"
+          "text": "A sharing rule restricted by IP"
         }
       ],
       "answer": [
@@ -86,19 +86,19 @@
         },
         {
           "id": "b",
-          "text": "Organization-wide defaults"
-        },
-        {
-          "id": "c",
           "text": "Profiles"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "Sharing rules"
+        },
+        {
+          "id": "d",
+          "text": "Organization-wide defaults"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Organization-wide defaults set the baseline. Roles, sharing rules and manual sharing can only open access up from there, never restrict it below the default."
     },
@@ -117,11 +117,11 @@
         },
         {
           "id": "c",
-          "text": "Give the rep the System Administrator profile"
+          "text": "Create a sharing rule granting Full Access"
         },
         {
           "id": "d",
-          "text": "Create a sharing rule granting Full Access"
+          "text": "Give the rep the System Administrator profile"
         }
       ],
       "answer": [
@@ -136,7 +136,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Freeze the user"
+          "text": "Remove their role"
         },
         {
           "id": "b",
@@ -144,15 +144,15 @@
         },
         {
           "id": "c",
-          "text": "Remove their role"
+          "text": "Change their profile to Read Only"
         },
         {
           "id": "d",
-          "text": "Change their profile to Read Only"
+          "text": "Freeze the user"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Freezing a user blocks login at once while you reassign the settings (default lead owner, workflow recipients) that prevent deactivation. A password reset still lets someone with access to their email log in."
     },
@@ -163,11 +163,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Company Information"
+          "text": "User Management Settings"
         },
         {
           "id": "b",
-          "text": "My Domain"
+          "text": "Company Information"
         },
         {
           "id": "c",
@@ -175,11 +175,11 @@
         },
         {
           "id": "d",
-          "text": "User Management Settings"
+          "text": "My Domain"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Company Information holds the org-wide defaults (locale, time zone, currency) and lists licenses with how many are used and remaining."
     },
@@ -190,23 +190,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Delegated administration"
-        },
-        {
-          "id": "b",
-          "text": "The Manage Users permission on their profile"
-        },
-        {
-          "id": "c",
           "text": "A permission set group"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "Manager groups"
+        },
+        {
+          "id": "c",
+          "text": "Delegated administration"
+        },
+        {
+          "id": "d",
+          "text": "The Manage Users permission on their profile"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Delegated administration lets chosen users manage users in specified roles (and their subordinates). The Manage Users permission would apply to every user in the org."
     },
@@ -217,7 +217,7 @@
       "options": [
         {
           "id": "a",
-          "text": "An owner-based sharing rule"
+          "text": "A new role above Sales"
         },
         {
           "id": "b",
@@ -225,11 +225,11 @@
         },
         {
           "id": "c",
-          "text": "A public list view"
+          "text": "An owner-based sharing rule"
         },
         {
           "id": "d",
-          "text": "A new role above Sales"
+          "text": "A public list view"
         }
       ],
       "answer": [
@@ -244,15 +244,15 @@
       "options": [
         {
           "id": "a",
-          "text": "Expense has a lookup to Project"
-        },
-        {
-          "id": "b",
           "text": "Expense has a master-detail relationship to Project"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "Project has a lookup to Expense"
+        },
+        {
+          "id": "c",
+          "text": "Expense has a lookup to Project"
         },
         {
           "id": "d",
@@ -260,7 +260,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Roll-up summary fields are created on the master side of a master-detail relationship. A lookup relationship needs a flow or Apex to total child records."
     },
@@ -271,23 +271,23 @@
       "options": [
         {
           "id": "a",
-          "text": "The object has no records"
-        },
-        {
-          "id": "b",
-          "text": "Every existing record has a value in the lookup field"
-        },
-        {
-          "id": "c",
           "text": "The object has fewer than two master-detail fields and no record types"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "Field history tracking is off"
+        },
+        {
+          "id": "c",
+          "text": "Every existing record has a value in the lookup field"
+        },
+        {
+          "id": "d",
+          "text": "The object has no records"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Detail records can't exist without a master, so every existing record must already have a value in the lookup before the conversion is allowed."
     },
@@ -302,20 +302,20 @@
         },
         {
           "id": "b",
-          "text": "Which page layout a profile sees"
+          "text": "Field-level security"
         },
         {
           "id": "c",
-          "text": "Which users can see a record"
+          "text": "Which page layout a profile sees"
         },
         {
           "id": "d",
-          "text": "Field-level security"
+          "text": "Which users can see a record"
         }
       ],
       "answer": [
         "a",
-        "b"
+        "c"
       ],
       "explanation": "A record type limits picklist values, and page layout assignment is done per profile and record type. Visibility comes from sharing, and field access comes from field-level security."
     },
@@ -330,7 +330,7 @@
         },
         {
           "id": "b",
-          "text": "Field-level security on their profile or permission sets"
+          "text": "A record type without the field"
         },
         {
           "id": "c",
@@ -338,11 +338,11 @@
         },
         {
           "id": "d",
-          "text": "A record type without the field"
+          "text": "Field-level security on their profile or permission sets"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Field-level security applies everywhere, including reports, search, list views and the API. Removing a field from a page layout only hides it on that layout."
     },
@@ -353,23 +353,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Create a second record type"
+          "text": "Create a new page layout"
         },
         {
           "id": "b",
-          "text": "Add a component visibility filter in Lightning App Builder"
-        },
-        {
-          "id": "c",
           "text": "Use a validation rule"
         },
         {
+          "id": "c",
+          "text": "Add a component visibility filter in Lightning App Builder"
+        },
+        {
           "id": "d",
-          "text": "Create a new page layout"
+          "text": "Create a second record type"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Lightning App Builder components (and Dynamic Forms fields) can have visibility filters based on record fields, the user, device and more."
     },
@@ -380,23 +380,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Roll-up summary"
-        },
-        {
-          "id": "b",
           "text": "Cross-object formula field"
         },
         {
+          "id": "b",
+          "text": "Text field updated by a flow"
+        },
+        {
           "id": "c",
-          "text": "Lookup filter"
+          "text": "Roll-up summary"
         },
         {
           "id": "d",
-          "text": "Text field updated by a flow"
+          "text": "Lookup filter"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "A formula can reference parent fields (Account.Industry) and is calculated when read, so it never goes stale. A copied text field must be kept in sync."
     },
@@ -407,15 +407,15 @@
       "options": [
         {
           "id": "a",
-          "text": "TRUE"
+          "text": "NULL"
         },
         {
           "id": "b",
-          "text": "FALSE"
+          "text": "TRUE"
         },
         {
           "id": "c",
-          "text": "NULL"
+          "text": "FALSE"
         },
         {
           "id": "d",
@@ -423,7 +423,7 @@
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "A validation rule describes the invalid condition: when the formula is TRUE, the save is blocked and the error is shown."
     },
@@ -434,23 +434,23 @@
       "options": [
         {
           "id": "a",
-          "text": "A lookup from Student to Course"
-        },
-        {
-          "id": "b",
-          "text": "A junction object with two master-detail relationships"
-        },
-        {
-          "id": "c",
           "text": "A multi-select picklist of courses on Student"
         },
         {
-          "id": "d",
+          "id": "b",
+          "text": "A lookup from Student to Course"
+        },
+        {
+          "id": "c",
           "text": "A hierarchical relationship"
+        },
+        {
+          "id": "d",
+          "text": "A junction object with two master-detail relationships"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Many-to-many relationships use a junction object (Enrollment) with a master-detail relationship to each side, so each enrollment links one student to one course."
     },
@@ -461,7 +461,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Account"
+          "text": "Opportunity"
         },
         {
           "id": "b",
@@ -469,21 +469,21 @@
         },
         {
           "id": "c",
-          "text": "Opportunity"
+          "text": "Campaign"
         },
         {
           "id": "d",
-          "text": "Case"
+          "text": "Account"
         },
         {
           "id": "e",
-          "text": "Campaign"
+          "text": "Case"
         }
       ],
       "answer": [
         "a",
         "b",
-        "c"
+        "d"
       ],
       "explanation": "Converting a lead creates (or merges into) an Account and a Contact and can optionally create an Opportunity. It never creates Cases or Campaigns."
     },
@@ -494,23 +494,23 @@
       "options": [
         {
           "id": "a",
-          "text": "A lead assignment rule"
-        },
-        {
-          "id": "b",
-          "text": "An escalation rule"
-        },
-        {
-          "id": "c",
           "text": "A sharing rule"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "A territory model"
+        },
+        {
+          "id": "c",
+          "text": "An escalation rule"
+        },
+        {
+          "id": "d",
+          "text": "A lead assignment rule"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Lead assignment rules route new leads (including web-to-lead) to users or queues based on criteria. Escalation rules are for Cases."
     },
@@ -521,23 +521,23 @@
       "options": [
         {
           "id": "a",
-          "text": "On the Stage picklist values"
-        },
-        {
-          "id": "b",
           "text": "In a validation rule"
         },
         {
+          "id": "b",
+          "text": "On the Stage picklist values"
+        },
+        {
           "id": "c",
-          "text": "On the forecast settings"
+          "text": "On the sales process"
         },
         {
           "id": "d",
-          "text": "On the sales process"
+          "text": "On the forecast settings"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Each Stage picklist value carries a default Probability and Forecast Category. Sales processes choose which stages each record type can use."
     },
@@ -548,7 +548,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Path"
+          "text": "Big Deal Alerts"
         },
         {
           "id": "b",
@@ -556,15 +556,15 @@
         },
         {
           "id": "c",
-          "text": "Sales process"
+          "text": "Path"
         },
         {
           "id": "d",
-          "text": "Big Deal Alerts"
+          "text": "Sales process"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Path shows the stages across the top of the record with key fields and guidance for success for each step."
     },
@@ -575,7 +575,7 @@
       "options": [
         {
           "id": "a",
-          "text": "It has no standard price in the standard price book"
+          "text": "Quotes are disabled"
         },
         {
           "id": "b",
@@ -583,15 +583,15 @@
         },
         {
           "id": "c",
-          "text": "Quotes are disabled"
+          "text": "Opportunity products are disabled"
         },
         {
           "id": "d",
-          "text": "Opportunity products are disabled"
+          "text": "It has no standard price in the standard price book"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "A product needs a standard price in the standard price book before it can be given a list price in a custom price book."
     },
@@ -602,23 +602,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Campaign hierarchy"
-        },
-        {
-          "id": "b",
           "text": "Campaign member statuses"
         },
         {
+          "id": "b",
+          "text": "Opportunity contact roles"
+        },
+        {
           "id": "c",
-          "text": "A lookup from Lead to Campaign"
+          "text": "Campaign hierarchy"
         },
         {
           "id": "d",
-          "text": "Opportunity contact roles"
+          "text": "A lookup from Lead to Campaign"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Campaign hierarchies group child campaigns under a parent, and the parent shows the aggregated statistics of its children."
     },
@@ -629,7 +629,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Case assignment rule"
+          "text": "Auto-response rule"
         },
         {
           "id": "b",
@@ -637,7 +637,7 @@
         },
         {
           "id": "c",
-          "text": "Auto-response rule"
+          "text": "Case assignment rule"
         },
         {
           "id": "d",
@@ -656,23 +656,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Web-to-Case"
+          "text": "Case auto-response rules"
         },
         {
           "id": "b",
-          "text": "Email-to-Case"
-        },
-        {
-          "id": "c",
           "text": "Email templates"
         },
         {
+          "id": "c",
+          "text": "Email-to-Case"
+        },
+        {
           "id": "d",
-          "text": "Case auto-response rules"
+          "text": "Web-to-Case"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Email-to-Case turns incoming email to a routing address into Cases. Web-to-Case captures cases from a web form."
     },
@@ -683,7 +683,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Entitlements and milestones"
+          "text": "Case teams"
         },
         {
           "id": "b",
@@ -691,15 +691,15 @@
         },
         {
           "id": "c",
-          "text": "Business hours only"
+          "text": "Entitlements and milestones"
         },
         {
           "id": "d",
-          "text": "Case teams"
+          "text": "Business hours only"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Entitlements define the support a customer gets, and entitlement processes with milestones track required steps such as first response against a time limit."
     },
@@ -710,11 +710,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Omni-Channel"
+          "text": "Queues with list views"
         },
         {
           "id": "b",
-          "text": "Queues with list views"
+          "text": "Macros"
         },
         {
           "id": "c",
@@ -722,11 +722,11 @@
         },
         {
           "id": "d",
-          "text": "Macros"
+          "text": "Omni-Channel"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Omni-Channel routes work items to agents based on availability, capacity and skills. Queues alone wait for agents to pick work up."
     },
@@ -745,11 +745,11 @@
         },
         {
           "id": "c",
-          "text": "A dependent picklist"
+          "text": "Two queues"
         },
         {
           "id": "d",
-          "text": "Two queues"
+          "text": "A dependent picklist"
         }
       ],
       "answer": [
@@ -764,23 +764,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Feed tracking on the Rating field"
-        },
-        {
-          "id": "b",
           "text": "Field history tracking"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "Chatter email digests"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "A list view"
+        },
+        {
+          "id": "d",
+          "text": "Feed tracking on the Rating field"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Feed tracking posts changes to tracked fields in the record's feed, which followers see. Field history tracking records changes in a related list, not the feed."
     },
@@ -795,19 +795,19 @@
         },
         {
           "id": "b",
-          "text": "Events"
-        },
-        {
-          "id": "c",
           "text": "Emails"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "Chatter posts"
+        },
+        {
+          "id": "d",
+          "text": "Events"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Events have a start and end time and appear on the calendar. Tasks are to-do items with a due date."
     },
@@ -818,7 +818,7 @@
       "options": [
         {
           "id": "a",
-          "text": "An object-specific quick action added to the Account page layout"
+          "text": "A list view"
         },
         {
           "id": "b",
@@ -830,11 +830,11 @@
         },
         {
           "id": "d",
-          "text": "A list view"
+          "text": "An object-specific quick action added to the Account page layout"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Object-specific quick actions on the page layout's mobile and Lightning actions section show up in the Salesforce mobile app."
     },
@@ -845,23 +845,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Data Import Wizard"
-        },
-        {
-          "id": "b",
-          "text": "Data Loader"
-        },
-        {
-          "id": "c",
           "text": "Mass Transfer Records"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "Mass Update Addresses"
+        },
+        {
+          "id": "c",
+          "text": "Data Import Wizard"
+        },
+        {
+          "id": "d",
+          "text": "Data Loader"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "The Data Import Wizard handles up to 50,000 records. Data Loader handles up to 5 million and also supports delete and export."
     },
@@ -872,15 +872,15 @@
       "options": [
         {
           "id": "a",
-          "text": "Data Import Wizard"
-        },
-        {
-          "id": "b",
           "text": "Data Loader"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "Mass Delete Records"
+        },
+        {
+          "id": "c",
+          "text": "Data Import Wizard"
         },
         {
           "id": "d",
@@ -888,7 +888,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Data Loader can delete (and hard delete) records by Id. The Import Wizard can't delete, and Mass Delete Records works only on certain objects and in batches of 250."
     },
@@ -899,24 +899,24 @@
       "options": [
         {
           "id": "a",
-          "text": "A matching rule on Email"
-        },
-        {
-          "id": "b",
-          "text": "A duplicate rule set to Block"
-        },
-        {
-          "id": "c",
           "text": "A validation rule using VLOOKUP"
         },
         {
-          "id": "d",
+          "id": "b",
+          "text": "A matching rule on Email"
+        },
+        {
+          "id": "c",
           "text": "A unique external Id field on Lead Email"
+        },
+        {
+          "id": "d",
+          "text": "A duplicate rule set to Block"
         }
       ],
       "answer": [
-        "a",
-        "b"
+        "b",
+        "d"
       ],
       "explanation": "Matching rules decide what counts as a duplicate, and duplicate rules decide what happens (alert or block). VLOOKUP only works on custom objects."
     },
@@ -931,11 +931,11 @@
         },
         {
           "id": "b",
-          "text": "A matrix report"
+          "text": "A joined report with Cases"
         },
         {
           "id": "c",
-          "text": "A joined report with Cases"
+          "text": "A matrix report"
         },
         {
           "id": "d",
@@ -954,7 +954,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Tabular"
+          "text": "Joined"
         },
         {
           "id": "b",
@@ -966,7 +966,7 @@
         },
         {
           "id": "d",
-          "text": "Joined"
+          "text": "Tabular"
         }
       ],
       "answer": [
@@ -985,7 +985,7 @@
         },
         {
           "id": "b",
-          "text": "A different dashboard per rep"
+          "text": "A sharing rule"
         },
         {
           "id": "c",
@@ -993,7 +993,7 @@
         },
         {
           "id": "d",
-          "text": "A sharing rule"
+          "text": "A different dashboard per rep"
         }
       ],
       "answer": [
@@ -1012,7 +1012,7 @@
         },
         {
           "id": "b",
-          "text": "Historical trend report on Accounts"
+          "text": "A dashboard filter"
         },
         {
           "id": "c",
@@ -1020,7 +1020,7 @@
         },
         {
           "id": "d",
-          "text": "A dashboard filter"
+          "text": "Historical trend report on Accounts"
         }
       ],
       "answer": [
@@ -1035,11 +1035,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Record-triggered flow optimized for Fast Field Updates (before save)"
+          "text": "Scheduled flow"
         },
         {
           "id": "b",
-          "text": "Record-triggered flow optimized for Actions and Related Records (after save)"
+          "text": "Record-triggered flow optimized for Fast Field Updates (before save)"
         },
         {
           "id": "c",
@@ -1047,11 +1047,11 @@
         },
         {
           "id": "d",
-          "text": "Scheduled flow"
+          "text": "Record-triggered flow optimized for Actions and Related Records (after save)"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Before-save flows update the triggering record without an extra DML statement, so they're much faster than after-save flows for same-record updates."
     },
@@ -1062,23 +1062,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Approval process"
+          "text": "Escalation rule"
         },
         {
           "id": "b",
-          "text": "Validation rule"
-        },
-        {
-          "id": "c",
           "text": "Screen flow"
         },
         {
+          "id": "c",
+          "text": "Validation rule"
+        },
+        {
           "id": "d",
-          "text": "Escalation rule"
+          "text": "Approval process"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Approval processes route records to approvers and lock the record while it's pending approval."
     },
@@ -1089,11 +1089,11 @@
       "options": [
         {
           "id": "a",
-          "text": "A record-triggered flow with a scheduled path based on Close Date"
+          "text": "A scheduled report"
         },
         {
           "id": "b",
-          "text": "A scheduled report"
+          "text": "A time-based workflow rule"
         },
         {
           "id": "c",
@@ -1101,11 +1101,11 @@
         },
         {
           "id": "d",
-          "text": "A time-based workflow rule"
+          "text": "A record-triggered flow with a scheduled path based on Close Date"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Scheduled paths run actions a set time before or after a date field on the record. Workflow rules are retired for new automation in favour of Flow."
     },
@@ -1116,7 +1116,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Screen flow"
+          "text": "Quick text"
         },
         {
           "id": "b",
@@ -1124,15 +1124,15 @@
         },
         {
           "id": "c",
-          "text": "Approval process"
+          "text": "Screen flow"
         },
         {
           "id": "d",
-          "text": "Quick text"
+          "text": "Approval process"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Screen flows show screens to users, collect input and can create or update records along the way."
     },
@@ -1143,11 +1143,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Workflow rules"
+          "text": "Apex triggers"
         },
         {
           "id": "b",
-          "text": "Process Builder"
+          "text": "Workflow rules"
         },
         {
           "id": "c",
@@ -1155,7 +1155,7 @@
         },
         {
           "id": "d",
-          "text": "Apex triggers"
+          "text": "Process Builder"
         }
       ],
       "answer": [
@@ -1174,19 +1174,19 @@
         },
         {
           "id": "b",
-          "text": "Multi-factor authentication (MFA)"
-        },
-        {
-          "id": "c",
           "text": "A hardware security key"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "Login IP ranges"
+        },
+        {
+          "id": "d",
+          "text": "Multi-factor authentication (MFA)"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Salesforce requires MFA for direct UI logins. SSO logins can satisfy it through the identity provider's own MFA. Login IP ranges are optional extra protection."
     },
@@ -1197,23 +1197,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Clone their profile five times"
+          "text": "A role"
         },
         {
           "id": "b",
-          "text": "A permission set group containing the five permission sets"
+          "text": "Clone their profile five times"
         },
         {
           "id": "c",
-          "text": "A public group"
+          "text": "A permission set group containing the five permission sets"
         },
         {
           "id": "d",
-          "text": "A role"
+          "text": "A public group"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Permission set groups bundle permission sets so users get them in one assignment, and a muting permission set can remove anything that shouldn't be included."
     },
@@ -1224,23 +1224,23 @@
       "options": [
         {
           "id": "a",
-          "text": "A record type per category"
-        },
-        {
-          "id": "b",
-          "text": "A dependent picklist with Category as the controlling field"
-        },
-        {
-          "id": "c",
           "text": "A validation rule"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "A lookup filter"
+        },
+        {
+          "id": "c",
+          "text": "A dependent picklist with Category as the controlling field"
+        },
+        {
+          "id": "d",
+          "text": "A record type per category"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Dependent picklists show only the values allowed for the controlling field's current value."
     },
@@ -1251,11 +1251,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Formulas can't hold percentages"
+          "text": "Formulas are calculated when read, so they always show today's value"
         },
         {
           "id": "b",
-          "text": "Formulas are calculated when read, so they always show today's value"
+          "text": "Formulas can't hold percentages"
         },
         {
           "id": "c",
@@ -1267,7 +1267,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "A formula has no stored history. To keep the value at a point in time, store it in a regular field (for example with a flow at the moment of sale)."
     },
@@ -1278,23 +1278,23 @@
       "options": [
         {
           "id": "a",
-          "text": "A validation rule on Account"
-        },
-        {
-          "id": "b",
           "text": "A lookup filter on the Partner field"
         },
         {
+          "id": "b",
+          "text": "A record type"
+        },
+        {
           "id": "c",
-          "text": "A sharing rule"
+          "text": "A validation rule on Account"
         },
         {
           "id": "d",
-          "text": "A record type"
+          "text": "A sharing rule"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Lookup filters restrict which records can be selected in a lookup, and can show an error or simply hide non-matching records."
     },
@@ -1309,7 +1309,7 @@
         },
         {
           "id": "b",
-          "text": "Unique"
+          "text": "Encrypted"
         },
         {
           "id": "c",
@@ -1317,12 +1317,12 @@
         },
         {
           "id": "d",
-          "text": "Encrypted"
+          "text": "Unique"
         }
       ],
       "answer": [
         "a",
-        "b"
+        "d"
       ],
       "explanation": "An External ID field lets imports and integrations upsert by that value; making it unique stops two Accounts sharing a customer number."
     },
@@ -1333,23 +1333,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Opportunity teams"
-        },
-        {
-          "id": "b",
-          "text": "A new role"
-        },
-        {
-          "id": "c",
           "text": "Organization-wide default Public Read/Write"
         },
         {
-          "id": "d",
+          "id": "b",
+          "text": "Opportunity teams"
+        },
+        {
+          "id": "c",
           "text": "A queue"
+        },
+        {
+          "id": "d",
+          "text": "A new role"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Opportunity teams give specific people access to a specific opportunity, with a role and access level per member."
     },
@@ -1360,7 +1360,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Chatter groups"
+          "text": "Case teams"
         },
         {
           "id": "b",
@@ -1372,7 +1372,7 @@
         },
         {
           "id": "d",
-          "text": "Case teams"
+          "text": "Chatter groups"
         }
       ],
       "answer": [
@@ -1387,11 +1387,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Email-to-Case"
+          "text": "Web-to-Case"
         },
         {
           "id": "b",
-          "text": "Web-to-Case"
+          "text": "Email-to-Case"
         },
         {
           "id": "c",
@@ -1403,7 +1403,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Web-to-Case generates an HTML form that creates cases. Web-to-Lead does the same for leads."
     },
@@ -1418,11 +1418,11 @@
         },
         {
           "id": "b",
-          "text": "Create a new app"
+          "text": "Use a report"
         },
         {
           "id": "c",
-          "text": "Use a report"
+          "text": "Create a new app"
         },
         {
           "id": "d",
@@ -1441,11 +1441,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Event"
+          "text": "Task"
         },
         {
           "id": "b",
-          "text": "Task"
+          "text": "Email"
         },
         {
           "id": "c",
@@ -1453,11 +1453,11 @@
         },
         {
           "id": "d",
-          "text": "Email"
+          "text": "Event"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Tasks are to-dos with a due date; events are calendar entries with start and end times."
     },
@@ -1468,7 +1468,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Insert"
+          "text": "Delete"
         },
         {
           "id": "b",
@@ -1480,7 +1480,7 @@
         },
         {
           "id": "d",
-          "text": "Delete"
+          "text": "Insert"
         }
       ],
       "answer": [
@@ -1499,7 +1499,7 @@
         },
         {
           "id": "b",
-          "text": "15 days"
+          "text": "Forever"
         },
         {
           "id": "c",
@@ -1507,11 +1507,11 @@
         },
         {
           "id": "d",
-          "text": "Forever"
+          "text": "15 days"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Deleted records stay in the Recycle Bin for 15 days, subject to storage-based limits, before they're permanently deleted."
     },
@@ -1526,7 +1526,7 @@
         },
         {
           "id": "b",
-          "text": "Data Export Service"
+          "text": "Sandbox refresh"
         },
         {
           "id": "c",
@@ -1534,11 +1534,11 @@
         },
         {
           "id": "d",
-          "text": "Sandbox refresh"
+          "text": "Data Export Service"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "The Data Export Service (Setup > Data Export) can export all data weekly or monthly as CSV files."
     },
@@ -1557,11 +1557,11 @@
         },
         {
           "id": "c",
-          "text": "Run asynchronously"
+          "text": "A scheduled path"
         },
         {
           "id": "d",
-          "text": "A scheduled path"
+          "text": "Run asynchronously"
         }
       ],
       "answer": [
@@ -1576,23 +1576,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Add a fault path from the element"
+          "text": "Use a loop"
         },
         {
           "id": "b",
-          "text": "Add a decision before it"
-        },
-        {
-          "id": "c",
           "text": "Run the flow in system context"
         },
         {
+          "id": "c",
+          "text": "Add a decision before it"
+        },
+        {
           "id": "d",
-          "text": "Use a loop"
+          "text": "Add a fault path from the element"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Fault paths run when an element fails, so you can show a message, log the error or notify an admin."
     },
@@ -1603,11 +1603,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Put the steps in one flow and call it as a subflow"
+          "text": "Use a validation rule"
         },
         {
           "id": "b",
-          "text": "Copy and paste"
+          "text": "Put the steps in one flow and call it as a subflow"
         },
         {
           "id": "c",
@@ -1615,11 +1615,11 @@
         },
         {
           "id": "d",
-          "text": "Use a validation rule"
+          "text": "Copy and paste"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Subflows let one flow call another, so shared logic lives in one place."
     },
@@ -1630,23 +1630,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Send Email Alert action (using an email alert)"
-        },
-        {
-          "id": "b",
-          "text": "Create Records"
-        },
-        {
-          "id": "c",
           "text": "Assignment"
         },
         {
-          "id": "d",
+          "id": "b",
+          "text": "Send Email Alert action (using an email alert)"
+        },
+        {
+          "id": "c",
           "text": "Decision"
+        },
+        {
+          "id": "d",
+          "text": "Create Records"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Email alerts use email templates and recipients you configure; flows can call them as actions."
     },
@@ -1661,19 +1661,19 @@
         },
         {
           "id": "b",
-          "text": "Set the Trigger Order value on each flow"
-        },
-        {
-          "id": "c",
           "text": "Rename them alphabetically"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "Make one a subflow"
+        },
+        {
+          "id": "d",
+          "text": "Set the Trigger Order value on each flow"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Record-triggered flows have a Trigger Order setting that decides their relative order for the same object and timing."
     }

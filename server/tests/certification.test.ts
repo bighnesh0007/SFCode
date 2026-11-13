@@ -8,6 +8,9 @@ import { reviewSchedule } from "../src/domain/review.ts";
 import { allocate, CertificationService } from "../src/services/certification/certification.service.ts";
 
 const bank = QuestionBank.load(CERTIFICATION_DIR);
+/** The answer key, read from the bank so reordering options never breaks a test. */
+const right = (id: string) => [...(bank.question(id)?.question.answer ?? [])];
+const wrong = (id: string) => [bank.question(id)?.question.options.find((o) => !right(id).includes(o.id))?.id ?? "?"];
 
 class MemoryAttempts implements CertAttemptRepository {
   readonly rows: { userId: string; exam: string; questionId: string; correct: boolean; at?: Date }[] = [];
@@ -103,11 +106,11 @@ describe("CertificationService", () => {
 
   it("grades multi-answer questions regardless of order, and only all-or-nothing", async () => {
     const service = new CertificationService(bank, undefined);
-    expect((await service.answer(null, "pd1-soql-injection", ["b", "a"])).correct).toBe(true);
-    expect((await service.answer(null, "pd1-soql-injection", ["a"])).correct).toBe(false);
-    expect((await service.answer(null, "pd1-soql-injection", ["a", "b", "c"])).correct).toBe(false);
-    const r = await service.answer(null, "pd1-limits-soql", ["a"]);
-    expect(r).toMatchObject({ correct: false, answer: ["b"] });
+    expect((await service.answer(null, "pd1-soql-injection", right("pd1-soql-injection").reverse())).correct).toBe(true);
+    expect((await service.answer(null, "pd1-soql-injection", right("pd1-soql-injection").slice(0, 1))).correct).toBe(false);
+    expect((await service.answer(null, "pd1-soql-injection", [...right("pd1-soql-injection"), ...wrong("pd1-soql-injection")])).correct).toBe(false);
+    const r = await service.answer(null, "pd1-limits-soql", wrong("pd1-limits-soql"));
+    expect(r).toMatchObject({ correct: false, answer: right("pd1-limits-soql") });
     expect(r.explanation).toContain("100");
   });
 
@@ -121,11 +124,11 @@ describe("CertificationService", () => {
   it("records attempts only for signed-in users and reports progress by latest attempt", async () => {
     const attempts = new MemoryAttempts();
     const service = new CertificationService(bank, attempts);
-    await service.answer(null, "pd1-limits-soql", ["b"]);
+    await service.answer(null, "pd1-limits-soql", right("pd1-limits-soql"));
     expect(attempts.rows).toHaveLength(0);
-    await service.answer("u1", "pd1-limits-soql", ["a"]);
-    await service.answer("u1", "pd1-limits-soql", ["b"]);
-    await service.answer("u1", "pd1-limits-dml", ["a"]);
+    await service.answer("u1", "pd1-limits-soql", wrong("pd1-limits-soql"));
+    await service.answer("u1", "pd1-limits-soql", right("pd1-limits-soql"));
+    await service.answer("u1", "pd1-limits-dml", wrong("pd1-limits-dml"));
     const logic = (await service.list("u1")).find((e) => e.exam === "pd1")?.sections.find((s) => s.id === "logic");
     expect(logic).toMatchObject({ answered: 2, correct: 1 });
     expect((await service.list(null))[0]?.sections[0]?.answered).toBeNull();
@@ -192,8 +195,8 @@ describe("certification routes", () => {
     expect(qs.status).toBe(200);
     expect(qs.body.data).toHaveLength(3);
     expect(JSON.stringify(qs.body)).not.toContain("explanation");
-    const ans = await request(app).post("/api/v1/certification/answers").send({ questionId: "pd2-batch-default-scope", selected: ["b"] });
-    expect(ans.body.data).toMatchObject({ correct: true, answer: ["b"] });
+    const ans = await request(app).post("/api/v1/certification/answers").send({ questionId: "pd2-batch-default-scope", selected: right("pd2-batch-default-scope") });
+    expect(ans.body.data).toMatchObject({ correct: true, answer: right("pd2-batch-default-scope") });
   });
 
   it("validates input", async () => {
@@ -227,12 +230,12 @@ describe("mock exams", () => {
   it("grades: score, pass mark, per-section totals; unanswered counts wrong and isn't recorded", async () => {
     const attempts = new MemoryAttempts();
     const s = new CertificationService(bank, attempts);
-    const res = await s.gradeMock("u1", "pd1", { "pd1-limits-soql": ["b"], "pd1-limits-dml": ["a"], "pd1-lwc-api": [] });
+    const res = await s.gradeMock("u1", "pd1", { "pd1-limits-soql": right("pd1-limits-soql"), "pd1-limits-dml": wrong("pd1-limits-dml"), "pd1-lwc-api": [] });
     expect(res).toMatchObject({ correct: 1, total: 3, score: 33, passed: false, passPercent: 68 });
     expect(res.sections.find((x) => x.id === "logic")).toMatchObject({ correct: 1, total: 2 });
-    expect(res.results.find((r) => r.id === "pd1-limits-dml")).toMatchObject({ correct: false, selected: ["a"], answer: ["b"] });
+    expect(res.results.find((r) => r.id === "pd1-limits-dml")).toMatchObject({ correct: false, selected: wrong("pd1-limits-dml"), answer: right("pd1-limits-dml") });
     expect(attempts.rows.map((r) => r.questionId).sort()).toEqual(["pd1-limits-dml", "pd1-limits-soql"]);
-    const all = await s.gradeMock(null, "pd1", { "pd1-limits-soql": ["b"] });
+    const all = await s.gradeMock(null, "pd1", { "pd1-limits-soql": right("pd1-limits-soql") });
     expect(all).toMatchObject({ score: 100, passed: true });
   });
 
@@ -248,7 +251,7 @@ describe("mock exams", () => {
     expect(m.status).toBe(200);
     expect(m.body.data.questions).toHaveLength(60);
     expect(JSON.stringify(m.body)).not.toContain("explanation");
-    const g = await request(app).post("/api/v1/certification/pd2/mock/grade").send({ answers: { "pd2-batch-default-scope": ["b"] } });
+    const g = await request(app).post("/api/v1/certification/pd2/mock/grade").send({ answers: { "pd2-batch-default-scope": right("pd2-batch-default-scope") } });
     expect(g.body.data).toMatchObject({ score: 100, passed: true });
     expect((await request(app).post("/api/v1/certification/pd2/mock/grade").send({ answers: {} })).status).toBe(400);
   });

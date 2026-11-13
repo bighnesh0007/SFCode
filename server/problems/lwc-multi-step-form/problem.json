@@ -1,0 +1,17 @@
+{
+  "title": "Multi-Step Signup Form",
+  "category": "Conditional Rendering",
+  "order": 409,
+  "tags": [
+    "lwc:if",
+    "validation",
+    "CustomEvent",
+    "state"
+  ],
+  "track": "lwc",
+  "difficulty": "Hard",
+  "files": [],
+  "lwc": {
+    "component": "signupWizard"
+  }
+}

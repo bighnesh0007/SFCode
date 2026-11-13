@@ -49,7 +49,7 @@
         },
         {
           "id": "b",
-          "text": "The formula field: declarative first"
+          "text": "Neither: use a report"
         },
         {
           "id": "c",
@@ -57,11 +57,11 @@
         },
         {
           "id": "d",
-          "text": "Neither: use a report"
+          "text": "The formula field: declarative first"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Prefer declarative tools when they meet the requirement: less to maintain, no tests or deployments of code."
     },
@@ -76,7 +76,7 @@
         },
         {
           "id": "b",
-          "text": "An AppExchange app"
+          "text": "A custom object only"
         },
         {
           "id": "c",
@@ -84,11 +84,11 @@
         },
         {
           "id": "d",
-          "text": "A custom object only"
+          "text": "An AppExchange app"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Before building, check AppExchange: existing solutions are usually faster and maintained by the vendor."
     },
@@ -99,7 +99,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Schema Builder"
+          "text": "Report Builder"
         },
         {
           "id": "b",
@@ -107,15 +107,15 @@
         },
         {
           "id": "c",
-          "text": "Report Builder"
+          "text": "Process Automation settings"
         },
         {
           "id": "d",
-          "text": "Process Automation settings"
+          "text": "Schema Builder"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Schema Builder visualises the data model and lets you add objects, fields and relationships."
     },
@@ -126,7 +126,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Page layout"
+          "text": "Compact layout"
         },
         {
           "id": "b",
@@ -138,7 +138,7 @@
         },
         {
           "id": "d",
-          "text": "Compact layout"
+          "text": "Page layout"
         }
       ],
       "answer": [
@@ -153,15 +153,15 @@
       "options": [
         {
           "id": "a",
-          "text": "OWD Public Read Only"
-        },
-        {
-          "id": "b",
           "text": "OWD Private plus the role hierarchy"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "Sharing rules only"
+        },
+        {
+          "id": "c",
+          "text": "OWD Public Read Only"
         },
         {
           "id": "d",
@@ -169,7 +169,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Private OWD limits access to owners; the role hierarchy opens it up to managers above them."
     },
@@ -180,23 +180,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Limits are the same everywhere"
+          "text": "Limits only apply to sandboxes"
         },
         {
           "id": "b",
-          "text": "Editions limit things like custom objects, fields per object and automation"
-        },
-        {
-          "id": "c",
           "text": "Limits only affect Apex"
         },
         {
+          "id": "c",
+          "text": "Editions limit things like custom objects, fields per object and automation"
+        },
+        {
           "id": "d",
-          "text": "Limits only apply to sandboxes"
+          "text": "Limits are the same everywhere"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Editions and licences cap custom objects, fields and other features, which can shape the design."
     },
@@ -207,23 +207,23 @@
       "options": [
         {
           "id": "a",
-          "text": "A Lightning app with those tabs"
-        },
-        {
-          "id": "b",
           "text": "A new profile"
         },
         {
+          "id": "b",
+          "text": "A Lightning app with those tabs"
+        },
+        {
           "id": "c",
-          "text": "A record type"
+          "text": "A report folder"
         },
         {
           "id": "d",
-          "text": "A report folder"
+          "text": "A record type"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Lightning apps group tabs, utility items and branding for a set of users."
     },
@@ -234,11 +234,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Lookup"
+          "text": "Master-detail from Interview to Position"
         },
         {
           "id": "b",
-          "text": "Master-detail from Interview to Position"
+          "text": "External lookup"
         },
         {
           "id": "c",
@@ -246,11 +246,11 @@
         },
         {
           "id": "d",
-          "text": "External lookup"
+          "text": "Lookup"
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Master-detail gives cascade delete and roll-up summary fields on the master."
     },
@@ -261,23 +261,23 @@
       "options": [
         {
           "id": "a",
-          "text": "A lookup from Candidate to Position"
+          "text": "Two lookups on Position"
         },
         {
           "id": "b",
-          "text": "A junction object (Job Application) with master-detail to both"
+          "text": "A lookup from Candidate to Position"
         },
         {
           "id": "c",
-          "text": "A multi-select picklist"
+          "text": "A junction object (Job Application) with master-detail to both"
         },
         {
           "id": "d",
-          "text": "Two lookups on Position"
+          "text": "A multi-select picklist"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Many-to-many relationships use a junction object with two master-detail relationships."
     },
@@ -288,11 +288,11 @@
       "options": [
         {
           "id": "a",
-          "text": "COUNT of detail records"
+          "text": "SUM of a number field on details"
         },
         {
           "id": "b",
-          "text": "SUM of a number field on details"
+          "text": "Values from a lookup child"
         },
         {
           "id": "c",
@@ -300,12 +300,12 @@
         },
         {
           "id": "d",
-          "text": "Values from a lookup child"
+          "text": "COUNT of detail records"
         }
       ],
       "answer": [
         "a",
-        "b"
+        "d"
       ],
       "explanation": "Roll-ups support COUNT, SUM, MIN and MAX over master-detail children. Lookup children need Flow or Apex."
     },
@@ -316,23 +316,23 @@
       "options": [
         {
           "id": "a",
-          "text": "None"
-        },
-        {
-          "id": "b",
-          "text": "Existing data can be lost or truncated"
-        },
-        {
-          "id": "c",
           "text": "It deletes the object"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "It changes the record Id"
+        },
+        {
+          "id": "c",
+          "text": "Existing data can be lost or truncated"
+        },
+        {
+          "id": "d",
+          "text": "None"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Some conversions lose data. Check the data and dependencies (formulas, reports, code) first."
     },
@@ -347,15 +347,15 @@
         },
         {
           "id": "b",
-          "text": "A formula"
-        },
-        {
-          "id": "c",
           "text": "A picklist"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "A rich text field"
+        },
+        {
+          "id": "d",
+          "text": "A formula"
         }
       ],
       "answer": [
@@ -370,23 +370,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Data Import Wizard"
+          "text": "Schema Builder"
         },
         {
           "id": "b",
-          "text": "Data Loader"
+          "text": "Data Import Wizard"
         },
         {
           "id": "c",
-          "text": "Mass Update from a list view"
+          "text": "Data Loader"
         },
         {
           "id": "d",
-          "text": "Schema Builder"
+          "text": "Mass Update from a list view"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "The Import Wizard handles up to 50,000 records; Data Loader handles far more and supports update and delete."
     },
@@ -397,11 +397,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Hierarchical"
+          "text": "Master-detail"
         },
         {
           "id": "b",
-          "text": "Master-detail"
+          "text": "External lookup"
         },
         {
           "id": "c",
@@ -409,11 +409,11 @@
         },
         {
           "id": "d",
-          "text": "External lookup"
+          "text": "Hierarchical"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Hierarchical relationships link a user to another user."
     },
@@ -479,7 +479,7 @@
       "options": [
         {
           "id": "a",
-          "text": "PRIORVALUE()"
+          "text": "VLOOKUP()"
         },
         {
           "id": "b",
@@ -487,15 +487,15 @@
         },
         {
           "id": "c",
-          "text": "BLANKVALUE()"
+          "text": "PRIORVALUE()"
         },
         {
           "id": "d",
-          "text": "VLOOKUP()"
+          "text": "BLANKVALUE()"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "PRIORVALUE returns the value before the change."
     },
@@ -510,15 +510,15 @@
         },
         {
           "id": "b",
-          "text": "A roll-up summary"
-        },
-        {
-          "id": "c",
           "text": "A lookup filter"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "A text field updated by hand"
+        },
+        {
+          "id": "d",
+          "text": "A roll-up summary"
         }
       ],
       "answer": [
@@ -533,7 +533,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Before-save record-triggered flow"
+          "text": "Scheduled flow"
         },
         {
           "id": "b",
@@ -545,11 +545,11 @@
         },
         {
           "id": "d",
-          "text": "Scheduled flow"
+          "text": "Before-save record-triggered flow"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Before-save (Fast Field Updates) flows change the triggering record with no extra DML."
     },
@@ -560,23 +560,23 @@
       "options": [
         {
           "id": "a",
-          "text": "An approval process"
-        },
-        {
-          "id": "b",
-          "text": "A validation rule"
-        },
-        {
-          "id": "c",
           "text": "A screen flow"
         },
         {
-          "id": "d",
+          "id": "b",
+          "text": "An approval process"
+        },
+        {
+          "id": "c",
           "text": "A sharing rule"
+        },
+        {
+          "id": "d",
+          "text": "A validation rule"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Approval processes route records for sign-off and lock them while pending."
     },
@@ -614,11 +614,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Collect changes in a collection variable and update once after the loop"
+          "text": "Keep the Update inside the loop"
         },
         {
           "id": "b",
-          "text": "Keep the Update inside the loop"
+          "text": "Collect changes in a collection variable and update once after the loop"
         },
         {
           "id": "c",
@@ -630,7 +630,7 @@
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "DML inside loops wastes limits; update the whole collection once."
     },
@@ -641,7 +641,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Dynamic Forms with field visibility rules"
+          "text": "Field-level security"
         },
         {
           "id": "b",
@@ -653,11 +653,11 @@
         },
         {
           "id": "d",
-          "text": "Field-level security"
+          "text": "Dynamic Forms with field visibility rules"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Dynamic Forms place fields as components with their own visibility rules."
     },
@@ -672,7 +672,7 @@
         },
         {
           "id": "b",
-          "text": "A global action"
+          "text": "A list view"
         },
         {
           "id": "c",
@@ -680,7 +680,7 @@
         },
         {
           "id": "d",
-          "text": "A list view"
+          "text": "A global action"
         }
       ],
       "answer": [
@@ -699,11 +699,11 @@
         },
         {
           "id": "b",
-          "text": "Compact layout"
+          "text": "Search layout"
         },
         {
           "id": "c",
-          "text": "Search layout"
+          "text": "Compact layout"
         },
         {
           "id": "d",
@@ -711,7 +711,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Compact layouts decide the fields in the highlights panel and mobile record headers."
     },
@@ -722,23 +722,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Assign Lightning record pages by app, record type and profile"
+          "text": "Use list views"
         },
         {
           "id": "b",
-          "text": "Use one page for all"
+          "text": "Assign Lightning record pages by app, record type and profile"
         },
         {
           "id": "c",
-          "text": "Create two Account objects"
+          "text": "Use one page for all"
         },
         {
           "id": "d",
-          "text": "Use list views"
+          "text": "Create two Account objects"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Lightning App Builder pages can be assigned per app, record type and profile."
     },
@@ -749,23 +749,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Path"
+          "text": "A flow"
         },
         {
           "id": "b",
-          "text": "Kanban"
-        },
-        {
-          "id": "c",
           "text": "A report"
         },
         {
+          "id": "c",
+          "text": "Kanban"
+        },
+        {
           "id": "d",
-          "text": "A flow"
+          "text": "Path"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Path shows stages with key fields and guidance for success."
     },
@@ -776,23 +776,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Developer"
+          "text": "Full"
         },
         {
           "id": "b",
-          "text": "Developer Pro"
+          "text": "Developer"
         },
         {
           "id": "c",
-          "text": "Partial Copy"
+          "text": "Developer Pro"
         },
         {
           "id": "d",
-          "text": "Full"
+          "text": "Partial Copy"
         }
       ],
       "answer": [
-        "c"
+        "d"
       ],
       "explanation": "Partial Copy includes sample data from a template and can refresh every 5 days."
     },
@@ -803,11 +803,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Outbound change set from the sandbox, deployed as an inbound change set in production"
+          "text": "A report"
         },
         {
           "id": "b",
-          "text": "Data Loader"
+          "text": "Outbound change set from the sandbox, deployed as an inbound change set in production"
         },
         {
           "id": "c",
@@ -815,11 +815,11 @@
         },
         {
           "id": "d",
-          "text": "A report"
+          "text": "Data Loader"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Change sets move metadata between connected orgs."
     },
@@ -834,11 +834,11 @@
         },
         {
           "id": "b",
-          "text": "They're mainly for sharing templates; installed components are editable and can't be upgraded"
+          "text": "They hide their code"
         },
         {
           "id": "c",
-          "text": "They hide their code"
+          "text": "They're mainly for sharing templates; installed components are editable and can't be upgraded"
         },
         {
           "id": "d",
@@ -846,7 +846,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Unmanaged packages distribute editable components once; they don't support upgrades."
     },
@@ -861,11 +861,11 @@
         },
         {
           "id": "b",
-          "text": "Assign them a permission set"
+          "text": "Change the organization-wide default"
         },
         {
           "id": "c",
-          "text": "Change the organization-wide default"
+          "text": "Assign them a permission set"
         },
         {
           "id": "d",
@@ -873,7 +873,7 @@
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Permission sets grant extra permissions to individual users without multiplying profiles."
     },
@@ -884,23 +884,23 @@
       "options": [
         {
           "id": "a",
-          "text": "An owner-based sharing rule"
+          "text": "A record type"
         },
         {
           "id": "b",
-          "text": "A criteria-based sharing rule on Department"
-        },
-        {
-          "id": "c",
           "text": "A new profile"
         },
         {
+          "id": "c",
+          "text": "A criteria-based sharing rule on Department"
+        },
+        {
           "id": "d",
-          "text": "A record type"
+          "text": "An owner-based sharing rule"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Criteria-based sharing rules share records by field values, regardless of who owns them."
     },
@@ -915,19 +915,19 @@
         },
         {
           "id": "b",
-          "text": "Manual sharing (the Sharing button)"
-        },
-        {
-          "id": "c",
           "text": "Change the OWD"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "A permission set"
+        },
+        {
+          "id": "d",
+          "text": "Manual sharing (the Sharing button)"
         }
       ],
       "answer": [
-        "b"
+        "d"
       ],
       "explanation": "Manual sharing grants access to a single record, when the OWD is Private or Public Read Only."
     },
@@ -938,15 +938,15 @@
       "options": [
         {
           "id": "a",
-          "text": "Yes, always build custom"
-        },
-        {
-          "id": "b",
           "text": "No: use the standard Account object, which already integrates with Contacts, Opportunities and reports"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "Yes, standard objects can't be customised"
+        },
+        {
+          "id": "c",
+          "text": "Yes, always build custom"
         },
         {
           "id": "d",
@@ -954,7 +954,7 @@
         }
       ],
       "answer": [
-        "b"
+        "a"
       ],
       "explanation": "Standard objects come with built-in features and relationships; reuse them before building custom ones."
     },
@@ -965,23 +965,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Object Manager, the object's Object Limits page"
+          "text": "A report"
         },
         {
           "id": "b",
-          "text": "Setup Audit Trail"
-        },
-        {
-          "id": "c",
           "text": "Schema Builder only"
         },
         {
+          "id": "c",
+          "text": "Object Manager, the object's Object Limits page"
+        },
+        {
           "id": "d",
-          "text": "A report"
+          "text": "Setup Audit Trail"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Each object's Object Limits page shows usage against limits for fields, relationships and more."
     },
@@ -992,23 +992,23 @@
       "options": [
         {
           "id": "a",
-          "text": "The object doesn't 'Allow Search'"
-        },
-        {
-          "id": "b",
           "text": "The object has no record types"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "The OWD is Private"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "The object has a lookup"
+        },
+        {
+          "id": "d",
+          "text": "The object doesn't 'Allow Search'"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Custom objects need search allowed (and a tab, in some cases) to appear in global search."
     },
@@ -1019,23 +1019,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Profile"
+          "text": "Page layout"
         },
         {
           "id": "b",
-          "text": "Role"
+          "text": "Profile"
         },
         {
           "id": "c",
-          "text": "Permission set"
+          "text": "Role"
         },
         {
           "id": "d",
-          "text": "Page layout"
+          "text": "Permission set"
         }
       ],
       "answer": [
-        "b"
+        "c"
       ],
       "explanation": "Roles drive record visibility through the hierarchy; profiles and permission sets control what users can do."
     },
@@ -1046,7 +1046,7 @@
       "options": [
         {
           "id": "a",
-          "text": "A global value set"
+          "text": "A formula"
         },
         {
           "id": "b",
@@ -1058,11 +1058,11 @@
         },
         {
           "id": "d",
-          "text": "A formula"
+          "text": "A global value set"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Global value sets share one list of values across picklist fields."
     },
@@ -1073,24 +1073,24 @@
       "options": [
         {
           "id": "a",
-          "text": "Clear the value of the lookup field"
-        },
-        {
-          "id": "b",
-          "text": "Don't allow deletion of the lookup record that's part of a lookup relationship"
-        },
-        {
-          "id": "c",
           "text": "Always delete the children like master-detail"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "Move children to the Recycle Bin automatically"
+        },
+        {
+          "id": "c",
+          "text": "Clear the value of the lookup field"
+        },
+        {
+          "id": "d",
+          "text": "Don't allow deletion of the lookup record that's part of a lookup relationship"
         }
       ],
       "answer": [
-        "a",
-        "b"
+        "c",
+        "d"
       ],
       "explanation": "Custom lookups can clear the field (default) or block the delete; cascade delete is for master-detail (and only some special cases)."
     },
@@ -1101,7 +1101,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Yes, always"
+          "text": "Only by an admin"
         },
         {
           "id": "b",
@@ -1109,11 +1109,11 @@
         },
         {
           "id": "c",
-          "text": "Only by an admin"
+          "text": "Only with Apex"
         },
         {
           "id": "d",
-          "text": "Only with Apex"
+          "text": "Yes, always"
         }
       ],
       "answer": [
@@ -1128,11 +1128,11 @@
       "options": [
         {
           "id": "a",
-          "text": "A matching rule and a duplicate rule set to Allow with an alert"
+          "text": "A validation rule"
         },
         {
           "id": "b",
-          "text": "A validation rule"
+          "text": "A matching rule and a duplicate rule set to Allow with an alert"
         },
         {
           "id": "c",
@@ -1144,7 +1144,7 @@
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Duplicate rules can allow with an alert, or block; matching rules define what counts as a duplicate."
     },
@@ -1155,7 +1155,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Field history tracking on Salary"
+          "text": "Setup Audit Trail"
         },
         {
           "id": "b",
@@ -1163,7 +1163,7 @@
         },
         {
           "id": "c",
-          "text": "Setup Audit Trail"
+          "text": "Field history tracking on Salary"
         },
         {
           "id": "d",
@@ -1171,7 +1171,7 @@
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Field history tracking records old and new values for chosen fields."
     },
@@ -1182,23 +1182,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Long text area"
-        },
-        {
-          "id": "b",
-          "text": "Picklist"
-        },
-        {
-          "id": "c",
           "text": "Number"
         },
         {
-          "id": "d",
+          "id": "b",
+          "text": "Long text area"
+        },
+        {
+          "id": "c",
           "text": "Checkbox"
+        },
+        {
+          "id": "d",
+          "text": "Picklist"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Long and rich text areas have limited filtering; use other field types for values you filter on."
     },
@@ -1209,23 +1209,23 @@
       "options": [
         {
           "id": "a",
-          "text": "CASE(Priority__c, ...)"
+          "text": "HYPERLINK"
         },
         {
           "id": "b",
-          "text": "VLOOKUP"
+          "text": "CASE(Priority__c, ...)"
         },
         {
           "id": "c",
-          "text": "ISCHANGED"
+          "text": "VLOOKUP"
         },
         {
           "id": "d",
-          "text": "HYPERLINK"
+          "text": "ISCHANGED"
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "CASE works with picklists and returns a value for each match."
     },
@@ -1263,11 +1263,11 @@
       "options": [
         {
           "id": "a",
-          "text": "BLANKVALUE(Discount__c, 0)"
+          "text": "ISBLANK(Discount__c)"
         },
         {
           "id": "b",
-          "text": "ISBLANK(Discount__c)"
+          "text": "COALESCE(Discount__c)"
         },
         {
           "id": "c",
@@ -1275,11 +1275,11 @@
         },
         {
           "id": "d",
-          "text": "COALESCE(Discount__c)"
+          "text": "BLANKVALUE(Discount__c, 0)"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "BLANKVALUE returns a substitute when the field is blank."
     },
@@ -1290,11 +1290,11 @@
       "options": [
         {
           "id": "a",
-          "text": "ISNEW()"
+          "text": "PRIORVALUE()"
         },
         {
           "id": "b",
-          "text": "PRIORVALUE()"
+          "text": "NOW()"
         },
         {
           "id": "c",
@@ -1302,11 +1302,11 @@
         },
         {
           "id": "d",
-          "text": "NOW()"
+          "text": "ISNEW()"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "ISNEW() is true only when the record is being created."
     },
@@ -1321,7 +1321,7 @@
         },
         {
           "id": "b",
-          "text": "A validation rule"
+          "text": "A formula"
         },
         {
           "id": "c",
@@ -1329,7 +1329,7 @@
         },
         {
           "id": "d",
-          "text": "A formula"
+          "text": "A validation rule"
         }
       ],
       "answer": [
@@ -1344,23 +1344,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Record-triggered flow, after save (Actions and Related Records)"
-        },
-        {
-          "id": "b",
           "text": "Before-save flow"
         },
         {
-          "id": "c",
+          "id": "b",
           "text": "Screen flow"
         },
         {
-          "id": "d",
+          "id": "c",
           "text": "Scheduled flow"
+        },
+        {
+          "id": "d",
+          "text": "Record-triggered flow, after save (Actions and Related Records)"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Creating other records needs an after-save record-triggered flow."
     },
@@ -1371,23 +1371,23 @@
       "options": [
         {
           "id": "a",
-          "text": "One approval process with two steps, the second with entry criteria for amount over 5,000"
+          "text": "A screen flow only"
         },
         {
           "id": "b",
-          "text": "Two validation rules"
-        },
-        {
-          "id": "c",
           "text": "Two record types"
         },
         {
+          "id": "c",
+          "text": "One approval process with two steps, the second with entry criteria for amount over 5,000"
+        },
+        {
           "id": "d",
-          "text": "A screen flow only"
+          "text": "Two validation rules"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Approval processes can have multiple steps, each with its own criteria and approvers."
     },
@@ -1402,7 +1402,7 @@
         },
         {
           "id": "b",
-          "text": "Nothing; roll-ups can't filter"
+          "text": "Only on lookup relationships"
         },
         {
           "id": "c",
@@ -1410,7 +1410,7 @@
         },
         {
           "id": "d",
-          "text": "Only on lookup relationships"
+          "text": "Nothing; roll-ups can't filter"
         }
       ],
       "answer": [
@@ -1425,23 +1425,23 @@
       "options": [
         {
           "id": "a",
-          "text": "Get Records"
+          "text": "Screen"
         },
         {
           "id": "b",
-          "text": "Create Records"
-        },
-        {
-          "id": "c",
           "text": "Assignment"
         },
         {
+          "id": "c",
+          "text": "Get Records"
+        },
+        {
           "id": "d",
-          "text": "Screen"
+          "text": "Create Records"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Get Records queries records into variables for later elements."
     },
@@ -1452,7 +1452,7 @@
       "options": [
         {
           "id": "a",
-          "text": "A lookup or master-detail to Account, and the related list on the layout or page"
+          "text": "A list view"
         },
         {
           "id": "b",
@@ -1464,11 +1464,11 @@
         },
         {
           "id": "d",
-          "text": "A list view"
+          "text": "A lookup or master-detail to Account, and the related list on the layout or page"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Related lists show child records of a relationship on the parent's page."
     },
@@ -1479,7 +1479,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Utility bar items in the Lightning app"
+          "text": "A record type"
         },
         {
           "id": "b",
@@ -1491,11 +1491,11 @@
         },
         {
           "id": "d",
-          "text": "A record type"
+          "text": "Utility bar items in the Lightning app"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "The utility bar gives persistent access to tools like Notes and Recent Items."
     },
@@ -1510,7 +1510,7 @@
         },
         {
           "id": "b",
-          "text": "A new profile"
+          "text": "A record type"
         },
         {
           "id": "c",
@@ -1518,7 +1518,7 @@
         },
         {
           "id": "d",
-          "text": "A record type"
+          "text": "A new profile"
         }
       ],
       "answer": [
@@ -1533,23 +1533,23 @@
       "options": [
         {
           "id": "a",
-          "text": "A custom button or link with a URL using merge fields"
-        },
-        {
-          "id": "b",
-          "text": "A validation rule"
-        },
-        {
-          "id": "c",
           "text": "A roll-up summary"
         },
         {
-          "id": "d",
+          "id": "b",
           "text": "A queue"
+        },
+        {
+          "id": "c",
+          "text": "A custom button or link with a URL using merge fields"
+        },
+        {
+          "id": "d",
+          "text": "A validation rule"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Custom buttons and links can build URLs from record fields."
     },
@@ -1560,7 +1560,7 @@
       "options": [
         {
           "id": "a",
-          "text": "A custom Lightning home page in Lightning App Builder, assigned to their profile"
+          "text": "A report folder"
         },
         {
           "id": "b",
@@ -1568,15 +1568,15 @@
         },
         {
           "id": "c",
-          "text": "A report folder"
+          "text": "A list view"
         },
         {
           "id": "d",
-          "text": "A list view"
+          "text": "A custom Lightning home page in Lightning App Builder, assigned to their profile"
         }
       ],
       "answer": [
-        "a"
+        "d"
       ],
       "explanation": "Home pages are built in Lightning App Builder and assigned by app and profile."
     },
@@ -1587,7 +1587,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Add the field (use 'View/Add Dependencies') to the change set"
+          "text": "Use Data Loader"
         },
         {
           "id": "b",
@@ -1595,15 +1595,15 @@
         },
         {
           "id": "c",
-          "text": "Deploy twice"
+          "text": "Add the field (use 'View/Add Dependencies') to the change set"
         },
         {
           "id": "d",
-          "text": "Use Data Loader"
+          "text": "Deploy twice"
         }
       ],
       "answer": [
-        "a"
+        "c"
       ],
       "explanation": "Change sets must include dependent components that don't exist in the target org."
     },
@@ -1618,11 +1618,11 @@
         },
         {
           "id": "b",
-          "text": "A new profile"
+          "text": "A sharing rule"
         },
         {
           "id": "c",
-          "text": "A sharing rule"
+          "text": "A new profile"
         },
         {
           "id": "d",
@@ -1641,15 +1641,15 @@
       "options": [
         {
           "id": "a",
-          "text": "Validate it first, then deploy during a planned window and tell users"
+          "text": "Skip testing in the sandbox"
         },
         {
           "id": "b",
-          "text": "Deploy during business hours without notice"
+          "text": "Validate it first, then deploy during a planned window and tell users"
         },
         {
           "id": "c",
-          "text": "Skip testing in the sandbox"
+          "text": "Deploy during business hours without notice"
         },
         {
           "id": "d",
@@ -1657,7 +1657,7 @@
         }
       ],
       "answer": [
-        "a"
+        "b"
       ],
       "explanation": "Validation catches errors early; planned releases and communication reduce disruption."
     }
