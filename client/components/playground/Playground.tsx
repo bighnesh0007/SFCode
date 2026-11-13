@@ -216,6 +216,7 @@ export function Playground({ mode }: { mode: Mode }) {
 
   return (
     <div className="flex h-[calc(100dvh-3rem)] flex-col">
+      <h1 className="sr-only">{mode === "apex" ? "Apex Playground" : "SOQL Playground"}</h1>
       <div className="flex min-h-11 flex-wrap items-center gap-2 border-b px-3 py-1.5">
         <nav aria-label="Playground" className="flex rounded-md border p-0.5 text-xs font-medium">
           {(["apex", "soql"] as const).map((m) => (
@@ -403,7 +404,7 @@ function Output({ run, tab, onJump }: { run: Run; tab: Tab; onJump: (line: numbe
   return (
     <div className="space-y-3">
       {r.success ? (
-        <Status icon={<CheckCircle2 className="h-4 w-4" />} tone="text-green-600 dark:text-green-400" title="Executed successfully" />
+        <Status icon={<CheckCircle2 className="h-4 w-4" />} tone="text-green-700 dark:text-green-400" title="Executed successfully" />
       ) : (
         <Status icon={<XCircle className="h-4 w-4" />} tone="text-destructive" title="Uncaught exception">
           {r.exceptionMessage}

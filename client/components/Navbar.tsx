@@ -52,7 +52,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-12 max-w-screen-2xl items-center gap-4 px-4 xl:gap-6">
         <Link href="/" className="flex items-center gap-1.5 text-[15px] font-semibold tracking-tight">
           <LogoMark size={24} />
-          <span>SF<span className="text-sky-500">Code</span></span>
+          <span>SF<span className="text-sky-700 dark:text-sky-400">Code</span></span>
         </Link>
 
         <nav className="hidden h-full items-center gap-3.5 whitespace-nowrap text-sm lg:flex xl:gap-5">

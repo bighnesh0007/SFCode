@@ -16,11 +16,11 @@ const ICONS: Record<string, typeof Award> = { sparkles: Sparkles, database: Data
 export function StatsStrip({ p }: { p: Profile }) {
   const tiles = [
     { label: "Streak", value: p.stats.streak ? `${p.stats.streak}d` : "0", hint: p.stats.freezesLeft > 0 ? `Longest ${p.stats.longestStreak}d · ❄ ${p.stats.freezesLeft}` : `Longest ${p.stats.longestStreak}d`, icon: Flame, tone: p.stats.streak > 0 ? "text-orange-500" : "text-muted-foreground", glow: p.stats.streak >= 3 },
-    { label: "Points", value: String(p.score), hint: `${p.solved} solved`, icon: Trophy, tone: "text-amber-500" },
-    { label: "Rank", value: p.rank ? `#${p.rank}` : "—", hint: "All time", icon: Medal, tone: "text-sky-500" },
+    { label: "Points", value: String(p.score), hint: `${p.solved} solved`, icon: Trophy, tone: "text-amber-700 dark:text-amber-400" },
+    { label: "Rank", value: p.rank ? `#${p.rank}` : "—", hint: "All time", icon: Medal, tone: "text-sky-700 dark:text-sky-400" },
     { label: "Coins", value: p.stats.coins === null ? "—" : String(p.stats.coins), hint: "Spend in the store", icon: Coins, tone: "text-yellow-500" },
     { label: "Contests", value: String(p.stats.contests), hint: p.stats.bestPlacement ? `Best #${p.stats.bestPlacement}` : "No finishes yet", icon: Swords, tone: "text-violet-500" },
-    { label: "Active days", value: String(p.stats.activeDays), hint: "Last 12 months", icon: Sparkles, tone: "text-emerald-500" },
+    { label: "Active days", value: String(p.stats.activeDays), hint: "Last 12 months", icon: Sparkles, tone: "text-emerald-700 dark:text-emerald-400" },
   ];
   return (
     <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -72,7 +72,7 @@ export function AchievementsWall({ p }: { p: Profile }) {
           const pct = Math.round((100 * a.progress.current) / a.progress.target);
           return (
             <li key={a.id} title={`${a.description} (${a.progress.current}/${a.progress.target})`} className={cn("group flex flex-col items-center rounded-lg border p-3 text-center transition-all", a.earned ? "border-amber-400/50 bg-gradient-to-b from-amber-400/15 to-transparent hover:shadow-[0_0_18px_rgba(251,191,36,0.35)]" : "opacity-60 grayscale hover:opacity-90")}>
-              <span className={cn("grid h-10 w-10 place-items-center rounded-full", a.earned ? "bg-amber-400/25 text-amber-600 dark:text-amber-300 group-hover:animate-[bounce_0.6s_1]" : "bg-muted text-muted-foreground")}><Icon className="h-5 w-5" /></span>
+              <span className={cn("grid h-10 w-10 place-items-center rounded-full", a.earned ? "bg-amber-400/25 text-amber-700 dark:text-amber-300 group-hover:animate-[bounce_0.6s_1]" : "bg-muted text-muted-foreground")}><Icon className="h-5 w-5" /></span>
               <span className="mt-2 text-xs font-medium leading-tight">{a.title}</span>
               {!a.earned && <span className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-muted"><span className="block h-full bg-sky-500" style={{ width: `${pct}%` }} /></span>}
             </li>
@@ -124,7 +124,7 @@ export function ContestHistory({ p }: { p: Profile }) {
       <ul className="divide-y text-sm">
         {p.contests.map((c) => (
           <li key={c.slug} className="flex items-center gap-3 py-2">
-            <span className={cn("w-10 font-semibold tabular-nums", c.rank <= 3 && "text-amber-500")}>#{c.rank}</span>
+            <span className={cn("w-10 font-semibold tabular-nums", c.rank <= 3 && "text-amber-700 dark:text-amber-400")}>#{c.rank}</span>
             <Link href={`/contests/${c.slug}`} className="min-w-0 flex-1 truncate hover:text-primary">{c.title}</Link>
             <span className="text-xs text-muted-foreground">{c.score} pts · of {c.entrants}</span>
           </li>
@@ -141,7 +141,7 @@ export function RoadmapProgress({ p, editable }: { p: Profile; editable: boolean
     <section className="rounded-xl border p-5">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold">{p.roadmap.title} roadmap</h2>
-        {editable && <Link href="/roadmap" className="text-xs text-sky-600 hover:underline dark:text-sky-400">Continue →</Link>}
+        {editable && <Link href="/roadmap" className="text-xs text-sky-700 hover:underline dark:text-sky-400">Continue →</Link>}
       </div>
       <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-gradient-to-r from-sky-400 to-indigo-500 transition-all duration-700" style={{ width: `${pct}%` }} /></div>
       <p className="mt-1.5 text-xs text-muted-foreground">{p.roadmap.done} of {p.roadmap.total} steps · {pct}%</p>
@@ -158,7 +158,7 @@ export function ShareButtons({ p }: { p: Profile }) {
       <a className="inline-flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs hover:bg-accent" target="_blank" rel="noopener noreferrer" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}><Link2 className="h-3.5 w-3.5" /> Share</a>
       <a className="inline-flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs hover:bg-accent" target="_blank" rel="noopener noreferrer" href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`}><Share2 className="h-3.5 w-3.5" /> Post</a>
       <button type="button" className="inline-flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs hover:bg-accent" onClick={() => void navigator.clipboard.writeText(url).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); })}>
-        {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />} {copied ? "Copied" : "Copy link"}
+        {copied ? <Check className="h-3.5 w-3.5 text-emerald-700 dark:text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />} {copied ? "Copied" : "Copy link"}
       </button>
     </div>
   );
@@ -221,7 +221,7 @@ export function AboutCard({ p, editable, onChange }: { p: Profile; editable: boo
     <section className="rounded-xl border p-5">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold">About</h2>
-        {editable && <button type="button" onClick={() => setEditing(true)} className="text-xs text-sky-600 hover:underline dark:text-sky-400">{empty ? "Add details" : "Edit"}</button>}
+        {editable && <button type="button" onClick={() => setEditing(true)} className="text-xs text-sky-700 hover:underline dark:text-sky-400">{empty ? "Add details" : "Edit"}</button>}
       </div>
       {empty ? (
         <p className="mt-3 text-sm text-muted-foreground">{editable ? "Add a bio, your certifications and links so others can find you." : "Nothing here yet."}</p>
@@ -237,7 +237,7 @@ export function AboutCard({ p, editable, onChange }: { p: Profile; editable: boo
           )}
           {a.certifications.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
-              {a.certifications.map((c) => <span key={c} className="inline-flex items-center gap-1 rounded-full border border-sky-500/40 bg-sky-500/10 px-2 py-0.5 text-xs"><Award className="h-3 w-3 text-sky-500" />{c}</span>)}
+              {a.certifications.map((c) => <span key={c} className="inline-flex items-center gap-1 rounded-full border border-sky-500/40 bg-sky-500/10 px-2 py-0.5 text-xs"><Award className="h-3 w-3 text-sky-700 dark:text-sky-400" />{c}</span>)}
             </div>
           )}
           <div className="flex flex-wrap gap-3 text-xs">

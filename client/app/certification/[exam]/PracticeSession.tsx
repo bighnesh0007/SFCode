@@ -142,7 +142,7 @@ export function PracticeSession({ exam, section, load, title }: { exam: string; 
                   >
                     <span className="mt-0.5 font-mono text-xs uppercase text-muted-foreground">{o.id}</span>
                     <Markdown source={o.text} className="markdown flex-1 [&_p]:m-0" />
-                    {result && isAnswer && <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500" />}
+                    {result && isAnswer && <CheckCircle2 className="h-4 w-4 shrink-0 text-green-700 dark:text-green-400" />}
                     {result && picked && !isAnswer && <XCircle className="h-4 w-4 shrink-0 text-red-500" />}
                   </button>
                 </li>
@@ -152,7 +152,7 @@ export function PracticeSession({ exam, section, load, title }: { exam: string; 
 
           {result && (
             <div className={cn("rounded-lg border p-4", result.correct ? "border-green-500/40" : "border-red-500/40")}>
-              <p className={cn("mb-2 font-semibold", result.correct ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400")}>
+              <p className={cn("mb-2 font-semibold", result.correct ? "text-green-700 dark:text-green-400" : "text-red-600 dark:text-red-400")}>
                 {result.correct ? "Correct" : "Not quite"}
               </p>
               <Markdown source={result.explanation} className="markdown text-sm" />

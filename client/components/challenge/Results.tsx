@@ -91,7 +91,7 @@ export function Results({ submission, isFlow = false, onOpenFile }: { submission
           {r.tests.map((t) => (
             <li key={t.method} className="rounded-md border px-3 py-2">
               <div className="flex items-center gap-2">
-                {t.passed ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
+                {t.passed ? <CheckCircle2 className="h-4 w-4 text-green-700 dark:text-green-400" /> : <XCircle className="h-4 w-4 text-red-500" />}
                 <span className="font-mono text-xs">{t.method}</span>
                 {t.timeMs !== null && <span className="ml-auto text-xs tabular-nums text-muted-foreground">{t.timeMs} ms</span>}
               </div>

@@ -102,7 +102,7 @@ export function DraftEditor({ id }: { id: string }) {
         <h1 className="text-2xl font-semibold tracking-tight">{content.title || "Untitled problem"}</h1>
         <span className="rounded-full border px-2 py-0.5 text-xs">{STATUS_TEXT[draft.status]}</span>
         {draft.author && <span className="text-xs text-muted-foreground">by @{draft.author}</span>}
-        {draft.publishedSlug && <Link href={`${trackInfo(content.track).base}/${draft.publishedSlug}`} className="text-sm text-sky-600 hover:underline dark:text-sky-400">View live →</Link>}
+        {draft.publishedSlug && <Link href={`${trackInfo(content.track).base}/${draft.publishedSlug}`} className="text-sm text-sky-700 hover:underline dark:text-sky-400">View live →</Link>}
       </div>
       {draft.reviewNote && (
         <p className={cn("mt-3 rounded-lg border p-3 text-sm", draft.status === "rejected" ? "border-destructive/40 bg-destructive/10" : "border-amber-500/40 bg-amber-500/10")}>
@@ -115,7 +115,7 @@ export function DraftEditor({ id }: { id: string }) {
         <div className="rounded-lg border p-3 text-sm">
           <p className="font-medium">Ready to go live?</p>
           {draft.problems.length === 0 ? (
-            <p className="mt-1 flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400"><CheckCircle2 className="h-4 w-4" /> Structure looks good.</p>
+            <p className="mt-1 flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400"><CheckCircle2 className="h-4 w-4" /> Structure looks good.</p>
           ) : (
             <ul className="mt-1 list-disc space-y-0.5 pl-5 text-amber-700 dark:text-amber-300">{draft.problems.map((p) => <li key={p}>{p}</li>)}</ul>
           )}
@@ -129,7 +129,7 @@ export function DraftEditor({ id }: { id: string }) {
             <p className="mt-1 flex items-center gap-1.5"><Loader2 className="h-4 w-4 animate-spin" /> Running in your org… (usually under a minute)</p>
           ) : (
             <div className="mt-1">
-              <p className={cn("flex items-center gap-1.5", check.status === "passed" ? "text-emerald-600 dark:text-emerald-400" : "text-destructive")}>
+              <p className={cn("flex items-center gap-1.5", check.status === "passed" ? "text-emerald-700 dark:text-emerald-400" : "text-destructive")}>
                 {check.status === "passed" ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                 {check.status === "passed" ? "Passed" : check.status === "failed" ? "Failed" : "Couldn't run"}
                 {check.reference && ` · solution ${check.reference.verdict} (${check.reference.passed}/${check.reference.run})`}
@@ -137,7 +137,7 @@ export function DraftEditor({ id }: { id: string }) {
               </p>
               {check.message && <p className="mt-1 text-xs">{check.message}</p>}
               {check.reference?.message && check.status !== "passed" && <p className="mt-1 font-mono text-xs text-muted-foreground">{check.reference.message}</p>}
-              {!check.current && <p className="mt-1 flex items-center gap-1 text-xs text-amber-600"><AlertTriangle className="h-3 w-3" /> For an older version: run it again.</p>}
+              {!check.current && <p className="mt-1 flex items-center gap-1 text-xs text-amber-700 dark:text-amber-400"><AlertTriangle className="h-3 w-3" /> For an older version: run it again.</p>}
             </div>
           )}
         </div>
@@ -185,7 +185,7 @@ export function DraftEditor({ id }: { id: string }) {
         <div>
           <div className="flex items-center justify-between text-xs">
             <span>Statement (Markdown): name every class, method and field the tests use</span>
-            <button type="button" className="text-sky-600 dark:text-sky-400" onClick={() => setPreview((p) => !p)}>{preview ? "Edit" : "Preview"}</button>
+            <button type="button" className="text-sky-700 dark:text-sky-400" onClick={() => setPreview((p) => !p)}>{preview ? "Edit" : "Preview"}</button>
           </div>
           {preview ? <div className="mt-1 rounded-md border p-3"><Markdown source={content.statement || "_Nothing yet._"} /></div> : <textarea className={cn(code, "min-h-32 font-sans text-sm")} value={content.statement} onChange={(e) => set({ statement: e.target.value })} />}
         </div>
@@ -219,7 +219,7 @@ export function DraftEditor({ id }: { id: string }) {
           </div>
         ))}
         {content.track !== "soql" && content.files.length < 4 && (
-          <button type="button" className="inline-flex items-center gap-1 text-sm text-sky-600 dark:text-sky-400" onClick={() => set({ files: [...content.files, { name: `SfcFile${content.files.length + 1}`, type: "class" }] })}>
+          <button type="button" className="inline-flex items-center gap-1 text-sm text-sky-700 dark:text-sky-400" onClick={() => set({ files: [...content.files, { name: `SfcFile${content.files.length + 1}`, type: "class" }] })}>
             <Plus className="h-4 w-4" /> Add a file
           </button>
         )}

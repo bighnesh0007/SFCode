@@ -38,7 +38,7 @@ export function WeeklyPlan({ view, hours, onOpen }: { view: RoadmapView; hours: 
   if (items.length === 0) return null;
   return (
     <section className="mt-6 rounded-xl border bg-gradient-to-br from-sky-500/5 to-transparent p-5">
-      <h2 className="flex items-center gap-2 text-sm font-semibold"><CalendarDays className="h-4 w-4 text-sky-500" /> Your plan this week</h2>
+      <h2 className="flex items-center gap-2 text-sm font-semibold"><CalendarDays className="h-4 w-4 text-sky-700 dark:text-sky-400" /> Your plan this week</h2>
       <p className="mt-0.5 text-xs text-muted-foreground">
         {items.length} item{items.length === 1 ? "" : "s"} for {hours} hours a week. It updates as you go: finished items drop off and the next ones move up.
       </p>

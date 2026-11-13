@@ -68,9 +68,9 @@ export function Celebration({ title, detail, onDone }: { title: string; detail: 
     <>
       <canvas ref={canvas} aria-hidden className="pointer-events-none fixed inset-0 z-[60] h-full w-full" />
       <div role="status" className="fixed left-1/2 top-16 z-[61] flex -translate-x-1/2 items-center gap-3 rounded-xl border border-emerald-500/40 bg-background/95 px-5 py-3 shadow-2xl backdrop-blur animate-in fade-in zoom-in-90 slide-in-from-top-4 duration-300">
-        <PartyPopper className="h-6 w-6 text-emerald-500" />
+        <PartyPopper className="h-6 w-6 text-emerald-700 dark:text-emerald-400" />
         <div>
-          <div className="font-semibold text-emerald-600 dark:text-emerald-400">{title}</div>
+          <div className="font-semibold text-emerald-700 dark:text-emerald-400">{title}</div>
           <div className="text-xs text-muted-foreground">{detail}</div>
         </div>
       </div>

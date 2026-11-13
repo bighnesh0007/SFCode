@@ -59,9 +59,9 @@ export default function TeamsPage() {
             {teams?.map((t) => (
               <li key={t.slug}>
                 <Link href={`/teams/${t.slug}`} className="flex items-center gap-3 px-4 py-3 hover:bg-accent/60">
-                  <Users className="h-4 w-4 text-sky-500" />
+                  <Users className="h-4 w-4 text-sky-700 dark:text-sky-400" />
                   <span className="min-w-0 flex-1 truncate font-medium">{t.name}</span>
-                  {t.owner && <Crown className="h-3.5 w-3.5 text-amber-500" aria-label="You own this team" />}
+                  {t.owner && <Crown className="h-3.5 w-3.5 text-amber-700 dark:text-amber-400" aria-label="You own this team" />}
                   <span className="text-xs text-muted-foreground">{t.members} member{t.members === 1 ? "" : "s"}</span>
                 </Link>
               </li>

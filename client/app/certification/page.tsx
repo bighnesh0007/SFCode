@@ -56,7 +56,7 @@ export default function CertificationPage() {
                     <div className="mt-3 rounded-lg border p-3">
                       <div className="flex items-baseline justify-between text-sm">
                         <span className="font-medium">Exam readiness</span>
-                        <span className={cn("text-lg font-semibold tabular-nums", e.readiness >= 70 ? "text-emerald-600 dark:text-emerald-400" : e.readiness >= 40 ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground")}>{e.readiness}%</span>
+                        <span className={cn("text-lg font-semibold tabular-nums", e.readiness >= 70 ? "text-emerald-700 dark:text-emerald-400" : e.readiness >= 40 ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground")}>{e.readiness}%</span>
                       </div>
                       <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted">
                         <div className={cn("h-full rounded-full transition-all duration-700", e.readiness >= 70 ? "bg-emerald-500" : e.readiness >= 40 ? "bg-amber-500" : "bg-sky-500")} style={{ width: `${e.readiness}%` }} />
@@ -66,7 +66,7 @@ export default function CertificationPage() {
                         {e.weakest && (
                           <>
                             {" "}Weakest:{" "}
-                            <Link href={`/certification/${e.exam}?section=${e.weakest}`} className="font-medium text-sky-600 hover:underline dark:text-sky-400">
+                            <Link href={`/certification/${e.exam}?section=${e.weakest}`} className="font-medium text-sky-700 hover:underline dark:text-sky-400">
                               {e.sections.find((s) => s.id === e.weakest)?.title ?? e.weakest} →
                             </Link>
                           </>
@@ -134,7 +134,7 @@ function ReviewCard() {
   if (!q || (q.due.length === 0 && q.upcoming === 0)) return null;
   return (
     <Link href="/certification/review" className="mb-6 flex items-center gap-4 rounded-xl border border-sky-500/40 bg-sky-500/5 p-4 transition-colors hover:bg-sky-500/10">
-      <BrainCircuit className="h-8 w-8 shrink-0 text-sky-500" />
+      <BrainCircuit className="h-8 w-8 shrink-0 text-sky-700 dark:text-sky-400" />
       <div className="min-w-0 flex-1">
         <p className="font-semibold">{q.due.length > 0 ? `${q.due.length} question${q.due.length === 1 ? "" : "s"} to review` : "All caught up"}</p>
         <p className="text-xs text-muted-foreground">Questions you missed come back on a schedule until they stick. {q.upcoming} waiting · {q.mastered} mastered</p>

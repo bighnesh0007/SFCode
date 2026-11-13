@@ -135,7 +135,7 @@ function Welcome() {
     return (
       <div className="relative mx-auto w-full max-w-2xl overflow-hidden px-4 py-12 text-center">
         <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-24 mx-auto h-64 w-64 rounded-full bg-sky-500/20 blur-3xl" />
-        <Sparkles className="mx-auto h-10 w-10 animate-bounce text-sky-500" />
+        <Sparkles className="mx-auto h-10 w-10 animate-bounce text-sky-700 dark:text-sky-400" />
         <h1 className="mt-4 text-3xl font-semibold tracking-tight">Your roadmap is ready</h1>
         <p className="mt-3 text-muted-foreground">
           You&apos;re a <b className="text-foreground">{ROLES.find((r) => r.value === a.role)?.title}</b> who&apos;s <b className="text-foreground">{LEVELS.find((l) => l.value === a.level)?.title.toLowerCase()}</b>. You&apos;ll start with {adminPath ? ADMIN_START[a.level] : START[a.level]}.

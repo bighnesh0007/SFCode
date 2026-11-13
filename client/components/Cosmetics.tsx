@@ -12,7 +12,7 @@ const FRAMES: Record<string, string> = {
   prism: "sfc-frame-prism",
 };
 const ACCENTS: Record<string, string> = {
-  emerald: "text-emerald-600 dark:text-emerald-400",
+  emerald: "text-emerald-700 dark:text-emerald-400",
   violet: "text-violet-600 dark:text-violet-400",
 };
 const BADGES: Record<string, { label: string; className: string }> = {
