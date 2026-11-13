@@ -14,7 +14,7 @@ mistakes before review.
 | `debug` | Debugging Arena | a fix to the **buggy starter** | your hidden Apex test class |
 | `soql` | SOQL Practice | one SOQL query (`query.soql`) | comparing its rows with your reference query's rows |
 | `flow` | Flows | nothing on SFCode: they **build the flow in their own org** | your hidden Apex test class, which fires the flow |
-| `lwc` | LWC | a component's `.html`, `.js`, `.css` | your browser tests, run in a sandboxed iframe |
+| `lwc` | LWC | a component's `.html`, `.js`, `.css` | **Run tests**: your visible tests in the browser. **Submit**: your hidden tests, in a server sandbox container |
 
 Flow and LWC problems have their own folder layouts; see the sections at the end.
 
@@ -114,7 +114,8 @@ server/problems/lwc-my-problem/
   statement.md
   starter/myThing.html  myThing.js  myThing.css   (all three, CSS may be empty)
   reference/myThing.html myThing.js myThing.css
-  tests/myThing.test.js
+  tests/myThing.test.js          visible: "Run tests" in the browser (learners can read these)
+  tests/myThing.hidden.test.js   graded: "Submit" runs these on the server; include the visible tests plus more
 ```
 
 The test file defines `const tests = [...]`. Each test is
@@ -130,8 +131,9 @@ The test file defines `const tests = [...]`. Each test is
 - Write failure messages for the learner: *"Expected one li.contact per contact"*
   beats a bare `expected 5, got 0`.
 - Salesforce's `lightning-*` base components aren't available; use plain HTML.
-- The tests are visible to a determined learner (they run in their browser). That's
-  fine for practice; don't rely on them being secret.
+- `myThing.test.js` is visible to learners (it runs in their browser). Scoring uses
+  `myThing.hidden.test.js`, which never leaves the server: keep every visible test in
+  it and add cases that only the statement's rules decide.
 - Prove it in a browser: open the problem, put the reference in the editor, and
   check **Run tests** passes; with the starter it must fail. (`verify:problems`
   only checks that both compile.)

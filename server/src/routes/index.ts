@@ -94,6 +94,7 @@ export function mountRoutes(app: Application, container: Container): void {
     ch.get("/:slug", validate({ params: slugParams }), c.get);
     ch.get("/:slug/submissions", signedIn, validate({ params: slugParams }), c.history);
     ch.post("/:slug/submissions", signedIn, limiter(6), validate({ params: slugParams, body: submitBody }), c.submit);
+    ch.post("/:slug/lwc-submissions", signedIn, limiter(10), validate({ params: slugParams, body: submitBody }), c.submitLwc);
   }
   v1.use("/challenges", ch);
 

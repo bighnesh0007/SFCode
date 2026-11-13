@@ -6,7 +6,7 @@
  * once per CHECK_INTERVAL_MS). No in-memory job state, so a server restart
  * mid-grade loses nothing.
  */
-import { AppError, ConflictError, NotConfiguredError, NotFoundError, ValidationError } from "../../errors/AppError.ts";
+import { AppError, BadRequestError, ConflictError, NotConfiguredError, NotFoundError, ValidationError } from "../../errors/AppError.ts";
 import { logEvent, contextLogger } from "../../lib/logger.ts";
 import type { ChallengeSubmissionRepository, SubmissionRecord } from "../../repositories/challengeSubmission.repository.ts";
 import type { ApexFileType, Challenge, GradeResult, SubmissionStatus, Track } from "../../domain/challenge.ts";
@@ -18,6 +18,8 @@ import type { SalesforceClient } from "../salesforce/salesforceClient.ts";
 import type { ChallengeCatalog } from "./catalog.ts";
 import { extensionFor } from "./catalog.ts";
 import { buildDeployPackage, interpretDeployResult, isDeployDone } from "./grader.ts";
+import { LwcCompileError, type LwcSource } from "../lwc/compiler.ts";
+import type { SandboxResult } from "../lwc/lwcSandbox.ts";
 
 export const CHECK_INTERVAL_MS = 2_000;
 /** A deploy still running after this is abandoned (Salesforce queues can stall). */
@@ -169,13 +171,14 @@ export class ChallengeService {
         ? (["html", "js", "css"] as const).map((ext) => ({ name: ext, type: "lwc" as const, fileName: `${c.lwc?.component ?? ""}.${ext}`, starter: c.starter[ext] ?? "" }))
         : c.files.map((f) => ({ name: f.name, type: f.type, fileName: `${f.name}.${extensionFor(f.type)}`, starter: c.starter[f.name] ?? "" })),
       ...(c.flow ? { flow: c.flow } : {}),
-      ...(c.lwc ? { lwc: c.lwc } : {}),
+      // Explicit fields: the lwc block also holds hidden tests.
+      ...(c.lwc ? { lwc: { component: c.lwc.component, tests: c.lwc.tests } } : {}),
     };
   }
 
   async submit(userId: string, slug: string, files: Record<string, string>): Promise<SubmissionView> {
     const challenge = this.require(slug);
-    if (challenge.lwc) throw new ValidationError("LWC problems are checked in your browser, not submitted to your org.");
+    if (challenge.lwc) throw new ValidationError("LWC problems are graded in our sandbox: use the LWC submit.");
     const { connections, sf, apiVersion } = this.requireGrading();
     this.checkFiles(challenge, files);
 
@@ -200,6 +203,67 @@ export class ChallengeService {
       contextLogger().warn({ err, submissionId: record.id }, "deploy could not be started");
       return toView({ ...record, status: "error", result: errorResult(message), completedAt: this.clock.now() });
     }
+  }
+
+  private lwcGrader: { run(code: string, tests: string): Promise<SandboxResult>; compile(src: LwcSource): Promise<string> } | undefined;
+  /** Wired when the sandbox image is configured (LWC_RUNNER_IMAGE). */
+  setLwcGrader(grader: { run(code: string, tests: string): Promise<SandboxResult>; compile(src: LwcSource): Promise<string> }): void {
+    this.lwcGrader = grader;
+  }
+
+  /**
+   * LWC submit: compile on the server, run the HIDDEN tests in the sandbox
+   * container, record the verdict like any other submission (so it scores,
+   * counts for contests and the daily challenge). Synchronous: ~1.5 s.
+   */
+  async submitLwc(userId: string, slug: string, files: Record<string, string>): Promise<SubmissionView> {
+    const challenge = this.require(slug);
+    if (!challenge.lwc) throw new ValidationError("Only LWC problems are graded this way.");
+    if (!this.lwcGrader) throw new BadRequestError("LWC grading is unavailable right now.");
+    if (!this.store) throw new BadRequestError("Submissions need a database.");
+    const { component, hiddenTests } = challenge.lwc;
+    const contestId = (await this.contests?.liveContestFor(userId, slug, this.clock.now())) ?? null;
+    const record = await this.store.createRunning({ userId, problemSlug: slug, orgId: "sandbox", files, contestId });
+    if (!record) throw new ConflictError("You already have a submission being graded. Wait for it to finish.");
+
+    let status: Exclude<SubmissionStatus, "running">;
+    let result: GradeResult;
+    try {
+      let code: string;
+      try {
+        code = await this.lwcGrader.compile({ component, html: files.html ?? "", js: files.js ?? "", css: files.css ?? "" });
+      } catch (err) {
+        if (!(err instanceof LwcCompileError)) throw err;
+        status = "compile_error";
+        result = { ...errorResult("Your component did not compile."), verdict: "compile_error", compileErrors: [{ file: null, line: null, column: null, message: err.message }] };
+        await this.store.complete(record.id, status, result, this.clock.now());
+        return toView({ ...record, status, result, completedAt: this.clock.now() });
+      }
+      const run = await this.lwcGrader.run(code, hiddenTests);
+      if (run.error !== undefined || !run.tests) {
+        status = "wrong_answer";
+        result = { ...errorResult(run.error ?? "Your component failed."), verdict: "wrong_answer" };
+      } else {
+        const passed = run.tests.filter((t) => t.passed).length;
+        status = passed === run.tests.length && passed > 0 ? "accepted" : "wrong_answer";
+        result = {
+          verdict: status,
+          testsRun: run.tests.length,
+          testsPassed: passed,
+          tests: run.tests.map((t) => ({ method: t.name, passed: t.passed, message: t.message, stackTrace: null, timeMs: null })),
+          compileErrors: [],
+          coverage: [],
+          message: null,
+        };
+      }
+    } catch (err) {
+      contextLogger().warn({ err, submissionId: record.id }, "lwc grading failed");
+      status = "error";
+      result = errorResult("LWC grading failed. Try again.");
+    }
+    await this.store.complete(record.id, status, result, this.clock.now());
+    logEvent("challenge.submitted", { slug, submissionId: record.id });
+    return toView({ ...record, status, result, completedAt: this.clock.now() });
   }
 
   /** The submission, advanced by one status check if it is still running. */

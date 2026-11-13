@@ -1,16 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
-import { CheckCircle2, ChevronLeft, Eye, FlaskConical, Info, Loader2, RotateCcw, XCircle } from "lucide-react";
+import { CheckCircle2, ChevronLeft, Eye, FlaskConical, Info, Loader2, RotateCcw, Send, XCircle } from "lucide-react";
+import { useAuthState } from "@/components/auth";
+import { Celebration } from "@/components/Celebration";
+import { Results } from "./Results";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Markdown } from "@/components/Markdown";
 import { ApiError } from "@/lib/apiClient";
-import type { ChallengeView } from "@/lib/challengesApi";
+import { submitLwc, type ChallengeView, type Submission } from "@/lib/challengesApi";
 import { compileLwcComponent } from "@/lib/lwcApi";
 import { cn } from "@/lib/utils";
 import { sandboxDocument, type SandboxMessage } from "./lwcSandbox";
@@ -46,6 +49,29 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
   const [active, setActive] = useState("html");
   const [run, setRun] = useState<Run>({ kind: "idle" });
   const [doc, setDoc] = useState<string | null>(null);
+  const { isSignedIn, getToken } = useAuthState();
+  const [submission, setSubmission] = useState<Submission | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [celebrate, setCelebrate] = useState(false);
+  const endCelebration = useCallback(() => setCelebrate(false), []);
+
+  async function submit() {
+    setSubmitting(true);
+    setSubmitError(null);
+    setSubmission(null);
+    setDoc(null);
+    setRun({ kind: "idle" });
+    try {
+      const s = await submitLwc(await getToken(), challenge.slug, sources);
+      setSubmission(s);
+      if (s.status === "accepted") setCelebrate(true);
+    } catch (err) {
+      setSubmitError(err instanceof ApiError ? err.message : "Could not submit.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
   const frame = useRef<HTMLIFrameElement>(null);
   const nonce = useRef("");
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -102,6 +128,8 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
   const showFrame = run.kind === "preview" || (run.kind === "running" && run.mode === "preview");
 
   return (
+    <>
+    {celebrate && <Celebration title="Accepted!" detail="Every hidden test passed. Nice work." onDone={endCelebration} />}
     <div className="flex h-[calc(100vh-3rem)] flex-col">
       <ResizablePanelGroup orientation="horizontal" className="flex-1">
         <ResizablePanel defaultSize="38%" minSize="25%">
@@ -152,9 +180,13 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
                     <Button size="sm" variant="outline" disabled={busy} onClick={() => void start("preview")}>
                       <Eye className="mr-1 h-3.5 w-3.5" /> Preview
                     </Button>
-                    <Button size="sm" disabled={busy} onClick={() => void start("tests")}>
+                    <Button size="sm" variant="outline" disabled={busy || submitting} onClick={() => { setSubmission(null); void start("tests"); }}>
                       {busy ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" /> : <FlaskConical className="mr-1 h-3.5 w-3.5" />}
                       Run tests
+                    </Button>
+                    <Button size="sm" disabled={busy || submitting || !isSignedIn} title={isSignedIn ? "Graded on the server with hidden tests" : "Sign in to submit"} onClick={() => void submit()}>
+                      {submitting ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" /> : <Send className="mr-1 h-3.5 w-3.5" />}
+                      Submit
                     </Button>
                   </div>
                 </div>
@@ -185,7 +217,14 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
                 )}
                 {!showFrame && (
                   <div className="absolute inset-0 overflow-auto p-3 text-sm">
-                    <LwcOutput run={run} />
+                    {submitError && <p className="mb-2 text-destructive">{submitError}</p>}
+                    {submitting ? (
+                      <p className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Grading with hidden tests…</p>
+                    ) : submission ? (
+                      <Results submission={submission} onOpenFile={() => undefined} />
+                    ) : (
+                      <LwcOutput run={run} />
+                    )}
                   </div>
                 )}
               </div>
@@ -194,6 +233,7 @@ export function LwcWorkspace({ challenge, backHref }: { challenge: ChallengeView
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
+    </>
   );
 }
 

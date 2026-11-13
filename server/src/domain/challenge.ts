@@ -6,11 +6,11 @@ export type ApexFileType = "class" | "trigger" | "soql";
 export const TRACKS = ["apex", "soql", "debug", "flow", "lwc"] as const;
 export type Track = (typeof TRACKS)[number];
 /**
- * Tracks whose solves the server verified itself (an org deploy ran the tests).
- * Only these earn points: LWC tests run in the learner's browser and their
- * result can't be trusted by the server.
+ * Tracks whose solves the server verified itself: an org deploy ran the
+ * tests, or (LWC) the hidden tests ran in the server's sandbox container.
+ * Browser "Run tests" results never count.
  */
-export const SCORED_TRACKS: readonly Track[] = ["apex", "soql", "debug", "flow"];
+export const SCORED_TRACKS: readonly Track[] = ["apex", "soql", "debug", "flow", "lwc"];
 
 export interface ChallengeFile {
   name: string;
@@ -43,7 +43,7 @@ export interface Challenge {
    * LWC problems only. Compiled on the server, run and tested in the learner's
    * browser (sandboxed iframe), so `tests` is sent to the client by design.
    */
-  lwc?: { component: string; tests: string };
+  lwc?: { component: string; tests: string; /** Hidden: graded on the server, never sent to a client. */ hiddenTests: string };
   /** Community problems: the Buddy who wrote it (built-in problems have none). */
   authorId?: string;
 }

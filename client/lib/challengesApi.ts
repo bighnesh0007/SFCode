@@ -83,6 +83,10 @@ export const listChallenges = (token: Token, track: Track) =>
 
 export const getChallenge = (slug: string) => apiRequest<ChallengeView>(`/api/v1/challenges/${encodeURIComponent(slug)}`);
 
+/** LWC: graded on the server (hidden tests in a sandbox); returns the finished submission. */
+export const submitLwc = (token: Token, slug: string, files: Record<string, string>) =>
+  apiRequest<Submission>(`/api/v1/challenges/${encodeURIComponent(slug)}/lwc-submissions`, { method: "POST", token, body: { files } });
+
 export const submitSolution = (token: Token, slug: string, files: Record<string, string>) =>
   apiRequest<Submission>(`/api/v1/challenges/${encodeURIComponent(slug)}/submissions`, { method: "POST", token, body: { files } });
 
