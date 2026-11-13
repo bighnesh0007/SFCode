@@ -1,0 +1,19 @@
+<template>
+    <template lwc:if={hasItems}>
+        <ul>
+            <template for:each={rows} for:item="item">
+                <li key={item.id} class="item">
+                    <span class="name">{item.name}</span>
+                    <button class="dec" data-id={item.id} onclick={decrement}>-</button>
+                    <span class="qty">{item.quantity}</span>
+                    <button class="inc" data-id={item.id} onclick={increment}>+</button>
+                    <span class="subtotal">{item.subtotal}</span>
+                </li>
+            </template>
+        </ul>
+        <p class="total">Total: {total}</p>
+    </template>
+    <template lwc:else>
+        <p class="empty">Your cart is empty</p>
+    </template>
+</template>

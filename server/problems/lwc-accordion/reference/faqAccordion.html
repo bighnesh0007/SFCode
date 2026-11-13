@@ -1,0 +1,10 @@
+<template>
+    <template for:each={rows} for:item="section">
+        <div key={section.id} class="section">
+            <button class="header" data-id={section.id} aria-expanded={section.ariaExpanded} onclick={toggle}>{section.title}</button>
+            <template lwc:if={section.expanded}>
+                <div class="body">{section.body}</div>
+            </template>
+        </div>
+    </template>
+</template>

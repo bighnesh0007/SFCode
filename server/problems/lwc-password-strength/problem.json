@@ -1,0 +1,17 @@
+{
+  "title": "Password Strength Meter",
+  "track": "lwc",
+  "difficulty": "Easy",
+  "category": "Getters",
+  "order": 412,
+  "tags": [
+    "getters",
+    "input events",
+    "dynamic classes",
+    "regex"
+  ],
+  "files": [],
+  "lwc": {
+    "component": "passwordStrength"
+  }
+}

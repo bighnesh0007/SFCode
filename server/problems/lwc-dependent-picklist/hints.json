@@ -1,0 +1,5 @@
+[
+  "Keep two fields, country and city. A getter returns the cities of the chosen country, or an empty list.",
+  "Bind disabled={noCountry} on the city select with a getter, and value={city} so resetting the field resets the select.",
+  "Handle change on each select. On country change set city = ''; on city change set it and dispatch new CustomEvent('select', { detail: { country, city } })."
+]

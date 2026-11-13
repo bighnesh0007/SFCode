@@ -1,0 +1,5 @@
+[
+  "Store the typed value in a field on input. Everything else is a getter computed from it.",
+  "Build the rules as an array of { label, met } with tests like /[a-z]/.test(v) && /[A-Z]/.test(v), /\\d/ and /[^A-Za-z0-9]/.",
+  "The score is rules.filter((r) => r.met).length. Return the label and the class name from getters, since templates can't compare numbers."
+]

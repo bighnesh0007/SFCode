@@ -1,0 +1,5 @@
+[
+  "Keep the open ids in a field, for example an array openIds. A getter maps sections to { ...section, expanded, ariaExpanded } for the template.",
+  "Templates can't compare, so compute ariaExpanded as the string 'true' or 'false' in the getter, and use lwc:if={section.expanded} for the body.",
+  "In the click handler read data-id from event.currentTarget.dataset. If it's open, remove it; otherwise add it, or replace the whole list when allowMultiple is false."
+]
