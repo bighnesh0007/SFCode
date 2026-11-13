@@ -141,7 +141,13 @@ const standalone = join(ROOT, "client", ".next", "standalone", "client", "server
 const CONTENT = ["problems", "certification", "roadmaps"].map((d) => join(ROOT, "server", d));
 function buildClientIfStale() {
   const inputs = Math.max(newestMtime(join(ROOT, "client")), mtime(join(ROOT, "client", ".env.local")), ...CONTENT.map((d) => newestMtime(d)));
-  if (REBUILD || mtime(standalone) < inputs) build("client", "sfcode-client");
+  if (REBUILD || mtime(standalone) < inputs) {
+    // Next keeps fetched API responses in .next/cache between builds and reuses
+    // them until they expire, so without this a build would render the previous
+    // release's catalogue even with the new API running.
+    rmSync(join(ROOT, "client", ".next", "cache", "fetch-cache"), { recursive: true, force: true });
+    build("client", "sfcode-client");
+  }
   // Standalone output omits static assets. Copied unconditionally because a build
   // interrupted before this step left DWCode serving pages with no CSS/JS.
   cpSync(join(ROOT, "client", ".next", "static"), join(ROOT, "client", ".next", "standalone", "client", ".next", "static"), { recursive: true });
