@@ -46,9 +46,9 @@ const valid = () => ({
 describe("question bank", () => {
   it("ships Administrator, PD I and PD II, valid, each with a mock shape", () => {
     expect(bank.all().map((e) => [e.exam, e.questions.length, e.mock?.questions])).toEqual([
-      ["admin", 41, 60],
-      ["pd1", 28, 60],
-      ["pd2", 19, 60],
+      ["admin", 60, 60],
+      ["pd1", 60, 60],
+      ["pd2", 60, 60],
     ]);
   });
 
@@ -96,7 +96,7 @@ describe("CertificationService", () => {
     expect(testing.every((q) => q.section === "testing")).toBe(true);
     expect(service.practice("pd1", undefined, 5)).toHaveLength(5);
     const all = service.practice("pd1", undefined, 30).map((q) => q.id);
-    expect(new Set(all).size).toBe(bank.exam("pd1")?.questions.length);
+    expect(new Set(all).size).toBe(Math.min(30, bank.exam("pd1")?.questions.length ?? 0)); // a session is capped at 30
   });
 
   it("grades multi-answer questions regardless of order, and only all-or-nothing", async () => {
@@ -214,9 +214,10 @@ describe("mock exams", () => {
     const s = new CertificationService(bank, undefined, () => 0.42);
     const m = s.mock("admin");
     const exam = bank.exam("admin");
-    expect(m.questions).toHaveLength(41); // the bank is smaller than the real 60
-    expect(new Set(m.questions.map((q) => q.id)).size).toBe(41);
-    expect(m).toMatchObject({ passPercent: 65, realQuestions: 60, realMinutes: 105, minutes: Math.round((105 * 41) / 60) });
+    const n = bank.exam("admin")?.questions.length ?? 0;
+    expect(m.questions).toHaveLength(Math.min(n, 60));
+    expect(new Set(m.questions.map((q) => q.id)).size).toBe(Math.min(n, 60));
+    expect(m).toMatchObject({ passPercent: 65, realQuestions: 60, realMinutes: 105, minutes: Math.round((105 * Math.min(n, 60)) / 60) });
     expect(JSON.stringify(m)).not.toMatch(/explanation|"answer"/);
     expect(exam).toBeDefined();
   });
@@ -243,7 +244,7 @@ describe("mock exams", () => {
     const app = buildApp({ certification: new CertificationService(bank, undefined) });
     const m = await request(app).get("/api/v1/certification/pd2/mock");
     expect(m.status).toBe(200);
-    expect(m.body.data.questions).toHaveLength(19);
+    expect(m.body.data.questions).toHaveLength(60);
     expect(JSON.stringify(m.body)).not.toContain("explanation");
     const g = await request(app).post("/api/v1/certification/pd2/mock/grade").send({ answers: { "pd2-batch-default-scope": ["b"] } });
     expect(g.body.data).toMatchObject({ score: 100, passed: true });

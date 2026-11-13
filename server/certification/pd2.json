@@ -551,6 +551,1115 @@
         "b"
       ],
       "explanation": "Lightning Web Security, and Lightning Locker before it, isolates components by namespace so they can't reach into each other's DOM or globals."
+    },
+    {
+      "id": "pd2-dynamic-apex-type",
+      "section": "advanced",
+      "prompt": "How do you create an instance of a class whose name is stored in custom metadata?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Type.forName(name).newInstance()"
+        },
+        {
+          "id": "b",
+          "text": "new Object(name)"
+        },
+        {
+          "id": "c",
+          "text": "Class.create(name)"
+        },
+        {
+          "id": "d",
+          "text": "Schema.newClass(name)"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Type.forName returns the class's type and newInstance creates an instance; cast it to an interface the class implements."
+    },
+    {
+      "id": "pd2-platform-cache",
+      "section": "advanced",
+      "prompt": "An expensive calculation is reused by many users for an hour. Where can Apex keep the result?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A static variable"
+        },
+        {
+          "id": "b",
+          "text": "Platform Cache (org cache)"
+        },
+        {
+          "id": "c",
+          "text": "A custom label"
+        },
+        {
+          "id": "d",
+          "text": "The view state"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Platform Cache's org partition shares values across transactions and users until they expire; static variables last only one transaction."
+    },
+    {
+      "id": "pd2-savepoint",
+      "section": "advanced",
+      "prompt": "A method inserts an Order and its lines; if the lines fail, the Order must not remain. With partial DML elsewhere in the transaction, what helps?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Database.setSavepoint() and Database.rollback(sp)"
+        },
+        {
+          "id": "b",
+          "text": "A @future method"
+        },
+        {
+          "id": "c",
+          "text": "Without sharing"
+        },
+        {
+          "id": "d",
+          "text": "A try/catch that ignores the error"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Savepoints let you undo DML back to a known point inside the transaction."
+    },
+    {
+      "id": "pd2-interfaces",
+      "section": "advanced",
+      "prompt": "Several payment providers need the same operations, chosen by configuration at runtime. What design fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "One class with a big if/else"
+        },
+        {
+          "id": "b",
+          "text": "An interface implemented by each provider, created with Type.forName"
+        },
+        {
+          "id": "c",
+          "text": "A trigger per provider"
+        },
+        {
+          "id": "d",
+          "text": "A custom setting per method"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "An interface plus dynamic instantiation is the strategy pattern: add a provider without changing callers."
+    },
+    {
+      "id": "pd2-sharing-recalc",
+      "section": "advanced",
+      "prompt": "Apex managed sharing gives users access to a custom object's records. What must the share rows use so they aren't removed on recalculation?",
+      "options": [
+        {
+          "id": "a",
+          "text": "RowCause set to a custom Apex sharing reason"
+        },
+        {
+          "id": "b",
+          "text": "RowCause Manual"
+        },
+        {
+          "id": "c",
+          "text": "AccessLevel All"
+        },
+        {
+          "id": "d",
+          "text": "OwnerId of the user"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Shares with a custom Apex sharing reason survive owner changes; Manual shares are removed when the owner changes."
+    },
+    {
+      "id": "pd2-queueable-finalizer",
+      "section": "advanced",
+      "prompt": "What does a Transaction Finalizer attached to a Queueable job do?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Runs after the job finishes, even if it failed, so you can log or retry"
+        },
+        {
+          "id": "b",
+          "text": "Speeds up the job"
+        },
+        {
+          "id": "c",
+          "text": "Prevents the job from failing"
+        },
+        {
+          "id": "d",
+          "text": "Schedules the job"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Finalizers run after the Queueable completes or fails, and can re-enqueue or record the outcome."
+    },
+    {
+      "id": "pd2-escaping-dynamic",
+      "section": "advanced",
+      "prompt": "A dynamic SOQL query must include a user-supplied search term. What's the safest approach?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Concatenate the term"
+        },
+        {
+          "id": "b",
+          "text": "Use a bind variable (:term) in Database.query or queryWithBinds"
+        },
+        {
+          "id": "c",
+          "text": "Upper-case the term"
+        },
+        {
+          "id": "d",
+          "text": "Remove spaces"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Binds keep input as data; concatenation allows SOQL injection."
+    },
+    {
+      "id": "pd2-named-credential",
+      "section": "integration",
+      "prompt": "Where should the endpoint URL and authentication for an external API live?",
+      "options": [
+        {
+          "id": "a",
+          "text": "In Apex constants"
+        },
+        {
+          "id": "b",
+          "text": "In a Named Credential (with an External Credential)"
+        },
+        {
+          "id": "c",
+          "text": "In a custom label"
+        },
+        {
+          "id": "d",
+          "text": "In a static resource"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Named Credentials keep endpoints and secrets out of code and handle authentication."
+    },
+    {
+      "id": "pd2-callout-after-dml",
+      "section": "integration",
+      "prompt": "A transaction performs DML and then a callout. What happens?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It works"
+        },
+        {
+          "id": "b",
+          "text": "It fails with 'You have uncommitted work pending'"
+        },
+        {
+          "id": "c",
+          "text": "The DML is rolled back automatically"
+        },
+        {
+          "id": "d",
+          "text": "The callout is queued"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Callouts can't follow uncommitted DML in the same transaction; do the callout first or move it to async Apex."
+    },
+    {
+      "id": "pd2-callout-limit",
+      "section": "integration",
+      "prompt": "How many callouts can one transaction make?",
+      "options": [
+        {
+          "id": "a",
+          "text": "10"
+        },
+        {
+          "id": "b",
+          "text": "50"
+        },
+        {
+          "id": "c",
+          "text": "100"
+        },
+        {
+          "id": "d",
+          "text": "Unlimited"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "The limit is 100 callouts per transaction, with a cumulative timeout of 120 seconds."
+    },
+    {
+      "id": "pd2-rest-resource",
+      "section": "integration",
+      "prompt": "Which annotation exposes an Apex method for HTTP POST in a custom REST service?",
+      "options": [
+        {
+          "id": "a",
+          "text": "@HttpPost"
+        },
+        {
+          "id": "b",
+          "text": "@RestResource"
+        },
+        {
+          "id": "c",
+          "text": "@AuraEnabled"
+        },
+        {
+          "id": "d",
+          "text": "@InvocableMethod"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The class has @RestResource(urlMapping=...); each method uses @HttpGet, @HttpPost and so on."
+    },
+    {
+      "id": "pd2-json-typed",
+      "section": "integration",
+      "prompt": "What's the safest way to parse a known JSON response?",
+      "options": [
+        {
+          "id": "a",
+          "text": "String.split"
+        },
+        {
+          "id": "b",
+          "text": "JSON.deserialize(body, MyResponse.class) into a typed class"
+        },
+        {
+          "id": "c",
+          "text": "Regular expressions"
+        },
+        {
+          "id": "d",
+          "text": "Database.query"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Typed deserialisation gives compile-time field names and types."
+    },
+    {
+      "id": "pd2-external-services",
+      "section": "integration",
+      "prompt": "Admins want to call a REST API from Flow without Apex. What enables that?",
+      "options": [
+        {
+          "id": "a",
+          "text": "External Services, registered from an OpenAPI specification"
+        },
+        {
+          "id": "b",
+          "text": "Platform events"
+        },
+        {
+          "id": "c",
+          "text": "Apex REST"
+        },
+        {
+          "id": "d",
+          "text": "Outbound messages only"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "External Services generate invocable actions from an API's OpenAPI spec."
+    },
+    {
+      "id": "pd2-cdc",
+      "section": "integration",
+      "prompt": "An external system must receive every change to Opportunities in near real time without polling. What fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Change Data Capture"
+        },
+        {
+          "id": "b",
+          "text": "A scheduled report"
+        },
+        {
+          "id": "c",
+          "text": "Bulk API every minute"
+        },
+        {
+          "id": "d",
+          "text": "A workflow outbound message per field"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Change Data Capture publishes create, update, delete and undelete events that subscribers receive."
+    },
+    {
+      "id": "pd2-bulk-api",
+      "section": "integration",
+      "prompt": "An integration loads 3 million records nightly. Which API?",
+      "options": [
+        {
+          "id": "a",
+          "text": "REST API, one call per record"
+        },
+        {
+          "id": "b",
+          "text": "Bulk API 2.0"
+        },
+        {
+          "id": "c",
+          "text": "SOAP API, one call per record"
+        },
+        {
+          "id": "d",
+          "text": "Streaming API"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Bulk API processes large data sets asynchronously in batches."
+    },
+    {
+      "id": "pd2-async-callout-trigger",
+      "section": "integration",
+      "prompt": "Which can make a callout when a record is inserted?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The trigger, directly"
+        },
+        {
+          "id": "b",
+          "text": "A Queueable implementing Database.AllowsCallouts, enqueued from the trigger"
+        },
+        {
+          "id": "c",
+          "text": "A validation rule"
+        },
+        {
+          "id": "d",
+          "text": "A formula field"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Triggers can't call out synchronously; async Apex can."
+    },
+    {
+      "id": "pd2-idempotent-upsert",
+      "section": "integration",
+      "prompt": "An external system retries failed requests, and retries sometimes create duplicate Orders. What design prevents duplicates?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Longer timeouts"
+        },
+        {
+          "id": "b",
+          "text": "Send the system's own order number and upsert on an External ID field"
+        },
+        {
+          "id": "c",
+          "text": "Insert, then delete duplicates nightly"
+        },
+        {
+          "id": "d",
+          "text": "Use a validation rule on Name"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Upserting on an External ID makes the operation idempotent: a retry updates the existing record instead of creating another."
+    },
+    {
+      "id": "pd2-oauth-jwt",
+      "section": "integration",
+      "prompt": "A server-to-server integration must log in to Salesforce with no user present, using a certificate. Which OAuth flow?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Web server flow"
+        },
+        {
+          "id": "b",
+          "text": "JWT bearer flow"
+        },
+        {
+          "id": "c",
+          "text": "Username-password flow"
+        },
+        {
+          "id": "d",
+          "text": "Device flow"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The JWT bearer flow signs a token with a certificate; no interactive login is needed."
+    },
+    {
+      "id": "pd2-lwc-lms-scope",
+      "section": "ui",
+      "prompt": "Which can subscribe to a Lightning Message Service channel on the same page? Choose 2.",
+      "options": [
+        {
+          "id": "a",
+          "text": "Lightning web components"
+        },
+        {
+          "id": "b",
+          "text": "Aura components"
+        },
+        {
+          "id": "c",
+          "text": "Apex triggers"
+        },
+        {
+          "id": "d",
+          "text": "Validation rules"
+        }
+      ],
+      "answer": [
+        "a",
+        "b"
+      ],
+      "explanation": "LMS works across LWC, Aura and Visualforce on a Lightning page; server-side code isn't a subscriber."
+    },
+    {
+      "id": "pd2-lwc-error-boundary",
+      "section": "ui",
+      "prompt": "Which hook lets a parent component catch errors thrown by its children?",
+      "options": [
+        {
+          "id": "a",
+          "text": "connectedCallback"
+        },
+        {
+          "id": "b",
+          "text": "errorCallback"
+        },
+        {
+          "id": "c",
+          "text": "renderedCallback"
+        },
+        {
+          "id": "d",
+          "text": "disconnectedCallback"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "errorCallback(error, stack) acts like an error boundary for the component's children."
+    },
+    {
+      "id": "pd2-lwc-performance",
+      "section": "ui",
+      "prompt": "A component re-renders slowly because a getter loops over thousands of rows. What helps most?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Compute the result once when the data changes and store it in a field"
+        },
+        {
+          "id": "b",
+          "text": "Move the loop to CSS"
+        },
+        {
+          "id": "c",
+          "text": "Use @track"
+        },
+        {
+          "id": "d",
+          "text": "Add more getters"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Getters run on every render; caching derived data avoids repeated work."
+    },
+    {
+      "id": "pd2-vf-viewstate",
+      "section": "ui",
+      "prompt": "A Visualforce page fails with a view state size error. What reduces view state?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Mark large controller variables transient"
+        },
+        {
+          "id": "b",
+          "text": "Add more components"
+        },
+        {
+          "id": "c",
+          "text": "Use with sharing"
+        },
+        {
+          "id": "d",
+          "text": "Increase heap"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "transient variables aren't stored in view state."
+    },
+    {
+      "id": "pd2-lwc-security-html",
+      "section": "ui",
+      "prompt": "How should a component display HTML-formatted text from a record safely?",
+      "options": [
+        {
+          "id": "a",
+          "text": "innerHTML"
+        },
+        {
+          "id": "b",
+          "text": "lightning-formatted-rich-text"
+        },
+        {
+          "id": "c",
+          "text": "eval"
+        },
+        {
+          "id": "d",
+          "text": "document.write"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "lightning-formatted-rich-text sanitises the HTML before rendering it."
+    },
+    {
+      "id": "pd2-lwc-jest-wire",
+      "section": "ui",
+      "prompt": "In Jest tests, how do you give a wired Apex method data?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Call the real org"
+        },
+        {
+          "id": "b",
+          "text": "Use the test wire adapter's emit() with mock data"
+        },
+        {
+          "id": "c",
+          "text": "Skip wired components"
+        },
+        {
+          "id": "d",
+          "text": "Use SeeAllData"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Wire adapters are mocked in Jest; emit() pushes data into the component."
+    },
+    {
+      "id": "pd2-test-mixed-dml",
+      "section": "testing",
+      "prompt": "A test inserts a User and an Account and fails with MIXED_DML_OPERATION. What fixes it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Insert the User inside System.runAs"
+        },
+        {
+          "id": "b",
+          "text": "Use SeeAllData"
+        },
+        {
+          "id": "c",
+          "text": "Insert them in one statement"
+        },
+        {
+          "id": "d",
+          "text": "Use @future in the test"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Setup objects (User) and non-setup objects can't mix in one transaction; runAs separates them in tests."
+    },
+    {
+      "id": "pd2-test-setcreateddate",
+      "section": "testing",
+      "prompt": "How can a test set an old CreatedDate on a test record?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Test.setCreatedDate(recordId, datetime)"
+        },
+        {
+          "id": "b",
+          "text": "Update CreatedDate directly"
+        },
+        {
+          "id": "c",
+          "text": "It's impossible"
+        },
+        {
+          "id": "d",
+          "text": "Use a sandbox"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Test.setCreatedDate lets tests set the CreatedDate of records they inserted."
+    },
+    {
+      "id": "pd2-test-stub-api",
+      "section": "testing",
+      "prompt": "Which feature replaces a class's behaviour with a mock in unit tests without changing production code?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The Apex Stub API (System.StubProvider)"
+        },
+        {
+          "id": "b",
+          "text": "@TestVisible"
+        },
+        {
+          "id": "c",
+          "text": "Test.loadData"
+        },
+        {
+          "id": "d",
+          "text": "SeeAllData"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The Stub API creates mock implementations via Test.createStub."
+    },
+    {
+      "id": "pd2-test-loaddata",
+      "section": "testing",
+      "prompt": "Which loads test records from a CSV static resource?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Test.loadData(Account.sObjectType, 'resourceName')"
+        },
+        {
+          "id": "b",
+          "text": "Database.load('file')"
+        },
+        {
+          "id": "c",
+          "text": "Test.readCsv()"
+        },
+        {
+          "id": "d",
+          "text": "StaticResource.insert()"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Test.loadData inserts records from a static resource CSV and returns them."
+    },
+    {
+      "id": "pd2-test-batch",
+      "section": "testing",
+      "prompt": "How do you make a batch job run inside a test?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Call Database.executeBatch between Test.startTest and Test.stopTest"
+        },
+        {
+          "id": "b",
+          "text": "Wait in a loop"
+        },
+        {
+          "id": "c",
+          "text": "Use System.schedule only"
+        },
+        {
+          "id": "d",
+          "text": "It can't run in tests"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Async jobs started inside start/stopTest run synchronously at stopTest; only one execute call is tested per test."
+    },
+    {
+      "id": "pd2-test-platform-event",
+      "section": "testing",
+      "prompt": "In a test, when are published platform events delivered to subscribers?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Immediately on publish"
+        },
+        {
+          "id": "b",
+          "text": "At Test.stopTest() (or Test.getEventBus().deliver())"
+        },
+        {
+          "id": "c",
+          "text": "Never"
+        },
+        {
+          "id": "d",
+          "text": "After the test ends"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Test event delivery happens at stopTest or when you call Test.getEventBus().deliver()."
+    },
+    {
+      "id": "pd2-test-queries",
+      "section": "testing",
+      "prompt": "A test must check that a method uses at most one query. What can it read?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Limits.getQueries() after calling the method"
+        },
+        {
+          "id": "b",
+          "text": "Test.getQueryCount()"
+        },
+        {
+          "id": "c",
+          "text": "The debug log"
+        },
+        {
+          "id": "d",
+          "text": "It can't be checked"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The Limits class reports usage so far in the transaction."
+    },
+    {
+      "id": "pd2-debug-replay",
+      "section": "testing",
+      "prompt": "Which tool lets you step through a recorded debug log with breakpoints in VS Code?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Apex Replay Debugger"
+        },
+        {
+          "id": "b",
+          "text": "Developer Console Query Editor"
+        },
+        {
+          "id": "c",
+          "text": "Setup Audit Trail"
+        },
+        {
+          "id": "d",
+          "text": "Health Check"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Apex Replay Debugger replays a debug log in VS Code with breakpoints and variable inspection."
+    },
+    {
+      "id": "pd2-test-callout-multi",
+      "section": "testing",
+      "prompt": "A method makes two callouts to different endpoints. How does a test return different responses?",
+      "options": [
+        {
+          "id": "a",
+          "text": "One HttpCalloutMock that checks req.getEndpoint() and responds accordingly"
+        },
+        {
+          "id": "b",
+          "text": "Two Test.setMock calls"
+        },
+        {
+          "id": "c",
+          "text": "It can't"
+        },
+        {
+          "id": "d",
+          "text": "Use SeeAllData"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "A single mock can branch on the request's endpoint or method; MultiStaticResourceCalloutMock is another option."
+    },
+    {
+      "id": "pd2-selective-query",
+      "section": "performance",
+      "prompt": "Which filter is most likely selective on an object with millions of records?",
+      "options": [
+        {
+          "id": "a",
+          "text": "WHERE Name LIKE '%corp'"
+        },
+        {
+          "id": "b",
+          "text": "WHERE External_Id__c = :key"
+        },
+        {
+          "id": "c",
+          "text": "WHERE Status__c != 'Closed'"
+        },
+        {
+          "id": "d",
+          "text": "WHERE Description != null"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "External ID fields are indexed; equality filters on indexed fields are selective. Leading wildcards and negative filters aren't."
+    },
+    {
+      "id": "pd2-skinny-tables",
+      "section": "performance",
+      "prompt": "Large reports on an object are slow even with selective filters. Which can Salesforce Support enable to help?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Skinny tables"
+        },
+        {
+          "id": "b",
+          "text": "More sandboxes"
+        },
+        {
+          "id": "c",
+          "text": "Field history"
+        },
+        {
+          "id": "d",
+          "text": "Platform events"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Skinny tables hold frequently used fields together to avoid joins, and are enabled by Salesforce Support."
+    },
+    {
+      "id": "pd2-ownership-skew",
+      "section": "performance",
+      "prompt": "One integration user owns 2 million Accounts and sharing changes are slow. What is this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Ownership data skew"
+        },
+        {
+          "id": "b",
+          "text": "A governor limit"
+        },
+        {
+          "id": "c",
+          "text": "A selective query"
+        },
+        {
+          "id": "d",
+          "text": "Field history"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Ownership skew (very many records owned by one user) makes sharing recalculation slow; spread ownership or use a user outside the role hierarchy."
+    },
+    {
+      "id": "pd2-heap-loop",
+      "section": "performance",
+      "prompt": "Code hits the heap limit processing a large query. What helps most?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A SOQL for loop or Batch Apex to process in chunks"
+        },
+        {
+          "id": "b",
+          "text": "More System.debug"
+        },
+        {
+          "id": "c",
+          "text": "A larger LIMIT"
+        },
+        {
+          "id": "d",
+          "text": "Using a Set instead of a List"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Processing in chunks keeps only part of the data in memory at a time."
+    },
+    {
+      "id": "pd2-cpu-limit",
+      "section": "performance",
+      "prompt": "Which change reduces CPU time in a trigger processing 200 records?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Replacing nested loops with a Map lookup"
+        },
+        {
+          "id": "b",
+          "text": "Adding System.debug"
+        },
+        {
+          "id": "c",
+          "text": "Querying inside the loop"
+        },
+        {
+          "id": "d",
+          "text": "Converting to a validation rule"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Nested loops are O(n²); a map turns lookups into constant time."
+    },
+    {
+      "id": "pd2-lazy-loading",
+      "section": "performance",
+      "prompt": "A Lightning page loads many related lists users rarely open. What improves load time?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Load the data only when the user opens the section (lazy loading)"
+        },
+        {
+          "id": "b",
+          "text": "Load everything up front"
+        },
+        {
+          "id": "c",
+          "text": "Use more Apex"
+        },
+        {
+          "id": "d",
+          "text": "Turn off caching"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Deferring rarely used data keeps the first render fast."
+    },
+    {
+      "id": "pd2-query-plan",
+      "section": "performance",
+      "prompt": "Which tool shows whether a SOQL query would use an index and its relative cost?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Query Plan tool in the Developer Console"
+        },
+        {
+          "id": "b",
+          "text": "Setup Audit Trail"
+        },
+        {
+          "id": "c",
+          "text": "Health Check"
+        },
+        {
+          "id": "d",
+          "text": "Schema Builder"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The Query Plan tool shows the plans the optimiser considers, with cost and whether an index is used."
+    },
+    {
+      "id": "pd2-async-limits",
+      "section": "performance",
+      "prompt": "Which is higher for asynchronous Apex than synchronous? Choose 2.",
+      "options": [
+        {
+          "id": "a",
+          "text": "SOQL queries (200 vs 100)"
+        },
+        {
+          "id": "b",
+          "text": "Heap size (12 MB vs 6 MB)"
+        },
+        {
+          "id": "c",
+          "text": "DML statements"
+        },
+        {
+          "id": "d",
+          "text": "Callouts per transaction"
+        }
+      ],
+      "answer": [
+        "a",
+        "b"
+      ],
+      "explanation": "Async gets 200 queries and 12 MB heap (and 60 s CPU); DML statements (150) and callouts (100) are the same."
     }
   ]
 }
