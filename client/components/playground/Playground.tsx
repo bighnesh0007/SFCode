@@ -14,6 +14,7 @@ import { useEditorTheme } from "@/components/useEditorTheme";
 import { ApiError } from "@/lib/apiClient";
 import { executeAnonymous, runSoql, type ApexExecutionResult, type SoqlQueryResult } from "@/lib/salesforceApi";
 import { cn } from "@/lib/utils";
+import { useIsNarrow } from "@/lib/useIsNarrow";
 import { extractLimits, extractUserDebug } from "@/app/playground/apex/debugLog";
 import { APEX_SAMPLES, SOQL_SAMPLES } from "@/app/playground/apex/samples";
 
@@ -72,17 +73,6 @@ function readDraft(mode: Mode): string {
   }
 }
 
-function useIsNarrow(): boolean {
-  const [narrow, setNarrow] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    const update = () => setNarrow(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-  return narrow;
-}
 
 export function Playground({ mode }: { mode: Mode }) {
   const editorTheme = useEditorTheme();

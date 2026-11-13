@@ -48,3 +48,18 @@ function ResizableHandle({
 }
 
 export { ResizableHandle, ResizablePanel, ResizablePanelGroup }
+
+/**
+ * Remembers a group's panel sizes in localStorage under `id`. Spread the result
+ * onto ResizablePanelGroup; every Panel inside needs a stable `id`.
+ */
+function useSavedLayout(id: string) {
+  const { defaultLayout, onLayoutChanged } = ResizablePrimitive.useDefaultLayout({
+    id: `sfcode.layout.${id}`,
+    storage: typeof window === "undefined" ? undefined : window.localStorage,
+    onlySaveAfterUserInteractions: true,
+  })
+  return { defaultLayout, onLayoutChanged }
+}
+
+export { useSavedLayout }

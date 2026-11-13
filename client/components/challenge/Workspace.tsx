@@ -12,7 +12,9 @@ type Monaco = typeof import("monaco-editor");
 import { ChevronLeft, Cloud, Info, Loader2, RotateCcw, Send } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup, useSavedLayout } from "@/components/ui/resizable";
+import { useSubmitShortcut } from "@/components/challenge/useSubmitShortcut";
+import { useIsNarrow } from "@/lib/useIsNarrow";
 import { Markdown } from "@/components/Markdown";
 import { LearningPanel } from "@/components/challenge/LearningPanel";
 import { useOrgConnection } from "@/components/useOrgConnection";
@@ -178,6 +180,11 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
 
   const activeFile = challenge.files.find((f) => f.name === active) ?? challenge.files[0];
   const canSubmit = org.kind === "connected" && !submitting && submission?.status !== "running";
+  const narrow = useIsNarrow();
+  // Stacked on phones; its sizes are saved separately from the desktop split.
+  const hLayout = useSavedLayout(narrow ? "challenge-stack" : "challenge-h");
+  const vLayout = useSavedLayout("challenge-v");
+  const shortcut = useSubmitShortcut(() => void submit(), canSubmit);
 
   return (
     <div className="flex h-[calc(100vh-3rem)] flex-col">
@@ -188,9 +195,9 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
           onDone={endCelebration}
         />
       )}
-      <ResizablePanelGroup orientation="horizontal" className="flex-1">
+      <ResizablePanelGroup key={narrow ? "stack" : "split"} orientation={narrow ? "vertical" : "horizontal"} className="flex-1" {...hLayout}>
         {/* ── statement / submissions ─────────────────────────────────── */}
-        <ResizablePanel defaultSize="40%" minSize="25%">
+        <ResizablePanel id="statement" defaultSize="40%" minSize="25%">
           <div className="flex h-full flex-col">
             <div className="flex h-10 items-center gap-1 border-b px-2">
               <Link href={backHref} className="mr-1 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label="Back to the list">
@@ -252,9 +259,9 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
         <ResizableHandle withHandle />
 
         {/* ── editor + results ─────────────────────────────────────────── */}
-        <ResizablePanel defaultSize="60%" minSize="30%">
-          <ResizablePanelGroup orientation="vertical">
-            <ResizablePanel defaultSize="62%" minSize="20%">
+        <ResizablePanel id="work" defaultSize="60%" minSize="30%">
+          <ResizablePanelGroup orientation="vertical" {...vLayout}>
+            <ResizablePanel id="code" defaultSize="62%" minSize="20%">
               <div className="flex h-full flex-col">
                 {/* One row: file tabs scroll sideways rather than wrapping the toolbar. */}
                 <div className="flex h-10 items-center gap-2 border-b px-2">
@@ -272,7 +279,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
                         <RotateCcw className="h-3.5 w-3.5" />
                       </Button>
                     )}
-                    <Button size="sm" disabled={!canSubmit} onClick={() => void submit()}>
+                    <Button size="sm" disabled={!canSubmit} title="Submit (Ctrl/⌘ + Enter)" onClick={() => void submit()}>
                       {submitting || submission?.status === "running" ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" /> : <Send className="mr-1 h-3.5 w-3.5" />}
                       {challenge.flow ? "Check my flow" : "Submit"}
                     </Button>
@@ -288,8 +295,9 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
                     beforeMount={defineSfcThemes}
                     value={sources[activeFile.name] ?? ""}
                     onChange={(v) => setSources((s) => ({ ...s, [activeFile.name]: v ?? "" }))}
-                    onMount={(_editor, monaco) => {
+                    onMount={(editor, monaco) => {
                       monacoRef.current = monaco;
+                      shortcut.bindEditor(editor, monaco);
                     }}
                     options={{ minimap: { enabled: false }, fontSize: 14, scrollBeyondLastLine: false, automaticLayout: true, tabSize: 4 }}
                   />
@@ -297,7 +305,7 @@ export function Workspace({ challenge, backHref }: { challenge: ChallengeView; b
               </div>
             </ResizablePanel>
             <ResizableHandle withHandle />
-            <ResizablePanel defaultSize="38%" minSize="15%">
+            <ResizablePanel id="results" defaultSize="38%" minSize="15%">
               <div className="h-full overflow-auto p-3">
                 {error && <p className="mb-2 text-sm text-destructive">{error}</p>}
                 <Results submission={submission} isFlow={Boolean(challenge.flow)} onOpenFile={(fileName) => {
