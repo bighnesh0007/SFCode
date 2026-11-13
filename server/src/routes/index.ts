@@ -222,6 +222,27 @@ export function mountRoutes(app: Application, container: Container): void {
     }) as RequestHandler);
   }
 
+  // Interview mode: a random timed set, scored from real submissions in the window.
+  if (container.interview && verifier) {
+    const iv = container.interview;
+    const auth = requireAuth(verifier);
+    const track = z.enum(["apex", "soql", "debug", "lwc"]);
+    const startBody = z.strictObject({ count: z.number().int().min(2).max(4), tracks: z.array(track).min(1).max(4) });
+    const scoreBody = z.strictObject({
+      slugs: z.array(z.string().regex(/^[a-z0-9-]{1,100}$/)).min(1).max(4),
+      startedAt: z.iso.datetime({ offset: true }),
+      endsAt: z.iso.datetime({ offset: true }),
+    });
+    v1.post("/interview/start", limiter(20), auth, validate({ body: startBody }), (async (req, res) => {
+      const b = validatedBody<z.infer<typeof startBody>>(req);
+      ok(res, await iv.start(req.auth?.userId ?? "", b.count, b.tracks));
+    }) as RequestHandler);
+    v1.post("/interview/score", limiter(30), auth, validate({ body: scoreBody }), (async (req, res) => {
+      const b = validatedBody<z.infer<typeof scoreBody>>(req);
+      ok(res, await iv.score(req.auth?.userId ?? "", b.slugs, new Date(b.startedAt), new Date(b.endsAt)));
+    }) as RequestHandler);
+  }
+
   // Onboarding placement check: static questions, graded here so answers never reach the browser.
   const trackParams = z.strictObject({ track: z.enum(["developer", "admin"]) });
   const placementBody = z.strictObject({ answers: z.record(z.string().regex(/^[a-z]\d{1,2}$/), z.number().int().min(0).max(9)).refine((a) => Object.keys(a).length <= 20) });
