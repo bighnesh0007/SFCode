@@ -1,0 +1,5 @@
+[
+  "Salesforce won't let a transaction make a callout after it has done DML that isn't committed yet.",
+  "Reorder: make the callout first (it reads only the opportunity Id), then do all the DML.",
+  "Check the status before any DML: if it isn't 200, throw. Since nothing was saved yet, there's nothing to undo."
+]

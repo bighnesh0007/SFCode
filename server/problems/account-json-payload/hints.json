@@ -1,0 +1,5 @@
+[
+  "Declare an inner class with the JSON field names as properties: public class Item { public String name; public String industry; public Integer employees; }.",
+  "toJson: build a List<Item> from the accounts and return JSON.serialize(items).",
+  "fromJson: (List<Item>) JSON.deserialize(body, List<Item>.class), then map each Item back to an Account. Check String.isBlank first."
+]

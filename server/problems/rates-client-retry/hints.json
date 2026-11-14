@@ -1,0 +1,5 @@
+[
+  "Put the callout in a small private method that returns the HttpResponse, so you can call it once or twice.",
+  "After the first response: if it's 429 or 503, call again and use the second response; otherwise keep the first.",
+  "Then: 200 → parse with JSON.deserializeUntyped and return (Decimal) map.get('rate'); anything else → throw new RatesException('Rates API returned ' + status)."
+]

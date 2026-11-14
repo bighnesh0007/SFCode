@@ -1,0 +1,24 @@
+{
+  "title": "Send Won Deals to the ERP",
+  "difficulty": "Hard",
+  "category": "Integration",
+  "order": 16,
+  "tags": [
+    "Queueable",
+    "Database.AllowsCallouts",
+    "triggers",
+    "bulkification",
+    "JSON"
+  ],
+  "files": [
+    {
+      "name": "SfcErpSyncJob",
+      "type": "class"
+    },
+    {
+      "name": "SfcOpportunityErpSync",
+      "type": "trigger"
+    }
+  ],
+  "testClass": "SfcErpSyncTest"
+}
