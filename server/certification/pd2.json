@@ -1660,6 +1660,546 @@
         "c"
       ],
       "explanation": "Async gets 200 queries and 12 MB heap (and 60 s CPU); DML statements (150) and callouts (100) are the same."
+    },
+    {
+      "id": "pd2-with-security-enforced",
+      "section": "advanced",
+      "prompt": "A query must throw if the running user can't read any of the selected fields. Which clause does this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "WITH SECURITY_ENFORCED (or WITH USER_MODE)"
+        },
+        {
+          "id": "b",
+          "text": "WITH SHARING added to the end of the query string"
+        },
+        {
+          "id": "c",
+          "text": "FOR VIEW at the end of the query"
+        },
+        {
+          "id": "d",
+          "text": "ALL ROWS after the WHERE clause"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "WITH SECURITY_ENFORCED throws when a selected field or object isn't readable; WITH USER_MODE also applies sharing and reports all inaccessible fields."
+    },
+    {
+      "id": "pd2-strip-inaccessible",
+      "section": "advanced",
+      "prompt": "Records are returned to a component, but fields the user can't read should be removed instead of throwing. What should the code use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A try/catch around the query that returns an empty list instead"
+        },
+        {
+          "id": "b",
+          "text": "Security.stripInaccessible(AccessType.READABLE, records)"
+        },
+        {
+          "id": "c",
+          "text": "Schema.describeSObjects to rebuild the records by hand"
+        },
+        {
+          "id": "d",
+          "text": "The without sharing keyword on the class"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "stripInaccessible returns copies of the records without the fields the user can't access, and reports what it removed."
+    },
+    {
+      "id": "pd2-inherited-sharing",
+      "section": "advanced",
+      "prompt": "A service class should follow its caller's sharing mode, but default to with sharing when it's the entry point. Which declaration fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "without sharing"
+        },
+        {
+          "id": "b",
+          "text": "inherited sharing"
+        },
+        {
+          "id": "c",
+          "text": "global with sharing"
+        },
+        {
+          "id": "d",
+          "text": "No sharing keyword at all"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "inherited sharing takes the caller's mode, and runs as with sharing when the class is the entry point (for example an @AuraEnabled method)."
+    },
+    {
+      "id": "pd2-custom-permission",
+      "section": "advanced",
+      "prompt": "Apex must check whether the user may approve large discounts, a capability granted through a permission set. What should it check?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Whether the user's role name contains 'Manager'"
+        },
+        {
+          "id": "b",
+          "text": "FeatureManagement.checkPermission('Approve_Large_Discounts') on a custom permission"
+        },
+        {
+          "id": "c",
+          "text": "The user's profile name, compared against a hard-coded list of approved profiles in the class"
+        },
+        {
+          "id": "d",
+          "text": "UserInfo.isCurrentUserLicensed for each permission set"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Custom permissions are granted through permission sets and checked with FeatureManagement.checkPermission, so the logic doesn't depend on profile or role names."
+    },
+    {
+      "id": "pd2-composite-api",
+      "section": "integration",
+      "prompt": "An external system must create an Account and its Contacts in one round trip, referencing the new Account's Id. Which REST API fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "An outbound message"
+        },
+        {
+          "id": "b",
+          "text": "The Bulk API with a single CSV file"
+        },
+        {
+          "id": "c",
+          "text": "The Composite API, using reference Ids between subrequests"
+        },
+        {
+          "id": "d",
+          "text": "Separate REST calls in parallel, one per record, matched up by name afterwards"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Composite requests chain subrequests and can reference earlier results (such as the new Account Id) in one call."
+    },
+    {
+      "id": "pd2-pub-sub-api",
+      "section": "integration",
+      "prompt": "An external system must subscribe to platform events and Change Data Capture in near real time over gRPC. What should it use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Outbound messages"
+        },
+        {
+          "id": "b",
+          "text": "The Bulk API"
+        },
+        {
+          "id": "c",
+          "text": "The Pub/Sub API"
+        },
+        {
+          "id": "d",
+          "text": "The SOAP API's query call"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "The Pub/Sub API publishes and subscribes to events over gRPC. Polling with queries adds load and delay."
+    },
+    {
+      "id": "pd2-outbound-message",
+      "section": "integration",
+      "prompt": "Which statement about outbound messages is true?",
+      "options": [
+        {
+          "id": "a",
+          "text": "They can only be sent from Apex code"
+        },
+        {
+          "id": "b",
+          "text": "They are sent synchronously during the save, and the save waits until the endpoint replies"
+        },
+        {
+          "id": "c",
+          "text": "They deliver messages to Chatter feeds"
+        },
+        {
+          "id": "d",
+          "text": "They send SOAP messages from flows or workflow and retry until the endpoint acknowledges"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Outbound messages are sent asynchronously and retried for up to 24 hours until acknowledged."
+    },
+    {
+      "id": "pd2-remote-site",
+      "section": "integration",
+      "prompt": "A callout without a Named Credential fails with 'Unauthorized endpoint'. What's missing?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A CORS allowlist entry"
+        },
+        {
+          "id": "b",
+          "text": "A Remote Site Setting for the endpoint's domain"
+        },
+        {
+          "id": "c",
+          "text": "A custom permission for the user"
+        },
+        {
+          "id": "d",
+          "text": "A Connected App created for the external system's domain"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Callouts need the endpoint allowed by a Remote Site Setting, unless they go through a Named Credential, which is the better option."
+    },
+    {
+      "id": "pd2-http-status-handling",
+      "section": "integration",
+      "prompt": "A callout returns status 503. What should the integration do?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Treat it as temporary: retry later with backoff, and log it"
+        },
+        {
+          "id": "b",
+          "text": "Treat it as success, since the server sent a response back"
+        },
+        {
+          "id": "c",
+          "text": "Retry immediately in a tight loop until it succeeds"
+        },
+        {
+          "id": "d",
+          "text": "Delete the record that triggered the callout"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "5xx responses usually mean the server is temporarily unavailable. Retry later with backoff, idempotently; never hammer the endpoint."
+    },
+    {
+      "id": "pd2-query-limit-indexes",
+      "section": "performance",
+      "prompt": "Which filter is most likely to be non-selective on an object with millions of rows?",
+      "options": [
+        {
+          "id": "a",
+          "text": "WHERE Id = :recordId"
+        },
+        {
+          "id": "b",
+          "text": "WHERE Status__c != 'Closed'"
+        },
+        {
+          "id": "c",
+          "text": "WHERE CreatedDate = TODAY"
+        },
+        {
+          "id": "d",
+          "text": "WHERE External_Id__c = :key"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Negative operators (!=, NOT IN) usually can't use an index, so the query scans the table. Equality on Id, an external Id or an indexed date is selective."
+    },
+    {
+      "id": "pd2-aggregate-soql",
+      "section": "performance",
+      "prompt": "You need the number of open cases per account for 50,000 accounts. What's most efficient?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A roll-up summary on Account recalculated nightly"
+        },
+        {
+          "id": "b",
+          "text": "One COUNT() query per account in a loop"
+        },
+        {
+          "id": "c",
+          "text": "Query every open case into a list, then count them per account in a loop with a Map<Id, Integer>, then update the accounts"
+        },
+        {
+          "id": "d",
+          "text": "One aggregate query: SELECT AccountId, COUNT(Id) FROM Case WHERE IsClosed = false GROUP BY AccountId"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Aggregate queries count in the database. Pulling every case into memory risks heap limits; a query per account hits the SOQL limit."
+    },
+    {
+      "id": "pd2-async-for-limits",
+      "section": "performance",
+      "prompt": "A synchronous process exceeds the CPU time limit only for very large accounts. Which change helps most?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Split the class into two smaller classes and call them one after another in the same transaction"
+        },
+        {
+          "id": "b",
+          "text": "Add more System.debug statements"
+        },
+        {
+          "id": "c",
+          "text": "Run it in a before trigger"
+        },
+        {
+          "id": "d",
+          "text": "Move the heavy part to asynchronous Apex, which has higher limits"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Asynchronous Apex gets higher CPU and heap limits. Splitting code across classes in the same transaction doesn't change the limits."
+    },
+    {
+      "id": "pd2-lwc-wire-vs-imperative-perf",
+      "section": "performance",
+      "prompt": "A component fetches the same read-only list every time it's shown. How can repeat loads be faster?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Fetch the data in a loop until it changes"
+        },
+        {
+          "id": "b",
+          "text": "Call the Apex method again in renderedCallback each time the component renders"
+        },
+        {
+          "id": "c",
+          "text": "Increase the component's API version"
+        },
+        {
+          "id": "d",
+          "text": "Use a cacheable Apex method so results are cached on the client"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "cacheable=true lets the client cache the response. Calling Apex from renderedCallback runs it on every render."
+    },
+    {
+      "id": "pd2-test-dml-limits",
+      "section": "testing",
+      "prompt": "A test asserts a trigger handles 200 records with at most two DML statements. What does it check after the operation?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The number of rows returned by a query"
+        },
+        {
+          "id": "b",
+          "text": "The debug log's line count, read after the test with getLog()"
+        },
+        {
+          "id": "c",
+          "text": "Test.getDmlCount()"
+        },
+        {
+          "id": "d",
+          "text": "Limits.getDmlStatements(), between startTest and stopTest"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Limits methods report usage in the current context; startTest gives the code under test a fresh set of limits to measure."
+    },
+    {
+      "id": "pd2-test-future",
+      "section": "testing",
+      "prompt": "How do you make a @future method's work happen before your assertions?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Call it between Test.startTest() and Test.stopTest()"
+        },
+        {
+          "id": "b",
+          "text": "Annotate the test with @future too"
+        },
+        {
+          "id": "c",
+          "text": "Add a Thread.sleep after calling it"
+        },
+        {
+          "id": "d",
+          "text": "Call it twice so the second call waits for the first"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Test.stopTest() runs queued asynchronous work synchronously, so assertions after it see the result."
+    },
+    {
+      "id": "pd2-test-negative-sharing",
+      "section": "testing",
+      "prompt": "A test must prove a user without access can't see a record through your 'with sharing' class. What setup is needed?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Delete the record before calling the method"
+        },
+        {
+          "id": "b",
+          "text": "Use SeeAllData=true and run the method as an existing user who lacks access to the record"
+        },
+        {
+          "id": "c",
+          "text": "Set the class to without sharing in the test"
+        },
+        {
+          "id": "d",
+          "text": "Create a user with a restricted profile and run the call inside System.runAs"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "System.runAs enforces the user's record sharing, so the test can check the class respects it."
+    },
+    {
+      "id": "pd2-test-schedulable",
+      "section": "testing",
+      "prompt": "How do you test that a Schedulable class's execute logic runs?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Call System.abortJob before scheduling it"
+        },
+        {
+          "id": "b",
+          "text": "Schedule it with System.schedule between Test.startTest and Test.stopTest"
+        },
+        {
+          "id": "c",
+          "text": "Wait in a loop inside the test until the scheduled time arrives and the job has finished"
+        },
+        {
+          "id": "d",
+          "text": "Schedulable classes can't be tested"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The scheduled job runs when Test.stopTest() is called, so its effects can be asserted."
+    },
+    {
+      "id": "pd2-lwc-error-handling",
+      "section": "ui",
+      "prompt": "An imperative Apex call from LWC can fail. Where should the component handle the error?",
+      "options": [
+        {
+          "id": "a",
+          "text": "In a try/catch around the awaited call, showing a toast with the message"
+        },
+        {
+          "id": "b",
+          "text": "In connectedCallback, by reloading the page whenever a call fails"
+        },
+        {
+          "id": "c",
+          "text": "In the Apex class, by returning null on every error"
+        },
+        {
+          "id": "d",
+          "text": "Nowhere; Salesforce shows errors automatically"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Imperative calls return promises; catch the rejection and tell the user. Returning null hides failures."
+    },
+    {
+      "id": "pd2-lwc-dynamic-import",
+      "section": "ui",
+      "prompt": "A heavy chart library is only needed when a user opens a tab. How can the component avoid loading it upfront?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Import it at the top of the component's JS file so it is bundled once"
+        },
+        {
+          "id": "b",
+          "text": "Inline the library into the template"
+        },
+        {
+          "id": "c",
+          "text": "Put it in the component's CSS"
+        },
+        {
+          "id": "d",
+          "text": "Load the static resource with loadScript only when the tab opens"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "loadScript from lightning/platformResourceLoader loads a static resource on demand, so it's fetched only when needed."
+    },
+    {
+      "id": "pd2-aura-vs-lwc",
+      "section": "ui",
+      "prompt": "A new feature needs a reusable UI component. Which should be built today, and why?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A Visualforce page, because it supports more data"
+        },
+        {
+          "id": "b",
+          "text": "An Aura component, because Lightning Web Components can't be placed on record pages"
+        },
+        {
+          "id": "c",
+          "text": "A Lightning Web Component: it uses web standards and performs better"
+        },
+        {
+          "id": "d",
+          "text": "An Aura component, because LWC can't call Apex"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "LWC is the recommended model for new components; it can be used on record pages and call Apex. Aura remains for older code."
     }
   ]
 }

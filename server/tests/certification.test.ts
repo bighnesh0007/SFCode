@@ -51,7 +51,7 @@ describe("question bank", () => {
     expect(bank.all().map((e) => [e.exam, e.questions.length, e.mock?.questions])).toEqual([
       ["admin", 80, 60],
       ["pd1", 80, 60],
-      ["pd2", 60, 60],
+      ["pd2", 80, 60],
       ["app-builder", 80, 60],
       ["js-dev-1", 80, 60],
       ["sales-consultant", 60, 60],
