@@ -214,11 +214,11 @@ export function MockExamSession({ exam }: { exam: string }) {
             </div>
             <Markdown source={q.prompt} className="markdown text-base" />
             <p className="text-xs text-muted-foreground">{q.choose === 1 ? "Choose one." : `Choose ${q.choose}.`}</p>
-            <ul className="space-y-2" role={q.choose === 1 ? "radiogroup" : "group"}>
+            <div className="space-y-2" role={q.choose === 1 ? "radiogroup" : "group"} aria-label="Answer options">
               {q.options.map((o) => {
                 const picked = selected.includes(o.id);
                 return (
-                  <li key={o.id}>
+                  <div key={o.id}>
                     <button
                       type="button"
                       role={q.choose === 1 ? "radio" : "checkbox"}
@@ -229,10 +229,10 @@ export function MockExamSession({ exam }: { exam: string }) {
                       <span className="mt-0.5 font-mono text-xs uppercase text-muted-foreground">{o.id}</span>
                       <Markdown source={o.text} className="markdown flex-1 [&_p]:m-0" />
                     </button>
-                  </li>
+                  </div>
                 );
               })}
-            </ul>
+            </div>
             <div className="flex justify-between">
               <Button variant="outline" disabled={index === 0} onClick={() => setIndex((i) => i - 1)}>
                 <ChevronLeft className="mr-1 h-4 w-4" /> Previous
