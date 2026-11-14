@@ -1657,6 +1657,546 @@
         "c"
       ],
       "explanation": "Predictive features learn from the org's own history. Missing close reasons, stale stages and duplicates all degrade predictions."
+    },
+    {
+      "id": "sc-forecast-adjustments",
+      "section": "lifecycle",
+      "prompt": "A sales manager believes a rep's Commit forecast is too optimistic. How can the manager reflect this without editing the rep's opportunities?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Make a forecast adjustment on the rep's forecast"
+        },
+        {
+          "id": "b",
+          "text": "Lower the probability on each opportunity"
+        },
+        {
+          "id": "c",
+          "text": "Move the rep's opportunities back a stage so they fall out of the Commit category"
+        },
+        {
+          "id": "d",
+          "text": "Delete the rep's largest opportunity"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Managers can adjust subordinates' forecast amounts in Collaborative Forecasts; the underlying opportunities stay unchanged."
+    },
+    {
+      "id": "sc-lead-status-convert",
+      "section": "lifecycle",
+      "prompt": "Marketing wants to know how many leads were disqualified versus converted. What should be configured?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Deleting disqualified leads so only converted ones remain"
+        },
+        {
+          "id": "b",
+          "text": "Lead status values including disqualified statuses, reported alongside converted leads"
+        },
+        {
+          "id": "c",
+          "text": "A separate lead record type for disqualified leads, with its own page layout and process"
+        },
+        {
+          "id": "d",
+          "text": "A validation rule on the Converted field"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Lead Status captures the outcome (for example 'Unqualified'); reports can compare those with converted leads. Deleting loses the history."
+    },
+    {
+      "id": "sc-opportunity-teams-roles",
+      "section": "lifecycle",
+      "prompt": "A sales engineer and a partner manager help on large deals and need access to those opportunities. What fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A criteria-based sharing rule for each large opportunity, naming the extra users"
+        },
+        {
+          "id": "b",
+          "text": "Changing the opportunity owner temporarily"
+        },
+        {
+          "id": "c",
+          "text": "Opportunity Teams with team member roles and access levels"
+        },
+        {
+          "id": "d",
+          "text": "Making all opportunities Public Read/Write"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Opportunity Teams give named people access to a specific opportunity with a defined role, and default teams can be added automatically."
+    },
+    {
+      "id": "sc-sales-console",
+      "section": "lifecycle",
+      "prompt": "Inside sales reps switch between leads, accounts and opportunities all day and want related records side by side. What should they use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A standard navigation app, opening each related record in its own browser tab"
+        },
+        {
+          "id": "b",
+          "text": "The Sales Console app with workspace tabs and subtabs"
+        },
+        {
+          "id": "c",
+          "text": "A dashboard of their open leads"
+        },
+        {
+          "id": "d",
+          "text": "The Salesforce mobile app"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Console apps open related records as tabs and subtabs in one workspace, which suits high-volume desk-based work."
+    },
+    {
+      "id": "sc-stakeholder-map",
+      "section": "consulting",
+      "prompt": "Early in a project, how should the consultant identify who must approve design decisions?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Ask the end users to vote on every decision"
+        },
+        {
+          "id": "b",
+          "text": "Build a stakeholder map with roles, influence and decision rights"
+        },
+        {
+          "id": "c",
+          "text": "Let the executive sponsor make every design decision alone to keep things moving quickly"
+        },
+        {
+          "id": "d",
+          "text": "Wait until UAT to see who objects"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Knowing who decides, who's consulted and who's informed avoids late surprises and rework."
+    },
+    {
+      "id": "sc-current-future-state",
+      "section": "consulting",
+      "prompt": "What is the purpose of documenting both the current state and the future state of a sales process?",
+      "options": [
+        {
+          "id": "a",
+          "text": "To copy the old system's screens and fields into Salesforce so nothing changes for users"
+        },
+        {
+          "id": "b",
+          "text": "To show the gaps the solution must close and what changes for users"
+        },
+        {
+          "id": "c",
+          "text": "To decide the colour scheme of the app"
+        },
+        {
+          "id": "d",
+          "text": "To estimate the license count"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Comparing current and future states reveals the gaps to address and the changes that need training and communication."
+    },
+    {
+      "id": "sc-hypercare",
+      "section": "consulting",
+      "prompt": "What should happen in the first weeks after go-live?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The project team moves on immediately and users raise tickets with the general IT helpdesk"
+        },
+        {
+          "id": "b",
+          "text": "A hypercare period with fast support, adoption tracking and quick fixes"
+        },
+        {
+          "id": "c",
+          "text": "A full redesign based on first impressions"
+        },
+        {
+          "id": "d",
+          "text": "A freeze on all changes for a year"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Hypercare gives users rapid help and lets the team fix early issues while watching adoption metrics."
+    },
+    {
+      "id": "sc-scope-creep",
+      "section": "consulting",
+      "prompt": "Each workshop adds new 'small' requests. What protects the timeline?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Building the requests on weekends"
+        },
+        {
+          "id": "b",
+          "text": "A backlog with prioritisation and change control against the agreed scope"
+        },
+        {
+          "id": "c",
+          "text": "Stopping all workshops"
+        },
+        {
+          "id": "d",
+          "text": "Saying yes to every request so stakeholders stay happy, and extending the timeline later if needed"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Capturing requests in a prioritised backlog and evaluating changes against scope keeps delivery predictable."
+    },
+    {
+      "id": "sc-guided-selling",
+      "section": "practical",
+      "prompt": "Reps should be walked through required qualification questions before an opportunity can move to Proposal. What combination fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A Chatter group for qualification tips"
+        },
+        {
+          "id": "b",
+          "text": "A report of opportunities missing answers"
+        },
+        {
+          "id": "c",
+          "text": "A separate page layout for each stage, swapped automatically by a record-triggered flow"
+        },
+        {
+          "id": "d",
+          "text": "Path guidance plus a validation rule on the key fields for that stage"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Path guides reps at each stage, and validation rules enforce the required fields before the stage can change."
+    },
+    {
+      "id": "sc-product-rules",
+      "section": "practical",
+      "prompt": "An opportunity must not be closed won without at least one product. How can this be enforced declaratively?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A dashboard of opportunities without products"
+        },
+        {
+          "id": "b",
+          "text": "A roll-up summary (or the standard product count) checked in a validation rule"
+        },
+        {
+          "id": "c",
+          "text": "Training reps to remember"
+        },
+        {
+          "id": "d",
+          "text": "A page layout that hides the Closed Won stage value from reps who haven't added products yet"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A validation rule can block Closed Won when the opportunity has no line items, using a roll-up or a related count field."
+    },
+    {
+      "id": "sc-discount-approval",
+      "section": "practical",
+      "prompt": "Discounts above 20% on an opportunity need a manager's approval before quoting. What should be used?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A validation rule that blocks any discount above 20% for every user, including managers"
+        },
+        {
+          "id": "b",
+          "text": "A sharing rule giving managers edit access"
+        },
+        {
+          "id": "c",
+          "text": "A report of high discounts reviewed monthly"
+        },
+        {
+          "id": "d",
+          "text": "An approval process with entry criteria on the discount"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Approval processes route the record for approval and lock it while pending."
+    },
+    {
+      "id": "sc-territory-assignment",
+      "section": "practical",
+      "prompt": "New accounts should be assigned to territories automatically based on billing state. What is configured?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Manual assignment by sales ops"
+        },
+        {
+          "id": "b",
+          "text": "Lead assignment rules, which also place new accounts in territories by state"
+        },
+        {
+          "id": "c",
+          "text": "A sharing rule per state"
+        },
+        {
+          "id": "d",
+          "text": "Territory assignment rules in Enterprise Territory Management"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Account assignment rules evaluate account fields and place accounts in territories, which grants access to the territory's users."
+    },
+    {
+      "id": "sc-data-cleanse",
+      "section": "data",
+      "prompt": "Before migrating 500,000 legacy accounts, what should be done first?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Load only accounts created in the last week"
+        },
+        {
+          "id": "b",
+          "text": "Convert all accounts into leads"
+        },
+        {
+          "id": "c",
+          "text": "Load everything as-is first, then clean and deduplicate the records inside Salesforce afterwards"
+        },
+        {
+          "id": "d",
+          "text": "Cleanse and deduplicate the data, and agree what to leave behind"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Migrating dirty data moves the problem into Salesforce; cleaning, deduplicating and deciding what to archive comes first."
+    },
+    {
+      "id": "sc-test-migration",
+      "section": "data",
+      "prompt": "How should a large data migration be rehearsed?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Run trial loads in a full sandbox, check counts and spot-check records"
+        },
+        {
+          "id": "b",
+          "text": "Use the Import Wizard in production"
+        },
+        {
+          "id": "c",
+          "text": "Ask users to re-enter the data"
+        },
+        {
+          "id": "d",
+          "text": "Load directly into production overnight and fix any errors the next morning"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Trial loads in a production-like sandbox expose mapping errors and timing before the real cutover."
+    },
+    {
+      "id": "sc-automation-during-load",
+      "section": "data",
+      "prompt": "A bulk load of historical opportunities triggers emails to customers and slow flows. What should be done?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Bypass or deactivate automation for the load, with a custom permission or setting"
+        },
+        {
+          "id": "b",
+          "text": "Let the automation run as normal and send customers an apology for the extra emails"
+        },
+        {
+          "id": "c",
+          "text": "Load records one at a time"
+        },
+        {
+          "id": "d",
+          "text": "Delete the flows permanently"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Historical loads shouldn't fire live automation. A bypass (often a custom permission checked in flows) keeps the automation for normal use."
+    },
+    {
+      "id": "sc-reporting-snapshots",
+      "section": "data",
+      "prompt": "Finance wants month-end pipeline totals preserved even after opportunities change. What should be used?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A list view of open opportunities, saved under a new name at each month end"
+        },
+        {
+          "id": "b",
+          "text": "Field history on Amount"
+        },
+        {
+          "id": "c",
+          "text": "Reporting snapshots scheduled at month end"
+        },
+        {
+          "id": "d",
+          "text": "A dashboard refresh"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Reporting snapshots store report results on a schedule, so historical totals stay fixed."
+    },
+    {
+      "id": "sc-einstein-activity-insights",
+      "section": "ai",
+      "prompt": "Reps want to know about relevant news and engagement signals for their accounts without searching. Which kind of AI capability addresses this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A validation rule on Account that requires reps to log news they find each week"
+        },
+        {
+          "id": "b",
+          "text": "Predictive insights that surface signals on records"
+        },
+        {
+          "id": "c",
+          "text": "A duplicate rule"
+        },
+        {
+          "id": "d",
+          "text": "A static dashboard"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Predictive AI features surface signals such as engagement changes or risks directly on records."
+    },
+    {
+      "id": "sc-prompt-grounding",
+      "section": "ai",
+      "prompt": "A generated sales email mentions a discount the customer never received. What reduces this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Grounding the prompt in the customer's actual records and reviewing before sending"
+        },
+        {
+          "id": "b",
+          "text": "Asking the model to be more creative and persuasive in the prompt instructions"
+        },
+        {
+          "id": "c",
+          "text": "Sending emails without a subject"
+        },
+        {
+          "id": "d",
+          "text": "Removing the customer's records from the prompt"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Grounding in real CRM data and human review reduce invented details."
+    },
+    {
+      "id": "sc-data-privacy-ai",
+      "section": "ai",
+      "prompt": "A customer asks whether their sales data is used to train the language model when reps generate emails. What protects it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Copying the data to a spreadsheet first"
+        },
+        {
+          "id": "b",
+          "text": "The Einstein Trust Layer's zero-data-retention agreements with model providers"
+        },
+        {
+          "id": "c",
+          "text": "Turning off field-level security so the model sees fewer fields"
+        },
+        {
+          "id": "d",
+          "text": "Using a different browser"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Through the Trust Layer, prompts and responses aren't retained by the model provider for training, and sensitive data can be masked."
+    },
+    {
+      "id": "sc-ai-adoption",
+      "section": "ai",
+      "prompt": "Reps don't trust AI lead scores. What helps adoption?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Hiding the score's reasons so reps aren't distracted, and showing only the number"
+        },
+        {
+          "id": "b",
+          "text": "Replacing reps' judgement entirely"
+        },
+        {
+          "id": "c",
+          "text": "Making the score required for every action"
+        },
+        {
+          "id": "d",
+          "text": "Showing the factors behind each score and checking results against outcomes"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Explainable factors and evidence that scores predict outcomes build trust; hiding reasoning undermines it."
     }
   ]
 }

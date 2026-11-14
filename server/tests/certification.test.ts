@@ -54,8 +54,8 @@ describe("question bank", () => {
       ["pd2", 80, 60],
       ["app-builder", 80, 60],
       ["js-dev-1", 80, 60],
-      ["sales-consultant", 60, 60],
-      ["service-consultant", 60, 60],
+      ["sales-consultant", 80, 60],
+      ["service-consultant", 80, 60],
       ["agentforce-specialist", 40, 40],
     ]);
   });
