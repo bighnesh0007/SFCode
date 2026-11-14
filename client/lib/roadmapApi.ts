@@ -42,6 +42,8 @@ export interface RoadmapNode {
   completeByQuiz: boolean;
   quiz?: { q: string; options: string[]; image?: string; imageAlt?: string }[];
   problems: { slug: string; title: string; track: string; difficulty: string; status: "solved" | "attempted" | "todo" }[];
+  /** Optional extra problems; solving them doesn't decide whether the step is done. Absent on older servers. */
+  practice?: { slug: string; title: string; track: string; difficulty: string; status: "solved" | "attempted" | "todo" }[];
 }
 export interface RoadmapView {
   id: string;

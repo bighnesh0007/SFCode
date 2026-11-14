@@ -283,22 +283,8 @@ function NodePanel({ node, view, onClose, onChange }: { node: RoadmapNode; view:
           </section>
         )}
 
-        {node.problems.length > 0 && (
-          <section className="mt-5">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Practice</h3>
-            <ul className="mt-2 divide-y rounded-lg border">
-              {node.problems.map((p) => (
-                <li key={p.slug}>
-                  <Link href={`${trackInfo(p.track as Track).base}/${p.slug}`} className="flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-accent/60">
-                    {p.status === "solved" ? <Check className="h-4 w-4 text-emerald-700 dark:text-emerald-400" /> : p.status === "attempted" ? <TriangleAlert className="h-4 w-4 text-amber-700 dark:text-amber-400" /> : <CircleDashed className="h-4 w-4 text-muted-foreground" />}
-                    <span className="min-w-0 flex-1 truncate">{p.title}</span>
-                    <span className="text-xs text-muted-foreground">{trackInfo(p.track as Track).label} · {p.difficulty}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+        {node.problems.length > 0 && <ProblemList title="Practice" problems={node.problems} />}
+        {node.practice && node.practice.length > 0 && <ProblemList title="More practice (optional)" problems={node.practice} />}
 
         {node.cert && (
           <Link href={`/certification/${node.cert.exam}${node.cert.section ? `?section=${node.cert.section}` : ""}`} className="mt-5 flex items-center gap-2 rounded-lg border p-3 text-sm hover:bg-accent/60">
@@ -337,6 +323,25 @@ function NodePanel({ node, view, onClose, onChange }: { node: RoadmapNode; view:
 }
 
 /** Level 1-4 as the roadmap stage it belongs to. */
+
+function ProblemList({ title, problems }: { title: string; problems: RoadmapNode["problems"] }) {
+  return (
+    <section className="mt-5">
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h3>
+      <ul className="mt-2 divide-y rounded-lg border">
+        {problems.map((p) => (
+          <li key={p.slug}>
+            <Link href={`${trackInfo(p.track as Track).base}/${p.slug}`} className="flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-accent/60">
+              {p.status === "solved" ? <Check className="h-4 w-4 text-emerald-700 dark:text-emerald-400" /> : p.status === "attempted" ? <TriangleAlert className="h-4 w-4 text-amber-700 dark:text-amber-400" /> : <CircleDashed className="h-4 w-4 text-muted-foreground" />}
+              <span className="min-w-0 flex-1 truncate">{p.title}</span>
+              <span className="text-xs text-muted-foreground">{trackInfo(p.track as Track).label} · {p.difficulty}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
 const RESOURCE_KIND: Record<string, string> = { docs: "Docs", trailhead: "Trailhead", guide: "Guide", video: "Video" };
 

@@ -51,6 +51,12 @@ describe("roadmap content", () => {
     expect(() => loadRoadmaps(roadmapDir([{ ...node("a"), quiz: [...quiz, { q: "q", options: ["a", "b"], answer: 2, why: "w" }] }]), exists)).toThrow(/out of range/);
   });
 
+  it("optional practice must name real problems that aren't already required", () => {
+    expect(() => loadRoadmaps(roadmapDir([{ ...node("a"), practice: ["no-such-problem"] }]), exists)).toThrow(/suggests unknown problem/);
+    expect(() => loadRoadmaps(roadmapDir([{ ...node("a", [], ["text-utils"]), practice: ["text-utils"] }]), exists)).toThrow(/both required and optional/);
+    expect(() => loadRoadmaps(roadmapDir([{ ...node("a", [], ["text-utils"]), practice: ["contacts-by-account"] }]), exists)).not.toThrow();
+  });
+
   it("rejects unknown problems, unknown prerequisites and cycles", () => {
     expect(() => loadRoadmaps(roadmapDir([node("a", [], ["no-such-problem"])]), exists)).toThrow(/unknown problem/);
     expect(() => loadRoadmaps(roadmapDir([node("a", ["ghost"])]), exists)).toThrow(/unknown node/);
@@ -70,6 +76,21 @@ describe("RoadmapService", () => {
     };
     return { svc, solve };
   }
+
+  it("optional practice is listed with progress but never completes or blocks a step", async () => {
+    const { svc, solve } = setup();
+    await svc.saveOnboarding("u", { role: "developer", level: "new", goal: "lwc", hours: "3-5" });
+    const step = (v: Awaited<ReturnType<typeof svc.view>>) => v.nodes.find((n) => n.id === "fe-lifecycle");
+    const before = step(await svc.view("lwc", "u"));
+    expect(before?.practice.map((p) => p.slug)).toEqual(["lwc-countdown", "lwc-debounced-search"]);
+    expect(before?.completeByQuiz).toBe(true);
+    await solve("u", "lwc-countdown");
+    const after = step(await svc.view("lwc", "u"));
+    expect(after?.practice.find((p) => p.slug === "lwc-countdown")?.status).toBe("solved");
+    // Solving optional practice doesn't count as finishing the step (its quiz still does).
+    expect(after?.state).toBe(before?.state);
+    expect(after?.completeByQuiz).toBe(true);
+  });
 
   it("a new learner starts at the root; everything downstream is locked", async () => {
     const { svc } = setup();

@@ -45,6 +45,8 @@ const nodeSchema = z.strictObject({
   col: z.number().int().min(0).max(4),
   requires: z.array(z.string()),
   problems: z.array(z.string()),
+  /** Extra problems worth trying for this step. Unlike `problems`, they never decide whether the step is done. */
+  practice: z.array(z.string()).optional(),
   cert: z.strictObject({ exam: z.string(), section: z.string().optional() }).optional(),
   /** Passing it (at most one wrong) completes the step. Answers never leave the server. */
   quiz: z
@@ -107,6 +109,10 @@ export function loadRoadmaps(dir: string, problemExists: (slug: string) => boole
     for (const n of raw.nodes) {
       for (const r of n.requires) if (!ids.has(r)) throw new Error(`${where}: "${n.id}" requires unknown node "${r}"`);
       for (const p of n.problems) if (!problemExists(p)) throw new Error(`${where}: "${n.id}" links unknown problem "${p}"`);
+      for (const p of n.practice ?? []) {
+        if (!problemExists(p)) throw new Error(`${where}: "${n.id}" suggests unknown problem "${p}"`);
+        if (n.problems.includes(p)) throw new Error(`${where}: "${n.id}" lists "${p}" as both required and optional practice`);
+      }
       if (n.problems.length === 0 && !n.lesson && !n.cert && !n.quiz) throw new Error(`${where}: "${n.id}" has nothing to do`);
     }
     // Depth = longest prerequisite chain; also detects cycles.

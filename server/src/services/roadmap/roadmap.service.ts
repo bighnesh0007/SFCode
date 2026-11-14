@@ -27,7 +27,7 @@ export interface QuizResult {
   roadmap: RoadmapView;
 }
 
-export interface RoadmapNodeView extends Omit<RoadmapNode, "problems" | "quiz"> {
+export interface RoadmapNodeView extends Omit<RoadmapNode, "problems" | "quiz" | "practice"> {
   /** Questions only; answers and explanations come back after submitting. */
   quiz?: { q: string; options: string[]; image?: string; imageAlt?: string }[];
   depth: number;
@@ -40,6 +40,8 @@ export interface RoadmapNodeView extends Omit<RoadmapNode, "problems" | "quiz"> 
   /** Completion is by passing the step quiz. */
   completeByQuiz: boolean;
   problems: { slug: string; title: string; track: string; difficulty: string; status: "solved" | "attempted" | "todo" }[];
+  /** Optional extra problems; they don't count towards completing the step. */
+  practice: { slug: string; title: string; track: string; difficulty: string; status: "solved" | "attempted" | "todo" }[];
 }
 
 export interface RoadmapView {
@@ -102,10 +104,12 @@ export class RoadmapService {
 
     const base = new Map<string, Omit<RoadmapNodeView, "state"> & { selfDone: boolean; touched: boolean }>();
     for (const n of r.nodes) {
-      const problems = n.problems.map((slug) => {
+      const describe = (slug: string) => {
         const c = this.catalog.get(slug);
         return { slug, title: c?.title ?? slug, track: c?.track ?? "apex", difficulty: c?.difficulty ?? "Easy", status: progress.get(slug) === "solved" ? "solved" as const : progress.get(slug) === "attempted" ? "attempted" as const : "todo" as const };
-      });
+      };
+      const problems = n.problems.map(describe);
+      const practice = (n.practice ?? []).map(describe);
       const graded = problems;
       const completeByQuiz = graded.length === 0 && n.quiz !== undefined;
       const completeByReading = graded.length === 0 && !completeByQuiz;
@@ -116,6 +120,7 @@ export class RoadmapService {
         ...(quiz ? { quiz: quiz.map(({ q, options, image, imageAlt }) => ({ q, options, ...(image ? { image } : {}), ...(imageAlt ? { imageAlt } : {}) })) } : {}),
         completeByQuiz,
         problems,
+        practice,
         depth: r.depth[n.id] ?? 0,
         read: read.has(n.id),
         completeByReading,
