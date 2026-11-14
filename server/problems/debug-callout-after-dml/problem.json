@@ -1,0 +1,19 @@
+{
+  "title": "You Have Uncommitted Work Pending",
+  "track": "debug",
+  "difficulty": "Hard",
+  "category": "Integration",
+  "order": 210,
+  "tags": [
+    "callouts",
+    "transaction order",
+    "CalloutException"
+  ],
+  "files": [
+    {
+      "name": "SfcInvoiceService",
+      "type": "class"
+    }
+  ],
+  "testClass": "SfcInvoiceServiceTest"
+}

@@ -1,0 +1,5 @@
+[
+  "In the trigger, compare Trigger.oldMap.get(o.Id).StageName with o.StageName to find deals that just became Closed Won. Enqueue once, after the loop, only if the set isn't empty.",
+  "In execute, query Id, Name and Amount for the Ids, build a list of small maps or wrapper objects, and JSON.serialize it into the request body.",
+  "Make the callout first, then update NextStep on all the queried records in one DML. A Queueable that implements Database.AllowsCallouts may call out; the trigger itself may not."
+]

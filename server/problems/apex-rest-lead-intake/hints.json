@@ -1,0 +1,5 @@
+[
+  "Apex REST maps the JSON body's keys to the method's parameters, so {\"email\": ...} arrives in email.",
+  "Query for an existing Lead by Email first (LIMIT 1). Update it if found, insert otherwise: that makes repeated calls safe (idempotent).",
+  "RestContext.response.statusCode = 201 / 200 / 400. Return early for a blank email before any query or DML."
+]

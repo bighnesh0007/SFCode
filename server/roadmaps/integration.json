@@ -63,6 +63,9 @@
           "answer": 2,
           "why": "Bulk API processes large data sets asynchronously."
         }
+      ],
+      "practice": [
+        "account-json-payload"
       ]
     },
     {
@@ -261,7 +264,11 @@
           "why": "External Services turn an API spec into invocable actions."
         }
       ],
-      "diagramCaption": "Callouts: Apex sends an HttpRequest to a Named Credential, which holds the URL and authentication and calls the external API."
+      "diagramCaption": "Callouts: Apex sends an HttpRequest to a Named Credential, which holds the URL and authentication and calls the external API.",
+      "practice": [
+        "rates-client-retry",
+        "debug-callout-after-dml"
+      ]
     },
     {
       "id": "int-apex-rest",
@@ -318,6 +325,9 @@
           "answer": 0,
           "why": "Clients rely on status codes to know what happened."
         }
+      ],
+      "practice": [
+        "apex-rest-lead-intake"
       ]
     },
     {
@@ -515,7 +525,10 @@
           "why": "Scheduled bulk movement is batch data sync."
         }
       ],
-      "diagramCaption": "Six integration patterns: request and reply, fire and forget, batch data sync, remote call-in, UI update from data change, and data virtualisation."
+      "diagramCaption": "Six integration patterns: request and reply, fire and forget, batch data sync, remote call-in, UI update from data change, and data virtualisation.",
+      "practice": [
+        "won-deals-to-erp"
+      ]
     },
     {
       "id": "int-reliability",
@@ -572,6 +585,10 @@
           "answer": 1,
           "why": "Logs are widely readable; credentials must stay out."
         }
+      ],
+      "practice": [
+        "rates-client-retry",
+        "won-deals-to-erp"
       ]
     },
     {

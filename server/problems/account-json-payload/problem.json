@@ -1,0 +1,19 @@
+{
+  "title": "Account JSON Payload",
+  "difficulty": "Easy",
+  "category": "Integration",
+  "order": 13,
+  "tags": [
+    "JSON",
+    "wrapper classes",
+    "serialize",
+    "deserialize"
+  ],
+  "files": [
+    {
+      "name": "SfcAccountPayload",
+      "type": "class"
+    }
+  ],
+  "testClass": "SfcAccountPayloadTest"
+}

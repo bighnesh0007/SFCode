@@ -1,0 +1,20 @@
+{
+  "title": "Lead Intake API",
+  "difficulty": "Medium",
+  "category": "Integration",
+  "order": 14,
+  "tags": [
+    "Apex REST",
+    "@RestResource",
+    "@HttpPost",
+    "idempotency",
+    "status codes"
+  ],
+  "files": [
+    {
+      "name": "SfcLeadApi",
+      "type": "class"
+    }
+  ],
+  "testClass": "SfcLeadApiTest"
+}

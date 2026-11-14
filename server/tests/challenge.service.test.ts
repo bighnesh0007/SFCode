@@ -77,8 +77,9 @@ describe("ChallengeService — what clients can see", () => {
         expect(json, `${c.slug} leaks its reference solution`).not.toContain(JSON.stringify(ref).slice(1, -1));
       }
       if (c.lwc) {
-        // Hidden-only test names (the hidden set also contains the visible ones).
-        const names = (src: string) => [...src.matchAll(/name: "([^"]+)"/g)].map((m) => m[1] ?? "");
+        // Hidden-only test names (the hidden set also contains the visible ones). Only a
+        // name followed by its run() is a test; fixtures like { name: "Pen" } aren't.
+        const names = (src: string) => [...src.matchAll(/name: "([^"]+)",\s*async run\(/g)].map((m) => m[1] ?? "");
         const hiddenOnly = names(c.lwc.hiddenTests).filter((n) => !names(c.lwc?.tests ?? "").includes(n));
         expect(hiddenOnly.length, `${c.slug} has no hidden-only tests`).toBeGreaterThan(0);
         for (const n of hiddenOnly) expect(json, `${c.slug} leaks hidden test "${n}"`).not.toContain(n);
@@ -103,11 +104,11 @@ describe("ChallengeService — what clients can see", () => {
     const { service } = setup();
     expect((await service.list(null, "soql")).every((c) => c.track === "soql")).toBe(true);
     expect((await service.list(null, "soql")).length).toBe(10);
-    expect((await service.list(null, "apex")).length).toBe(12);
-    expect((await service.list(null, "debug")).length).toBe(9);
+    expect((await service.list(null, "apex")).length).toBe(16);
+    expect((await service.list(null, "debug")).length).toBe(10);
     expect((await service.list(null, "flow")).length).toBe(9);
     expect((await service.list(null, "lwc")).length).toBe(17);
-    expect((await service.list(null)).length).toBe(57);
+    expect((await service.list(null)).length).toBe(62);
   });
 
   it("404s unknown problems", () => {

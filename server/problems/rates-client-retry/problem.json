@@ -1,0 +1,19 @@
+{
+  "title": "Exchange Rates With Retries",
+  "difficulty": "Medium",
+  "category": "Integration",
+  "order": 15,
+  "tags": [
+    "HTTP callout",
+    "retries",
+    "error handling",
+    "HttpCalloutMock"
+  ],
+  "files": [
+    {
+      "name": "SfcRatesClient",
+      "type": "class"
+    }
+  ],
+  "testClass": "SfcRatesClientTest"
+}
