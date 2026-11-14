@@ -172,7 +172,7 @@ export function MockExamSession({ exam }: { exam: string }) {
   return (
     <div className="container mx-auto max-w-5xl px-4 py-6">
       <div className="sticky top-12 z-10 -mx-4 mb-6 flex items-center gap-3 border-b bg-background/95 px-4 py-2 backdrop-blur">
-        <span className="truncate text-sm font-medium">{mock.title}</span>
+        <h1 className="truncate text-sm font-medium">{mock.title}</h1>
         <span className="text-xs tabular-nums text-muted-foreground">
           {answeredCount}/{mock.questions.length} answered
         </span>
@@ -294,9 +294,9 @@ function Results({ mock, answers, result, usedMs }: { mock: MockExam; answers: R
   return (
     <div className="container mx-auto max-w-3xl space-y-8 px-4 py-10">
       <div className={cn("rounded-xl border p-6 text-center sm:p-8", result.passed ? "border-emerald-500/40 bg-emerald-500/5" : "border-red-500/40 bg-red-500/5")}>
-        <p className={cn("text-sm font-semibold uppercase tracking-wide", result.passed ? "text-emerald-700 dark:text-emerald-400" : "text-red-600 dark:text-red-400")}>
-          {result.passed ? "Pass" : "Not yet"}
-        </p>
+        <h1 className={cn("text-sm font-semibold uppercase tracking-wide", result.passed ? "text-emerald-700 dark:text-emerald-400" : "text-red-600 dark:text-red-400")}>
+          {mock.title}: {result.passed ? "Pass" : "Not yet"}
+        </h1>
         <p className="mt-1 text-5xl font-bold tabular-nums">{result.score}%</p>
         <p className="mt-2 text-sm text-muted-foreground">
           {result.correct} of {result.total} correct · {result.passPercent}% needed · finished in {formatClock(usedMs)}
