@@ -1,0 +1,5 @@
+[
+  "Use the Custom Error element: it blocks the save and shows your message, like a validation rule, from a flow.",
+  "'Was already closed' means the prior value: {!$Record__Prior.IsClosed} Equals true. 'Amount changed' is {!$Record.Amount} Not Equal To {!$Record__Prior.Amount}.",
+  "Put both conditions in the Start element's entry conditions (AND), connect it to a Custom Error element with the exact message."
+]

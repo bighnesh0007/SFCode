@@ -1,0 +1,20 @@
+{
+  "title": "Accounts to Win Back",
+  "track": "soql",
+  "difficulty": "Hard",
+  "category": "Subqueries",
+  "order": 110,
+  "tags": [
+    "semi-join",
+    "anti-join",
+    "date literals",
+    "ORDER BY"
+  ],
+  "files": [
+    {
+      "name": "query",
+      "type": "soql"
+    }
+  ],
+  "testClass": "SfcSoqlWinBackTest"
+}

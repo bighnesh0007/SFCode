@@ -1,0 +1,5 @@
+[
+  "Get Records on OpportunityContactRole where OpportunityId Equals {!$Record.Id}, storing all records.",
+  "Loop over them. In the loop, use an Assignment to set the fields of a single Task variable, then Add that variable to a Task collection variable.",
+  "After the loop, one Create Records element creates the whole collection. Creating inside the loop runs one DML statement per contact, so a deal with more than 150 contacts hits the limit."
+]

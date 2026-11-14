@@ -1,0 +1,20 @@
+{
+  "title": "Thank Every Contact on a Won Deal",
+  "track": "flow",
+  "difficulty": "Hard",
+  "category": "Loops & Collections",
+  "order": 309,
+  "tags": [
+    "record-triggered",
+    "get records",
+    "loop",
+    "collections",
+    "bulkification"
+  ],
+  "files": [],
+  "flow": {
+    "apiName": "SFC_Won_Contact_Tasks",
+    "kind": "record-triggered"
+  },
+  "testClass": "SfcFlowWonTasksTest"
+}

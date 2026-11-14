@@ -1,0 +1,5 @@
+[
+  "This changes other records (Opportunities), so it must be after-save: optimize for Actions and Related Records.",
+  "Start: Rating Equals Hot, and 'Only when a record is updated to meet the condition requirements'.",
+  "One Update Records element can update many records: choose 'Specify conditions to identify records', object Opportunity, AccountId Equals {!$Record.Id} AND IsClosed Equals false, then set NextStep."
+]

@@ -70,8 +70,10 @@ describe("ChallengeService — what clients can see", () => {
       expect(json).not.toContain("sfcAssertSameRows");
       // Compare in JSON-escaped form: multi-line source with quotes appears in
       // the response as \n and \" — matching the raw text could never fail.
-      // Empty reference files (a component with no CSS) have nothing to leak.
-      for (const ref of Object.values(c.reference).filter((r) => r.trim() !== "")) {
+      // Empty reference files (a component with no CSS) have nothing to leak, and nor does
+      // a file the learner is given unchanged (a provided trigger in a debugging problem).
+      const starters = new Set(Object.values(c.starter));
+      for (const ref of Object.values(c.reference).filter((r) => r.trim() !== "" && !starters.has(r))) {
         expect(json, `${c.slug} leaks its reference solution`).not.toContain(JSON.stringify(ref).slice(1, -1));
       }
       if (c.lwc) {
@@ -100,12 +102,12 @@ describe("ChallengeService — what clients can see", () => {
   it("filters the list by track", async () => {
     const { service } = setup();
     expect((await service.list(null, "soql")).every((c) => c.track === "soql")).toBe(true);
-    expect((await service.list(null, "soql")).length).toBe(9);
-    expect((await service.list(null, "apex")).length).toBe(11);
-    expect((await service.list(null, "debug")).length).toBe(8);
-    expect((await service.list(null, "flow")).length).toBe(6);
+    expect((await service.list(null, "soql")).length).toBe(10);
+    expect((await service.list(null, "apex")).length).toBe(12);
+    expect((await service.list(null, "debug")).length).toBe(9);
+    expect((await service.list(null, "flow")).length).toBe(9);
     expect((await service.list(null, "lwc")).length).toBe(17);
-    expect((await service.list(null)).length).toBe(51);
+    expect((await service.list(null)).length).toBe(57);
   });
 
   it("404s unknown problems", () => {

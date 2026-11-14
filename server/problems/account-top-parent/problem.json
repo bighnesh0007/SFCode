@@ -1,0 +1,19 @@
+{
+  "title": "Find the Top of the Account Hierarchy",
+  "difficulty": "Hard",
+  "category": "Collections",
+  "order": 12,
+  "tags": [
+    "hierarchy",
+    "bulkification",
+    "maps",
+    "query limits"
+  ],
+  "files": [
+    {
+      "name": "SfcAccountHierarchy",
+      "type": "class"
+    }
+  ],
+  "testClass": "SfcAccountHierarchyTest"
+}

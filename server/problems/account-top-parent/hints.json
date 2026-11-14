@@ -1,0 +1,5 @@
+[
+  "Keep a map from each starting account to the account you've reached so far (its 'current ancestor').",
+  "Each round, query the ParentId of every current ancestor that might have a parent, in one SOQL query. Move each start's ancestor up one level.",
+  "Stop when no ancestor has a parent. The number of queries then equals the depth of the deepest hierarchy, not the number of accounts."
+]
