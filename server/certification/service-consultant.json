@@ -1672,6 +1672,546 @@
         "a"
       ],
       "explanation": "A dedicated, least-privilege integration user limits damage if credentials leak and keeps audit trails clear."
+    },
+    {
+      "id": "sv-nps",
+      "section": "industry",
+      "prompt": "Leadership wants a measure of customers' overall loyalty to the brand, not just one support interaction. Which metric fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Agent utilisation during peak hours"
+        },
+        {
+          "id": "b",
+          "text": "Net Promoter Score (likelihood to recommend)"
+        },
+        {
+          "id": "c",
+          "text": "Average handle time for the last quarter's cases"
+        },
+        {
+          "id": "d",
+          "text": "First contact resolution across all channels"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "NPS asks how likely customers are to recommend the company, a relationship measure. CSAT rates a specific interaction; AHT and FCR are operational."
+    },
+    {
+      "id": "sv-backlog",
+      "section": "industry",
+      "prompt": "Open cases keep growing week over week while staffing is flat. Which combination of measures shows where to act?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Incoming volume by channel and reason, plus resolution rate and age of open cases"
+        },
+        {
+          "id": "b",
+          "text": "The number of Knowledge articles created"
+        },
+        {
+          "id": "c",
+          "text": "Agent login hours alone"
+        },
+        {
+          "id": "d",
+          "text": "Customer lifetime value per account"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "A growing backlog means inflow exceeds resolution; volume by reason shows what to deflect or automate, and case age shows what's stuck."
+    },
+    {
+      "id": "sv-uat",
+      "section": "implementation",
+      "prompt": "Who should perform user acceptance testing of a new case routing design?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The IT security team"
+        },
+        {
+          "id": "b",
+          "text": "Customers, after go-live"
+        },
+        {
+          "id": "c",
+          "text": "Representative support agents and supervisors, using real scenarios"
+        },
+        {
+          "id": "d",
+          "text": "Only the consultant who built it"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "UAT confirms the solution works for the people who'll use it, with realistic cases. Builders testing their own work miss gaps in process."
+    },
+    {
+      "id": "sv-phased-channels",
+      "section": "implementation",
+      "prompt": "A client wants email, chat, WhatsApp, voice and an AI agent all live in the first release. What should the consultant suggest?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Launch all five on the same day to save time"
+        },
+        {
+          "id": "b",
+          "text": "Skip email because it's an older channel"
+        },
+        {
+          "id": "c",
+          "text": "Phase the channels, starting with the highest-volume one, and add others once it's stable"
+        },
+        {
+          "id": "d",
+          "text": "Launch the AI agent before any human channel exists"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Phasing reduces risk and lets routing, staffing and reporting settle on one channel before adding more."
+    },
+    {
+      "id": "sv-record-types-cases",
+      "section": "design",
+      "prompt": "Billing and Technical Support cases need different fields, status values and layouts. What should the design use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Two separate custom objects for the two teams"
+        },
+        {
+          "id": "b",
+          "text": "Case record types, each with its own support process and page layout"
+        },
+        {
+          "id": "c",
+          "text": "One layout with every field, and validation rules"
+        },
+        {
+          "id": "d",
+          "text": "Separate orgs for each team"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Record types with support processes give each team its own status values and layout on the same Case object, keeping reporting unified."
+    },
+    {
+      "id": "sv-experience-cloud-license",
+      "section": "design",
+      "prompt": "Thousands of consumers need to log in to view their own cases and Knowledge. Which license type usually fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Full Salesforce licenses for each customer"
+        },
+        {
+          "id": "b",
+          "text": "No licenses; guest users can see their cases"
+        },
+        {
+          "id": "c",
+          "text": "Customer Community (high-volume) licenses, with sharing sets"
+        },
+        {
+          "id": "d",
+          "text": "Partner Community licenses with roles"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "High-volume customer licenses suit large consumer audiences; sharing sets grant access to their own records. Guest users can't see private case data."
+    },
+    {
+      "id": "sv-console-utility",
+      "section": "design",
+      "prompt": "Agents need their call history, a softphone and notes always available while working cases. Where should these go in the console?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The utility bar"
+        },
+        {
+          "id": "b",
+          "text": "A related list on each case"
+        },
+        {
+          "id": "c",
+          "text": "A separate app per tool"
+        },
+        {
+          "id": "d",
+          "text": "The home page only"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Utility bar items stay available across all tabs in a console app, which suits tools like the softphone and history."
+    },
+    {
+      "id": "sv-article-versions",
+      "section": "knowledge",
+      "prompt": "An agent edits a published article. What do customers see until the edit is published?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The previous archived version"
+        },
+        {
+          "id": "b",
+          "text": "Nothing; the article is hidden while it's a draft"
+        },
+        {
+          "id": "c",
+          "text": "The draft with an 'in progress' label"
+        },
+        {
+          "id": "d",
+          "text": "The current published version"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Editing creates a draft version; the published version stays live until the draft is published."
+    },
+    {
+      "id": "sv-article-record-types",
+      "section": "knowledge",
+      "prompt": "FAQs and troubleshooting guides need different fields in Lightning Knowledge. How is this modelled?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Data categories with field-level security"
+        },
+        {
+          "id": "b",
+          "text": "Two different channels"
+        },
+        {
+          "id": "c",
+          "text": "Knowledge record types with their own page layouts"
+        },
+        {
+          "id": "d",
+          "text": "Separate Knowledge objects for each kind"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Lightning Knowledge uses one Knowledge object with record types for different article types."
+    },
+    {
+      "id": "sv-knowledge-search",
+      "section": "knowledge",
+      "prompt": "Agents should see suggested articles automatically based on the case they're working. What provides this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A report of popular articles"
+        },
+        {
+          "id": "b",
+          "text": "The Knowledge component on the case page, which suggests articles from the case details"
+        },
+        {
+          "id": "c",
+          "text": "Data category visibility settings"
+        },
+        {
+          "id": "d",
+          "text": "An approval process on articles"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The Knowledge component searches using case fields such as the subject and shows relevant articles to attach."
+    },
+    {
+      "id": "sv-omni-capacity",
+      "section": "channels",
+      "prompt": "Agents should handle up to three chats at once but only one phone call. How is this controlled in Omni-Channel?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A validation rule on the AgentWork object"
+        },
+        {
+          "id": "b",
+          "text": "Separate Salesforce users for chat and phone"
+        },
+        {
+          "id": "c",
+          "text": "Capacity and work sizes per channel in presence and routing configurations"
+        },
+        {
+          "id": "d",
+          "text": "Queue membership alone"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Each agent has a capacity, and each work item consumes units defined by its routing configuration, so chats can be smaller than calls."
+    },
+    {
+      "id": "sv-skills-routing",
+      "section": "channels",
+      "prompt": "Cases in Spanish about billing should go to agents with both Spanish and billing skills. Which routing model fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Skills-based routing in Omni-Channel"
+        },
+        {
+          "id": "b",
+          "text": "Round-robin assignment rules"
+        },
+        {
+          "id": "c",
+          "text": "Queue-based routing with one queue per agent"
+        },
+        {
+          "id": "d",
+          "text": "Escalation rules by language"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Skills-based routing matches work to agents who have all the required skills, rather than to a fixed queue."
+    },
+    {
+      "id": "sv-bot-to-agent-context",
+      "section": "channels",
+      "prompt": "When an AI agent hands a chat to a human, what should the design ensure?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The customer starts a new conversation"
+        },
+        {
+          "id": "b",
+          "text": "The chat is converted to an email"
+        },
+        {
+          "id": "c",
+          "text": "The transcript and collected details are passed along, so the customer isn't asked again"
+        },
+        {
+          "id": "d",
+          "text": "The human agent sees only the customer's name"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "A good handoff carries the context forward; repeating questions is a major source of frustration."
+    },
+    {
+      "id": "sv-case-closure-rules",
+      "section": "cases",
+      "prompt": "Cases waiting on the customer should close automatically after seven days without a reply. What can do this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A validation rule"
+        },
+        {
+          "id": "b",
+          "text": "A scheduled path on a record-triggered flow, from the time the case enters that status"
+        },
+        {
+          "id": "c",
+          "text": "An escalation rule"
+        },
+        {
+          "id": "d",
+          "text": "A case assignment rule"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A scheduled path can act a set time after a status change, checking the case is still waiting. Escalation rules reassign; they don't close."
+    },
+    {
+      "id": "sv-case-hierarchy-sla",
+      "section": "cases",
+      "prompt": "Different customers have different response times depending on their contract tier. How is the right SLA applied to a case?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Through the entitlement on the case, which links to that tier's entitlement process"
+        },
+        {
+          "id": "b",
+          "text": "Through the case owner's role"
+        },
+        {
+          "id": "c",
+          "text": "Through the case's priority picklist only"
+        },
+        {
+          "id": "d",
+          "text": "Through the case record type alone"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Entitlements represent the customer's support terms and decide which entitlement process and milestones apply."
+    },
+    {
+      "id": "sv-dashboard-filters",
+      "section": "analytics",
+      "prompt": "Regional managers want one dashboard they can switch between regions. What should be added?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A validation rule on Region"
+        },
+        {
+          "id": "b",
+          "text": "A separate dashboard per region"
+        },
+        {
+          "id": "c",
+          "text": "A dashboard filter on Region"
+        },
+        {
+          "id": "d",
+          "text": "A report snapshot per region"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Dashboard filters let viewers change a field value across all components without maintaining copies."
+    },
+    {
+      "id": "sv-report-formula",
+      "section": "analytics",
+      "prompt": "A report should show the percentage of cases resolved within SLA per team. What's the simplest way?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A summary formula in a report grouped by team"
+        },
+        {
+          "id": "b",
+          "text": "A separate report per team"
+        },
+        {
+          "id": "c",
+          "text": "Exporting to a spreadsheet each week"
+        },
+        {
+          "id": "d",
+          "text": "A custom field on each case updated by a flow"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Summary formulas calculate ratios such as within-SLA ÷ total at each grouping level."
+    },
+    {
+      "id": "sv-historical-trending",
+      "section": "analytics",
+      "prompt": "Supervisors want to see how case priority and status values changed over the last few weeks. Which feature helps?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Field-level security on Status"
+        },
+        {
+          "id": "b",
+          "text": "Historical trend reporting on Cases"
+        },
+        {
+          "id": "c",
+          "text": "A list view sorted by priority"
+        },
+        {
+          "id": "d",
+          "text": "A Kanban view of cases"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Historical trend reporting captures field values over time for comparison."
+    },
+    {
+      "id": "sv-order-status-api",
+      "section": "integrations",
+      "prompt": "Agents need live order status from an ERP shown on the case, without storing it in Salesforce. Which approach fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A report on an orders custom object"
+        },
+        {
+          "id": "b",
+          "text": "Agents phoning the warehouse"
+        },
+        {
+          "id": "c",
+          "text": "A component calling the ERP through Apex or External Services when the case opens"
+        },
+        {
+          "id": "d",
+          "text": "A nightly batch copying every order"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Fetching on demand keeps the data current and avoids storing copies; Salesforce Connect is another option for read-only views."
+    },
+    {
+      "id": "sv-cti-screen-pop",
+      "section": "integrations",
+      "prompt": "When a call arrives, the agent's console should open the caller's contact automatically. What is this called?",
+      "options": [
+        {
+          "id": "a",
+          "text": "An escalation rule"
+        },
+        {
+          "id": "b",
+          "text": "An auto-response rule"
+        },
+        {
+          "id": "c",
+          "text": "A screen pop driven by the telephony integration"
+        },
+        {
+          "id": "d",
+          "text": "A case assignment rule"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Telephony integrations (Service Cloud Voice or Open CTI) look up the caller and pop the matching record."
     }
   ]
 }
