@@ -20,6 +20,8 @@ export interface PracticeQuestion {
   prompt: string;
   options: { id: string; text: string }[];
   choose: number;
+  /** Written by a community Buddy and approved by a reviewer. */
+  community?: boolean;
 }
 
 export interface AnswerResult {

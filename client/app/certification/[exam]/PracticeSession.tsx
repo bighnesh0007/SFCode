@@ -119,7 +119,10 @@ export function PracticeSession({ exam, section, load, title }: { exam: string; 
       ) : q ? (
         <div className="space-y-5">
           <Markdown source={q.prompt} className="markdown text-base" />
-          <p className="text-xs text-muted-foreground">{q.choose === 1 ? "Choose one." : `Choose ${q.choose}.`}</p>
+          <p className="text-xs text-muted-foreground">
+            {q.choose === 1 ? "Choose one." : `Choose ${q.choose}.`}
+            {q.community && <span className="ml-2 rounded-full border px-2 py-0.5">Community question</span>}
+          </p>
           <div className="space-y-2" role={q.choose === 1 ? "radiogroup" : "group"} aria-label="Answer options">
             {q.options.map((o) => {
               const picked = selected.includes(o.id);

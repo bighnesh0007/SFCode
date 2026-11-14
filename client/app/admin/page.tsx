@@ -24,6 +24,7 @@ import {
   type Standing,
   type StaffRole,
 } from "@/lib/adminApi";
+import { CertQuestionReview } from "@/components/admin/CertQuestionReview";
 import { communityProblems, reviewQueue, setProblemActive, type CommunityProblemRow, type DraftRow } from "@/lib/draftsApi";
 import { cn } from "@/lib/utils";
 import { getEmailUsage, sendTestDigest } from "@/lib/emailApi";
@@ -32,7 +33,7 @@ import { ContestsTab, ModerationTab, ProblemsTab, StoreTab } from "@/components/
 import { STATUS_LABEL } from "@/lib/verdicts";
 import { PageSkeleton } from "@/components/ui/skeleton";
 
-type Tab = "dashboard" | "review" | "people" | "applications" | "problems" | "points" | "email" | "announcement" | "audit" | "errors" | "traffic" | "contests" | "store" | "problem-stats" | "moderation";
+type Tab = "cert-review" | "dashboard" | "review" | "people" | "applications" | "problems" | "points" | "email" | "announcement" | "audit" | "errors" | "traffic" | "contests" | "store" | "problem-stats" | "moderation";
 const ROLE_LABEL: Record<StaffRole, string> = { admin: "Admin", reviewer: "Reviewer", buddy: "Buddy" };
 
 export default function AdminPage() {
@@ -87,6 +88,7 @@ export default function AdminPage() {
     { id: "traffic", label: "Traffic", show: true },
     { id: "errors", label: "Errors", show: view === "owner" || view === "admin" },
     { id: "review", label: "Review queue", show: true },
+    { id: "cert-review", label: "Question review", show: true },
     { id: "moderation", label: "Moderation", show: true },
     { id: "problem-stats", label: "Problems", show: true },
     { id: "contests", label: "Contests", show: view === "owner" || view === "admin" },
@@ -134,6 +136,7 @@ export default function AdminPage() {
       </div>
 
       {tab === "review" && <ReviewQueue />}
+      {tab === "cert-review" && <CertQuestionReview />}
       {tab === "problems" && <CommunityProblems canToggle={view === "owner" || view === "admin"} />}
       {tab === "people" && <People view={view} />}
       {tab === "applications" && <Applications />}

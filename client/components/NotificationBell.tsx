@@ -14,6 +14,12 @@ function describe(n: NotificationItem): { text: string; href: string } {
   if (n.kind === "mentor") return { text: `${n.data.displayName ?? n.data.handle} asked for help: "${n.data.message ?? ""}"`, href: `/u/${n.data.handle ?? ""}` };
   if (n.kind === "team") return { text: `@${n.data.handle} joined ${n.data.team}`, href: `/teams/${n.data.slug ?? ""}` };
   if (n.kind === "buddy") return { text: n.data.approved === "yes" ? "You're a Buddy now! Start writing problems." : `Your Buddy application wasn't accepted${n.data.note ? `: ${n.data.note}` : "."}`, href: "/contribute" };
+  if (n.data.cert === "yes") {
+    const q = `"${n.data.prompt ?? "your question"}…"`;
+    if (n.data.action === "approved") return { text: `Your question ${q} is live in practice 🎉`, href: `/certification/${n.data.exam ?? ""}` };
+    if (n.data.action === "changes_requested") return { text: `A reviewer asked for changes to ${q}`, href: "/contribute/questions" };
+    return { text: `Your question ${q} was not accepted`, href: "/contribute/questions" };
+  }
   const title = n.data.title ?? "your problem";
   if (n.data.action === "approved") return { text: `"${title}" was approved and is live 🎉`, href: n.data.slug && n.data.track ? `${trackInfo(n.data.track as Track).base}/${n.data.slug}` : "/contribute" };
   if (n.data.action === "changes") return { text: `A reviewer asked for changes to "${title}"`, href: `/contribute/drafts/${n.data.draftId ?? ""}` };
