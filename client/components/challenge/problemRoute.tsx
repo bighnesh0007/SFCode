@@ -4,7 +4,7 @@ import { cache } from "react";
 import { JsonLd } from "@/components/JsonLd";
 import type { ChallengeView, Track } from "@/lib/challengesApi";
 import { clip, pageMeta } from "@/lib/seo";
-import { serverFetch } from "@/lib/serverApi";
+import { serverApi, serverFetch } from "@/lib/serverApi";
 import { lessonsFor } from "@/lib/roadmapSeo";
 import { absoluteUrl } from "@/lib/site";
 import { trackInfo } from "@/lib/tracks";
@@ -14,6 +14,16 @@ import { ChallengePage } from "./ChallengePage";
 const load = cache((slug: string) => serverFetch<ChallengeView>(`/api/v1/challenges/${encodeURIComponent(slug)}`));
 
 const TRACK_WORDS: Record<Track, string> = { apex: "Apex", soql: "SOQL", debug: "Apex debugging", flow: "Salesforce Flow", lwc: "LWC" };
+
+/**
+ * Built-in problems of a track, for generateStaticParams: their pages are
+ * prerendered at build and refreshed every 10 minutes. Community problems
+ * still render on first request (dynamicParams stays on).
+ */
+export async function problemParams(track: Track): Promise<{ slug: string }[]> {
+  const data = await serverApi<{ challenges: { slug: string; community?: boolean }[] }>(`/api/v1/challenges?track=${track}`);
+  return (data?.challenges ?? []).filter((c) => !c.community).map((c) => ({ slug: c.slug }));
+}
 
 export async function problemMetadata(slug: string): Promise<Metadata> {
   const { data: c } = await load(slug);
