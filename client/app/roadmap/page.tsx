@@ -194,7 +194,7 @@ export default function RoadmapPage() {
                 <span className="mt-1 line-clamp-2 text-xs text-muted-foreground">{n.summary}</span>
                 <span className="mt-1 flex gap-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                   {STAGE[n.level]}
-                  {n.optional && <span className="rounded bg-muted px-1">Optional</span>}
+                  {n.optional && <span className="rounded bg-muted px-1 text-foreground/80">Optional</span>}
                 </span>
                 {n.problems.length > 0 && (
                   <span className="mt-auto flex gap-0.5 pt-1" aria-label={`${solved} of ${n.problems.length} solved`}>
