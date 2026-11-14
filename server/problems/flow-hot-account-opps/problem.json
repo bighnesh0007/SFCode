@@ -1,0 +1,18 @@
+{
+  "title": "Hot Accounts Push Their Deals",
+  "track": "flow",
+  "difficulty": "Medium",
+  "category": "After-Save Flows",
+  "order": 307,
+  "tags": [
+    "record-triggered",
+    "update related records",
+    "entry criteria"
+  ],
+  "files": [],
+  "flow": {
+    "apiName": "SFC_Hot_Account_Opps",
+    "kind": "record-triggered"
+  },
+  "testClass": "SfcFlowHotAccountTest"
+}

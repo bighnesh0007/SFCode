@@ -1,0 +1,24 @@
+{
+  "title": "The Trigger That Skips Half the Import",
+  "track": "debug",
+  "difficulty": "Hard",
+  "category": "Trigger Recursion",
+  "order": 209,
+  "tags": [
+    "static variables",
+    "trigger chunks",
+    "recursion guards",
+    "bulk loads"
+  ],
+  "files": [
+    {
+      "name": "SfcLeadScorer",
+      "type": "class"
+    },
+    {
+      "name": "SfcLeadScoreTrigger",
+      "type": "trigger"
+    }
+  ],
+  "testClass": "SfcLeadScorerTest"
+}

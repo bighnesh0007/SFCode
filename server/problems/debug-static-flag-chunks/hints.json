@@ -1,0 +1,5 @@
+[
+  "Salesforce runs triggers in chunks of 200 records. With 400 leads in one DML, the trigger runs twice in the same transaction.",
+  "A static Boolean set to true after the first chunk is still true for the second chunk, so the second 200 are skipped.",
+  "Guard per record instead: keep a static Set of what you've already scored. Before insert there are no Ids yet, so for new records skip the guard (they can only be inserted once) and track updated records by Id."
+]

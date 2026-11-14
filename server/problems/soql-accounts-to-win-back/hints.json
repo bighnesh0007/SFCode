@@ -1,0 +1,5 @@
+[
+  "You need two conditions on related Opportunities: one that must exist (semi-join) and one that must not (anti-join).",
+  "Semi-join: Id IN (SELECT AccountId FROM Opportunity WHERE IsClosed = false). Anti-join: Id NOT IN (SELECT AccountId FROM Opportunity WHERE ...).",
+  "'Won in the last 365 days' is IsWon = true AND CloseDate = LAST_N_DAYS:365. Combine both joins with AND and finish with ORDER BY Name ASC."
+]

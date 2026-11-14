@@ -1,6 +1,7 @@
 /** Daily Challenge against a real database: the pick is fixed per day, and wins count only same-day solves of that day's problem. */
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { sql } from "drizzle-orm";
+import { SCORED_TRACKS } from "../../src/domain/challenge.ts";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createPgDatabase, type PgDatabase } from "../../src/data/postgres/client.ts";
 import { PROBLEMS_DIR } from "../../src/container.ts";
@@ -34,7 +35,7 @@ describe.skipIf(!safe)("DailyService on Postgres", () => {
     const a = await svc.view(null);
     clock.advance(10 * 3600_000); // 18:00, same UTC day
     expect((await svc.view("someone")).problem.slug).toBe(a.problem.slug);
-    expect(["apex", "soql", "debug", "flow"]).toContain(a.problem.track);
+    expect(SCORED_TRACKS).toContain(a.problem.track);
     expect(a.resetsIn).toBe(16 * 3600);
 
     await db.execute(sql`INSERT INTO daily_challenges (day, problem_slug) VALUES ('2026-03-11', 'text-utils') ON CONFLICT DO NOTHING`);

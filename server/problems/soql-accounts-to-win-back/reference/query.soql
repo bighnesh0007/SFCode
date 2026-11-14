@@ -1,0 +1,1 @@
+SELECT Id, Name FROM Account WHERE Id IN (SELECT AccountId FROM Opportunity WHERE IsClosed = false) AND Id NOT IN (SELECT AccountId FROM Opportunity WHERE IsWon = true AND CloseDate = LAST_N_DAYS:365) ORDER BY Name ASC

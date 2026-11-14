@@ -1,0 +1,18 @@
+{
+  "title": "Lock the Amount on Closed Deals",
+  "track": "flow",
+  "difficulty": "Medium",
+  "category": "Before-Save Flows",
+  "order": 308,
+  "tags": [
+    "record-triggered",
+    "custom error",
+    "prior value"
+  ],
+  "files": [],
+  "flow": {
+    "apiName": "SFC_Lock_Closed_Amount",
+    "kind": "record-triggered"
+  },
+  "testClass": "SfcFlowLockAmountTest"
+}
