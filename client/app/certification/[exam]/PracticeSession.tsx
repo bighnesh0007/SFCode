@@ -120,12 +120,12 @@ export function PracticeSession({ exam, section, load, title }: { exam: string; 
         <div className="space-y-5">
           <Markdown source={q.prompt} className="markdown text-base" />
           <p className="text-xs text-muted-foreground">{q.choose === 1 ? "Choose one." : `Choose ${q.choose}.`}</p>
-          <ul className="space-y-2" role={q.choose === 1 ? "radiogroup" : "group"}>
+          <div className="space-y-2" role={q.choose === 1 ? "radiogroup" : "group"} aria-label="Answer options">
             {q.options.map((o) => {
               const picked = selected.includes(o.id);
               const isAnswer = result?.answer.includes(o.id) ?? false;
               return (
-                <li key={o.id}>
+                <div key={o.id}>
                   <button
                     type="button"
                     role={q.choose === 1 ? "radio" : "checkbox"}
@@ -144,10 +144,10 @@ export function PracticeSession({ exam, section, load, title }: { exam: string; 
                     {result && isAnswer && <CheckCircle2 className="h-4 w-4 shrink-0 text-green-700 dark:text-green-400" />}
                     {result && picked && !isAnswer && <XCircle className="h-4 w-4 shrink-0 text-red-500" />}
                   </button>
-                </li>
+                </div>
               );
             })}
-          </ul>
+          </div>
 
           {result && (
             <div className={cn("rounded-lg border p-4", result.correct ? "border-green-500/40" : "border-red-500/40")}>
