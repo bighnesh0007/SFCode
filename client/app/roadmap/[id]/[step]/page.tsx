@@ -121,6 +121,21 @@ export default async function Page({ params }: Props) {
           </ul>
         </section>
       )}
+      {(n.practice?.length ?? 0) > 0 && (
+        <section className="mt-8">
+          <h2 className="text-xl font-semibold">More practice (optional)</h2>
+          <ul className="mt-2 divide-y rounded-lg border">
+            {(n.practice ?? []).map((p) => (
+              <li key={p.slug}>
+                <Link href={`${trackInfo(p.track as Track).base}/${p.slug}`} className="flex items-baseline gap-3 px-4 py-2.5 hover:bg-accent/50">
+                  <span className="font-medium">{p.title}</span>
+                  <span className="ml-auto text-xs text-muted-foreground">{p.difficulty}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       {n.resources && n.resources.length > 0 && (
         <section className="mt-8">
           <h2 className="text-xl font-semibold">Official resources</h2>

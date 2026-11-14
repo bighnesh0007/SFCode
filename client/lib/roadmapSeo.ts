@@ -28,6 +28,6 @@ export const lessonsFor = cache(async (slug: string): Promise<RelatedLesson[]> =
   const list = (await serverApi<{ id: string }[]>("/api/v1/roadmaps")) ?? [];
   const maps = await Promise.all(list.map((r) => loadRoadmap(r.id)));
   return maps.flatMap(({ data }) =>
-    data ? data.nodes.filter((n) => n.problems.some((p) => p.slug === slug)).map((n) => ({ href: `/roadmap/${data.id}/${n.id}`, title: n.title, roadmap: data.title })) : [],
+    data ? data.nodes.filter((n) => [...n.problems, ...(n.practice ?? [])].some((p) => p.slug === slug)).map((n) => ({ href: `/roadmap/${data.id}/${n.id}`, title: n.title, roadmap: data.title })) : [],
   );
 });

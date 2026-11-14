@@ -65,6 +65,9 @@
           "answer": 1,
           "why": "Arrow functions don't rebind `this`."
         }
+      ],
+      "practice": [
+        "lwc-undo-redo"
       ]
     },
     {
@@ -150,6 +153,10 @@
       ],
       "problems": [
         "lwc-click-counter"
+      ],
+      "practice": [
+        "lwc-temperature-converter",
+        "lwc-show-more"
       ]
     },
     {
@@ -175,6 +182,10 @@
       "problems": [
         "lwc-character-counter",
         "lwc-contact-filter"
+      ],
+      "practice": [
+        "lwc-password-strength",
+        "lwc-sortable-table"
       ]
     },
     {
@@ -255,6 +266,11 @@
       ],
       "problems": [
         "lwc-star-rating"
+      ],
+      "practice": [
+        "lwc-cart-total",
+        "lwc-dependent-picklist",
+        "lwc-multi-step-form"
       ]
     },
     {
@@ -326,7 +342,11 @@
           "why": "Clean up so nothing keeps running after the component is gone."
         }
       ],
-      "diagramCaption": "LWC lifecycle: constructor, connectedCallback when inserted, render, renderedCallback after every render, disconnectedCallback when removed; errorCallback catches errors in children."
+      "diagramCaption": "LWC lifecycle: constructor, connectedCallback when inserted, render, renderedCallback after every render, disconnectedCallback when removed; errorCallback catches errors in children.",
+      "practice": [
+        "lwc-countdown",
+        "lwc-debounced-search"
+      ]
     },
     {
       "id": "fe-lds",
@@ -700,6 +720,9 @@
           "answer": 3,
           "why": "Buttons are focusable and keyboard-accessible by default."
         }
+      ],
+      "practice": [
+        "lwc-accordion"
       ]
     },
     {
