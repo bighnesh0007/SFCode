@@ -1654,6 +1654,546 @@
         "c"
       ],
       "explanation": "RunLocalTests runs every local test; RunAllTestsInOrg also includes managed package tests."
+    },
+    {
+      "id": "pd1-relationship-name",
+      "section": "fundamentals",
+      "prompt": "A custom lookup field `Project__c` on Task__c points to Project__c. How do you read the project's Name in SOQL from Task__c?",
+      "options": [
+        {
+          "id": "a",
+          "text": "SELECT Project.Name FROM Task__c"
+        },
+        {
+          "id": "b",
+          "text": "SELECT Project__c.Name FROM Task__c"
+        },
+        {
+          "id": "c",
+          "text": "SELECT (SELECT Name FROM Project__c) FROM Task__c"
+        },
+        {
+          "id": "d",
+          "text": "SELECT Project__r.Name FROM Task__c"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Custom relationship fields are traversed with the __r suffix: Project__r.Name. Project__c holds only the Id; a subquery goes from parent to children, not child to parent."
+    },
+    {
+      "id": "pd1-recordtype-id",
+      "section": "fundamentals",
+      "prompt": "Code must assign the 'Partner' record type to new Accounts without hard-coding an Id. Which is the reliable way?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Query RecordType once in the sandbox and store the returned Id as a constant in the class for production"
+        },
+        {
+          "id": "b",
+          "text": "Account.RecordType = 'Partner' assigned directly on the record"
+        },
+        {
+          "id": "c",
+          "text": "Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('Partner').getRecordTypeId()"
+        },
+        {
+          "id": "d",
+          "text": "The Id stored as a constant in the class, updated after each refresh"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Record type Ids differ between orgs, so look them up by developer name with the describe API. Hard-coded Ids break after deployment."
+    },
+    {
+      "id": "pd1-access-modifiers",
+      "section": "fundamentals",
+      "prompt": "A class must be callable from code in a managed package installed in other orgs. Which access modifier does it need?",
+      "options": [
+        {
+          "id": "a",
+          "text": "protected"
+        },
+        {
+          "id": "b",
+          "text": "public"
+        },
+        {
+          "id": "c",
+          "text": "private"
+        },
+        {
+          "id": "d",
+          "text": "global"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "public is visible only within the same namespace. global makes a class or method available to code outside its namespace, which managed packages require."
+    },
+    {
+      "id": "pd1-formula-vs-trigger",
+      "section": "fundamentals",
+      "prompt": "A field must always show an Opportunity's Amount converted to a fixed tax-inclusive value, recalculated whenever Amount changes. What's the simplest correct choice?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A roll-up summary field on Opportunity"
+        },
+        {
+          "id": "b",
+          "text": "A scheduled Apex job running nightly"
+        },
+        {
+          "id": "c",
+          "text": "A before-update trigger copying the value"
+        },
+        {
+          "id": "d",
+          "text": "A formula field"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "A formula field is calculated when read, so it's always current with no automation. A trigger or job would need to keep a stored copy in sync."
+    },
+    {
+      "id": "pd1-static-vs-instance",
+      "section": "fundamentals",
+      "prompt": "A utility method doesn't use any instance fields and is called from many classes. How should it be declared?",
+      "options": [
+        {
+          "id": "a",
+          "text": "As a static method, called with ClassName.method()"
+        },
+        {
+          "id": "b",
+          "text": "As an instance method, creating a new object for each call"
+        },
+        {
+          "id": "c",
+          "text": "As a trigger handler method on every object"
+        },
+        {
+          "id": "d",
+          "text": "As a global variable shared across transactions"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Static methods belong to the class, so callers don't need an instance. Static state lasts only for the transaction; nothing in Apex is shared across transactions in memory."
+    },
+    {
+      "id": "pd1-saveresult",
+      "section": "logic",
+      "prompt": "After `List<Database.SaveResult> results = Database.update(records, false);` how do you find which records failed and why?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Loop over results, check isSuccess(), and read getErrors() for the failures"
+        },
+        {
+          "id": "b",
+          "text": "Query the records again and compare their values"
+        },
+        {
+          "id": "c",
+          "text": "Check Limits.getDmlRows() against the list size"
+        },
+        {
+          "id": "d",
+          "text": "Wrap the call in try/catch and read the DmlException, which lists every record that failed and why"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "With allOrNone false no exception is thrown; each SaveResult says whether its record succeeded, and getErrors() gives the messages."
+    },
+    {
+      "id": "pd1-future-params",
+      "section": "logic",
+      "prompt": "Why does this fail to compile? `@future public static void sync(List<Account> accounts) { ... }`",
+      "options": [
+        {
+          "id": "a",
+          "text": "@future methods accept only primitives and collections of primitives, so pass Ids instead"
+        },
+        {
+          "id": "b",
+          "text": "@future methods must be declared global"
+        },
+        {
+          "id": "c",
+          "text": "@future methods can't be static"
+        },
+        {
+          "id": "d",
+          "text": "@future methods must return a List of results so the caller can check what the job did when it ran"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Future methods take primitive parameters (such as a Set<Id>); sObjects may have changed by the time the method runs, so query them inside it."
+    },
+    {
+      "id": "pd1-queueable-chain",
+      "section": "logic",
+      "prompt": "A job must process data in stages, each starting after the previous one finishes, passing state along. What fits best?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A Queueable that enqueues the next Queueable from execute()"
+        },
+        {
+          "id": "b",
+          "text": "One trigger that runs all stages synchronously"
+        },
+        {
+          "id": "c",
+          "text": "Several @future methods called in a loop, one per stage, in order"
+        },
+        {
+          "id": "d",
+          "text": "A Schedulable that runs every minute"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Queueables can carry state in member variables and chain by enqueuing the next job. Future methods can't chain or take complex state."
+    },
+    {
+      "id": "pd1-recursion-flag",
+      "section": "logic",
+      "prompt": "An after-update trigger updates related records whose triggers update the original record again. What's a common guard?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Moving the logic into a formula field"
+        },
+        {
+          "id": "b",
+          "text": "A validation rule on the record that blocks any second update in a transaction"
+        },
+        {
+          "id": "c",
+          "text": "A static Set<Id> of records already processed in this transaction"
+        },
+        {
+          "id": "d",
+          "text": "A custom setting that is set to true forever"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Static variables live for the transaction, so a static set of processed Ids stops re-entry without affecting the next transaction."
+    },
+    {
+      "id": "pd1-dml-exception-message",
+      "section": "logic",
+      "prompt": "A DmlException is caught from inserting a list. Which method returns the message for the first failed row?",
+      "options": [
+        {
+          "id": "a",
+          "text": "e.getMessage(0)"
+        },
+        {
+          "id": "b",
+          "text": "e.getCause().getMessage()"
+        },
+        {
+          "id": "c",
+          "text": "e.getRowError()"
+        },
+        {
+          "id": "d",
+          "text": "e.getDmlMessage(0)"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "DmlException adds per-row methods such as getDmlMessage(i), getDmlFieldNames(i) and getNumDml()."
+    },
+    {
+      "id": "pd1-platform-event-publish",
+      "section": "logic",
+      "prompt": "Apex must notify an external subscriber that an order shipped, without waiting for it. Which is the fitting approach?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Make a synchronous callout inside the trigger"
+        },
+        {
+          "id": "b",
+          "text": "Publish a platform event with EventBus.publish()"
+        },
+        {
+          "id": "c",
+          "text": "Send an email to the subscriber's inbox with the order details"
+        },
+        {
+          "id": "d",
+          "text": "Insert a Task assigned to the integration user"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Platform events decouple publishers from subscribers. A synchronous callout in a trigger isn't allowed after DML and would block the save."
+    },
+    {
+      "id": "pd1-lwc-api-setter",
+      "section": "ui",
+      "prompt": "An LWC must recompute a sorted copy whenever the parent changes its `items` property. What's a clean way?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Sort the parent's array in place inside connectedCallback so every render already sees it sorted"
+        },
+        {
+          "id": "b",
+          "text": "An @api getter and setter: the setter stores the value and builds the sorted copy"
+        },
+        {
+          "id": "c",
+          "text": "A renderedCallback that sorts this.items on every render"
+        },
+        {
+          "id": "d",
+          "text": "Use @track on items so the parent's array is sorted automatically"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A setter runs each time the parent assigns the property, so derived data stays in step. Sorting in renderedCallback causes extra renders, and mutating the parent's array breaks one-way data flow."
+    },
+    {
+      "id": "pd1-lwc-getrecord-fields",
+      "section": "ui",
+      "prompt": "A component uses `@wire(getRecord, { recordId: '$recordId', fields })`. Why import fields like `import NAME from '@salesforce/schema/Account.Name'`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Because getRecord only accepts field references imported from the same namespace as the component"
+        },
+        {
+          "id": "b",
+          "text": "Because imported fields bypass field-level security"
+        },
+        {
+          "id": "c",
+          "text": "So Salesforce knows the field dependency and stops the field from being deleted"
+        },
+        {
+          "id": "d",
+          "text": "Because strings are slower than imports at runtime"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Schema imports create a reference the platform tracks, so the field can't be deleted or renamed while the component uses it. FLS still applies."
+    },
+    {
+      "id": "pd1-lwc-slots",
+      "section": "ui",
+      "prompt": "A reusable card component must let parents supply their own content in the body. What should it use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A <slot> in its template"
+        },
+        {
+          "id": "b",
+          "text": "lwc:dom=\"manual\" with innerHTML"
+        },
+        {
+          "id": "c",
+          "text": "An @api property holding HTML strings"
+        },
+        {
+          "id": "d",
+          "text": "A separate component for every possible body"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Slots let a parent pass markup into a child. Passing HTML strings and injecting them risks XSS and loses reactivity."
+    },
+    {
+      "id": "pd1-lwc-event-composed",
+      "section": "ui",
+      "prompt": "A child's custom event must reach a listener outside its parent component's shadow tree. Which options does it need?",
+      "options": [
+        {
+          "id": "a",
+          "text": "bubbles: false and composed: true"
+        },
+        {
+          "id": "b",
+          "text": "cancelable: true only"
+        },
+        {
+          "id": "c",
+          "text": "bubbles: true and composed: true"
+        },
+        {
+          "id": "d",
+          "text": "No options; events always cross shadow boundaries"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "composed lets the event cross shadow boundaries and bubbles lets it travel up the tree. Use both sparingly, since the event becomes part of the component's public API."
+    },
+    {
+      "id": "pd1-vf-action-return",
+      "section": "ui",
+      "prompt": "A Visualforce controller action saves a record and must send the user to the record's detail page. What should it return?",
+      "options": [
+        {
+          "id": "a",
+          "text": "void, with a JavaScript redirect"
+        },
+        {
+          "id": "b",
+          "text": "The saved record itself"
+        },
+        {
+          "id": "c",
+          "text": "A String containing the record's full URL for the page"
+        },
+        {
+          "id": "d",
+          "text": "A PageReference to the record's view page"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Action methods return a PageReference to navigate (or null to stay on the page)."
+    },
+    {
+      "id": "pd1-standard-pricebook-test",
+      "section": "testing",
+      "prompt": "A test needs the standard price book to create PricebookEntry records. How does it get its Id without SeeAllData?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Test.getStandardPricebookId()"
+        },
+        {
+          "id": "b",
+          "text": "[SELECT Id FROM Pricebook2 WHERE IsStandard = true]"
+        },
+        {
+          "id": "c",
+          "text": "Insert a new Pricebook2 with IsStandard = true"
+        },
+        {
+          "id": "d",
+          "text": "Read it from a custom setting populated in production"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Tests can't see the standard price book without SeeAllData, but Test.getStandardPricebookId() returns its Id. You can't create a standard price book."
+    },
+    {
+      "id": "pd1-testsetup-reuse",
+      "section": "testing",
+      "prompt": "Several test methods in one class need the same 200 Accounts. What's the efficient way?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Use SeeAllData=true and query production accounts"
+        },
+        {
+          "id": "b",
+          "text": "Create them once in an @testSetup method"
+        },
+        {
+          "id": "c",
+          "text": "Create them in each test method separately"
+        },
+        {
+          "id": "d",
+          "text": "Store them in a static variable set by the first test"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "@testSetup data is created once and rolled back to that state before each test method, which saves time. Static variables don't survive between test methods."
+    },
+    {
+      "id": "pd1-debug-checkpoints",
+      "section": "testing",
+      "prompt": "You need to inspect the values of variables at a specific line during execution without adding System.debug calls. What can you use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Checkpoints in the Developer Console"
+        },
+        {
+          "id": "b",
+          "text": "The Health Check page"
+        },
+        {
+          "id": "c",
+          "text": "Field history tracking"
+        },
+        {
+          "id": "d",
+          "text": "Setup Audit Trail, filtered to your own changes"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Checkpoints capture heap and variable state at a line when the code runs, viewable in the Developer Console."
+    },
+    {
+      "id": "pd1-deploy-tool",
+      "section": "testing",
+      "prompt": "A team deploys metadata from source control to production in an automated pipeline. Which tool fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The Salesforce CLI (sf project deploy start) run from the pipeline"
+        },
+        {
+          "id": "b",
+          "text": "Change sets uploaded from the sandbox by a developer at each release, with the deployment validated manually"
+        },
+        {
+          "id": "c",
+          "text": "Data Loader exporting metadata as CSV"
+        },
+        {
+          "id": "d",
+          "text": "The Developer Console's file menu"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The Salesforce CLI deploys source-format metadata from scripts, which suits CI/CD. Change sets are manual, and Data Loader moves data, not metadata."
     }
   ]
 }

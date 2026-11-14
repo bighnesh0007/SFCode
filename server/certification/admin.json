@@ -1676,6 +1676,546 @@
         "d"
       ],
       "explanation": "Record-triggered flows have a Trigger Order setting that decides their relative order for the same object and timing."
+    },
+    {
+      "id": "adm-session-timeout",
+      "section": "setup",
+      "prompt": "Security wants users logged out after 30 minutes of inactivity. Where is this set?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Password policies, with a 30-minute expiry"
+        },
+        {
+          "id": "b",
+          "text": "Session Settings, timeout value of 30 minutes"
+        },
+        {
+          "id": "c",
+          "text": "Login hours on every profile, ending each half hour"
+        },
+        {
+          "id": "d",
+          "text": "A scheduled flow that freezes idle users"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The session timeout in Session Settings (or per profile) logs out inactive users. Password policies control password expiry, not idle sessions."
+    },
+    {
+      "id": "adm-fiscal-year",
+      "section": "setup",
+      "prompt": "The company's fiscal year starts in April and every forecast and report should follow it. What do you configure?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A separate org for the finance team"
+        },
+        {
+          "id": "b",
+          "text": "The standard fiscal year in Company Settings, starting in April"
+        },
+        {
+          "id": "c",
+          "text": "A custom field on every opportunity holding the fiscal quarter"
+        },
+        {
+          "id": "d",
+          "text": "A report filter that shifts dates by three months"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Setting the fiscal year start month makes fiscal periods in reports and forecasts line up. Custom fiscal years are for non-standard calendars and are hard to undo."
+    },
+    {
+      "id": "adm-profile-vs-permset",
+      "section": "setup",
+      "prompt": "What is the recommended way to grant extra permissions to some users today?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Grant permissions through the role hierarchy"
+        },
+        {
+          "id": "b",
+          "text": "Create a new profile for every combination of permissions"
+        },
+        {
+          "id": "c",
+          "text": "Give everyone the System Administrator profile and remove access with page layouts"
+        },
+        {
+          "id": "d",
+          "text": "Keep profiles minimal and add permissions with permission sets and permission set groups"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Salesforce recommends minimal profiles plus permission sets. The role hierarchy controls record access, not permissions."
+    },
+    {
+      "id": "adm-field-dependency-limit",
+      "section": "objects",
+      "prompt": "Which field type can't be a controlling field for a dependent picklist?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Checkbox"
+        },
+        {
+          "id": "b",
+          "text": "Standard picklist"
+        },
+        {
+          "id": "c",
+          "text": "Custom picklist"
+        },
+        {
+          "id": "d",
+          "text": "Multi-select picklist"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Picklists and checkboxes can control dependent picklists; multi-select picklists can be dependent but can't control others."
+    },
+    {
+      "id": "adm-roll-up-filter",
+      "section": "objects",
+      "prompt": "Project needs a count of only its open Tasks__c (a master-detail child). What can do this without code?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A formula field on Project that counts open tasks"
+        },
+        {
+          "id": "b",
+          "text": "A lookup filter on the master-detail field"
+        },
+        {
+          "id": "c",
+          "text": "A validation rule on Task__c"
+        },
+        {
+          "id": "d",
+          "text": "A COUNT roll-up summary with filter criteria Status__c = 'Open'"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Roll-up summaries support filter criteria. Formula fields can't count child records."
+    },
+    {
+      "id": "adm-schema-builder",
+      "section": "objects",
+      "prompt": "An admin wants a visual map of objects and their relationships, and to add a field from that view. Which tool?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The Setup Audit Trail"
+        },
+        {
+          "id": "b",
+          "text": "Schema Builder"
+        },
+        {
+          "id": "c",
+          "text": "Lightning App Builder"
+        },
+        {
+          "id": "d",
+          "text": "Object Manager's page layout editor"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Schema Builder shows objects and relationships as a diagram and can create objects and fields. Lightning App Builder designs pages."
+    },
+    {
+      "id": "adm-quotes-sync",
+      "section": "sales",
+      "prompt": "A rep has three quotes on one opportunity. How many can sync with the opportunity's products at a time?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Two, one active and one draft"
+        },
+        {
+          "id": "b",
+          "text": "One"
+        },
+        {
+          "id": "c",
+          "text": "All three"
+        },
+        {
+          "id": "d",
+          "text": "None; quotes never sync"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Only one quote syncs with its opportunity at a time; starting sync on another stops the first."
+    },
+    {
+      "id": "adm-lead-queue",
+      "section": "sales",
+      "prompt": "Web leads should wait in a shared list where any rep on the inside-sales team can take them. What do you create?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A public group used as the lead owner"
+        },
+        {
+          "id": "b",
+          "text": "A role called Inside Sales that owns the leads"
+        },
+        {
+          "id": "c",
+          "text": "A list view filtered to unassigned leads"
+        },
+        {
+          "id": "d",
+          "text": "A lead queue with the inside-sales team as members"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Queues can own records, and members take records from them. Public groups and roles can't own records."
+    },
+    {
+      "id": "adm-forecast-hierarchy",
+      "section": "sales",
+      "prompt": "Whose forecasts roll up to a manager in Collaborative Forecasts by default?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Users with the same profile"
+        },
+        {
+          "id": "b",
+          "text": "Only users who share an account team"
+        },
+        {
+          "id": "c",
+          "text": "Every user in the same public group"
+        },
+        {
+          "id": "d",
+          "text": "The forecasts of users below them in the forecast (role) hierarchy"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Forecasts roll up through the forecast hierarchy, which is based on the role hierarchy."
+    },
+    {
+      "id": "adm-case-auto-response",
+      "section": "service",
+      "prompt": "Customers who submit a web form should immediately receive an email with their case number. What do you configure?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A case assignment rule"
+        },
+        {
+          "id": "b",
+          "text": "A case auto-response rule"
+        },
+        {
+          "id": "c",
+          "text": "A workflow on the Contact object"
+        },
+        {
+          "id": "d",
+          "text": "A case escalation rule"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Auto-response rules send a templated email when a case is created from Web-to-Case or Email-to-Case."
+    },
+    {
+      "id": "adm-macros",
+      "section": "service",
+      "prompt": "Agents repeat the same steps for common cases: send a reply, set the status and close. What saves them time in the console?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A separate case record type for each issue"
+        },
+        {
+          "id": "b",
+          "text": "Macros"
+        },
+        {
+          "id": "c",
+          "text": "A dashboard of common cases"
+        },
+        {
+          "id": "d",
+          "text": "Quick Text alone"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Macros run several console actions in one click. Quick Text only inserts text into a message."
+    },
+    {
+      "id": "adm-email-templates-lightning",
+      "section": "productivity",
+      "prompt": "Reps want reusable emails with merge fields from the opportunity they're sending from. What should the admin create?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A custom field holding the email body"
+        },
+        {
+          "id": "b",
+          "text": "Lightning email templates with merge fields"
+        },
+        {
+          "id": "c",
+          "text": "A report subscription for each opportunity"
+        },
+        {
+          "id": "d",
+          "text": "Chatter posts saved as drafts"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Lightning email templates support merge fields and are available from the email composer."
+    },
+    {
+      "id": "adm-kanban",
+      "section": "productivity",
+      "prompt": "Sales managers want to drag opportunities between stages on a board. What should they use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Path on the opportunity record page"
+        },
+        {
+          "id": "b",
+          "text": "A matrix report grouped by Stage"
+        },
+        {
+          "id": "c",
+          "text": "A dashboard with a stage chart"
+        },
+        {
+          "id": "d",
+          "text": "A Kanban list view grouped by Stage"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Kanban list views show records as cards in columns and let users drag them to update the grouping field."
+    },
+    {
+      "id": "adm-field-history-retention",
+      "section": "data",
+      "prompt": "How many fields per object can have standard field history tracking?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Up to 20"
+        },
+        {
+          "id": "b",
+          "text": "Only formula fields"
+        },
+        {
+          "id": "c",
+          "text": "Unlimited"
+        },
+        {
+          "id": "d",
+          "text": "Up to 5"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Standard field history tracking supports up to 20 fields per object; Field Audit Trail (Shield) extends this."
+    },
+    {
+      "id": "adm-report-bucket",
+      "section": "data",
+      "prompt": "A report should group accounts into 'Small', 'Medium' and 'Large' by annual revenue without creating a field. What do you use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A validation rule on Annual Revenue"
+        },
+        {
+          "id": "b",
+          "text": "A new picklist field on Account"
+        },
+        {
+          "id": "c",
+          "text": "A bucket column in the report"
+        },
+        {
+          "id": "d",
+          "text": "A cross filter on Opportunities"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Bucket columns group values into categories inside the report, with no new field needed."
+    },
+    {
+      "id": "adm-joined-report",
+      "section": "data",
+      "prompt": "Leadership wants opportunities and cases for each account side by side in one report. Which format fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A summary report on Accounts with Opportunities"
+        },
+        {
+          "id": "b",
+          "text": "A joined report with an Opportunities block and a Cases block"
+        },
+        {
+          "id": "c",
+          "text": "A tabular report with a cross filter"
+        },
+        {
+          "id": "d",
+          "text": "A matrix report on Cases"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Joined reports combine blocks from different report types, grouped by a common field such as account."
+    },
+    {
+      "id": "adm-data-loader-delete",
+      "section": "data",
+      "prompt": "Which tool can delete 300,000 records matched by Id from a CSV file?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Data Import Wizard"
+        },
+        {
+          "id": "b",
+          "text": "Mass Delete Records in Setup"
+        },
+        {
+          "id": "c",
+          "text": "Data Loader"
+        },
+        {
+          "id": "d",
+          "text": "The Recycle Bin"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Data Loader supports delete and hard delete from a CSV of Ids. The Import Wizard only inserts and updates, and Mass Delete covers only some objects and up to 250 records at a time."
+    },
+    {
+      "id": "adm-flow-get-records",
+      "section": "automation",
+      "prompt": "A flow needs the account's open cases before deciding what to do. Which element retrieves them?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Decision"
+        },
+        {
+          "id": "b",
+          "text": "Assignment"
+        },
+        {
+          "id": "c",
+          "text": "Collection Sort"
+        },
+        {
+          "id": "d",
+          "text": "Get Records"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Get Records queries records into a variable or collection. Decision branches on values you already have."
+    },
+    {
+      "id": "adm-flow-loop-dml",
+      "section": "automation",
+      "prompt": "A flow updates every contact in a collection. Why put the Update Records element after the loop rather than inside it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Update Records can't be placed inside a loop"
+        },
+        {
+          "id": "b",
+          "text": "One update for the whole collection avoids hitting DML limits"
+        },
+        {
+          "id": "c",
+          "text": "It makes the flow run in system mode"
+        },
+        {
+          "id": "d",
+          "text": "Loops skip records that are updated inside them"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "An update inside a loop runs once per record and can exceed the DML statement limit. Collect changes in a collection variable and update once after the loop."
+    },
+    {
+      "id": "adm-workflow-retirement",
+      "section": "automation",
+      "prompt": "The org still has workflow rules and Process Builder processes. What does Salesforce recommend?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Convert them to validation rules"
+        },
+        {
+          "id": "b",
+          "text": "Rewrite all of them in Apex"
+        },
+        {
+          "id": "c",
+          "text": "Migrate them to Flow, using the Migrate to Flow tool where possible"
+        },
+        {
+          "id": "d",
+          "text": "Keep building new automation in Process Builder"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Workflow rules and Process Builder are retired for new automation; Flow is the replacement, and the Migrate to Flow tool converts many of them."
     }
   ]
 }
