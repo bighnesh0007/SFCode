@@ -1660,6 +1660,546 @@
         "b"
       ],
       "explanation": "Validation catches errors early; planned releases and communication reduce disruption."
+    },
+    {
+      "id": "pab-custom-metadata",
+      "section": "fundamentals",
+      "prompt": "Discount thresholds must be configurable by admins and deployed with the app between orgs. What should hold them?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A custom object with one record per threshold"
+        },
+        {
+          "id": "b",
+          "text": "A list view filter"
+        },
+        {
+          "id": "c",
+          "text": "Hard-coded values in a formula field"
+        },
+        {
+          "id": "d",
+          "text": "Custom metadata types"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Custom metadata records are metadata, so they move with change sets and packages. Records of a custom object are data and must be loaded separately in each org."
+    },
+    {
+      "id": "pab-record-type-layout",
+      "section": "fundamentals",
+      "prompt": "Partner accounts need a different page layout and different Type picklist values from customer accounts. What do you set up?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A validation rule that blocks partner-only fields and values on customer accounts"
+        },
+        {
+          "id": "b",
+          "text": "A second Account object for partners"
+        },
+        {
+          "id": "c",
+          "text": "A permission set that changes the layout"
+        },
+        {
+          "id": "d",
+          "text": "A Partner record type, with its own page layout assignment and picklist values"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Record types control available picklist values and, with profiles, which page layout users see."
+    },
+    {
+      "id": "pab-big-objects",
+      "section": "fundamentals",
+      "prompt": "An app must store billions of read-mostly event records for years. Which feature is designed for this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Custom settings"
+        },
+        {
+          "id": "b",
+          "text": "Big objects"
+        },
+        {
+          "id": "c",
+          "text": "Chatter files"
+        },
+        {
+          "id": "d",
+          "text": "Standard custom objects"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Big objects hold massive volumes with consistent performance; they're queried through their index and have limited automation."
+    },
+    {
+      "id": "pab-external-objects",
+      "section": "fundamentals",
+      "prompt": "Users need to see orders stored in an ERP in real time without copying them into Salesforce. What fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Email-to-Case with the orders attached"
+        },
+        {
+          "id": "b",
+          "text": "A report on a custom object of copied orders"
+        },
+        {
+          "id": "c",
+          "text": "External objects through Salesforce Connect"
+        },
+        {
+          "id": "d",
+          "text": "A nightly import into a custom object"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Salesforce Connect shows external data as external objects, fetched when viewed, with no copies stored."
+    },
+    {
+      "id": "pab-text-picklist",
+      "section": "data",
+      "prompt": "A formula must compare a picklist field Status__c to 'Closed'. Which expression works?",
+      "options": [
+        {
+          "id": "a",
+          "text": "CONTAINS(TEXT(Status__c), 'Closed') = TRUE"
+        },
+        {
+          "id": "b",
+          "text": "ISPICKVAL(Status__c, 'Closed')"
+        },
+        {
+          "id": "c",
+          "text": "VALUE(Status__c) = 'Closed'"
+        },
+        {
+          "id": "d",
+          "text": "Status__c = 'Closed'"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Picklists can't be compared with = in formulas. Use ISPICKVAL, or TEXT(Status__c) = 'Closed'."
+    },
+    {
+      "id": "pab-image-formula",
+      "section": "data",
+      "prompt": "Account records should show a traffic-light icon based on Rating. Which formula function displays an image?",
+      "options": [
+        {
+          "id": "a",
+          "text": "HYPERLINK(url, text)"
+        },
+        {
+          "id": "b",
+          "text": "INCLUDES(Rating, url)"
+        },
+        {
+          "id": "c",
+          "text": "IMAGE(url, alt_text)"
+        },
+        {
+          "id": "d",
+          "text": "ICON(Rating)"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "IMAGE returns an image for a formula field, often combined with CASE to choose the icon."
+    },
+    {
+      "id": "pab-lookup-filter",
+      "section": "data",
+      "prompt": "On Opportunity, the Partner Account lookup should only allow accounts whose Type is Partner. What do you use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A record type on Opportunity"
+        },
+        {
+          "id": "b",
+          "text": "A lookup filter on the field"
+        },
+        {
+          "id": "c",
+          "text": "A sharing rule on Account"
+        },
+        {
+          "id": "d",
+          "text": "A validation rule on Account"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Lookup filters restrict which records can be selected in a lookup, and can be required or optional."
+    },
+    {
+      "id": "pab-today-vs-now",
+      "section": "data",
+      "prompt": "A formula field returns the number of days until a Date field Renewal_Date__c. Which expression is right?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Renewal_Date__c - NOW()"
+        },
+        {
+          "id": "b",
+          "text": "Renewal_Date__c - TODAY()"
+        },
+        {
+          "id": "c",
+          "text": "DATEVALUE(Renewal_Date__c) - NOW()"
+        },
+        {
+          "id": "d",
+          "text": "DAYS(Renewal_Date__c, TODAY)"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Subtracting two Dates gives a number of days. NOW() returns a Date/Time, which can't be subtracted from a Date without conversion."
+    },
+    {
+      "id": "pab-flow-decision",
+      "section": "logic",
+      "prompt": "A flow must take different paths for High, Medium and Low priority cases. Which element does this?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Assignment, with one variable per priority level"
+        },
+        {
+          "id": "b",
+          "text": "Decision, with an outcome for each priority"
+        },
+        {
+          "id": "c",
+          "text": "Loop over the priority values"
+        },
+        {
+          "id": "d",
+          "text": "Get Records filtered by priority"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Decision elements route the flow by conditions, with one outcome per path plus a default."
+    },
+    {
+      "id": "pab-flow-assignment",
+      "section": "logic",
+      "prompt": "In a flow, how do you add a record to a collection variable?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A Decision element with an outcome that adds it"
+        },
+        {
+          "id": "b",
+          "text": "An Assignment element using the Add operator"
+        },
+        {
+          "id": "c",
+          "text": "A Create Records element"
+        },
+        {
+          "id": "d",
+          "text": "An Update Records element"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Assignment sets or changes variable values; the Add operator appends to a collection."
+    },
+    {
+      "id": "pab-autolaunched-subflow",
+      "section": "logic",
+      "prompt": "Several flows need the same steps to calculate shipping cost. How do you share them?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Copy the same elements into each flow and keep them aligned"
+        },
+        {
+          "id": "b",
+          "text": "Build an autolaunched flow and call it as a subflow"
+        },
+        {
+          "id": "c",
+          "text": "Copy the elements into each flow"
+        },
+        {
+          "id": "d",
+          "text": "Use a separate approval process"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Subflows let flows reuse an autolaunched flow, passing input and output variables."
+    },
+    {
+      "id": "pab-before-vs-after-save",
+      "section": "logic",
+      "prompt": "When a case is created, the flow must create a follow-up task. Why must this run after save?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Before-save flows can't read any field values from the triggering case"
+        },
+        {
+          "id": "b",
+          "text": "The case needs an Id before a related task can be created"
+        },
+        {
+          "id": "c",
+          "text": "Before-save flows only run on update"
+        },
+        {
+          "id": "d",
+          "text": "After-save flows are always faster"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Before-save flows can only change fields on the triggering record. Creating related records needs the record saved, with an Id, so it's an after-save flow."
+    },
+    {
+      "id": "pab-approval-entry",
+      "section": "logic",
+      "prompt": "Only opportunities over $50,000 should be eligible for a particular approval process. Where is that set?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A validation rule on Amount that blocks submission below it"
+        },
+        {
+          "id": "b",
+          "text": "The opportunity's sharing settings"
+        },
+        {
+          "id": "c",
+          "text": "The approval process's entry criteria"
+        },
+        {
+          "id": "d",
+          "text": "The page layout's buttons section"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Entry criteria decide which records can be submitted to an approval process."
+    },
+    {
+      "id": "pab-flow-schedule",
+      "section": "logic",
+      "prompt": "Every Monday morning, overdue tasks must be reassigned to the owner's manager. What type of flow fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A record-triggered before-save flow"
+        },
+        {
+          "id": "b",
+          "text": "A schedule-triggered flow"
+        },
+        {
+          "id": "c",
+          "text": "A screen flow"
+        },
+        {
+          "id": "d",
+          "text": "A platform event-triggered flow"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Schedule-triggered flows run at a set time and frequency on a batch of records."
+    },
+    {
+      "id": "pab-dynamic-actions",
+      "section": "ui",
+      "prompt": "The Escalate button on a case record page should appear only when Priority is High. What do you use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Dynamic Actions with a visibility filter"
+        },
+        {
+          "id": "b",
+          "text": "A separate page layout per priority"
+        },
+        {
+          "id": "c",
+          "text": "A validation rule on Priority"
+        },
+        {
+          "id": "d",
+          "text": "A permission set for high-priority cases"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Dynamic Actions let you show or hide actions on Lightning record pages based on field values, device or user."
+    },
+    {
+      "id": "pab-custom-tab",
+      "section": "ui",
+      "prompt": "Users need a navigation item for a new custom object. What do you create?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A compact layout"
+        },
+        {
+          "id": "b",
+          "text": "A custom object tab, added to the app"
+        },
+        {
+          "id": "c",
+          "text": "A report folder for the object"
+        },
+        {
+          "id": "d",
+          "text": "A list view on the home page"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Custom object tabs give an object a place in navigation; then add the tab to the app."
+    },
+    {
+      "id": "pab-path-guidance",
+      "section": "ui",
+      "prompt": "Reps should see key fields and coaching text for each stage at the top of the opportunity. What do you configure?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A dashboard on the record page"
+        },
+        {
+          "id": "b",
+          "text": "Path, with key fields and guidance for success"
+        },
+        {
+          "id": "c",
+          "text": "A compact layout for each stage"
+        },
+        {
+          "id": "d",
+          "text": "A screen flow for each stage"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Path shows the stages with key fields and guidance per stage on the record page."
+    },
+    {
+      "id": "pab-packages",
+      "section": "deployment",
+      "prompt": "A team wants to deliver its app as a versioned, upgradeable unit to its own orgs, from source control. What fits best?",
+      "options": [
+        {
+          "id": "a",
+          "text": "An unlocked package"
+        },
+        {
+          "id": "b",
+          "text": "A copied sandbox"
+        },
+        {
+          "id": "c",
+          "text": "A change set"
+        },
+        {
+          "id": "d",
+          "text": "An unmanaged package"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Unlocked packages are versioned and upgradeable and built from source. Unmanaged packages can't be upgraded, and change sets aren't versioned."
+    },
+    {
+      "id": "pab-devops-center",
+      "section": "deployment",
+      "prompt": "An admin team wants to track changes in source control and promote them through environments without the command line. What can they use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "DevOps Center"
+        },
+        {
+          "id": "b",
+          "text": "Data Loader"
+        },
+        {
+          "id": "c",
+          "text": "Schema Builder"
+        },
+        {
+          "id": "d",
+          "text": "Setup Audit Trail"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "DevOps Center manages work items, source control and pipeline promotion with a point-and-click interface."
+    },
+    {
+      "id": "pab-validate-first",
+      "section": "deployment",
+      "prompt": "What does validating a change set in production do?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Deploys the changes and runs no tests"
+        },
+        {
+          "id": "b",
+          "text": "Copies production metadata back into the sandbox"
+        },
+        {
+          "id": "c",
+          "text": "Runs the deployment and tests without saving the changes, so you can deploy later quickly"
+        },
+        {
+          "id": "d",
+          "text": "Deletes components that aren't in the change set"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Validation checks the deployment and runs tests without committing; a validated change set can then be quick-deployed."
     }
   ]
 }

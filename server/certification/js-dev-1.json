@@ -1673,6 +1673,546 @@
         "c"
       ],
       "explanation": "beforeEach runs before each test; beforeAll once for the file."
+    },
+    {
+      "id": "js-var-hoisting",
+      "section": "variables",
+      "prompt": "What does this log? `console.log(x); var x = 5;`",
+      "options": [
+        {
+          "id": "a",
+          "text": "undefined"
+        },
+        {
+          "id": "b",
+          "text": "null"
+        },
+        {
+          "id": "c",
+          "text": "5"
+        },
+        {
+          "id": "d",
+          "text": "A ReferenceError"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "var declarations are hoisted and initialised to undefined; the assignment happens later. With let or const, reading x first throws a ReferenceError (temporal dead zone)."
+    },
+    {
+      "id": "js-sort-default",
+      "section": "variables",
+      "prompt": "What does `[10, 9, 1].sort()` return?",
+      "options": [
+        {
+          "id": "a",
+          "text": "[10, 9, 1]"
+        },
+        {
+          "id": "b",
+          "text": "A TypeError, because sort needs a comparator"
+        },
+        {
+          "id": "c",
+          "text": "[1, 9, 10]"
+        },
+        {
+          "id": "d",
+          "text": "[1, 10, 9]"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Without a comparator, sort converts elements to strings and compares them: '1' < '10' < '9'. Use sort((a, b) => a - b) for numbers."
+    },
+    {
+      "id": "js-float",
+      "section": "variables",
+      "prompt": "Why does `0.1 + 0.2 === 0.3` return false?",
+      "options": [
+        {
+          "id": "a",
+          "text": "0.3 is stored as an integer"
+        },
+        {
+          "id": "b",
+          "text": "JavaScript rounds every sum down to one decimal place"
+        },
+        {
+          "id": "c",
+          "text": "Numbers are binary floating point, so 0.1 + 0.2 is 0.30000000000000004"
+        },
+        {
+          "id": "d",
+          "text": "=== compares types, and the sum is a string"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "JavaScript numbers are IEEE 754 doubles; many decimals can't be represented exactly. Compare with a tolerance (Number.EPSILON) or work in integers (cents)."
+    },
+    {
+      "id": "js-date-month",
+      "section": "variables",
+      "prompt": "What month does `new Date(2026, 1, 15)` represent?",
+      "options": [
+        {
+          "id": "a",
+          "text": "March"
+        },
+        {
+          "id": "b",
+          "text": "It throws, because months start at 1"
+        },
+        {
+          "id": "c",
+          "text": "February"
+        },
+        {
+          "id": "d",
+          "text": "January"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Months in the Date constructor are zero-based: 0 is January, so 1 is February. Days of the month start at 1."
+    },
+    {
+      "id": "js-slice-splice",
+      "section": "objects",
+      "prompt": "Which statement about `slice` and `splice` on arrays is true?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Both change the array and return nothing"
+        },
+        {
+          "id": "b",
+          "text": "Both return copies and leave the array unchanged"
+        },
+        {
+          "id": "c",
+          "text": "slice returns a copy of part of the array; splice changes the array in place"
+        },
+        {
+          "id": "d",
+          "text": "slice changes the array in place; splice returns a copy"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "slice(start, end) is non-mutating. splice(start, deleteCount, ...items) removes or inserts in place and returns the removed items."
+    },
+    {
+      "id": "js-object-assign-shallow",
+      "section": "objects",
+      "prompt": "After `const b = Object.assign({}, a)` where `a = { n: { x: 1 } }`, what does `b.n.x = 2` do to `a.n.x`?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Nothing; Object.assign copies nested objects deeply"
+        },
+        {
+          "id": "b",
+          "text": "It deletes a.n"
+        },
+        {
+          "id": "c",
+          "text": "It changes a.n.x to 2, because the copy is shallow"
+        },
+        {
+          "id": "d",
+          "text": "It throws, because a is frozen by the copy"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Object.assign and spread copy only the top level; nested objects are shared. Use structuredClone(a) for a deep copy."
+    },
+    {
+      "id": "js-structured-clone",
+      "section": "objects",
+      "prompt": "Which creates a deep copy of an object containing nested objects, arrays and Dates?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Object.assign({}, obj)"
+        },
+        {
+          "id": "b",
+          "text": "Object.create(obj)"
+        },
+        {
+          "id": "c",
+          "text": "{ ...obj }"
+        },
+        {
+          "id": "d",
+          "text": "structuredClone(obj)"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "structuredClone copies nested structures and supports types like Date and Map. JSON.parse(JSON.stringify(obj)) also deep-copies but turns Dates into strings and drops functions."
+    },
+    {
+      "id": "js-hasown",
+      "section": "objects",
+      "prompt": "Which checks whether an object has its own property `name`, not one inherited from its prototype?",
+      "options": [
+        {
+          "id": "a",
+          "text": "typeof obj.name === 'string'"
+        },
+        {
+          "id": "b",
+          "text": "obj.name !== undefined"
+        },
+        {
+          "id": "c",
+          "text": "'name' in obj"
+        },
+        {
+          "id": "d",
+          "text": "Object.hasOwn(obj, 'name')"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "The in operator also finds inherited properties, and a property can exist with the value undefined. Object.hasOwn checks own properties only."
+    },
+    {
+      "id": "js-instanceof",
+      "section": "objects",
+      "prompt": "What does `[] instanceof Object` return?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A TypeError"
+        },
+        {
+          "id": "b",
+          "text": "undefined"
+        },
+        {
+          "id": "c",
+          "text": "true"
+        },
+        {
+          "id": "d",
+          "text": "false"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "instanceof checks the prototype chain. Arrays inherit from Array.prototype, which inherits from Object.prototype. Use Array.isArray to test for arrays."
+    },
+    {
+      "id": "js-session-storage",
+      "section": "browser",
+      "prompt": "How does sessionStorage differ from localStorage?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It's sent to the server with every request"
+        },
+        {
+          "id": "b",
+          "text": "It's shared across all sites in the browser"
+        },
+        {
+          "id": "c",
+          "text": "It's cleared when the tab is closed, and each tab has its own copy"
+        },
+        {
+          "id": "d",
+          "text": "It can store objects without converting them to strings"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "sessionStorage lasts for the tab's session; localStorage persists until cleared. Both store strings per origin, and neither is sent to the server (cookies are)."
+    },
+    {
+      "id": "js-event-once",
+      "section": "browser",
+      "prompt": "A click handler should run only the first time a button is clicked. What's the simplest way?",
+      "options": [
+        {
+          "id": "a",
+          "text": "addEventListener('click', handler, { once: true })"
+        },
+        {
+          "id": "b",
+          "text": "Set button.onclick = null before adding the listener"
+        },
+        {
+          "id": "c",
+          "text": "addEventListener('click', handler, { capture: true })"
+        },
+        {
+          "id": "d",
+          "text": "Call event.stopPropagation() inside the handler"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The once option removes the listener automatically after it runs. capture changes the phase, not how many times it runs."
+    },
+    {
+      "id": "js-history-pushstate",
+      "section": "browser",
+      "prompt": "A single-page app changes the URL without reloading the page. Which API does it use?",
+      "options": [
+        {
+          "id": "a",
+          "text": "document.URL = newUrl"
+        },
+        {
+          "id": "b",
+          "text": "navigator.navigate()"
+        },
+        {
+          "id": "c",
+          "text": "window.location.assign()"
+        },
+        {
+          "id": "d",
+          "text": "history.pushState()"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "history.pushState adds a history entry and changes the URL without a reload. location.assign navigates and reloads."
+    },
+    {
+      "id": "js-debugger-statement",
+      "section": "debugging",
+      "prompt": "What does the `debugger;` statement do when developer tools are open?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Nothing; it's only a comment"
+        },
+        {
+          "id": "b",
+          "text": "Pauses execution at that line, like a breakpoint"
+        },
+        {
+          "id": "c",
+          "text": "Throws an error that can be caught"
+        },
+        {
+          "id": "d",
+          "text": "Logs the current call stack to the console"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "debugger acts as a breakpoint when a debugger is attached; without dev tools open it has no effect."
+    },
+    {
+      "id": "js-console-time",
+      "section": "debugging",
+      "prompt": "Which pair measures how long a block of code takes to run?",
+      "options": [
+        {
+          "id": "a",
+          "text": "console.assert() and console.trace()"
+        },
+        {
+          "id": "b",
+          "text": "console.time('label') and console.timeEnd('label')"
+        },
+        {
+          "id": "c",
+          "text": "console.group() and console.groupEnd()"
+        },
+        {
+          "id": "d",
+          "text": "console.count() and console.countReset()"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "console.time starts a named timer and console.timeEnd logs the elapsed time."
+    },
+    {
+      "id": "js-microtask-order",
+      "section": "async",
+      "prompt": "What order does this log? `setTimeout(() => log('t')); Promise.resolve().then(() => log('p')); log('s');`",
+      "options": [
+        {
+          "id": "a",
+          "text": "t, p, s"
+        },
+        {
+          "id": "b",
+          "text": "p, s, t"
+        },
+        {
+          "id": "c",
+          "text": "s, t, p"
+        },
+        {
+          "id": "d",
+          "text": "s, p, t"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Synchronous code runs first; promise callbacks are microtasks and run before the next macrotask such as setTimeout."
+    },
+    {
+      "id": "js-for-await",
+      "section": "async",
+      "prompt": "How do you process the values of an async iterable one at a time?",
+      "options": [
+        {
+          "id": "a",
+          "text": "await Promise.all(source)"
+        },
+        {
+          "id": "b",
+          "text": "for await (const item of source) { ... }"
+        },
+        {
+          "id": "c",
+          "text": "for (const item of await source) { ... }"
+        },
+        {
+          "id": "d",
+          "text": "source.forEach(async (item) => { ... })"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "for await...of waits for each value of an async iterable in turn. forEach doesn't wait for async callbacks."
+    },
+    {
+      "id": "js-async-sequential",
+      "section": "async",
+      "prompt": "Three independent requests are made with `await a(); await b(); await c();`. How can they be made faster?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Wrap each await in a try/catch"
+        },
+        {
+          "id": "b",
+          "text": "Use setTimeout(0) between them"
+        },
+        {
+          "id": "c",
+          "text": "Add async to the calling function a second time"
+        },
+        {
+          "id": "d",
+          "text": "Start them together and await Promise.all([a(), b(), c()])"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "Awaiting one by one runs them in sequence. Starting all three and awaiting Promise.all runs them concurrently."
+    },
+    {
+      "id": "js-process-env",
+      "section": "server",
+      "prompt": "Where should a Node.js app read its database password from?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A constant in the source code"
+        },
+        {
+          "id": "b",
+          "text": "An environment variable, via process.env"
+        },
+        {
+          "id": "c",
+          "text": "A comment in package.json"
+        },
+        {
+          "id": "d",
+          "text": "The npm cache"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Configuration and secrets belong in the environment (process.env), not in source control."
+    },
+    {
+      "id": "js-package-lock",
+      "section": "server",
+      "prompt": "What is package-lock.json for?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It records the exact installed versions so every install gets the same tree"
+        },
+        {
+          "id": "b",
+          "text": "It stores npm login credentials"
+        },
+        {
+          "id": "c",
+          "text": "It lists only the dev dependencies"
+        },
+        {
+          "id": "d",
+          "text": "It prevents anyone from adding dependencies"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The lockfile pins exact versions of every dependency, so installs are reproducible. Commit it."
+    },
+    {
+      "id": "js-jest-tothrow",
+      "section": "testing",
+      "prompt": "In Jest, how do you assert that `parse('')` throws?",
+      "options": [
+        {
+          "id": "a",
+          "text": "expect(parse).toThrow('')"
+        },
+        {
+          "id": "b",
+          "text": "expect(() => parse('')).toThrow()"
+        },
+        {
+          "id": "c",
+          "text": "expect(parse('')).toThrow()"
+        },
+        {
+          "id": "d",
+          "text": "assert.throws(parse(''))"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "toThrow needs a function to call, so wrap the call in an arrow function. Calling parse('') directly throws before expect runs."
     }
   ]
 }
