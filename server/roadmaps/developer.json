@@ -756,7 +756,12 @@
       "cert": {
         "exam": "pd1",
         "section": "ui"
-      }
+      },
+      "practice": [
+        "lwc-show-more",
+        "lwc-temperature-converter",
+        "lwc-password-strength"
+      ]
     },
     {
       "id": "triggers",
@@ -1015,6 +1020,11 @@
         "lwc-contact-filter",
         "lwc-todo-list",
         "lwc-tabs"
+      ],
+      "practice": [
+        "lwc-sortable-table",
+        "lwc-dependent-picklist",
+        "lwc-cart-total"
       ]
     },
     {
@@ -1257,6 +1267,11 @@
           "answer": 1,
           "why": "Event names are lower-case, and `on` plus the name forms the handler attribute."
         }
+      ],
+      "practice": [
+        "lwc-multi-step-form",
+        "lwc-debounced-search",
+        "lwc-accordion"
       ]
     },
     {
