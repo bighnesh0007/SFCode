@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
-import { ProblemRoute, problemMetadata } from "@/components/challenge/problemRoute";
+import { ProblemRoute, problemMetadata, problemParams } from "@/components/challenge/problemRoute";
 
 type Props = { params: Promise<{ slug: string }> };
+
+// Prerendered at build, refreshed every 10 minutes: these pages change only on deploy.
+export const revalidate = 600;
+export const generateStaticParams = () => problemParams("soql");
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return problemMetadata((await params).slug);
