@@ -6,13 +6,16 @@ import "server-only";
  * Responses are cached for `revalidate` seconds so crawlers don't hammer it.
  */
 const BASE = (process.env.BACKEND_INTERNAL_URL ?? "http://127.0.0.1:4100").replace(/\/+$/, "");
+// During `next build` the build's workers saturate the CPU the API shares, and
+// 4s requests timed out, silently prerendering pages without their data.
+const TIMEOUT_MS = process.env.NEXT_PHASE === "phase-production-build" ? 30_000 : 4000;
 
 // T is the caller's declared shape of the API's data; nothing checks it at runtime.
 /* eslint-disable @typescript-eslint/no-unnecessary-type-parameters */
 /** `missing` is a definite 404 from the API; `null` data otherwise means it couldn't be reached. */
 export async function serverFetch<T>(path: string, revalidate = 600): Promise<{ data: T | null; missing: boolean }> {
   try {
-    const res = await fetch(`${BASE}${path}`, { next: { revalidate }, signal: AbortSignal.timeout(4000) });
+    const res = await fetch(`${BASE}${path}`, { next: { revalidate }, signal: AbortSignal.timeout(TIMEOUT_MS) });
     if (res.status === 404) return { data: null, missing: true };
     if (!res.ok) return { data: null, missing: false };
     const body = (await res.json()) as { success?: boolean; data?: T };
