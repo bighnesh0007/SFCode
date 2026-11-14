@@ -1,6 +1,7 @@
 import express, { Router, type Application, type RequestHandler } from "express";
 import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 import { hasCapability } from "../config/index.ts";
+import { logger } from "../lib/logger.ts";
 import type { Container } from "../container.ts";
 import { salesforceController } from "../controllers/salesforce.controller.ts";
 import { NotConfiguredError, NotFoundError, RateLimitError } from "../errors/AppError.ts";
@@ -167,6 +168,31 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.use("/admin", disabled("Admin"));
   }
   // Error reports and page views from browsers (anonymous allowed); the admin views of both.
+  // Content-Security-Policy violation reports (the policy runs report-only first). Browsers send
+  // application/csp-report ({"csp-report": {...}}) or application/reports+json ([{type, body}]).
+  // Only the directive and URLs without query strings are kept; nothing is stored.
+  const cspJson = express.json({ type: ["application/csp-report", "application/reports+json"], limit: "16kb" });
+  const bareUrl = (u: unknown) => (typeof u === "string" ? u.split(/[?#]/)[0]?.slice(0, 300) : undefined);
+  v1.post("/telemetry/csp", limiter(60), cspJson, ((req, res) => {
+    const raw: unknown = req.body;
+    const reports = Array.isArray(raw)
+      ? raw.map((r) => (r as { body?: Record<string, unknown> }).body ?? {})
+      : [((raw as { "csp-report"?: Record<string, unknown> } | undefined)?.["csp-report"]) ?? {}];
+    for (const r of reports.slice(0, 10)) {
+      logger.warn(
+        {
+          event: "csp.violation",
+          directive: r["effective-directive"] ?? r.effectiveDirective ?? r["violated-directive"],
+          blocked: bareUrl(r["blocked-uri"] ?? r.blockedURL),
+          page: bareUrl(r["document-uri"] ?? r.documentURL),
+          source: bareUrl(r["source-file"] ?? r.sourceFile),
+        },
+        "csp violation",
+      );
+    }
+    res.status(204).end();
+  }) as RequestHandler);
+
   if (container.telemetry) {
     const t = container.telemetry;
     const identify: RequestHandler = verifier ? optionalAuth(verifier) : (_req, _res, next) => next();
