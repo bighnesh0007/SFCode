@@ -1,0 +1,5 @@
+[
+  "Before-save flows can read other records: add a Get Records for Case where ContactId Equals {!$Record.ContactId} AND IsClosed Equals false, first record only.",
+  "In before-save, the new case isn't saved yet, so it can't match itself. Add an entry condition ContactId Is Null false so cases without a contact skip the flow.",
+  "A Decision checks whether Get Records found a case ({!Get_Open_Case} Is Null false); on that outcome, an Assignment sets {!$Record.Priority} to High. No Update Records is needed in before-save."
+]

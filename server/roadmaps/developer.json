@@ -447,6 +447,10 @@
         "soql-accounts-with-won-deals",
         "soql-contacts-with-open-cases",
         "soql-closing-this-quarter"
+      ],
+      "practice": [
+        "soql-accounts-to-win-back",
+        "soql-monthly-won-revenue"
       ]
     },
     {
@@ -481,6 +485,12 @@
         "flow-shipping-cost",
         "flow-revenue-tier",
         "flow-won-total-loop"
+      ],
+      "practice": [
+        "flow-hot-account-opps",
+        "flow-lock-closed-amount",
+        "flow-won-contact-tasks",
+        "flow-repeat-caller-priority"
       ]
     },
     {
@@ -570,6 +580,10 @@
       ],
       "problems": [
         "contacts-by-account"
+      ],
+      "practice": [
+        "account-top-parent",
+        "merge-duplicate-accounts"
       ]
     },
     {
@@ -868,6 +882,9 @@
           "answer": 2,
           "why": "There's no previous version of a record being inserted, so Trigger.old and Trigger.oldMap are null."
         }
+      ],
+      "practice": [
+        "debug-static-flag-chunks"
       ]
     },
     {
@@ -1383,6 +1400,9 @@
         "close-stale-opportunities",
         "overdue-task-scheduler",
         "debug-batch-wrong-scope"
+      ],
+      "practice": [
+        "debug-batch-lost-totals"
       ]
     },
     {

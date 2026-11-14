@@ -1,0 +1,21 @@
+{
+  "title": "Won Revenue by Month",
+  "track": "soql",
+  "difficulty": "Hard",
+  "category": "Aggregates",
+  "order": 111,
+  "tags": [
+    "date functions",
+    "GROUP BY",
+    "SUM",
+    "THIS_YEAR",
+    "ORDER BY"
+  ],
+  "files": [
+    {
+      "name": "query",
+      "type": "soql"
+    }
+  ],
+  "testClass": "SfcSoqlMonthlyRevenueTest"
+}

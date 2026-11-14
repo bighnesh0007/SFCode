@@ -1,0 +1,19 @@
+{
+  "title": "The Batch That Forgets Its Totals",
+  "track": "debug",
+  "difficulty": "Hard",
+  "category": "Batch Apex",
+  "order": 211,
+  "tags": [
+    "Database.Batchable",
+    "Database.Stateful",
+    "finish()"
+  ],
+  "files": [
+    {
+      "name": "SfcRatingBatch",
+      "type": "class"
+    }
+  ],
+  "testClass": "SfcRatingBatchTest"
+}

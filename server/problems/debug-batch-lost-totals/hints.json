@@ -1,0 +1,5 @@
+[
+  "Each execute() and finish() runs in its own transaction, with a fresh copy of the batch object.",
+  "Instance fields keep their values between those transactions only when the class implements Database.Stateful.",
+  "Add Database.Stateful to the implements list. Nothing else needs to change: the counter is already incremented in execute() and read in finish()."
+]
