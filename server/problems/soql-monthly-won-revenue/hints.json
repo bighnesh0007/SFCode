@@ -1,0 +1,5 @@
+[
+  "Date functions can be grouped on: CALENDAR_MONTH(CloseDate). Give it the alias month.",
+  "Filter with IsWon = true AND CloseDate = THIS_YEAR, and alias SUM(Amount) total and COUNT(Id) deals.",
+  "ORDER BY must repeat the expression: ORDER BY CALENDAR_MONTH(CloseDate). Aliases can't be used in ORDER BY."
+]

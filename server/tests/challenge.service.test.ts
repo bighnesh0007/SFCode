@@ -103,12 +103,12 @@ describe("ChallengeService — what clients can see", () => {
   it("filters the list by track", async () => {
     const { service } = setup();
     expect((await service.list(null, "soql")).every((c) => c.track === "soql")).toBe(true);
-    expect((await service.list(null, "soql")).length).toBe(10);
-    expect((await service.list(null, "apex")).length).toBe(16);
-    expect((await service.list(null, "debug")).length).toBe(10);
-    expect((await service.list(null, "flow")).length).toBe(9);
+    expect((await service.list(null, "soql")).length).toBe(11);
+    expect((await service.list(null, "apex")).length).toBe(17);
+    expect((await service.list(null, "debug")).length).toBe(11);
+    expect((await service.list(null, "flow")).length).toBe(10);
     expect((await service.list(null, "lwc")).length).toBe(17);
-    expect((await service.list(null)).length).toBe(62);
+    expect((await service.list(null)).length).toBe(66);
   });
 
   it("404s unknown problems", () => {

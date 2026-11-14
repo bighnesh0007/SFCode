@@ -1,0 +1,5 @@
+[
+  "Re-query the accounts (Id, Name, CreatedDate) ordered by CreatedDate, Id, then group them in a Map<String, List<Account>> keyed by Name.trim().toLowerCase().",
+  "The first account in each group (thanks to the ORDER BY) is the master; the rest are duplicates.",
+  "Call Database.merge(new Account(Id = master.Id), duplicateIds) in slices of up to two Ids. Passing the queried master fails, because merge tries to save read-only fields like CreatedDate."
+]

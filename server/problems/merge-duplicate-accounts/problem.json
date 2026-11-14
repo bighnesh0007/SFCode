@@ -1,0 +1,19 @@
+{
+  "title": "Merge Duplicate Accounts",
+  "difficulty": "Hard",
+  "category": "Data Quality",
+  "order": 17,
+  "tags": [
+    "Database.merge",
+    "maps",
+    "bulkification",
+    "DML limits"
+  ],
+  "files": [
+    {
+      "name": "SfcAccountMerger",
+      "type": "class"
+    }
+  ],
+  "testClass": "SfcAccountMergerTest"
+}

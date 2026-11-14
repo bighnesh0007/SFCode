@@ -1,0 +1,20 @@
+{
+  "title": "Escalate Repeat Callers",
+  "track": "flow",
+  "difficulty": "Hard",
+  "category": "Before-Save Flows",
+  "order": 310,
+  "tags": [
+    "record-triggered",
+    "get records",
+    "before-save",
+    "decision",
+    "bulkification"
+  ],
+  "files": [],
+  "flow": {
+    "apiName": "SFC_Repeat_Caller_Priority",
+    "kind": "record-triggered"
+  },
+  "testClass": "SfcFlowRepeatCallerTest"
+}
