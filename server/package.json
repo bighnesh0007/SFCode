@@ -46,7 +46,7 @@
     "@types/compression": "^1.8.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
-    "@types/node": "^22",
+    "@types/node": "^26",
     "@types/pg": "^8.23.1",
     "@types/supertest": "^7.2.1",
     "drizzle-kit": "^0.31.11",
