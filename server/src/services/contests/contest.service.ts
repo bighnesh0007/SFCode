@@ -74,6 +74,12 @@ export interface RatingRow {
 }
 
 export class ContestService {
+  private onDelete: ((slug: string, by: string) => Promise<void>) | undefined;
+  /** Lets the auto-contest scheduler remember deleted contests (wired after construction). */
+  setOnDelete(fn: (slug: string, by: string) => Promise<void>): void {
+    this.onDelete = fn;
+  }
+
   constructor(
     private readonly repo: ContestRepository,
     private readonly catalog: ChallengeCatalog,
@@ -163,6 +169,7 @@ export class ContestService {
     if (this.phase(c) !== "upcoming") throw new ConflictError("Only contests that haven't started can be deleted.");
     await this.repo.delete(c.id);
     await this.admin.record(actor, "contest.delete", null, { slug });
+    await this.onDelete?.(slug, actor);
   }
 
   async join(userId: string, slug: string): Promise<ContestView> {
