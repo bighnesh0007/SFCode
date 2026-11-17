@@ -11,6 +11,13 @@ export const connectBody = z
   .refine((b) => (b.clientId === undefined) === (b.clientSecret === undefined), "Enter both the Consumer Key and the Consumer Secret, or neither.");
 export type ConnectBody = z.infer<typeof connectBody>;
 
+/** A pasted access token: format checked in the service, so the error can say what's wrong. */
+export const tokenConnectBody = z.strictObject({
+  instanceUrl: z.string().min(1).max(255),
+  accessToken: z.string().min(1).max(600),
+});
+export type TokenConnectBody = z.infer<typeof tokenConnectBody>;
+
 // Salesforce may add parameters; only these three are read, the rest ignored.
 export const callbackQuery = z.object({
   code: z.string().max(2048).optional(),

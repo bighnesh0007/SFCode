@@ -12,7 +12,7 @@ import { notFound } from "../middleware/notFound.ts";
 import { v1Cors } from "../middleware/security.ts";
 import { validate } from "../middleware/validate.ts";
 import { noContent, ok } from "../utils/respond.ts";
-import { callbackQuery, connectBody, executeBody, queryBody } from "../validation/salesforce.schema.ts";
+import { callbackQuery, connectBody, executeBody, queryBody, tokenConnectBody } from "../validation/salesforce.schema.ts";
 import { challengeController } from "../controllers/challenge.controller.ts";
 import { certificationController } from "../controllers/certification.controller.ts";
 import { answerBody, examParams, mockGradeBody, practiceQuery } from "../validation/certification.schema.ts";
@@ -83,6 +83,7 @@ export function mountRoutes(app: Application, container: Container): void {
     sf.get("/oauth/callback", limiter(30), validate({ query: callbackQuery }), c.callback);
     sf.use(requireAuth(verifier));
     sf.post("/connect", limiter(10), validate({ body: connectBody }), c.start);
+    sf.post("/connect/token", limiter(10), validate({ body: tokenConnectBody }), c.connectToken);
     sf.get("/connection", c.status);
     sf.delete("/connection", c.disconnect);
     sf.post("/apex/execute", limiter(20), validate({ body: executeBody }), c.execute);

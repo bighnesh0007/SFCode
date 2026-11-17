@@ -37,11 +37,19 @@ export interface ConnectionView {
   connectedAt: string;
   /** Connected through the learner's own Connected App (its secret is never returned). */
   ownApp: boolean;
+  /** "token": a pasted access token, which stops working when its session ends. */
+  authType: "oauth" | "token";
 }
+
+/**
+ * An access token / session id: the 15-character org id, "!", then the
+ * session part. Checked before any request, so junk never reaches Salesforce.
+ */
+export const ACCESS_TOKEN_PATTERN = /^00D[A-Za-z0-9]{12}![A-Za-z0-9._]{20,500}$/;
 
 function toView(c: StoredConnection): ConnectionView {
   const environment = c.loginUrl === "https://login.salesforce.com" ? "production" : c.loginUrl === "https://test.salesforce.com" ? "sandbox" : "custom";
-  return { orgId: c.orgId, username: c.username, instanceUrl: c.instanceUrl, environment, connectedAt: c.connectedAt.toISOString(), ownApp: c.clientId !== null };
+  return { orgId: c.orgId, username: c.username, instanceUrl: c.instanceUrl, environment, connectedAt: c.connectedAt.toISOString(), ownApp: c.clientId !== null, authType: c.authType };
 }
 
 export class SalesforceConnectionService {
@@ -119,6 +127,7 @@ export class SalesforceConnectionService {
         loginUrl: pending.loginUrl,
         accessTokenEnc: encryptToken(tokens.accessToken, this.secrets.tokenKey),
         refreshTokenEnc: encryptToken(tokens.refreshToken, this.secrets.tokenKey),
+        authType: "oauth",
         // The app the refresh token belongs to: refreshing with any other app fails.
         clientId: pending.clientId,
         clientSecretEnc: pending.clientSecretEnc,
@@ -129,6 +138,50 @@ export class SalesforceConnectionService {
       logEvent("salesforce.connect_failed", { reason: "exchange", err }, "error");
       return withQuery(returnTo, { sf: "error", reason: "exchange" });
     }
+  }
+
+  /**
+   * Connects with an access token the learner pasted (e.g. from `sf org display`)
+   * instead of the OAuth flow. Checked against the org's userinfo before it is
+   * stored; there is no refresh token, so it lasts as long as its session.
+   */
+  async connectWithToken(userId: string, instanceInput: string, accessToken: string): Promise<ConnectionView> {
+    // My Domain hosts only: the token is sent to this host, so it must be Salesforce's.
+    const instanceUrl = resolveLoginUrl(instanceInput.trim());
+    if (!instanceUrl || instanceInput.trim() === "production" || instanceInput.trim() === "sandbox") {
+      throw new BadRequestError("Enter your org's instance URL, e.g. https://yourorg.my.salesforce.com (the Instance Url line of `sf org display`).");
+    }
+    const token = accessToken.trim();
+    if (!ACCESS_TOKEN_PATTERN.test(token)) {
+      throw new BadRequestError("That doesn't look like a Salesforce access token. It starts with your org id (00D…) followed by an exclamation mark.");
+    }
+    let who;
+    try {
+      who = await this.sf.identity(instanceUrl, token);
+    } catch (err) {
+      logEvent("salesforce.token_connect_failed", { reason: err instanceof SessionExpiredError ? "expired" : "upstream" }, "warn");
+      if (err instanceof SessionExpiredError) throw new BadRequestError("Salesforce rejected that token: it has expired, was logged out, or belongs to a different org.");
+      throw new BadRequestError("Couldn't reach that org with this token. Check the instance URL.");
+    }
+    // The token names its org; refuse a token pointed at some other org's host.
+    if (who.orgId.slice(0, 15) !== token.slice(0, 15)) throw new BadRequestError("That token belongs to a different org than this instance URL.");
+    await this.repo.upsert({
+      userId,
+      orgId: who.orgId,
+      sfUserId: who.sfUserId,
+      username: who.username,
+      instanceUrl,
+      loginUrl: instanceUrl,
+      accessTokenEnc: encryptToken(token, this.secrets.tokenKey),
+      refreshTokenEnc: null,
+      authType: "token",
+      clientId: null,
+      clientSecretEnc: null,
+    });
+    logEvent("salesforce.connected", { orgId: who.orgId, authType: "token" });
+    const view = await this.status(userId);
+    if (!view) throw new Error("connection vanished right after it was stored");
+    return view;
   }
 
   async status(userId: string): Promise<ConnectionView | null> {
@@ -165,6 +218,13 @@ export class SalesforceConnectionService {
       return await fn({ orgId: conn.orgId, instanceUrl: conn.instanceUrl, accessToken: decryptToken(conn.accessTokenEnc, this.secrets.tokenKey) });
     } catch (err) {
       if (!(err instanceof SessionExpiredError)) throw err;
+    }
+
+    // A pasted token can't be renewed: once its session ends, the connection is over.
+    if (conn.refreshTokenEnc === null) {
+      await this.repo.delete(userId);
+      logEvent("salesforce.token_session_ended");
+      throw new OrgNotConnectedError("Your pasted Salesforce session has expired. Paste a fresh access token, or connect with Salesforce to stay signed in.");
     }
 
     let refreshed;
