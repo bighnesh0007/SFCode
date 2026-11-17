@@ -332,6 +332,22 @@ export function mountRoutes(app: Application, container: Container): void {
     v1.get("/contests/:slug", identify, validate({ params: contestSlugParams }), c.get);
     v1.post("/contests/:slug/join", signedIn, limiter(20), validate({ params: contestSlugParams }), c.join);
     v1.delete("/contests/:slug", signedIn, limiter(10), validate({ params: contestSlugParams }), c.remove);
+    if (container.autoContests && container.admin) {
+      const auto = container.autoContests;
+      const adminSvc = container.admin;
+      const autoBody = z.strictObject({ enabled: z.boolean() });
+      v1.get("/admin/auto-contests", limiter(30), signedIn, (async (req, res) => {
+        await adminSvc.require(req.auth?.userId ?? "", "admin");
+        ok(res, await auto.state());
+      }) as RequestHandler);
+      v1.post("/admin/auto-contests", limiter(10), signedIn, validate({ body: autoBody }), (async (req, res) => {
+        const by = req.auth?.userId ?? "";
+        await adminSvc.require(by, "admin");
+        const s = await auto.setEnabled(validatedBody<z.infer<typeof autoBody>>(req).enabled, by);
+        await adminSvc.record(by, "contest.auto_toggle", null, { enabled: s.enabled });
+        ok(res, { ...s, created: s.enabled ? await auto.ensureUpcoming() : [] });
+      }) as RequestHandler);
+    }
   } else {
     v1.use("/contests", disabled("Contests"));
   }

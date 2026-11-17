@@ -11,7 +11,7 @@ import { useLoad } from "@/components/admin/AdminTools";
 import { getAdminStore, getModeration, getProblemStats, setCommentHidden, setStoreItem, type AdminStoreItem, type ProblemStatRow } from "@/lib/adminApi";
 import { hidePost } from "@/lib/blogApi";
 import { getRecentDiscussion, hideComment } from "@/lib/discussionApi";
-import { deleteContest, getContest, listContests } from "@/lib/contestApi";
+import { deleteContest, getAutoContests, getContest, listContests, setAutoContests } from "@/lib/contestApi";
 import { trackInfo } from "@/lib/tracks";
 import type { Track } from "@/lib/challengesApi";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,42 @@ import { cn } from "@/lib/utils";
 const when = (iso: string) => new Date(iso).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
 // ── Contests ─────────────────────────────────────────────────────────────────
+
+/** The on/off switch for the Weekly and Biweekly contests the server schedules itself. */
+function AutoContestsToggle({ onChange }: { onChange: () => void }) {
+  const { getToken } = useAuthState();
+  const { data, reload } = useLoad((t) => getAutoContests(t));
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  async function toggle(enabled: boolean) {
+    setBusy(true);
+    setNote(null);
+    try {
+      const r = await setAutoContests(await getToken(), enabled);
+      setNote(enabled ? (r.created?.length ? `Scheduled ${r.created.join(", ")}.` : "On. Upcoming contests are already scheduled.") : "Off. Already scheduled contests stay; delete them below if needed.");
+      reload();
+      onChange();
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not change it.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  if (!data) return null;
+  return (
+    <div className="rounded-lg border p-3 text-sm">
+      <label className="flex items-center gap-2 font-medium">
+        <input type="checkbox" checked={data.enabled} disabled={busy} onChange={(e) => void toggle(e.target.checked)} />
+        Schedule contests automatically
+      </label>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Weekly Contest every Sunday and Biweekly Contest every other Saturday, 8:00 PM IST, 90 minutes, four problems (Easy, Medium, Medium, Hard). Created a week ahead; you
+        can still edit them, and a deleted one isn&apos;t recreated.
+      </p>
+      {note && <p className="mt-1 text-xs">{note}</p>}
+    </div>
+  );
+}
 
 export function ContestsTab() {
   const { getToken } = useAuthState();
@@ -51,6 +87,7 @@ export function ContestsTab() {
   return (
     <section className="mt-5 space-y-4">
       <p className="text-xs text-muted-foreground">Schedule contests, and edit or delete ones that haven&apos;t started. Live and finished contests can&apos;t change, so results stay fair.</p>
+      <AutoContestsToggle onChange={reload} />
       {editing ? (
         <div>
           <p className="text-sm font-medium">Editing &ldquo;{editing.title}&rdquo;</p>

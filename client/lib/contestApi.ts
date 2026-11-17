@@ -89,3 +89,8 @@ export async function deleteContest(token: Token, slug: string): Promise<void> {
     throw new Error(body?.error?.message ?? `Request failed (HTTP ${res.status}).`);
   }
 }
+
+/** Weekly and Biweekly contests created automatically by the server (admins only). */
+export interface AutoContests { enabled: boolean; skipped: string[]; created?: string[] }
+export const getAutoContests = (token: Token) => apiRequest<AutoContests>("/api/v1/admin/auto-contests", { token });
+export const setAutoContests = (token: Token, enabled: boolean) => apiRequest<AutoContests>("/api/v1/admin/auto-contests", { method: "POST", token, body: { enabled } });

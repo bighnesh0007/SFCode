@@ -93,6 +93,7 @@ export type BusinessEvent =
   | "cert_question.submitted"
   | "cert_question.reviewed"
   | "cert_question.visibility"
+  | "contest.auto_created"
   | "admin.role_revoked"
   | "admin.user_suspended"
   | "admin.user_restored"

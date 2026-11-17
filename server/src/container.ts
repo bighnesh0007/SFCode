@@ -15,6 +15,7 @@ import { PgChallengeSubmissionRepository } from "./repositories/challengeSubmiss
 import { ChallengeCatalog } from "./services/challenges/catalog.ts";
 import { QuestionBank } from "./services/certification/bank.ts";
 import { CertificationService } from "./services/certification/certification.service.ts";
+import { AutoContestService } from "./services/contests/autoContest.service.ts";
 import { CertQuestionService } from "./services/certification/certQuestion.service.ts";
 import { PgCertQuestionRepository } from "./repositories/certQuestion.repository.ts";
 import { PgCertAttemptRepository } from "./repositories/certAttempt.repository.ts";
@@ -70,6 +71,7 @@ export interface Container {
   admin?: AdminService;
   blog?: BlogService;
   contests?: ContestService;
+  autoContests?: AutoContestService;
   store?: StoreService;
   solutionSize?: SolutionSizeService;
   roadmaps?: RoadmapService;
@@ -163,6 +165,9 @@ export function buildContainer(): Container {
     container.discussion = new DiscussionService(new PgDiscussionRepository(container.db), catalog, new PgProfileRepository(container.db), container.community, container.admin, systemClock);
     container.blog = new BlogService(new PgBlogRepository(container.db), new PgProfileRepository(container.db), container.community, container.admin);
     container.contests = new ContestService(contestRepo ?? new PgContestRepository(container.db), catalog, new PgProfileRepository(container.db), container.community, container.admin, systemClock);
+    container.autoContests = new AutoContestService(contestRepo ?? new PgContestRepository(container.db), catalog, new PgSettingsRepository(container.db), systemClock);
+    const auto = container.autoContests;
+    container.contests.setOnDelete((slug, by) => auto.remember(slug, by));
     container.daily = new DailyService(new PgDailyRepository(container.db), catalog, systemClock);
     container.store = new StoreService(new PgStoreRepository(container.db), new PgChallengeSubmissionRepository(container.db), catalog, container.contests, container.daily, container.points);
     container.solutionSize = new SolutionSizeService(new PgChallengeSubmissionRepository(container.db), (slug) => catalog.get(slug) !== undefined);

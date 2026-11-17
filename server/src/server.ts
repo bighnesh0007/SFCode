@@ -30,6 +30,18 @@ if (container.certQuestions) {
 }
 const app = buildApp(container);
 
+// Weekly and Biweekly contests: created up to 7 days ahead; checked shortly after start, then hourly.
+if (container.autoContests) {
+  const auto = container.autoContests;
+  const run = () =>
+    void auto
+      .ensureUpcoming()
+      .then((created) => created.length > 0 && logger.info({ created }, "auto contests created"))
+      .catch((err: unknown) => logger.error({ err }, "auto contest run failed"));
+  setTimeout(run, 30_000).unref();
+  setInterval(run, 60 * 60_000).unref();
+}
+
 // Weekly digest: check hourly (it only sends on Mondays from 09:00 UTC, once per user per week).
 if (container.digest?.enabled) {
   const digest = container.digest;
