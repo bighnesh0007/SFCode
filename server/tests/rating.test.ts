@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { INITIAL_RATING, replayRatings, type ContestPlacing } from "../src/domain/rating.ts";
+import { INITIAL_RATING, ratingTier, replayRatings, type ContestPlacing } from "../src/domain/rating.ts";
 
 const contest = (slug: string, endsAt: string, ranks: [string, number][]): ContestPlacing => ({ contestSlug: slug, title: slug, endsAt, ranks: new Map(ranks) });
 
@@ -28,5 +28,10 @@ describe("contest rating", () => {
     const big = replayRatings([contest("c", "2026-01-01", Array.from({ length: 10 }, (_, i): [string, number] => [`p${i}`, i + 1]))]);
     for (const [, pts] of big) expect(Math.abs(pts[0]?.delta ?? 0)).toBeLessThanOrEqual(40);
     expect(big.get("p0")?.[0]?.delta).toBe(20); // beats 9 equals: 40 × (9 − 4.5) / 9
+  });
+
+  it("tiers: boundaries are inclusive, and a new player starts as a Ranger", () => {
+    expect(ratingTier(INITIAL_RATING).id).toBe("ranger");
+    expect([1399, 1400, 1599, 1600, 1799, 1800, 2400].map((r) => ratingTier(r).id)).toEqual(["trailblazer", "ranger", "ranger", "architect", "architect", "cta", "cta"]);
   });
 });

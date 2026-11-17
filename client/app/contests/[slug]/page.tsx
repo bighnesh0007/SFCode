@@ -1,5 +1,6 @@
 "use client";
 
+import { RatingDelta } from "@/components/RatingTier";
 import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Check } from "lucide-react";
@@ -69,6 +70,7 @@ export default function ContestPage({ params }: { params: Promise<{ slug: string
   if (error && !contest) return <div className="mx-auto max-w-3xl px-4 py-8 text-sm text-destructive">{error}</div>;
   if (!contest) return <div className="mx-auto max-w-3xl px-4 py-8"><div className="h-8 w-64 animate-pulse rounded bg-muted" /></div>;
 
+  const rated = contest.standings.some((r) => r.rating);
   const clock = contest.phase === "upcoming" ? `Starts in ${countdown(Date.parse(contest.startsAt) - now)}` : contest.phase === "live" ? `${countdown(Date.parse(contest.endsAt) - now)} left` : "Final standings";
 
   return (
@@ -124,6 +126,7 @@ export default function ContestPage({ params }: { params: Promise<{ slug: string
               <th className="py-2">Learner</th>
               <th className="w-16 py-2 text-right">Score</th>
               <th className="w-20 py-2 text-right">Penalty</th>
+              {rated && <th className="w-24 py-2 text-right">Rating</th>}
               {contest.problems.map((p, i) => <th key={p.slug} className="w-14 py-2 text-center" title={p.title}>{String.fromCharCode(65 + i)}</th>)}
             </tr>
           </thead>
@@ -139,6 +142,17 @@ export default function ContestPage({ params }: { params: Promise<{ slug: string
                 </td>
                 <td className="py-2.5 text-right font-medium tabular-nums">{r.score}</td>
                 <td className="py-2.5 text-right tabular-nums text-muted-foreground">{r.penalty}</td>
+                {rated && (
+                  <td className="py-2.5 text-right text-xs" title={r.rating ? `${r.rating.tier.title}, now ${r.rating.rating}` : "Not rated"}>
+                    {r.rating ? (
+                      <>
+                        <RatingDelta delta={r.rating.delta} className="font-medium" /> <span className="text-muted-foreground tabular-nums">{r.rating.rating}</span>
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">·</span>
+                    )}
+                  </td>
+                )}
                 {contest.problems.map((p) => {
                   const cell = r.problems.find((x) => x.slug === p.slug);
                   return (
@@ -156,7 +170,7 @@ export default function ContestPage({ params }: { params: Promise<{ slug: string
               </tr>
             ))}
             {contest.standings.length === 0 && (
-              <tr className="border-t"><td colSpan={4 + contest.problems.length} className="px-4 py-8 text-center text-muted-foreground">No one has joined yet.</td></tr>
+              <tr className="border-t"><td colSpan={4 + (rated ? 1 : 0) + contest.problems.length} className="px-4 py-8 text-center text-muted-foreground">No one has joined yet.</td></tr>
             )}
           </tbody>
         </table>

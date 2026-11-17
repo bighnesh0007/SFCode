@@ -1,5 +1,6 @@
 "use client";
 
+import { RatingTier } from "@/components/RatingTier";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Award, Briefcase, Bug, Check, Coins, Copy, Database, Flame, Code2, Gauge, Link2, Map as MapIcon, MapPin, Medal, PenLine, Mountain, Share2, Sparkles, Swords, Timer, Trophy, Workflow, Zap } from "lucide-react";
@@ -117,6 +118,7 @@ export function ContestHistory({ p }: { p: Profile }) {
         <div className="mb-4">
           <div className="flex items-baseline gap-4">
             <span className="text-2xl font-semibold tabular-nums">{p.rating.current}</span>
+            <RatingTier tier={p.rating.tier} className="self-center" />
             <span className="text-xs text-muted-foreground">rating · peak {p.rating.peak} · {p.rating.history.length} rated contest{p.rating.history.length === 1 ? "" : "s"}</span>
           </div>
           <RatingChart history={p.rating.history} />

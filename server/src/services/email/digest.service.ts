@@ -4,7 +4,7 @@
  */
 import { BadRequestError } from "../../errors/AppError.ts";
 import { logger } from "../../lib/logger.ts";
-import type { EmailRepository } from "../../repositories/email.repository.ts";
+import type { EmailRepository, PrefsPatch } from "../../repositories/email.repository.ts";
 import type { Clock } from "../../types/ports.ts";
 import type { EmailSender } from "./emailjs.ts";
 
@@ -54,6 +54,20 @@ ${daily}${contests}
   return { subject: `Your SFCode week: ${c.rank}, ${c.points} points`, html };
 }
 
+/** The contest-reminder email: one per contest, an hour before it starts. */
+export function renderContestReminder(c: { title: string; slug: string; startsAt: string }, name: string, siteUrl: string): { subject: string; html: string } {
+  const url = `${siteUrl}/contests/${c.slug}`;
+  const html = `<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:560px;margin:0 auto;color:#0f172a">
+<h2 style="margin:0 0 4px">${esc(c.title)} starts in an hour</h2>
+<p style="margin:0;color:#475569">Hi ${esc(name)}: it starts at ${esc(new Date(c.startsAt).toUTCString().slice(0, 22))} UTC and runs 90 minutes. Only solves made during the contest count.</p>
+<p style="margin:28px 0"><a href="${esc(url)}" style="background:#0284c7;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600">Join the contest →</a></p>
+<p style="font-size:12px;color:#94a3b8">You get this because you turned on contest reminders. <a href="${esc(`${siteUrl}/profile`)}" style="color:#94a3b8">Turn them off</a> any time.</p>
+</div>`;
+  return { subject: `${c.title} starts in an hour`, html };
+}
+
+type Rendered = { subject: string; html: string };
+
 export class DigestService {
   constructor(
     private readonly repo: EmailRepository,
@@ -72,27 +86,32 @@ export class DigestService {
     return this.repo.prefs(userId).then((p) => ({ ...p, available: this.enabled }));
   }
 
-  async setPrefs(userId: string, weeklyDigest: boolean) {
-    await this.repo.setPrefs(userId, weeklyDigest);
+  async setPrefs(userId: string, patch: PrefsPatch) {
+    await this.repo.setPrefs(userId, patch);
     return this.prefs(userId);
   }
 
-  /** Sends one user's digest for `period` if allowed. Returns what happened (with the provider's reason on failure). */
-  private async sendOne(userId: string, kind: string, period: string): Promise<string> {
+  private readonly renderDigestFor = async (userId: string): Promise<Rendered | null> => {
+    const content = await this.sources.content(userId);
+    return content ? renderDigest(content, this.siteUrl) : null;
+  };
+
+  /** Sends one user one email for (kind, period) if allowed. Returns what happened (with the provider's reason on failure). */
+  private async sendOne(userId: string, kind: string, period: string, render: (userId: string) => Promise<Rendered | null> = this.renderDigestFor): Promise<string> {
     const sender = this.sender;
     if (!sender) return "disabled";
-    const [to, content] = await Promise.all([this.sources.email(userId), this.sources.content(userId)]);
-    if (!to || !content) return "no_address";
+    const [to, rendered] = await Promise.all([this.sources.email(userId), render(userId)]);
+    if (!to || !rendered) return "no_address";
     const outcome = await this.repo.claim(userId, kind, period, monthStart(this.clock.now()), this.caps);
     if (outcome !== "claimed") return outcome;
-    const { subject, html } = renderDigest(content, this.siteUrl);
+    const { subject, html } = rendered;
     try {
       await sender.send(to, subject, html);
       return "sent";
     } catch (err) {
       await this.repo.markFailed(userId, kind, period);
       const reason = err instanceof Error ? err.message : String(err);
-      logger.warn({ err: reason, userId }, "digest send failed");
+      logger.warn({ err: reason, userId, kind }, "email send failed");
       return `failed: ${reason}`;
     }
   }
@@ -110,6 +129,27 @@ export class DigestService {
       if (r === "global_cap") break; // nothing else can go out this month
     }
     if (Object.keys(counts).length) logger.info({ period, ...counts }, "weekly digest run");
+    return counts;
+  }
+
+  /**
+   * Emails everyone who opted in to contest reminders, once per contest (the
+   * send log's (user, kind, period) key makes a rerun a no-op). Inside the caps.
+   */
+  async remindContest(c: { title: string; slug: string; startsAt: string }): Promise<Record<string, number>> {
+    const counts: Record<string, number> = {};
+    if (!this.sender) return counts;
+    const render = async (userId: string) => {
+      const content = await this.sources.content(userId);
+      return content ? renderContestReminder(c, content.name, this.siteUrl) : null;
+    };
+    for (const userId of await this.repo.reminderSubscribers()) {
+      const r = await this.sendOne(userId, "contest-reminder", c.slug, render);
+      const key = r.startsWith("failed") ? "failed" : r;
+      counts[key] = (counts[key] ?? 0) + 1;
+      if (r === "global_cap") break;
+    }
+    if (Object.keys(counts).length) logger.info({ contest: c.slug, ...counts }, "contest reminder run");
     return counts;
   }
 

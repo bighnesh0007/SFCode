@@ -10,7 +10,7 @@
 import { randomBytes } from "node:crypto";
 import { ConflictError, NotFoundError, ValidationError } from "../../errors/AppError.ts";
 import { SCORED_TRACKS } from "../../domain/challenge.ts";
-import { replayRatings, type ContestPlacing, type RatingPoint } from "../../domain/rating.ts";
+import { ratingTier, replayRatings, type ContestPlacing, type RatingPoint, type RatingTierId } from "../../domain/rating.ts";
 import type { ContestRecord, ContestRepository } from "../../repositories/contest.repository.ts";
 import type { ProfileRecord, ProfileRepository } from "../../repositories/profile.repository.ts";
 import type { Clock } from "../../types/ports.ts";
@@ -48,8 +48,15 @@ export interface ContestSummary {
   entrants: number;
 }
 
-/** What the public API returns: internal user ids never leave the server. */
-export type PublicStandingRow = Omit<StandingRow, "userId">;
+/** A rated entrant's result in one contest. */
+export interface ContestRatingChange {
+  rating: number;
+  delta: number;
+  tier: { id: RatingTierId; title: string };
+}
+
+/** What the public API returns: internal user ids never leave the server. Ended contests carry each entrant's rating change. */
+export type PublicStandingRow = Omit<StandingRow, "userId"> & { rating?: ContestRatingChange };
 
 export interface ContestView extends ContestSummary {
   joined: boolean;
@@ -70,6 +77,7 @@ export interface RatingRow {
   displayName: string;
   imageUrl: string | null;
   rating: number;
+  tier: { id: RatingTierId; title: string };
   contests: number;
 }
 
@@ -115,7 +123,7 @@ export class ContestService {
               const ch = this.catalog.get(p.slug);
               return ch ? [{ slug: ch.slug, title: ch.title, track: ch.track, difficulty: ch.difficulty, points: p.points }] : [];
             }),
-      standings: (await this.standings(c)).map(({ userId: _internal, ...row }) => row),
+      standings: await this.publicStandings(c, phase),
     };
   }
 
@@ -197,15 +205,49 @@ export class ContestService {
     return rows;
   }
 
-  /** The user's contest-rating history (oldest first), replayed from every finished contest. */
-  async ratingHistory(userId: string): Promise<RatingPoint[]> {
+  /** Every user's rating history, replayed from every finished contest. */
+  private async replayAll(): Promise<Map<string, RatingPoint[]>> {
     const placings: ContestPlacing[] = [];
     for (const c of await this.repo.list()) {
       if (this.phase(c) !== "ended") continue;
       const rows = await this.finalRows(c);
       placings.push({ contestSlug: c.slug, title: c.title, endsAt: c.endsAt.toISOString(), ranks: new Map(rows.map((r) => [r.userId, r.rank])) });
     }
-    return replayRatings(placings).get(userId) ?? [];
+    return replayRatings(placings);
+  }
+
+  /** The user's contest-rating history (oldest first). */
+  async ratingHistory(userId: string): Promise<RatingPoint[]> {
+    return (await this.replayAll()).get(userId) ?? [];
+  }
+
+  /**
+   * Each entrant's rating change from one finished contest (userId → change).
+   * Empty for a contest that isn't over or had fewer than two entrants (unrated).
+   */
+  async ratingChanges(slug: string): Promise<Map<string, ContestRatingChange>> {
+    const out = new Map<string, ContestRatingChange>();
+    for (const [userId, history] of await this.replayAll()) {
+      const point = history.find((h) => h.contestSlug === slug);
+      if (point) out.set(userId, { rating: point.rating, delta: point.delta, tier: ratingTier(point.rating) });
+    }
+    return out;
+  }
+
+  /** Final placings of a settled contest (null until it has settled, so ranks can't still move). */
+  async settledResults(slug: string): Promise<{ userId: string; rank: number; score: number }[] | null> {
+    const c = await this.repo.findBySlug(slug);
+    if (!c || this.clock.nowMs() < c.endsAt.getTime() + SETTLE_MS) return null;
+    return this.finalRows(c);
+  }
+
+  private async publicStandings(c: ContestRecord, phase: ContestPhase): Promise<PublicStandingRow[]> {
+    const rows = await this.standings(c);
+    const changes = phase === "ended" ? await this.ratingChanges(c.slug) : new Map<string, ContestRatingChange>();
+    return rows.map(({ userId, ...row }) => {
+      const rating = changes.get(userId);
+      return rating ? { ...row, rating } : row;
+    });
   }
 
   private ratingCache: { at: number; rows: RatingRow[] } | null = null;
@@ -214,13 +256,7 @@ export class ContestService {
   async ratingBoard(limit = 100): Promise<RatingRow[]> {
     const now = this.clock.nowMs();
     if (this.ratingCache && now - this.ratingCache.at < 60_000) return this.ratingCache.rows.slice(0, limit);
-    const placings: ContestPlacing[] = [];
-    for (const c of await this.repo.list()) {
-      if (this.phase(c) !== "ended") continue;
-      const rows = await this.finalRows(c);
-      placings.push({ contestSlug: c.slug, title: c.title, endsAt: c.endsAt.toISOString(), ranks: new Map(rows.map((r) => [r.userId, r.rank])) });
-    }
-    const latest = [...replayRatings(placings)].flatMap(([userId, h]) => {
+    const latest = [...(await this.replayAll())].flatMap(([userId, h]) => {
       const last = h.at(-1);
       return last ? [{ userId, rating: last.rating, contests: h.length }] : [];
     });
@@ -228,7 +264,7 @@ export class ContestService {
     const rows = latest
       .flatMap((r) => {
         const p = profiles.get(r.userId);
-        return p ? [{ handle: p.handle, displayName: p.displayName, imageUrl: p.imageUrl, rating: r.rating, contests: r.contests }] : [];
+        return p ? [{ handle: p.handle, displayName: p.displayName, imageUrl: p.imageUrl, rating: r.rating, tier: ratingTier(r.rating), contests: r.contests }] : [];
       })
       .sort((a, b) => b.rating - a.rating || b.contests - a.contests)
       .map((r, i) => ({ rank: i + 1, ...r }));
