@@ -109,6 +109,7 @@ describe.skipIf(!safe)("Contests and store on Postgres", () => {
       ["bob", 100, 20],
     ]);
     expect(JSON.stringify(v)).not.toContain('"userId"');
+    expect(v.standings.some((r) => r.rating)).toBe(false); // no rating change while live
 
     expect(await contests.history("bob")).toEqual([]); // still live
     clock.advance(200 * MIN);
@@ -121,6 +122,13 @@ describe.skipIf(!safe)("Contests and store on Postgres", () => {
       [1, "alice", 1520, 1],
       [2, "bob", 1480, 1],
     ]);
+    expect((await contests.ratingBoard())[0]?.tier.id).toBe("ranger");
+    expect((await contests.get(c.slug, null)).standings.map((r) => [r.handle, r.rating?.delta, r.rating?.rating])).toEqual([
+      ["alice", 20, 1520],
+      ["bob", -20, 1480],
+    ]);
+    clock.advance(24 * 60 * MIN);
+    expect(await contests.settledResults(c.slug)).toEqual([expect.objectContaining({ userId: "alice", rank: 1 }), expect.objectContaining({ userId: "bob", rank: 2 })]);
   });
 
   it("the purchase lock stops parallel buys from overspending", async () => {

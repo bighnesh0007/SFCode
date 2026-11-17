@@ -1,5 +1,6 @@
 "use client";
 
+import { RatingTier } from "@/components/RatingTier";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Flag, Swords, Trophy, Users } from "lucide-react";
@@ -209,7 +210,12 @@ export default function LeaderboardPage() {
                           </Link>
                         </td>
                         <td className="py-3 text-right tabular-nums">{r.contests}</td>
-                        <td className="py-3 pr-4 text-right font-medium tabular-nums">{r.rating}</td>
+                        <td className="py-3 pr-4 text-right font-medium tabular-nums">
+                          <span className="inline-flex items-center gap-2">
+                            <RatingTier tier={r.tier} className="hidden sm:inline-flex" />
+                            {r.rating}
+                          </span>
+                        </td>
                       </tr>
                     ))}
             </tbody>

@@ -391,7 +391,7 @@ export const follows = pgTable(
   (t) => [primaryKey({ columns: [t.followerId, t.followeeId] }), index("follows_followee_idx").on(t.followeeId)],
 );
 
-export type NotificationKind = "follow" | "review" | "buddy" | "mentor" | "team";
+export type NotificationKind = "follow" | "review" | "buddy" | "mentor" | "team" | "contest";
 
 /** In-app notifications (the bell). `data` holds what the UI needs to render and link. */
 export const notifications = pgTable(
@@ -411,6 +411,8 @@ export const notifications = pgTable(
 export const emailPrefs = pgTable("email_prefs", {
   userId: text("user_id").primaryKey(),
   weeklyDigest: boolean("weekly_digest").notNull().default(false),
+  /** An email an hour before each contest starts. */
+  contestReminders: boolean("contest_reminders").notNull().default(false),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

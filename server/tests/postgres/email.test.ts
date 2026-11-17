@@ -55,8 +55,8 @@ describe.skipIf(!safe)("weekly digest on Postgres", () => {
   }
 
   it("opt-in only; Mondays from 09:00 UTC; once per user per week", async () => {
-    await repo.setPrefs("ann", true);
-    await repo.setPrefs("bob", false);
+    await repo.setPrefs("ann", { weeklyDigest: true });
+    await repo.setPrefs("bob", { weeklyDigest: false });
     expect(await setup(Date.parse("2026-11-16T08:59:00Z")).svc.runWeekly()).toEqual({}); // too early
     expect(await setup(Date.parse("2026-11-17T10:00:00Z")).svc.runWeekly()).toEqual({}); // Tuesday
     const a = setup(monday9);
@@ -66,7 +66,7 @@ describe.skipIf(!safe)("weekly digest on Postgres", () => {
   });
 
   it("per-user and total monthly caps; failures still count", async () => {
-    for (const u of ["u1", "u2", "u3"]) await repo.setPrefs(u, true);
+    for (const u of ["u1", "u2", "u3"]) await repo.setPrefs(u, { weeklyDigest: true });
     expect(await setup(monday9, { total: 2, perUser: 4 }).svc.runWeekly()).toEqual({ sent: 2, global_cap: 1 });
     await db.execute(sql`TRUNCATE email_log`);
     for (let i = 0; i < 2; i++) expect(await repo.claim("u1", "test", `p${i}`, monthStart(new Date(monday9)), { total: 190, perUser: 2 })).toBe("claimed");
@@ -86,8 +86,21 @@ describe.skipIf(!safe)("weekly digest on Postgres", () => {
   });
 
   it("users without a verified address are skipped without using the budget", async () => {
-    await repo.setPrefs("noaddr", true);
+    await repo.setPrefs("noaddr", { weeklyDigest: true });
     expect(await setup(monday9).svc.runWeekly()).toEqual({ no_address: 1 });
     expect(await repo.sentThisMonth(monthStart(new Date(monday9)))).toBe(0);
+  });
+
+  it("contest reminders: separate opt-in, one email per contest, setting one preference keeps the other", async () => {
+    await repo.setPrefs("ann", { weeklyDigest: true });
+    await repo.setPrefs("ann", { contestReminders: true });
+    expect(await repo.prefs("ann")).toEqual({ weeklyDigest: true, contestReminders: true });
+    await repo.setPrefs("bob", { weeklyDigest: true });
+    const a = setup(monday9);
+    const contest = { title: "Weekly Contest 1", slug: "weekly-contest-1", startsAt: "2026-11-22T14:30:00Z" };
+    expect(await a.svc.remindContest(contest)).toEqual({ sent: 1 });
+    expect(a.sent).toEqual(["ann@example.com"]);
+    expect(await setup(monday9).svc.remindContest(contest)).toEqual({ duplicate: 1 });
+    expect(await setup(monday9).svc.remindContest({ ...contest, slug: "weekly-contest-2" })).toEqual({ sent: 1 });
   });
 });

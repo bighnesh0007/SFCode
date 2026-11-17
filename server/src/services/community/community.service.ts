@@ -11,7 +11,7 @@ import { achievements, streaks, type Achievement } from "../../domain/achievemen
 import { EMPTY_ABOUT, type AboutRecord, type AboutRepository } from "../../repositories/about.repository.ts";
 import { PointsService } from "../points/points.service.ts";
 import { rankFor, type RankView } from "../../domain/ranks.ts";
-import type { RatingPoint } from "../../domain/rating.ts";
+import { ratingTier, type RatingPoint, type RatingTierId } from "../../domain/rating.ts";
 import type { ChallengeSubmissionRepository } from "../../repositories/challengeSubmission.repository.ts";
 import type { ProfileRecord, ProfileRepository } from "../../repositories/profile.repository.ts";
 import type { Clock } from "../../types/ports.ts";
@@ -88,7 +88,7 @@ export interface ProfileStats {
 
 export interface ProfileView {
   /** Contest rating (Elo-style), null before the first rated contest. */
-  rating: { current: number; peak: number; history: RatingPoint[] } | null;
+  rating: { current: number; peak: number; tier: { id: RatingTierId; title: string }; history: RatingPoint[] } | null;
   /** Rank-from-points with progress to the next one. */
   tier: RankView;
   cosmetics: Cosmetics;
@@ -335,7 +335,7 @@ export class CommunityService {
 
     const lastRating = ratingHistory.at(-1);
     return {
-      rating: lastRating ? { current: lastRating.rating, peak: Math.max(...ratingHistory.map((r) => r.rating)), history: ratingHistory } : null,
+      rating: lastRating ? { current: lastRating.rating, tier: ratingTier(lastRating.rating), peak: Math.max(...ratingHistory.map((r) => r.rating)), history: ratingHistory } : null,
       tier: rankFor(score),
       about: about ?? EMPTY_ABOUT,
       stats: { freezesLeft: freezes - streak.freezesUsed, streak: streak.current, longestStreak: streak.longest, coins, contests: contests.length, bestPlacement, activeDays: activity.filter((d) => d.count > 0).length, contributions },

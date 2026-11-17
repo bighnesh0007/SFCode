@@ -64,6 +64,8 @@ export interface Tier {
   progress: number;
 }
 
+import type { RatingTierInfo } from "@/components/RatingTier";
+
 export interface RatingPoint {
   contestSlug: string;
   title: string;
@@ -75,7 +77,7 @@ export interface RatingPoint {
 }
 
 export interface ProfileView {
-  rating: { current: number; peak: number; history: RatingPoint[] } | null;
+  rating: { current: number; peak: number; tier: RatingTierInfo; history: RatingPoint[] } | null;
   tier: Tier;
   cosmetics: Cosmetics;
   about: About;
@@ -144,6 +146,7 @@ export interface RatingRow {
   displayName: string;
   imageUrl: string | null;
   rating: number;
+  tier: RatingTierInfo;
   contests: number;
 }
 export const getRatingBoard = () => apiRequest<RatingRow[]>("/api/v1/leaderboard/rating");

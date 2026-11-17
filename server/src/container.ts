@@ -31,6 +31,7 @@ import { PgHubRepository } from "./repositories/hub.repository.ts";
 import { HubService } from "./services/hub/hub.service.ts";
 import { PgEmailRepository } from "./repositories/email.repository.ts";
 import { DigestService } from "./services/email/digest.service.ts";
+import { ContestNotifyService } from "./services/contests/contestNotify.service.ts";
 import { emailJsSender } from "./services/email/emailjs.ts";
 import { PgSocialRepository } from "./repositories/social.repository.ts";
 import { SocialService } from "./services/social/social.service.ts";
@@ -81,6 +82,7 @@ export interface Container {
   drafts?: ProblemDraftService;
   social?: SocialService;
   digest?: DigestService;
+  contestNotify?: ContestNotifyService;
   telemetry?: TelemetryService;
   discussion?: DiscussionService;
   interview?: InterviewService;
@@ -231,6 +233,17 @@ export function buildContainer(): Container {
       { total: monthlyCap, perUser: perUserMonthly },
       site,
     );
+    if (container.contests) {
+      const digest = container.digest;
+      container.contestNotify = new ContestNotifyService({
+        repo: contestRepo ?? new PgContestRepository(container.db),
+        contests: container.contests,
+        notify: (userId, kind, data) => social.notify(userId, kind, data),
+        email: digest.enabled ? digest : undefined,
+        settings: new PgSettingsRepository(container.db),
+        clock: systemClock,
+      });
+    }
     container.hub = new HubService(new PgHubRepository(container.db), new PgProfileRepository(container.db), container.community, container.admin, container.social, systemClock);
     container.buddies.setNotifier((userId, kind, data) => social.notify(userId, kind, data));
     container.community.setCosmeticsSource(container.store);

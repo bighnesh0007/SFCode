@@ -1,0 +1,1 @@
+ALTER TABLE "email_prefs" ADD COLUMN "contest_reminders" boolean DEFAULT false NOT NULL;

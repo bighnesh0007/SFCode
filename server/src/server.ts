@@ -42,6 +42,14 @@ if (container.autoContests) {
   setInterval(run, 60 * 60_000).unref();
 }
 
+// Contest reminders (an hour before) and results (once settled): checked every 5 minutes.
+if (container.contestNotify) {
+  const notifier = container.contestNotify;
+  const run = () => void notifier.run().catch((err: unknown) => logger.error({ err }, "contest notification run failed"));
+  setTimeout(run, 45_000).unref();
+  setInterval(run, 5 * 60_000).unref();
+}
+
 // Weekly digest: check hourly (it only sends on Mondays from 09:00 UTC, once per user per week).
 if (container.digest?.enabled) {
   const digest = container.digest;

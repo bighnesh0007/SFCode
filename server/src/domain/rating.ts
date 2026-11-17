@@ -53,3 +53,21 @@ export function replayRatings(contests: ContestPlacing[]): Map<string, RatingPoi
   }
   return history;
 }
+
+/**
+ * Named rating tiers, lowest first. Everyone starts at 1500 (Ranger), so one
+ * bad first contest can drop you a tier, and Architect takes a run of wins.
+ */
+export const RATING_TIERS = [
+  { id: "trailblazer", title: "Trailblazer", min: 0 },
+  { id: "ranger", title: "Ranger", min: 1400 },
+  { id: "architect", title: "Architect", min: 1600 },
+  { id: "cta", title: "CTA", min: 1800 },
+] as const;
+
+export type RatingTierId = (typeof RATING_TIERS)[number]["id"];
+
+export function ratingTier(rating: number): { id: RatingTierId; title: string } {
+  const tier = [...RATING_TIERS].reverse().find((t) => rating >= t.min) ?? RATING_TIERS[0];
+  return { id: tier.id, title: tier.title };
+}

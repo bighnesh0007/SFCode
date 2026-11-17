@@ -3,12 +3,21 @@ import { and, eq, gte, sql } from "drizzle-orm";
 import type { PgDatabase } from "../data/postgres/client.ts";
 import { emailLog, emailPrefs } from "../data/postgres/schema.ts";
 
+export interface EmailPrefs {
+  weeklyDigest: boolean;
+  contestReminders: boolean;
+}
+
+export type PrefsPatch = { [K in keyof EmailPrefs]?: EmailPrefs[K] | undefined };
+
 export type ClaimOutcome = "claimed" | "duplicate" | "user_cap" | "global_cap";
 
 export interface EmailRepository {
-  prefs(userId: string): Promise<{ weeklyDigest: boolean }>;
-  setPrefs(userId: string, weeklyDigest: boolean): Promise<void>;
+  prefs(userId: string): Promise<EmailPrefs>;
+  /** Changes only the preferences given. */
+  setPrefs(userId: string, patch: PrefsPatch): Promise<void>;
   digestSubscribers(): Promise<string[]>;
+  reminderSubscribers(): Promise<string[]>;
   /**
    * Reserves one send for (user, kind, period) if both monthly caps allow it,
    * atomically (a global advisory lock), so concurrent runs can't overshoot.
@@ -21,20 +30,29 @@ export interface EmailRepository {
 export class PgEmailRepository implements EmailRepository {
   constructor(private readonly db: PgDatabase) {}
 
-  async prefs(userId: string): Promise<{ weeklyDigest: boolean }> {
-    const [row] = await this.db.select({ weeklyDigest: emailPrefs.weeklyDigest }).from(emailPrefs).where(eq(emailPrefs.userId, userId)).limit(1);
-    return { weeklyDigest: row?.weeklyDigest ?? false };
+  async prefs(userId: string): Promise<EmailPrefs> {
+    const [row] = await this.db
+      .select({ weeklyDigest: emailPrefs.weeklyDigest, contestReminders: emailPrefs.contestReminders })
+      .from(emailPrefs)
+      .where(eq(emailPrefs.userId, userId))
+      .limit(1);
+    return { weeklyDigest: row?.weeklyDigest ?? false, contestReminders: row?.contestReminders ?? false };
   }
 
-  async setPrefs(userId: string, weeklyDigest: boolean): Promise<void> {
+  async setPrefs(userId: string, patch: PrefsPatch): Promise<void> {
+    const set = { ...(patch.weeklyDigest !== undefined && { weeklyDigest: patch.weeklyDigest }), ...(patch.contestReminders !== undefined && { contestReminders: patch.contestReminders }) };
     await this.db
       .insert(emailPrefs)
-      .values({ userId, weeklyDigest })
-      .onConflictDoUpdate({ target: emailPrefs.userId, set: { weeklyDigest, updatedAt: sql`now()` } });
+      .values({ userId, ...set })
+      .onConflictDoUpdate({ target: emailPrefs.userId, set: { ...set, updatedAt: sql`now()` } });
   }
 
   async digestSubscribers(): Promise<string[]> {
     return (await this.db.select({ id: emailPrefs.userId }).from(emailPrefs).where(eq(emailPrefs.weeklyDigest, true))).map((r) => r.id);
+  }
+
+  async reminderSubscribers(): Promise<string[]> {
+    return (await this.db.select({ id: emailPrefs.userId }).from(emailPrefs).where(eq(emailPrefs.contestReminders, true))).map((r) => r.id);
   }
 
   async claim(userId: string, kind: string, period: string, monthStart: Date, caps: { total: number; perUser: number }): Promise<ClaimOutcome> {

@@ -15,6 +15,8 @@ export interface ContestSummary {
   entrants: number;
 }
 
+import type { RatingTierInfo } from "@/components/RatingTier";
+
 export interface StandingRow {
   rank: number;
   handle: string;
@@ -23,6 +25,8 @@ export interface StandingRow {
   score: number;
   penalty: number;
   problems: { slug: string; solved: boolean; wrong: number; minutes: number | null }[];
+  /** Ended contests only: this entrant's new rating and the change. */
+  rating?: { rating: number; delta: number; tier: RatingTierInfo };
 }
 
 export interface ContestView extends ContestSummary {
