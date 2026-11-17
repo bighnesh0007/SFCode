@@ -6,6 +6,13 @@ import { buildApp } from "../src/app.ts";
 const app = buildApp({});
 
 describe("routes without configuration", () => {
+  it("serves both ladders (points ranks and rating tiers) with no database", async () => {
+    const res = await request(app).get("/api/v1/ranks");
+    expect(res.status).toBe(200);
+    expect(res.body.data.ranks.map((r: { id: string }) => r.id)).toEqual(["novice", "trailblazer", "ranger", "expert", "legend"]);
+    expect(res.body.data.ratingTiers.map((r: { id: string }) => r.id)).toEqual(["contender", "challenger", "champion", "grandmaster"]);
+  });
+
   it("serves /health", async () => {
     const res = await request(app).get("/health");
     expect(res.status).toBe(200);

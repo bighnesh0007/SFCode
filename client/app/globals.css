@@ -361,3 +361,25 @@
   .sfc-frame-holo { box-shadow: 0 0 0 3px #93c5fd, 0 0 12px #f0abfc; }
   .sfc-banner-starfield::after { opacity: 0.7; }
 }
+
+/* ── Home page ───────────────────────────────────────────────────────── */
+.sfc-reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.sfc-reveal.is-in { opacity: 1; transform: none; }
+.sfc-gradient-text {
+  background-image: linear-gradient(90deg, #0ea5e9, #6366f1, #8b5cf6, #0ea5e9);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sfc-sweep 8s linear infinite;
+}
+@keyframes sfc-caret { 50% { opacity: 0; } }
+.sfc-caret { animation: sfc-caret 1s steps(1) infinite; }
+@keyframes sfc-ladder-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.sfc-ladder-step { transform-origin: bottom; animation: sfc-ladder-grow 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.sfc-faq summary::-webkit-details-marker { display: none; }
+.sfc-faq[open] .sfc-faq-icon { transform: rotate(45deg); }
+@media (prefers-reduced-motion: reduce) {
+  .sfc-reveal { opacity: 1; transform: none; transition: none; }
+  .sfc-gradient-text, .sfc-caret, .sfc-ladder-step { animation: none; }
+}

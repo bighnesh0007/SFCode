@@ -1,4 +1,6 @@
 import express, { Router, type Application, type RequestHandler } from "express";
+import { RANKS } from "../domain/ranks.ts";
+import { RATING_TIERS } from "../domain/rating.ts";
 import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 import { hasCapability } from "../config/index.ts";
 import { logger } from "../lib/logger.ts";
@@ -125,6 +127,9 @@ export function mountRoutes(app: Application, container: Container): void {
     cert.use(disabled("Certification Prep"));
   }
   v1.use("/certification", cert);
+
+  // Both ladders, for the home page: thresholds live only on the server.
+  v1.get("/ranks", (_req, res) => ok(res, { ranks: RANKS, ratingTiers: RATING_TIERS }));
 
   // Profiles and leaderboard: public reads; your own profile needs sign-in.
   // Mounted on their own paths: a router at "/" with a catch-all "not

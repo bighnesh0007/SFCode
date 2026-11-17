@@ -30,8 +30,8 @@ describe("contest rating", () => {
     expect(big.get("p0")?.[0]?.delta).toBe(20); // beats 9 equals: 40 × (9 − 4.5) / 9
   });
 
-  it("tiers: boundaries are inclusive, and a new player starts as a Ranger", () => {
-    expect(ratingTier(INITIAL_RATING).id).toBe("ranger");
-    expect([1399, 1400, 1599, 1600, 1799, 1800, 2400].map((r) => ratingTier(r).id)).toEqual(["trailblazer", "ranger", "ranger", "architect", "architect", "cta", "cta"]);
+  it("tiers: boundaries are inclusive, and a new player starts as a Challenger", () => {
+    expect(ratingTier(INITIAL_RATING).id).toBe("challenger");
+    expect([1399, 1400, 1599, 1600, 1799, 1800, 2400].map((r) => ratingTier(r).id)).toEqual(["contender", "challenger", "challenger", "champion", "champion", "grandmaster", "grandmaster"]);
   });
 });

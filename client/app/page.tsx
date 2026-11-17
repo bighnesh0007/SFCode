@@ -10,7 +10,13 @@ import { LiveStats } from "@/components/LiveStats";
 import { DotBackground } from "@/components/home/DotBackground";
 import { ProblemMarquee } from "@/components/home/ProblemMarquee";
 import { SpotlightCard } from "@/components/home/SpotlightCard";
-import { TerminalDemo } from "@/components/home/TerminalDemo";
+import { CodeDemo } from "@/components/home/CodeDemo";
+import { Faq } from "@/components/home/Faq";
+import { HomeDashboard } from "@/components/home/HomeDashboard";
+import { NextContest } from "@/components/home/NextContest";
+import { RankLadder } from "@/components/home/RankLadder";
+import { Reveal } from "@/components/home/Reveal";
+import { TopLearners } from "@/components/home/TopLearners";
 import { buttonVariants } from "@/components/ui/button";
 
 export const metadata = pageMeta({ title: `Salesforce Practice Problems: Apex, SOQL, LWC & Flow | ${SITE_NAME}`, description: SITE_DESCRIPTION, path: "/", absoluteTitle: true });
@@ -36,11 +42,11 @@ const SITE_LD = [
 ];
 
 const TRACKS = [
-  { icon: Code2, label: "Apex", href: "/problems?track=apex", tone: "text-sky-700 dark:text-sky-400" },
-  { icon: Database, label: "SOQL", href: "/problems?track=soql", tone: "text-emerald-700 dark:text-emerald-400" },
-  { icon: Bug, label: "Debugging", href: "/problems?track=debug", tone: "text-rose-500" },
-  { icon: Workflow, label: "Flows", href: "/problems?track=flow", tone: "text-amber-700 dark:text-amber-400" },
-  { icon: Zap, label: "LWC", href: "/problems?track=lwc", tone: "text-violet-500" },
+  { icon: Code2, label: "Apex", href: "/problems?track=apex", tone: "text-sky-700 dark:text-sky-400", glow: "hover:border-sky-500/50 hover:shadow-sky-500/20" },
+  { icon: Database, label: "SOQL", href: "/problems?track=soql", tone: "text-emerald-700 dark:text-emerald-400", glow: "hover:border-emerald-500/50 hover:shadow-emerald-500/20" },
+  { icon: Bug, label: "Debugging", href: "/problems?track=debug", tone: "text-rose-500", glow: "hover:border-rose-500/50 hover:shadow-rose-500/20" },
+  { icon: Workflow, label: "Flows", href: "/problems?track=flow", tone: "text-amber-700 dark:text-amber-400", glow: "hover:border-amber-500/50 hover:shadow-amber-500/20" },
+  { icon: Zap, label: "LWC", href: "/problems?track=lwc", tone: "text-violet-500", glow: "hover:border-violet-500/50 hover:shadow-violet-500/20" },
 ];
 
 const STEPS = [
@@ -64,6 +70,7 @@ export default function Home() {
   return (
     <div className="relative">
       <JsonLd data={SITE_LD} />
+      <HomeDashboard />
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden">
         <DotBackground />
@@ -75,7 +82,7 @@ export default function Home() {
             </p>
             <h1 className="mt-4 max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
               Write real Apex.{" "}
-              <span className="bg-gradient-to-r from-sky-500 via-indigo-500 to-violet-500 bg-clip-text text-transparent">Get graded in a real org.</span>
+              <span className="sfc-gradient-text">Get graded in a real org.</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
               Apex, SOQL, Flow, debugging and LWC problems checked by hidden tests, a roadmap from first steps to certification, and weekly
@@ -89,6 +96,7 @@ export default function Home() {
                 See the roadmap
               </Link>
             </div>
+            <NextContest className="mt-6" />
             <LiveStats />
           </div>
           <Globe className="mx-auto w-full max-w-[340px] sm:max-w-[460px] lg:max-w-[560px]" />
@@ -107,11 +115,13 @@ export default function Home() {
             <h2 className="text-2xl font-semibold tracking-tight">Today on SFCode</h2>
             <p className="text-muted-foreground">One problem for everyone each day, worth bonus coins if you solve it before midnight UTC. Keep the streak going.</p>
             <DailyCard />
+            <TopLearners />
           </div>
           <ActivityFeed />
         </section>
 
         {/* ── Bento: everything in one place ─────────────────────────────── */}
+        <Reveal>
         <section className="py-12">
           <SectionTitle eyebrow="Everything in one place" title="From your first query to Legend" body="Practice, learn, compete and give back, all graded against real Salesforce." />
           <div className="mt-10 grid gap-4 md:grid-cols-6">
@@ -121,7 +131,7 @@ export default function Home() {
               <p className="mt-2 max-w-md text-sm text-muted-foreground">Every solution runs against hidden tests in a real org (or our LWC sandbox). No regex matching, no multiple choice.</p>
               <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-5">
                 {TRACKS.map((t) => (
-                  <span key={t.label} className="flex flex-col items-center gap-2 rounded-xl border bg-background/60 p-4 text-sm font-medium transition-transform group-hover:-translate-y-0.5">
+                  <span key={t.label} className={`flex flex-col items-center gap-2 rounded-xl border bg-background/60 p-4 text-sm font-medium transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${t.glow}`}>
                     <t.icon className={`h-6 w-6 ${t.tone}`} />
                     {t.label}
                   </span>
@@ -157,7 +167,20 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── How grading works: timeline + terminal ─────────────────────── */}
+        </Reveal>
+
+        {/* ── Two ladders: rank and rating ───────────────────────────────── */}
+        <Reveal>
+          <section className="py-16">
+            <SectionTitle eyebrow="Progress you can see" title="Two ladders to climb" body="Solve problems to rank up from Novice to Legend. Compete in contests to build a rating." />
+            <div className="mt-10">
+              <RankLadder />
+            </div>
+          </section>
+        </Reveal>
+
+        {/* ── How grading works: timeline + live demo ────────────────────── */}
+        <Reveal>
         <section className="grid items-center gap-10 py-16 lg:grid-cols-2">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-sky-700 dark:text-sky-400">How it works</p>
@@ -174,10 +197,21 @@ export default function Home() {
             </ol>
           </div>
           <div>
-            <TerminalDemo />
-            <p className="mt-2 text-center text-xs text-muted-foreground">Illustration of a real submission&apos;s output.</p>
+            <CodeDemo />
+            <p className="mt-2 text-center text-xs text-muted-foreground">An illustration of real submissions. Pick a track.</p>
           </div>
         </section>
+        </Reveal>
+
+        {/* ── FAQ ────────────────────────────────────────────────────────── */}
+        <Reveal>
+          <section className="py-16">
+            <SectionTitle eyebrow="Questions" title="Good to know" body="The short answers. Everything else is one click away." />
+            <div className="mt-10">
+              <Faq />
+            </div>
+          </section>
+        </Reveal>
 
         {/* ── Call to action ─────────────────────────────────────────────── */}
         <section className="relative my-16 overflow-hidden rounded-3xl border bg-gradient-to-br from-sky-500/10 via-indigo-500/10 to-violet-500/10 px-6 py-14 text-center">
