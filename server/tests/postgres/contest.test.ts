@@ -122,7 +122,7 @@ describe.skipIf(!safe)("Contests and store on Postgres", () => {
       [1, "alice", 1520, 1],
       [2, "bob", 1480, 1],
     ]);
-    expect((await contests.ratingBoard())[0]?.tier.id).toBe("ranger");
+    expect((await contests.ratingBoard())[0]?.tier.id).toBe("challenger");
     expect((await contests.get(c.slug, null)).standings.map((r) => [r.handle, r.rating?.delta, r.rating?.rating])).toEqual([
       ["alice", 20, 1520],
       ["bob", -20, 1480],

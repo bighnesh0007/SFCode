@@ -55,14 +55,16 @@ export function replayRatings(contests: ContestPlacing[]): Map<string, RatingPoi
 }
 
 /**
- * Named rating tiers, lowest first. Everyone starts at 1500 (Ranger), so one
- * bad first contest can drop you a tier, and Architect takes a run of wins.
+ * Named contest-rating tiers, lowest first. Deliberately not the points-rank
+ * names (Novice…Legend in ranks.ts): the two ladders measure different things.
+ * Everyone starts at 1500 (Challenger), so one bad first contest can drop a
+ * tier, and Champion takes a run of wins.
  */
 export const RATING_TIERS = [
-  { id: "trailblazer", title: "Trailblazer", min: 0 },
-  { id: "ranger", title: "Ranger", min: 1400 },
-  { id: "architect", title: "Architect", min: 1600 },
-  { id: "cta", title: "CTA", min: 1800 },
+  { id: "contender", title: "Contender", min: 0 },
+  { id: "challenger", title: "Challenger", min: 1400 },
+  { id: "champion", title: "Champion", min: 1600 },
+  { id: "grandmaster", title: "Grandmaster", min: 1800 },
 ] as const;
 
 export type RatingTierId = (typeof RATING_TIERS)[number]["id"];

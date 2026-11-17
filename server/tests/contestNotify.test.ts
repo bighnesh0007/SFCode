@@ -17,7 +17,7 @@ function setup() {
     repo: { list: () => Promise.resolve([contest]), entrants: () => Promise.resolve(["ann", "bob"]) },
     contests: {
       settledResults: () => Promise.resolve(settled ? [{ userId: "ann", rank: 1, score: 30 }, { userId: "bob", rank: 2, score: 10 }] : null),
-      ratingChanges: () => Promise.resolve(new Map<string, ContestRatingChange>([["ann", { rating: 1520, delta: 20, tier: { id: "ranger", title: "Ranger" } }]])),
+      ratingChanges: () => Promise.resolve(new Map<string, ContestRatingChange>([["ann", { rating: 1520, delta: 20, tier: { id: "challenger", title: "Challenger" } }]])),
     },
     notify: (userId, _kind, data) => (bell.push({ userId, data }), Promise.resolve()),
     email: { remindContest: (c) => (emails.push(c.slug), Promise.resolve()) },
@@ -50,7 +50,7 @@ describe("contest notifications", () => {
     expect((await t.svc.run()).resulted).toEqual(["weekly-contest-1"]);
     expect((await t.svc.run()).resulted).toEqual([]);
     expect(t.bell.map((b) => b.data)).toEqual([
-      { event: "result", slug: "weekly-contest-1", title: "Weekly Contest 1", rank: "1", entrants: "2", rating: "1520", delta: "20", tier: "Ranger" },
+      { event: "result", slug: "weekly-contest-1", title: "Weekly Contest 1", rank: "1", entrants: "2", rating: "1520", delta: "20", tier: "Challenger" },
       { event: "result", slug: "weekly-contest-1", title: "Weekly Contest 1", rank: "2", entrants: "2" },
     ]);
   });
