@@ -242,3 +242,122 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Store cosmetics, round 2 ───────────────────────────────────────────────
+ * Every animation below is decorative: under prefers-reduced-motion each one
+ * stops on a still frame that still shows the look (block at the end). */
+
+/* Frames (box-shadow only: avatars are plain <img> elements). */
+@keyframes sfc-neon-ring {
+  0%, 100% { box-shadow: 0 0 0 2px #22d3ee, 0 0 10px 2px rgb(34 211 238 / 0.7), 0 0 0 5px rgb(236 72 153 / 0.85); }
+  45% { box-shadow: 0 0 0 2px #22d3ee, 0 0 16px 4px rgb(34 211 238 / 0.9), 0 0 0 5px rgb(236 72 153 / 0.95); }
+  50% { box-shadow: 0 0 0 2px rgb(34 211 238 / 0.5), 0 0 4px 1px rgb(34 211 238 / 0.3), 0 0 0 5px rgb(236 72 153 / 0.4); }
+  55% { box-shadow: 0 0 0 2px #22d3ee, 0 0 16px 4px rgb(34 211 238 / 0.9), 0 0 0 5px rgb(236 72 153 / 0.95); }
+}
+@keyframes sfc-galaxy-ring {
+  0% { box-shadow: 0 0 0 3px #4338ca, -6px -4px 14px #a855f7, 6px 4px 14px #0ea5e9; }
+  33% { box-shadow: 0 0 0 3px #6d28d9, 6px -4px 14px #ec4899, -6px 4px 14px #6366f1; }
+  66% { box-shadow: 0 0 0 3px #1e3a8a, 6px 6px 14px #22d3ee, -6px -6px 14px #c026d3; }
+  100% { box-shadow: 0 0 0 3px #4338ca, -6px -4px 14px #a855f7, 6px 4px 14px #0ea5e9; }
+}
+@keyframes sfc-ember-ring {
+  0%, 100% { box-shadow: 0 0 0 3px #f97316, 0 -3px 12px 2px rgb(239 68 68 / 0.8), 0 0 20px rgb(251 191 36 / 0.5); }
+  30% { box-shadow: 0 0 0 3px #fb923c, 0 -5px 16px 3px rgb(239 68 68 / 0.9), 0 0 24px rgb(251 191 36 / 0.7); }
+  60% { box-shadow: 0 0 0 3px #ea580c, 0 -2px 9px 1px rgb(239 68 68 / 0.6), 0 0 16px rgb(251 191 36 / 0.4); }
+}
+@keyframes sfc-holo-ring {
+  0% { box-shadow: 0 0 0 3px #f0abfc, 0 0 14px #f0abfc; }
+  20% { box-shadow: 0 0 0 3px #93c5fd, 0 0 14px #93c5fd; }
+  40% { box-shadow: 0 0 0 3px #6ee7b7, 0 0 14px #6ee7b7; }
+  60% { box-shadow: 0 0 0 3px #fde68a, 0 0 14px #fde68a; }
+  80% { box-shadow: 0 0 0 3px #fca5a5, 0 0 14px #fca5a5; }
+  100% { box-shadow: 0 0 0 3px #f0abfc, 0 0 14px #f0abfc; }
+}
+.sfc-frame-neon { animation: sfc-neon-ring 3.2s ease-in-out infinite; }
+.sfc-frame-galaxy { animation: sfc-galaxy-ring 6s linear infinite; }
+.sfc-frame-ember { animation: sfc-ember-ring 1.6s ease-in-out infinite; }
+.sfc-frame-holo { animation: sfc-holo-ring 4s linear infinite; }
+
+/* Name effects. Gradient text keeps enough contrast in both themes. */
+@keyframes sfc-sweep { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }
+@keyframes sfc-flicker { 0%, 100% { filter: brightness(1); } 40% { filter: brightness(1.15); } 70% { filter: brightness(0.92); } }
+.sfc-name-glow { color: #0e7490; text-shadow: 0 0 6px rgb(34 211 238 / 0.55); }
+.dark .sfc-name-glow { color: #67e8f9; text-shadow: 0 0 8px rgb(34 211 238 / 0.8), 0 0 2px rgb(255 255 255 / 0.6); }
+.sfc-name-shimmer, .sfc-name-flame, .sfc-name-holo { background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sfc-name-shimmer { background-image: linear-gradient(90deg, #4338ca, #0891b2, #7c3aed, #4338ca); animation: sfc-sweep 4s linear infinite; }
+.dark .sfc-name-shimmer { background-image: linear-gradient(90deg, #a5b4fc, #67e8f9, #d8b4fe, #a5b4fc); }
+.sfc-name-flame { background-image: linear-gradient(90deg, #b91c1c, #ea580c, #ca8a04, #b91c1c); animation: sfc-sweep 2.5s linear infinite, sfc-flicker 1.4s ease-in-out infinite; }
+.dark .sfc-name-flame { background-image: linear-gradient(90deg, #f87171, #fb923c, #fde047, #f87171); }
+.sfc-name-holo { background-image: linear-gradient(90deg, #be185d, #1d4ed8, #047857, #a16207, #be185d); animation: sfc-sweep 5s linear infinite; }
+.dark .sfc-name-holo { background-image: linear-gradient(90deg, #f9a8d4, #93c5fd, #6ee7b7, #fde68a, #f9a8d4); }
+
+/* Badge: a shine that sweeps across the Legend badge. */
+.sfc-badge-legend { background-image: linear-gradient(110deg, #b45309 0%, #f59e0b 40%, #fef3c7 50%, #f59e0b 60%, #b45309 100%); background-size: 250% 100%; color: #451a03; animation: sfc-sweep 3s linear infinite; }
+
+/* Banners (behind the profile header). */
+.sfc-banner { position: relative; overflow: hidden; }
+.sfc-banner-sunset { background: linear-gradient(160deg, #fb923c 0%, #f43f5e 45%, #7c3aed 100%); }
+.sfc-banner-waves { background:
+    radial-gradient(120% 60% at 50% 120%, #0e7490 40%, transparent 41%),
+    radial-gradient(120% 60% at 30% 135%, #0891b2 40%, transparent 41%),
+    linear-gradient(180deg, #67e8f9, #0ea5e9);
+  background-size: 200% 100%, 220% 100%, 100% 100%;
+  animation: sfc-waves 9s ease-in-out infinite alternate; }
+@keyframes sfc-waves { from { background-position: 0% 0%, 100% 0%, 0 0; } to { background-position: 100% 0%, 0% 0%, 0 0; } }
+.sfc-banner-circuit { background-color: #052e2b; background-image:
+    linear-gradient(90deg, transparent 0 47%, rgb(52 211 153 / 0.9) 47% 53%, transparent 53%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%2310b981' stroke-opacity='.45' stroke-width='2'%3E%3Cpath d='M0 20h30v20h20V10h30M10 80V60h30v-10h40M60 0v30'/%3E%3C/g%3E%3Cg fill='%2334d399' fill-opacity='.7'%3E%3Ccircle cx='30' cy='20' r='3'/%3E%3Ccircle cx='50' cy='40' r='3'/%3E%3Ccircle cx='40' cy='60' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 160px 2px, 80px 80px; background-repeat: repeat-y, repeat;
+  animation: sfc-circuit 4s linear infinite; }
+@keyframes sfc-circuit { from { background-position: -160px 0, 0 0; } to { background-position: 100vw 0, 0 0; } }
+.sfc-banner-aurora { background:
+    radial-gradient(60% 80% at 20% 30%, rgb(52 211 153 / 0.75), transparent 70%),
+    radial-gradient(50% 70% at 70% 20%, rgb(129 140 248 / 0.75), transparent 70%),
+    radial-gradient(40% 60% at 50% 80%, rgb(236 72 153 / 0.5), transparent 70%),
+    #0b1026;
+  background-size: 160% 160%; animation: sfc-aurora 12s ease-in-out infinite alternate; }
+@keyframes sfc-aurora { from { background-position: 0% 0%, 100% 0%, 50% 100%, 0 0; } to { background-position: 100% 100%, 0% 100%, 50% 0%, 0 0; } }
+.sfc-banner-starfield { background-color: #050816; background-image:
+    radial-gradient(1.5px 1.5px at 20px 30px, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 90px 70px, #c7d2fe 50%, transparent 51%),
+    radial-gradient(2px 2px at 150px 20px, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 60px 110px, #e0e7ff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 130px 95px, #fff 50%, transparent 51%),
+    radial-gradient(80% 120% at 80% 0%, rgb(99 102 241 / 0.35), transparent 70%);
+  background-size: 180px 130px, 180px 130px, 180px 130px, 180px 130px, 180px 130px, 100% 100%; }
+.sfc-banner-starfield::after { content: ""; position: absolute; inset: 0; background-image:
+    radial-gradient(2px 2px at 40px 50px, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 120px 40px, #a5b4fc 50%, transparent 51%),
+    radial-gradient(2px 2px at 160px 110px, #fff 50%, transparent 51%);
+  background-size: 200px 140px; animation: sfc-twinkle 2.8s ease-in-out infinite; }
+@keyframes sfc-twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+.sfc-banner-synthwave { background:
+    radial-gradient(circle at 50% 78%, #fde047 0 14%, #f97316 22%, #db2777 30%, transparent 31%),
+    linear-gradient(180deg, #1e1b4b 0%, #581c87 55%, #be185d 100%); }
+.sfc-banner-synthwave::after { content: ""; position: absolute; left: -50%; right: -50%; bottom: -10%; height: 55%;
+  background-image: linear-gradient(rgb(244 114 182 / 0.9) 2px, transparent 2px), linear-gradient(90deg, rgb(244 114 182 / 0.9) 2px, transparent 2px);
+  background-size: 40px 22px; transform: perspective(160px) rotateX(55deg); transform-origin: bottom;
+  animation: sfc-grid 1.6s linear infinite; }
+@keyframes sfc-grid { from { background-position: 0 0; } to { background-position: 0 22px; } }
+.sfc-banner-coderain { background-color: #021b0e; background-image:
+    linear-gradient(180deg, transparent 0 60%, rgb(74 222 128 / 0.9) 60% 61%, transparent 61%),
+    repeating-linear-gradient(90deg, rgb(34 197 94 / 0.45) 0 2px, transparent 2px 18px),
+    repeating-linear-gradient(180deg, rgb(21 128 61 / 0.6) 0 6px, transparent 6px 12px);
+  background-size: 18px 140px, 100% 100%, 18px 24px; animation: sfc-rain 2.2s linear infinite; }
+@keyframes sfc-rain { from { background-position: 0 -140px, 0 0, 0 0; } to { background-position: 0 140px, 0 0, 0 24px; } }
+
+/* Rarity glow on store cards. */
+@keyframes sfc-legendary-border { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }
+.sfc-card-legendary { border-color: transparent; background: linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(90deg, #f59e0b, #ec4899, #8b5cf6, #06b6d4, #f59e0b) border-box; background-size: 100% 100%, 200% 100%; animation: sfc-legendary-border 6s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sfc-frame-neon, .sfc-frame-galaxy, .sfc-frame-ember, .sfc-frame-holo,
+  .sfc-name-shimmer, .sfc-name-flame, .sfc-name-holo, .sfc-badge-legend,
+  .sfc-banner-waves, .sfc-banner-circuit, .sfc-banner-aurora, .sfc-banner-coderain, .sfc-card-legendary,
+  .sfc-banner-starfield::after, .sfc-banner-synthwave::after { animation: none; }
+  .sfc-frame-neon { box-shadow: 0 0 0 2px #22d3ee, 0 0 0 5px rgb(236 72 153 / 0.85); }
+  .sfc-frame-galaxy { box-shadow: 0 0 0 3px #4338ca, 0 0 12px #a855f7; }
+  .sfc-frame-ember { box-shadow: 0 0 0 3px #f97316, 0 0 12px rgb(239 68 68 / 0.7); }
+  .sfc-frame-holo { box-shadow: 0 0 0 3px #93c5fd, 0 0 12px #f0abfc; }
+  .sfc-banner-starfield::after { opacity: 0.7; }
+}

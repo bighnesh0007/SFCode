@@ -5,7 +5,7 @@ import type { Track } from "./challengesApi";
 type Token = string | null;
 
 /** Equipped cosmetic style tokens per slot ("frame" | "badge" | "accent"). */
-export type Cosmetics = Partial<Record<"frame" | "badge" | "accent", string>>;
+export type Cosmetics = Partial<Record<"frame" | "badge" | "accent" | "banner", string>>;
 
 export const CERTIFICATIONS = [
   "Administrator",
