@@ -52,7 +52,7 @@ export default class CharacterCounter extends LightningElement {
   handleInput(e) { this.text = e.target.value; }
 }`,
     tests: ["rendersRemainingCount", "updatesOnInput", "respectsMaxProperty"],
-    verdict: "Accepted · 3/3 Jest tests · +4 points",
+    verdict: "Accepted · 3/3 hidden tests · +4 points",
   },
   {
     id: "flow",
