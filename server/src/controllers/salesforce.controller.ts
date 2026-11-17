@@ -3,7 +3,7 @@ import { config } from "../config/index.ts";
 import { validatedBody, validatedQuery } from "../middleware/validate.ts";
 import type { SalesforceConnectionService } from "../services/salesforce/connection.service.ts";
 import { noContent, ok } from "../utils/respond.ts";
-import type { CallbackQuery, ConnectBody, ExecuteBody, QueryBody } from "../validation/salesforce.schema.ts";
+import type { CallbackQuery, ConnectBody, ExecuteBody, QueryBody, TokenConnectBody } from "../validation/salesforce.schema.ts";
 
 function userId(req: Request): string {
   // requireAuth runs first on every route that calls this.
@@ -15,6 +15,11 @@ export function salesforceController(service: SalesforceConnectionService) {
     const body = validatedBody<ConnectBody>(req);
     const app = body.clientId && body.clientSecret ? { clientId: body.clientId, clientSecret: body.clientSecret } : undefined;
     ok(res, await service.start(userId(req), body.loginUrl, body.returnTo, app));
+  };
+
+  const connectToken: RequestHandler = async (req, res) => {
+    const body = validatedBody<TokenConnectBody>(req);
+    ok(res, { connection: await service.connectWithToken(userId(req), body.instanceUrl, body.accessToken) });
   };
 
   const callback: RequestHandler = async (req, res: Response) => {
@@ -48,5 +53,5 @@ export function salesforceController(service: SalesforceConnectionService) {
     ok(res, await service.query(userId(req), body.soql));
   };
 
-  return { start, callback, status, disconnect, execute, query };
+  return { start, connectToken, callback, status, disconnect, execute, query };
 }

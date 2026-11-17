@@ -21,7 +21,10 @@ export const salesforceConnections = pgTable("salesforce_connections", {
   loginUrl: text("login_url").notNull(),
   // Both stored as `enc:v1:…` (lib/crypto/tokenCipher.ts). Never plaintext.
   accessTokenEnc: text("access_token_enc").notNull(),
-  refreshTokenEnc: text("refresh_token_enc").notNull(),
+  /** Null for a pasted access token ("token"): it can't be refreshed and dies with its session. */
+  refreshTokenEnc: text("refresh_token_enc"),
+  /** "oauth" = connected through the OAuth flow; "token" = an access token the learner pasted (e.g. from `sf org display`). */
+  authType: text("auth_type").$type<"oauth" | "token">().notNull().default("oauth"),
   /** Set when the learner connected through their own Connected App; null = SFCode's shared app. */
   clientId: text("client_id"),
   clientSecretEnc: text("client_secret_enc"),

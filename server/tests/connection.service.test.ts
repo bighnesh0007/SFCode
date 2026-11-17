@@ -293,3 +293,50 @@ describe("SalesforceConnectionService — the learner's own Connected App", () =
     expect((await s.service.status("user_1"))?.ownApp).toBe(false);
   });
 });
+
+describe("SalesforceConnectionService — pasted access token", () => {
+  const TOKEN = `00Dxx0000001gPL!${"A".repeat(40)}`;
+  const who = (c: { url: string }) =>
+    c.url.endsWith("/services/oauth2/userinfo") ? json(200, { organization_id: "00Dxx0000001gPLEAY", user_id: "005xx", preferred_username: "dev@acme.com" }) : json(500, {});
+
+  it("checks the token against userinfo, then stores it encrypted with no refresh token", async () => {
+    const s = setup(who);
+    const view = await s.service.connectWithToken("user_1", "https://acme.lightning.force.com", TOKEN);
+    expect(view).toMatchObject({ username: "dev@acme.com", authType: "token", instanceUrl: INSTANCE });
+    const call = s.fetch.calls.find((c) => c.url.endsWith("/userinfo"));
+    expect(call?.url).toBe(`${INSTANCE}/services/oauth2/userinfo`);
+    const stored = s.repo.connections.get("user_1");
+    expect(stored?.accessTokenEnc).not.toContain("00Dxx");
+    expect(decryptToken(stored?.accessTokenEnc ?? "", tokenKey)).toBe(TOKEN);
+    expect(stored?.refreshTokenEnc).toBeNull();
+  });
+
+  it("never sends the token to a non-Salesforce host or a generic login host, and rejects junk before any request", async () => {
+    const s = setup(who);
+    for (const host of ["https://evil.example.com", "https://login.salesforce.com", "production", "http://acme.my.salesforce.com"]) {
+      await expect(s.service.connectWithToken("user_1", host, TOKEN)).rejects.toMatchObject({ status: 400 });
+    }
+    await expect(s.service.connectWithToken("user_1", INSTANCE, "not-a-token")).rejects.toMatchObject({ status: 400 });
+    expect(s.fetch.calls).toHaveLength(0);
+  });
+
+  it("rejects an expired token and one from a different org", async () => {
+    const expired = setup(() => json(401, {}));
+    await expect(expired.service.connectWithToken("user_1", INSTANCE, TOKEN)).rejects.toMatchObject({ status: 400, message: expect.stringMatching(/expired/) });
+    expect(expired.repo.connections.size).toBe(0);
+    const other = setup(who);
+    await expect(other.service.connectWithToken("user_1", INSTANCE, `00Dyy0000009zzz!${"A".repeat(40)}`)).rejects.toMatchObject({ message: expect.stringMatching(/different org/) });
+    expect(other.repo.connections.size).toBe(0);
+  });
+
+  it("when the session ends: no refresh attempt, the connection is dropped, and the learner is told to paste a new one", async () => {
+    let live = true;
+    const s = setup((c) => (c.url.includes("/services/data/") ? (live ? json(200, { totalSize: 0, done: true, records: [] }) : json(401, [{ errorCode: "INVALID_SESSION_ID" }])) : who(c)));
+    await s.service.connectWithToken("user_1", INSTANCE, TOKEN);
+    expect(await s.service.query("user_1", "SELECT Id FROM Account")).toMatchObject({ totalSize: 0 });
+    live = false;
+    await expect(s.service.query("user_1", "SELECT Id FROM Account")).rejects.toMatchObject({ message: expect.stringMatching(/pasted Salesforce session has expired/) });
+    expect(s.fetch.calls.some((c) => c.url.endsWith("/services/oauth2/token"))).toBe(false);
+    expect(s.repo.connections.has("user_1")).toBe(false);
+  });
+});

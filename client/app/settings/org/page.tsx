@@ -3,14 +3,14 @@
 import { Suspense, useState, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
 import { SignInButton, useAuthState } from "@/components/auth";
-import { AlertTriangle, CheckCircle2, Cloud, Loader2, LogOut } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Cloud, KeyRound, Loader2, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { notifyOrgChanged, useOrgConnection } from "@/components/useOrgConnection";
 import { ApiError } from "@/lib/apiClient";
-import { disconnect, startConnect } from "@/lib/salesforceApi";
+import { connectWithToken, disconnect, startConnect } from "@/lib/salesforceApi";
 import { cn } from "@/lib/utils";
 
 const CALLBACK_ERRORS: Record<string, string> = {
@@ -40,6 +40,9 @@ function OrgSettings() {
   const [clientId, setClientId] = useState("");
   const [clientSecret, setClientSecret] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [instanceUrl, setInstanceUrl] = useState("");
+  const [accessToken, setAccessToken] = useState("");
+  const [tokenError, setTokenError] = useState<string | null>(null);
 
   const sf = params.get("sf");
   const reason = params.get("reason") ?? "";
@@ -54,6 +57,21 @@ function OrgSettings() {
       window.location.assign(await startConnect(await getToken(), loginUrl, returnTo, app));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not start the Salesforce sign-in.");
+      setBusy(false);
+    }
+  }
+
+  async function connectToken() {
+    setBusy(true);
+    setTokenError(null);
+    try {
+      await connectWithToken(await getToken(), instanceUrl.trim(), accessToken.trim());
+      setAccessToken("");
+      refresh();
+      notifyOrgChanged();
+    } catch (err) {
+      setTokenError(err instanceof ApiError ? err.message : "Could not connect with that token.");
+    } finally {
       setBusy(false);
     }
   }
@@ -121,9 +139,15 @@ function OrgSettings() {
               </CardTitle>
               <CardDescription>
                 Org {state.connection.orgId} · {state.connection.environment}
-                {state.connection.ownApp && " · your own Connected App"} · connected{" "}
+                {state.connection.ownApp && " · your own Connected App"}
+                {state.connection.authType === "token" && " · pasted access token"} · connected{" "}
                 {new Date(state.connection.connectedAt).toLocaleString()}
               </CardDescription>
+              {state.connection.authType === "token" && (
+                <p className="mt-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-800 dark:text-amber-300">
+                  This connection ends when that Salesforce session expires or you log out of it. Then paste a fresh token, or connect with Salesforce to stay signed in.
+                </p>
+              )}
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2">
               <Button variant="outline" disabled={busy} onClick={onDisconnect}>
@@ -198,6 +222,37 @@ function OrgSettings() {
                 {busy ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Cloud className="mr-1 h-4 w-4" />}
                 Connect with Salesforce
               </Button>
+
+              <details className="rounded-lg border px-3 py-2 text-sm">
+                <summary className="cursor-pointer font-medium">Advanced: paste an access token instead</summary>
+                <div className="mt-3 space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    For when the sign-in above is blocked in your org. With the{" "}
+                    <a className="underline" href="https://developer.salesforce.com/tools/salesforcecli" target="_blank" rel="noreferrer">Salesforce CLI</a>, log in to the org and run:
+                  </p>
+                  <pre className="overflow-x-auto rounded bg-muted px-3 py-2 text-xs"><code>sf org login web --alias sfcode{"\n"}sf org display --target-org sfcode</code></pre>
+                  <p className="text-xs text-muted-foreground">
+                    Copy the <b>Instance Url</b> and <b>Access Token</b> lines here. The token is stored encrypted and only works until that session ends (usually a few
+                    hours). There&apos;s no refresh, so you&apos;ll paste a new one then.
+                  </p>
+                  <p className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-800 dark:text-amber-300">
+                    An access token is as powerful as your login. Only paste one for a Developer Edition or sandbox org, and never paste it anywhere else.
+                  </p>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="instance-url">Instance Url</Label>
+                    <Input id="instance-url" placeholder="https://yourorg.my.salesforce.com" autoComplete="off" spellCheck={false} value={instanceUrl} onChange={(e) => setInstanceUrl(e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="access-token">Access Token</Label>
+                    <Input id="access-token" type="password" placeholder="00D…!…" autoComplete="off" spellCheck={false} value={accessToken} onChange={(e) => setAccessToken(e.target.value)} />
+                  </div>
+                  {tokenError && <p className="text-sm text-destructive">{tokenError}</p>}
+                  <Button variant="outline" disabled={busy || !instanceUrl.trim() || !accessToken.trim()} onClick={connectToken}>
+                    {busy ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <KeyRound className="mr-1 h-4 w-4" />}
+                    Connect with token
+                  </Button>
+                </div>
+              </details>
             </CardContent>
           </>
         )}

@@ -78,6 +78,8 @@ export function contextLogger(): Logger {
 export type BusinessEvent =
   | "salesforce.connect_started"
   | "salesforce.connected"
+  | "salesforce.token_connect_failed"
+  | "salesforce.token_session_ended"
   | "salesforce.connect_failed"
   | "salesforce.disconnected"
   | "salesforce.token_refreshed"

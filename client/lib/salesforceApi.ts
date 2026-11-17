@@ -9,6 +9,8 @@ export interface OrgConnection {
   connectedAt: string;
   /** Connected through the learner's own Connected App. */
   ownApp?: boolean;
+  /** "token": a pasted access token, which stops working when its Salesforce session ends. */
+  authType?: "oauth" | "token";
 }
 
 export interface ApexExecutionResult {
@@ -35,6 +37,11 @@ export async function startConnect(token: Token, loginUrl: string, returnTo: str
     body: { loginUrl, returnTo, ...(app ? { clientId: app.clientId, clientSecret: app.clientSecret } : {}) },
   });
   return authorizeUrl;
+}
+
+/** Connects with an access token from `sf org display` instead of the OAuth sign-in. */
+export async function connectWithToken(token: Token, instanceUrl: string, accessToken: string): Promise<OrgConnection> {
+  return (await apiRequest<{ connection: OrgConnection }>("/api/v1/salesforce/connect/token", { method: "POST", token, body: { instanceUrl, accessToken } })).connection;
 }
 
 export async function disconnect(token: Token): Promise<void> {

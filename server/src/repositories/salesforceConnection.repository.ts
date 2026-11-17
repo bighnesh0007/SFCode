@@ -14,7 +14,9 @@ export interface StoredConnection {
   instanceUrl: string;
   loginUrl: string;
   accessTokenEnc: string;
-  refreshTokenEnc: string;
+  /** Null for a pasted access token, which can't be refreshed. */
+  refreshTokenEnc: string | null;
+  authType: "oauth" | "token";
   /** Both set for a learner's own Connected App; both null for SFCode's shared app. */
   clientId: string | null;
   clientSecretEnc: string | null;
@@ -62,6 +64,7 @@ export class PgSalesforceConnectionRepository implements SalesforceConnectionRep
       loginUrl: row.loginUrl,
       accessTokenEnc: row.accessTokenEnc,
       refreshTokenEnc: row.refreshTokenEnc,
+      authType: row.authType,
       clientId: row.clientId,
       clientSecretEnc: row.clientSecretEnc,
       connectedAt: row.connectedAt,
@@ -80,6 +83,7 @@ export class PgSalesforceConnectionRepository implements SalesforceConnectionRep
       loginUrl: conn.loginUrl,
       accessTokenEnc: conn.accessTokenEnc,
       refreshTokenEnc: conn.refreshTokenEnc,
+      authType: conn.authType,
       clientId: conn.clientId,
       clientSecretEnc: conn.clientSecretEnc,
     };
