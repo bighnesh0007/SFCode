@@ -31,6 +31,10 @@ export const STORE_ITEMS: readonly StoreItem[] = [
   { id: "frame-galaxy", slot: "frame", name: "Galaxy frame", description: "A slowly orbiting ring of deep-space colours.", price: 320, style: "galaxy", rarity: "epic" },
   { id: "frame-ember", slot: "frame", name: "Ember frame", description: "A ring that flickers like a campfire.", price: 350, style: "ember", rarity: "epic" },
   { id: "frame-holo", slot: "frame", name: "Holographic frame", description: "A rainbow foil ring that shimmers as it turns.", price: 600, style: "holo", rarity: "legendary" },
+  { id: "frame-blueflame", slot: "frame", name: "Blue Flame frame", description: "Tongues of blue fire, hotter than any ember.", price: 700, style: "blueflame", rarity: "legendary" },
+  { id: "frame-solarflame", slot: "frame", name: "Solar Flame frame", description: "A blazing gold-and-yellow fire around your avatar.", price: 700, style: "solarflame", rarity: "legendary" },
+  { id: "frame-shadowflame", slot: "frame", name: "Shadow Flame frame", description: "Black fire with a violet edge, smouldering in the dark.", price: 750, style: "shadowflame", rarity: "legendary" },
+  { id: "frame-lightning", slot: "frame", name: "Lightning frame", description: "A crackling ring of electricity that strikes at random.", price: 800, style: "lightning", rarity: "legendary" },
   // Banners (behind your profile header)
   { id: "banner-sunset", slot: "banner", name: "Sunset banner", description: "Warm dusk colours behind your profile header.", price: 100, style: "sunset", rarity: "common" },
   { id: "banner-waves", slot: "banner", name: "Ocean banner", description: "Gentle layered waves that drift.", price: 120, style: "waves", rarity: "common" },

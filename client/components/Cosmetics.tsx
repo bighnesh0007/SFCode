@@ -14,6 +14,10 @@ const FRAMES: Record<string, string> = {
   galaxy: "sfc-frame-galaxy",
   ember: "sfc-frame-ember",
   holo: "sfc-frame-holo",
+  blueflame: "sfc-frame-flame sfc-flame-blue",
+  solarflame: "sfc-frame-flame sfc-flame-solar",
+  shadowflame: "sfc-frame-flame sfc-flame-shadow",
+  lightning: "sfc-frame-lightning",
 };
 const ACCENTS: Record<string, string> = {
   emerald: "text-emerald-700 dark:text-emerald-400",

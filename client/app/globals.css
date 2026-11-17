@@ -278,6 +278,29 @@
 .sfc-frame-ember { animation: sfc-ember-ring 1.6s ease-in-out infinite; }
 .sfc-frame-holo { animation: sfc-holo-ring 4s linear infinite; }
 
+/*
+ * Legendary flames: one flicker, three palettes. --ring is the solid edge,
+ * --core the hot inner fire, --tip the outer tongues that lick upward.
+ */
+.sfc-flame-blue { --ring: #3b82f6; --core: rgb(56 189 248 / 0.95); --tip: rgb(99 102 241 / 0.7); --halo: rgb(147 197 253 / 0.55); }
+.sfc-flame-solar { --ring: #f59e0b; --core: rgb(250 204 21 / 0.95); --tip: rgb(249 115 22 / 0.75); --halo: rgb(254 240 138 / 0.6); }
+.sfc-flame-shadow { --ring: #0a0a0a; --core: rgb(23 23 23 / 0.95); --tip: rgb(124 58 237 / 0.75); --halo: rgb(167 139 250 / 0.5); }
+@keyframes sfc-flame {
+  0%, 100% { box-shadow: 0 0 0 3px var(--ring), 0 -3px 8px 2px var(--core), -5px -12px 10px -2px var(--tip), 5px -10px 9px -3px var(--tip), 0 -16px 14px -6px var(--tip), 0 0 20px 2px var(--halo); }
+  25% { box-shadow: 0 0 0 3px var(--ring), 0 -5px 10px 3px var(--core), 4px -16px 11px -2px var(--tip), -6px -9px 9px -3px var(--tip), -1px -20px 13px -6px var(--tip), 0 0 24px 3px var(--halo); }
+  50% { box-shadow: 0 0 0 3px var(--ring), 0 -2px 7px 2px var(--core), -3px -14px 10px -2px var(--tip), 6px -13px 10px -3px var(--tip), 2px -18px 14px -6px var(--tip), 0 0 16px 2px var(--halo); }
+  75% { box-shadow: 0 0 0 3px var(--ring), 0 -4px 11px 3px var(--core), 6px -11px 9px -2px var(--tip), -4px -17px 12px -3px var(--tip), -2px -22px 14px -6px var(--tip), 0 0 22px 3px var(--halo); }
+}
+.sfc-frame-flame { animation: sfc-flame 0.9s ease-in-out infinite; }
+/* Lightning: a steady electric ring, with sudden white strikes from different sides. */
+@keyframes sfc-lightning {
+  0%, 9%, 13%, 47%, 51%, 79%, 83%, 100% { box-shadow: 0 0 0 2px #38bdf8, 0 0 10px 1px rgb(56 189 248 / 0.6), 0 0 0 4px rgb(224 242 254 / 0.25); }
+  10%, 12% { box-shadow: 0 0 0 3px #f0f9ff, -6px -4px 16px 3px #e0f2fe, 4px -8px 22px 4px rgb(56 189 248 / 0.9), 0 0 30px 6px rgb(59 130 246 / 0.6); }
+  48%, 50% { box-shadow: 0 0 0 3px #f0f9ff, 7px 3px 18px 3px #e0f2fe, -5px 6px 24px 4px rgb(56 189 248 / 0.9), 0 0 30px 6px rgb(99 102 241 / 0.6); }
+  80%, 82% { box-shadow: 0 0 0 3px #fefce8, 0 -9px 20px 4px #fef9c3, 0 6px 14px 2px rgb(56 189 248 / 0.8), 0 0 28px 6px rgb(59 130 246 / 0.55); }
+}
+.sfc-frame-lightning { animation: sfc-lightning 2.6s steps(1, end) infinite; }
+
 /* Name effects. Gradient text keeps enough contrast in both themes. */
 @keyframes sfc-sweep { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }
 @keyframes sfc-flicker { 0%, 100% { filter: brightness(1); } 40% { filter: brightness(1.15); } 70% { filter: brightness(0.92); } }
@@ -359,6 +382,9 @@
   .sfc-frame-galaxy { box-shadow: 0 0 0 3px #4338ca, 0 0 12px #a855f7; }
   .sfc-frame-ember { box-shadow: 0 0 0 3px #f97316, 0 0 12px rgb(239 68 68 / 0.7); }
   .sfc-frame-holo { box-shadow: 0 0 0 3px #93c5fd, 0 0 12px #f0abfc; }
+  .sfc-frame-flame, .sfc-frame-lightning { animation: none; }
+  .sfc-frame-flame { box-shadow: 0 0 0 3px var(--ring), 0 -4px 10px 2px var(--core), 0 0 18px 2px var(--halo); }
+  .sfc-frame-lightning { box-shadow: 0 0 0 2px #38bdf8, 0 0 12px 2px rgb(56 189 248 / 0.7); }
   .sfc-banner-starfield::after { opacity: 0.7; }
 }
 
