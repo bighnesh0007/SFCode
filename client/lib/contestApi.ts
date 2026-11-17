@@ -42,11 +42,13 @@ export interface Wallet {
 
 export interface StoreItem {
   id: string;
-  slot: "frame" | "badge" | "accent" | "editor";
+  slot: "frame" | "badge" | "accent" | "editor" | "banner";
   name: string;
   description: string;
   price: number;
   style: string;
+  /** Absent from servers older than the rarity tiers. */
+  rarity?: "common" | "rare" | "epic" | "legendary";
   owned: boolean;
   equipped: boolean;
 }

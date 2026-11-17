@@ -9,7 +9,7 @@ import { RankBadge } from "@/components/RankBadge";
 import { FollowButton } from "@/components/FollowButton";
 import { EmailPrefs } from "@/components/profile/EmailPrefs";
 import { AboutCard, AchievementsWall, CertReadiness, ContestHistory, RoadmapProgress, ShareButtons, SkillRadar, StatsStrip } from "@/components/profile/Sections";
-import { Flair, accentClass, frameClass } from "@/components/Cosmetics";
+import { Banner, Flair, accentClass, frameClass } from "@/components/Cosmetics";
 import { useAuthState } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/apiClient";
@@ -83,8 +83,9 @@ export function ProfileView({ profile: initial, editable }: { profile: Profile; 
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
-      <div className="flex flex-wrap items-center gap-4">
-        <Avatar src={profile.imageUrl} name={profile.displayName} size={64} className={frameClass(profile.cosmetics.frame)} />
+      <Banner banner={profile.cosmetics.banner} className="h-28 rounded-xl sm:h-36" />
+      <div className={cn("flex flex-wrap items-center gap-4", profile.cosmetics.banner && "-mt-8 px-4 sm:-mt-10")}>
+        <Avatar src={profile.imageUrl} name={profile.displayName} size={64} className={cn(frameClass(profile.cosmetics.frame), profile.cosmetics.banner && "border-4 border-background")} />
         <div className="min-w-0 flex-1">
           {editing ? (
             <div className="flex flex-wrap items-center gap-2">
